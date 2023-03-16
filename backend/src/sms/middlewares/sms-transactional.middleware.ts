@@ -29,7 +29,7 @@ function convertMessageModelToResponse(message: SmsMessageTransactional) {
     accepted_at: message.acceptedAt?.toISOString() || null,
     sent_at: message.sentAt?.toISOString() || null,
     delivered_at: message.deliveredAt?.toISOString() || null,
-    opened_at: message.erroredAt?.toISOString() || null,
+    errored_at: message.erroredAt?.toISOString() || null,
   }
 }
 

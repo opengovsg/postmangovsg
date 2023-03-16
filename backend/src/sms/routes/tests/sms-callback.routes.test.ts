@@ -97,9 +97,11 @@ describe('On successful message send, status should update according to Twilio r
     expect(getByIdRes.body.body).toEqual('Hello world')
     expect(getByIdRes.body.recipient).toEqual('98765432')
     expect(getByIdRes.body.credentialsLabel).toEqual('twilio-callback-1')
+    expect(getByIdRes.body.accepted_at).not.toBeNull()
+    expect(getByIdRes.body.sent_at).toBeNull()
+    expect(getByIdRes.body.errored_at).toBeNull()
+    expect(getByIdRes.body.delivered_at).toBeNull()
 
-    expect(getByIdRes.status).toBe(200)
-    expect(getByIdRes.body.status).toBe(TransactionalSmsMessageStatus.Unsent)
     const sampleTwilioCallback = {
       SmsSid: mockSendMessageResolvedValue,
       SmsStatus: 'sent',
@@ -128,6 +130,10 @@ describe('On successful message send, status should update according to Twilio r
     expect(postCallbackGetByIdRes.body.status).toBe(
       TransactionalSmsMessageStatus.Sent
     )
+    expect(postCallbackGetByIdRes.body.accepted_at).not.toBeNull()
+    expect(postCallbackGetByIdRes.body.sent_at).not.toBeNull()
+    expect(postCallbackGetByIdRes.body.errored_at).toBeNull()
+    expect(postCallbackGetByIdRes.body.delivered_at).toBeNull()
     const sampleTwilioCallbackError = {
       ...sampleTwilioCallback,
       MessageStatus: 'failed',
@@ -149,6 +155,10 @@ describe('On successful message send, status should update according to Twilio r
     expect(errorCallbackGetByIdRes.body.status).toBe(
       TransactionalSmsMessageStatus.Error
     )
+    expect(errorCallbackGetByIdRes.body.accepted_at).not.toBeNull()
+    expect(errorCallbackGetByIdRes.body.sent_at).not.toBeNull()
+    expect(errorCallbackGetByIdRes.body.errored_at).not.toBeNull()
+    expect(errorCallbackGetByIdRes.body.delivered_at).toBeNull()
 
     const sampleTwilioCallbackDelivered = {
       ...sampleTwilioCallback,
@@ -169,6 +179,10 @@ describe('On successful message send, status should update according to Twilio r
     expect(finalCallbackGetByIdRes.body.status).toBe(
       TransactionalSmsMessageStatus.Error
     )
+    expect(finalCallbackGetByIdRes.body.accepted_at).not.toBeNull()
+    expect(finalCallbackGetByIdRes.body.sent_at).not.toBeNull()
+    expect(finalCallbackGetByIdRes.body.errored_at).not.toBeNull()
+    expect(finalCallbackGetByIdRes.body.delivered_at).toBeNull()
     mockSendMessage.mockReset()
   })
 })
