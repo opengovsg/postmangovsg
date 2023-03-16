@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction, Application } from 'express'
+import { Application, NextFunction, Request, Response, Router } from 'express'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
@@ -20,10 +20,10 @@ import listRoutes from './list.routes'
 
 // Import channel-specific routes
 import {
-  smsCallbackRoutes,
   InitSmsCampaignRoute,
   InitSmsSettingsRoute,
   InitSmsTransactionalRoute,
+  smsCallbackRoutes,
 } from '@sms/routes'
 import {
   emailCallbackRoutes,
@@ -32,9 +32,9 @@ import {
   InitEmailTransactionalRoute,
 } from '@email/routes'
 import {
-  telegramCallbackRoutes,
   InitTelegramCampaignMiddleware,
   InitTelegramSettingsRoute,
+  telegramCallbackRoutes,
 } from '@telegram/routes'
 import { InitSmsMiddleware } from '@sms/middlewares'
 import {
@@ -43,10 +43,14 @@ import {
   InitEmailTransactionalMiddleware,
 } from '@email/middlewares'
 import { InitTelegramMiddleware } from '@telegram/middlewares'
+import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
+import { InitApiKeyRoutes } from '@core/routes/api-key.routes'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
   const authMiddleware = InitAuthMiddleware((app as any).authService)
+  const apiKeyMiddleware = InitApiKeyMiddleware((app as any).authService)
+  const apiKeyRoutes = InitApiKeyRoutes(apiKeyMiddleware)
   const authenticationRoutes = InitAuthRoutes(authMiddleware)
   const settingsMiddleware = InitSettingsMiddleware(
     (app as any).credentialService
@@ -164,6 +168,7 @@ export const InitV1Route = (app: Application): Router => {
   const router = Router()
   router.use('/ping', ping)
   router.use('/auth', authenticationRoutes)
+  router.use('/api-key', apiKeyRoutes)
   router.use('/stats', statsRoutes)
   router.use('/protect', protectedMailRoutes)
   router.use('/unsubscribe', unsubscriberRoutes)

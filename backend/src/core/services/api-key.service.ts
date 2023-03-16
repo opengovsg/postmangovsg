@@ -44,9 +44,22 @@ const getApiKeyRecord = async (hash: string): Promise<ApiKey | null> => {
   })
 }
 
+const deleteApiKey = async (
+  userId: string,
+  apiKeyId: number
+): Promise<number> => {
+  return await ApiKey.destroy({
+    where: {
+      id: apiKeyId,
+      userId,
+    },
+  })
+}
+
 export const ApiKeyService = {
   generateApiKeyFromName,
   getApiKeyHash,
   hasValidApiKey,
   getApiKeyRecord,
+  deleteApiKey,
 }
