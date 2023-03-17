@@ -57,7 +57,7 @@ export class SmsMessageTransactional extends Model<SmsMessageTransactional> {
   errorCode: string | null
 
   @Column({ type: DataType.DATE, allowNull: true })
-  acceptedAt: Date
+  acceptedAt: Date | null
 
   @Column({ type: DataType.DATE, allowNull: true })
   sentAt: Date | null
