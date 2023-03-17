@@ -32,7 +32,7 @@ describe('DELETE /api-key/:apiKeyId', () => {
     await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
     const res = await request(appWithUserSession).delete('/api-key/1')
     expect(res.status).toBe(404)
-    expect(res.body.get('message')).toEqual('Could not find API key to delete')
+    expect(res.text).toEqual('Not Found')
   })
   test('Deleting a valid API key', async () => {
     await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
