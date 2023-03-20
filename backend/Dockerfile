@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:16-alpine as builder
+FROM public.ecr.aws/docker/library/node:18-alpine as builder
 WORKDIR /usr/home/postmangovsg
 
 COPY shared ../shared
@@ -7,15 +7,13 @@ RUN cd ../shared && npm ci
 COPY ./package* ./
 RUN npm ci
 
-COPY tsconfig.json ./
-COPY tsconfig.build.json ./
-COPY openapi.yaml ./
+COPY tsconfig.* ./
 COPY src ./src
 
 RUN npm run build
 RUN cd ../shared && npm run postbuild
 
-FROM public.ecr.aws/docker/library/node:16-alpine
+FROM public.ecr.aws/docker/library/node:18-alpine
 # postman public ecr
 
 # required for node-gyp
