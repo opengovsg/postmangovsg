@@ -15,7 +15,7 @@ const deleteApiKey = async (
     userId.toString(),
     +apiKeyId
   )
-  if (deletedRows <= 0) {
+  if (deletedRows == 0) {
     return res.status(404).json({
       code: 'not_found',
       message: `Could not find API key to delete`,
