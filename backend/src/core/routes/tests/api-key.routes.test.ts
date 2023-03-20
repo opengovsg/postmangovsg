@@ -26,13 +26,14 @@ afterAll(async () => {
 describe('DELETE /api-key/:apiKeyId', () => {
   test('Attempting to deleting an API key without cookie', async () => {
     const res = await request(app).delete('/api-key/1')
-    expect(res.status).toBe(403)
+    // this is currently gonna be 401 as auth middleware returns 401 for now
+    expect(res.status).toBe(401)
   })
   test('Deleting a non existent API key', async () => {
     await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
     const res = await request(appWithUserSession).delete('/api-key/1')
     expect(res.status).toBe(404)
-    expect(res.text).toEqual('Not Found')
+    expect(res.body.code).toEqual('not_found')
   })
   test('Deleting a valid API key', async () => {
     await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
@@ -45,5 +46,6 @@ describe('DELETE /api-key/:apiKeyId', () => {
     } as ApiKey)
     const res = await request(appWithUserSession).delete('/api-key/1')
     expect(res.status).toBe(200)
+    expect(res.body.api_key_id).toBe('1')
   })
 })
