@@ -51,6 +51,9 @@ jobs:
           # Reusing env var from cypress
           # TODO: rename this once we've migrated away from Cypress
           API_KEY: ${{ secrets.CYPRESS_API_KEY }}
+          TWILIO_ACC_SID: ${{ secrets.CYPRESS_TWILIO_ACC_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.CYPRESS_TWILIO_AUTH_TOKEN }}
+          SMS_NUMBER: "+6582410222"
           MAILBOX: internal-testing@open.gov.sg
         working-directory: e2e
       - uses: actions/upload-artifact@v3
