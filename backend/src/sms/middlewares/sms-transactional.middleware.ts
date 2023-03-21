@@ -26,6 +26,10 @@ function convertMessageModelToResponse(message: SmsMessageTransactional) {
     updated_at: message.updatedAt,
     status: message.status,
     error_code: message.errorCode,
+    accepted_at: message.acceptedAt?.toISOString() || null,
+    sent_at: message.sentAt?.toISOString() || null,
+    delivered_at: message.deliveredAt?.toISOString() || null,
+    errored_at: message.erroredAt?.toISOString() || null,
   }
 }
 
@@ -76,6 +80,7 @@ async function sendMessage(
       throw new Error('Unable to send SMS')
     }
     smsMessageTransactional.set('messageId', messageId)
+    smsMessageTransactional.acceptedAt = new Date()
     await smsMessageTransactional.save()
     res.status(201).json(convertMessageModelToResponse(smsMessageTransactional))
   } catch (err) {

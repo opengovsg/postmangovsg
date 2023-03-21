@@ -55,4 +55,16 @@ export class SmsMessageTransactional extends Model<SmsMessageTransactional> {
 
   @Column({ type: DataType.STRING, allowNull: true })
   errorCode: string | null
+
+  @Column({ type: DataType.DATE, allowNull: true })
+  acceptedAt: Date | null
+
+  @Column({ type: DataType.DATE, allowNull: true })
+  sentAt: Date | null
+
+  @Column({ type: DataType.DATE, allowNull: true })
+  deliveredAt: Date | null
+
+  @Column({ type: DataType.DATE, allowNull: true })
+  erroredAt: Date | null
 }
