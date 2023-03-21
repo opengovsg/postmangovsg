@@ -4,6 +4,14 @@ import { ApiKeyService } from '@core/services'
 
 const logger = loggerWithLabel(module)
 
+const listApiKeys = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  const userId = req.session?.user?.id
+  const apiKeys = await ApiKeyService.getApiKeys(userId.toString())
+  return res.status(200).json(apiKeys)
+}
 const deleteApiKey = async (
   req: Request,
   res: Response
@@ -31,5 +39,6 @@ const deleteApiKey = async (
 }
 
 export const ApiKeyMiddleware = {
+  listApiKeys,
   deleteApiKey,
 }
