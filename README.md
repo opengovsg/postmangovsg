@@ -22,6 +22,7 @@
       - [Local database](#local-database)
     - [Compile frontend translations](#compile-frontend-translations)
     - [Run the app](#run-the-app)
+    - [Setting up local application to receive webhooks](#setting-up-local-application-to-receive-webhooks)
   - [Deployment](#deployment)
   - [Releasing](#releasing)
   - [Serverless](#serverless)
@@ -196,6 +197,58 @@ Alternatively, if you would like to develop locally against staging database and
 - `npm run dev:connectstagingdbreadonly` (to make a readonly connection with the staging db.).
 
 Your frontend and backend will still be on `localhost` but you will be able to use staging database and workers.
+
+### Setting up local application to receive webhooks
+
+As we're relying on external service provider like AWS, Twilio to delivery our messages, we have endpoints to handle webhooks from these providers about statuses of the sent messages. To be able to develop these locally, we have to direct these webhooks to the local instance. This section will outline how to achieve that for the default service providers
+
+#### Exposing the local server to the internet
+
+We will be using [ngrok](https://ngrok.com/). Run this command to create a tunnel to port 4000 of your machine (i.e. where the Postman backend server is listening)
+
+```bash
+ngrok http 4000
+```
+
+You will get a public URL that looks something like ` https://d564-101-78-115-134.ap.ngrok.io`. Keep this as we will be using it for later sections.
+
+#### Email
+
+AWS SES webhooks are configured through configuration set with SNS topics.
+
+Creating your config set:
+
+- Go to the corresponding SES account & region that you are using > `Configuration sets`
+- Create a new config set and open its dashboard page
+- Go to `Event destinations` tab > `Add destination`
+- Choose `Sends`, `Deliveries`, `Hard bounces`, `Complaints`, `Opens` (Those are the events that we're handling)
+- `Next` > `Amazon SNS` > `Create SNS topic` and chose it as the destination
+- `Next` > Confirm with `Add destination`
+- Update your `.env` files to set the values of `BACKEND_SES_CONFIGURATION_SET` and `WORKER_SES_CONFIGURATION_SET` to the newly config set's name
+
+Configure the endpoint to receive webhooks:
+
+- Go to the SNS destination that you've just created
+- `Create subscription` > Protocol: `HTTPS`
+- Endpoint value will be `https://{env.CALLBACK_SECRET}@{NGROK_TUNNEL_URL}/v1/callback/email`
+- Make sure your local backend server is running (this is so we can get the subscription URL confirmation)
+- We can leave the rest of the configs to default as this is only used locally > `Create subscription`
+- SES will send a request for confirmation with `subscribeUrl` value in the request body
+- Go back to the dashboard page of your SNS topic
+- Choose the correct subscription and click `Confirm subscription`
+- Paste in the `subscribeUrl` value and voila!
+
+**Note**: After this initial setup, for future usage, the ngrok url might not be the same so we will have to delete the old one and create a new subscription under the same SNS topic.
+
+#### SMS
+
+SMS webhook URL is set on every request we make to Twilio and the base URL is determined by `BACKEND_URL` env variable. Hence, to receive webhooks from Twilio about message statuses, we just need to set `BACKEND_URL` value in `.env` to the ngrok provided URL suffixed with `/v1/callback/sms`.
+
+#### Telegram
+
+Telegram webhook URL will be set when a credential added to the Postman platform. Our backend sets this value to the value of `TELEGRAM_WEBHOOK_URL` env variable. Hence, to receive webhooks from Telegram about message statuses, we need to set `TELEGRAM_WEBOOK_URL` in the `.env` file to `https://{NGROK_TUNNEL_URL}/v1/callback/telegram`.
+
+**Note**: Because this URL is only set to the bot when the credentials are added, we will need to re-add the credentials when the ngrok URL changes between development sessions.
 
 ## Deployment
 
