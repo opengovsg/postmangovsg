@@ -7,7 +7,12 @@ import {
 } from 'sequelize-typescript'
 import { User } from './user'
 
-@Table({ tableName: 'api_keys', underscored: true, timestamps: true })
+@Table({
+  tableName: 'api_keys',
+  underscored: true,
+  timestamps: true,
+  paranoid: true,
+})
 export class ApiKey extends Model<ApiKey> {
   @ForeignKey(() => User)
   @Column({ type: DataType.STRING, allowNull: false })
