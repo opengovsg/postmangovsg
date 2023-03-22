@@ -44,9 +44,32 @@ const getApiKeyRecord = async (hash: string): Promise<ApiKey | null> => {
   })
 }
 
+const getApiKeys = async (userId: string): Promise<ApiKey[] | null> => {
+  return await ApiKey.findAll({
+    where: {
+      userId,
+    },
+    order: [['createdAt', 'DESC']],
+  })
+}
+
+const deleteApiKey = async (
+  userId: string,
+  apiKeyId: number
+): Promise<number> => {
+  return await ApiKey.destroy({
+    where: {
+      id: apiKeyId,
+      userId,
+    },
+  })
+}
+
 export const ApiKeyService = {
   generateApiKeyFromName,
   getApiKeyHash,
   hasValidApiKey,
   getApiKeyRecord,
+  getApiKeys,
+  deleteApiKey,
 }
