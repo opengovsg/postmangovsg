@@ -4,10 +4,10 @@ WORKDIR /usr/home/postmangovsg
 COPY shared ../shared
 RUN cd ../shared && npm ci
 
+COPY tsconfig.json ./
 COPY ./package* ./
 RUN npm ci
 
-COPY tsconfig.json ./
 COPY src ./src
 
 RUN npm run build
