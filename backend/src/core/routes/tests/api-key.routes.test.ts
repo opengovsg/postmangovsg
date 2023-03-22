@@ -13,7 +13,7 @@ beforeAll(async () => {
 })
 
 afterEach(async () => {
-  await ApiKey.destroy({ where: {} })
+  await ApiKey.destroy({ where: {}, force: true })
   await User.destroy({ where: {} })
 })
 
@@ -47,6 +47,8 @@ describe('DELETE /api-key/:apiKeyId', () => {
     const res = await request(appWithUserSession).delete('/api-key/1')
     expect(res.status).toBe(200)
     expect(res.body.api_key_id).toBe('1')
+    const softDeletedApiKey = await ApiKey.findByPk(1)
+    expect(softDeletedApiKey?.deletedAt).not.toBeNull()
   })
 })
 
