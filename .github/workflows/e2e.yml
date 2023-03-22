@@ -50,9 +50,9 @@ jobs:
           DASHBOARD_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg' || 'https://staging.postman.gov.sg' }}
           # Reusing env var from cypress
           # TODO: rename this once we've migrated away from Cypress
-          API_KEY: ${{ secrets.CYPRESS_API_KEY }}
-          TWILIO_ACC_SID: ${{ secrets.CYPRESS_TWILIO_ACC_SID }}
-          TWILIO_AUTH_TOKEN: ${{ secrets.CYPRESS_TWILIO_AUTH_TOKEN }}
+          API_KEY: ${{ secrets.E2E_API_KEY }}
+          TWILIO_ACC_SID: ${{ secrets.E2E_TWILIO_ACC_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.E2E_TWILIO_AUTH_TOKEN }}
           SMS_NUMBER: "+6582410222"
           MAILBOX: internal-testing@open.gov.sg
         working-directory: e2e
