@@ -1,6 +1,7 @@
 import { MessageCountryPricing, TwilioCredentials } from './interfaces'
 import twilio from 'twilio'
 import { getSha256Hash } from '../../utils/crypto'
+import { AuthenticationError } from './errors'
 
 export * from './interfaces'
 
@@ -57,6 +58,9 @@ export default class TwilioClient {
           !forceDelivery
         ) {
           return this.send(recipient, message, true)
+        }
+        if (/Authenticate/i.test(error.message)) {
+          return Promise.reject(new AuthenticationError(error.message))
         }
         return Promise.reject(new Error(error.message))
       })

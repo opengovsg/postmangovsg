@@ -14,7 +14,6 @@ RUN npm run build
 RUN cd ../shared && npm run postbuild
 
 FROM public.ecr.aws/docker/library/node:18-alpine
-# postman public ecr
 
 # required for node-gyp
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \
