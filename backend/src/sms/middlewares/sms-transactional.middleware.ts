@@ -12,6 +12,7 @@ import {
   TimestampFilter,
   TransactionalSmsSortField,
 } from '@core/constants'
+import { AuthenticationError } from '@shared/clients/twilio-client.class/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -93,6 +94,14 @@ async function sendMessage(
     const BAD_REQUEST_ERRORS = [TemplateError, InvalidRecipientError]
     if (BAD_REQUEST_ERRORS.some((errType) => err instanceof errType)) {
       res.status(400).json({ message: (err as Error).message })
+      return
+    }
+
+    if (err instanceof AuthenticationError) {
+      res.status(400).json({
+        code: 'invalid_sms_credentials',
+        message: 'Invalid Twilio credentials',
+      })
       return
     }
 
