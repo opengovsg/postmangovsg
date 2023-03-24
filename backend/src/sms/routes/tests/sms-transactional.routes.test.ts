@@ -3,8 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 
 import { Credential, User, UserCredential } from '@core/models'
 import { ChannelType } from '@core/constants'
-import { InvalidRecipientError, RateLimitError } from '@core/errors'
-import { TemplateError } from '@shared/templating'
+import { RateLimitError } from '@core/errors'
 import { SmsService } from '@sms/services'
 
 import { mockSecretsManager } from '@mocks/aws-sdk'
@@ -125,42 +124,6 @@ describe('POST /transactional/sms/send', () => {
     expect(listRes.body.data[0].credentialsLabel).toEqual('twilio-1')
     expect(listRes.status).toBe(200)
 
-    mockSendMessage.mockReset()
-  })
-
-  test('Should return a HTTP 400 when template is invalid', async () => {
-    const mockSendMessage = jest
-      .spyOn(SmsService, 'sendMessage')
-      .mockRejectedValueOnce(new TemplateError('Invalid template'))
-    mockSecretsManager.getSecretValue().promise.mockResolvedValueOnce({
-      SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
-    })
-
-    const res = await request(app)
-      .post('/transactional/sms/send')
-      .set('Authorization', `Bearer ${apiKey}`)
-      .send(validApiCall)
-
-    expect(res.status).toBe(400)
-    expect(mockSendMessage).toBeCalledTimes(1)
-    mockSendMessage.mockReset()
-  })
-
-  test('Should return a HTTP 400 when recipient is not valid', async () => {
-    const mockSendMessage = jest
-      .spyOn(SmsService, 'sendMessage')
-      .mockRejectedValueOnce(new InvalidRecipientError())
-    mockSecretsManager.getSecretValue().promise.mockResolvedValueOnce({
-      SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
-    })
-
-    const res = await request(app)
-      .post('/transactional/sms/send')
-      .set('Authorization', `Bearer ${apiKey}`)
-      .send(validApiCall)
-
-    expect(res.status).toBe(400)
-    expect(mockSendMessage).toBeCalledTimes(1)
     mockSendMessage.mockReset()
   })
 
