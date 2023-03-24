@@ -313,7 +313,6 @@ export const InitCredentialService = (redisService: RedisService) => {
       where: {
         id: userId,
       },
-      attributes: ['apiKeyHash'],
       // include as 'creds'
       include: [
         {
@@ -363,12 +362,12 @@ export const InitCredentialService = (redisService: RedisService) => {
     })
     const name = user.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
     const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
-    user.apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
+    const apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
     await Promise.all([
       user.save(),
       ApiKey.create({
         userId: user.id.toString(),
-        hash: user.apiKeyHash,
+        hash: apiKeyHash,
         lastFive: apiKeyPlainText.slice(-5),
         label: 'default',
       } as ApiKey),
