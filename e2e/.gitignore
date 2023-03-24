@@ -130,3 +130,6 @@ dist
 .pnp.*
 gmail_token.json
 credentials.json
+playwright-report/
+*state.json
+*.csv

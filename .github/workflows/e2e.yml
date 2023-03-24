@@ -7,7 +7,7 @@ on:
     outputs:
       e2e_result:
         description: "Outcome of the cypress suite, enum<success, failure, skipped, cancelled>"
-        value: ${{ jobs.puppeteer-run.outputs.outcome }}
+        value: ${{ jobs.playwright-run.outputs.outcome }}
 
 jobs:
   set_environment:
@@ -23,13 +23,13 @@ jobs:
           else
              echo "current_env=staging" >> $GITHUB_OUTPUT
           fi
-  puppeteer-run:
+  playwright-run:
     runs-on: ubuntu-latest
     needs: [set_environment]
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
     outputs:
-      outcome: ${{ steps.puppeteer.outcome }}
+      outcome: ${{ steps.playwright.outcome }}
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -44,11 +44,20 @@ jobs:
       - run: npm ci
         working-directory: e2e
       - run: npm run test
-        id: puppeteer
+        id: playwright
         env:
           API_URL: ${{ github.ref == 'refs/heads/master' && 'https://api.postman.gov.sg' || 'https://api-staging.postman.gov.sg' }}
+          DASHBOARD_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg' || 'https://staging.postman.gov.sg' }}
           # Reusing env var from cypress
           # TODO: rename this once we've migrated away from Cypress
-          API_KEY: ${{ secrets.CYPRESS_API_KEY }}
+          API_KEY: ${{ secrets.E2E_API_KEY }}
+          TWILIO_ACC_SID: ${{ secrets.E2E_TWILIO_ACC_SID }}
+          TWILIO_AUTH_TOKEN: ${{ secrets.E2E_TWILIO_AUTH_TOKEN }}
+          SMS_NUMBER: "+6582410222"
           MAILBOX: internal-testing@open.gov.sg
         working-directory: e2e
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: playwright-report
+          path: e2e/playwright-report/

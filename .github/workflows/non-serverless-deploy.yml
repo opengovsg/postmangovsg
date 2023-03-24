@@ -1,5 +1,5 @@
 # This action is to orchestrate the non-serverless stuffs deployment
-# to make sure cypress e2e test is run post-deployments.
+# to make sure playwright e2e test is run post-deployments.
 # The reason we need to do this hack is because there's currently no way
 # to use "workflow_run" trigger with requirement being all depdency workflows'
 # complete. More here: https://github.com/community/community/discussions/16059
