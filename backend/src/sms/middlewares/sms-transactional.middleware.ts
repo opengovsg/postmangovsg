@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
-import { RateLimitError } from '@core/errors'
+import { InvalidRecipientError, RateLimitError } from '@core/errors'
 import {
   SmsMessageTransactional,
   TransactionalSmsMessageStatus,
@@ -93,7 +93,10 @@ async function sendMessage(
       action,
     })
 
-    if (err instanceof InvalidPhoneNumberError) {
+    if (
+      err instanceof InvalidPhoneNumberError ||
+      err instanceof InvalidRecipientError
+    ) {
       res.status(400).json({
         code: 'invalid_recipient',
         message: `Phone number ${req.body.recipient} is invalid`,
