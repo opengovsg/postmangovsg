@@ -1,8 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
-import { TemplateError } from '@shared/templating'
-import { InvalidRecipientError, RateLimitError } from '@core/errors'
+import { RateLimitError } from '@core/errors'
 import {
   SmsMessageTransactional,
   TransactionalSmsMessageStatus,
@@ -12,7 +11,10 @@ import {
   TimestampFilter,
   TransactionalSmsSortField,
 } from '@core/constants'
-import { AuthenticationError } from '@shared/clients/twilio-client.class/errors'
+import {
+  AuthenticationError,
+  InvalidPhoneNumberError,
+} from '@shared/clients/twilio-client.class/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -91,9 +93,11 @@ async function sendMessage(
       action,
     })
 
-    const BAD_REQUEST_ERRORS = [TemplateError, InvalidRecipientError]
-    if (BAD_REQUEST_ERRORS.some((errType) => err instanceof errType)) {
-      res.status(400).json({ message: (err as Error).message })
+    if (err instanceof InvalidPhoneNumberError) {
+      res.status(400).json({
+        code: 'invalid_recipient',
+        message: `Phone number ${req.body.recipient} is invalid`,
+      })
       return
     }
 
