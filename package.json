@@ -7,6 +7,7 @@
     "test:frontend": "cd frontend && npm run test",
     "test:backend": "cd backend && npm run test",
     "test:shared": "cd shared && npm run test",
+    "test:e2e": "cd e2e && npm run test",
     "build": "npm run build:shared && npm run build:backend && npm run build:worker && npm run build:frontend",
     "build:shared": "cd shared && npm run build",
     "build:frontend": "cd frontend && npm run build",
