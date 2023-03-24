@@ -1,7 +1,7 @@
 import { MessageCountryPricing, TwilioCredentials } from './interfaces'
 import twilio from 'twilio'
 import { getSha256Hash } from '../../utils/crypto'
-import { AuthenticationError } from './errors'
+import { AuthenticationError, InvalidPhoneNumberError } from './errors'
 
 export * from './interfaces'
 
@@ -58,6 +58,9 @@ export default class TwilioClient {
           !forceDelivery
         ) {
           return this.send(recipient, message, true)
+        }
+        if (/not a valid phone number/i.test(error.message)) {
+          return Promise.reject(new InvalidPhoneNumberError(error.message))
         }
         if (/Authenticate/i.test(error.message)) {
           return Promise.reject(new AuthenticationError(error.message))

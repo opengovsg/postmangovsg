@@ -3,3 +3,9 @@ export class AuthenticationError extends Error {
     super(message)
   }
 }
+
+export class InvalidPhoneNumberError extends Error {
+  constructor(message: string) {
+    super(message)
+  }
+}
