@@ -95,8 +95,8 @@ async function sendMessage(
 
     if (err instanceof InvalidPhoneNumberError) {
       res.status(400).json({
-        code: 'invalid_phone_number',
-        message: 'Invalid phone number',
+        code: 'invalid_recipient',
+        message: `Phone number ${req.body.recipient} is invalid`,
       })
       return
     }
