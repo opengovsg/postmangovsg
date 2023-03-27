@@ -23,7 +23,7 @@ const verifyBotIdRegistered = async (botId: string): Promise<boolean> => {
       // before this change https://github.com/opengovsg/postmangovsg/pull/1414
       // we used to save only the secret by botId, hence there must be an or condition
       // here to support the legacy credentials as well
-      [Op.or]: [{ name: botId }, { name: `${process.env.NODE_ENV}-${botId}` }],
+      [Op.or]: [{ name: botId }, { name: `${process.env.APP_ENV}-${botId}` }],
     },
   })
   return !!botIdExists
