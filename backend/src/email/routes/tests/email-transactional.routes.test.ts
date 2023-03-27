@@ -715,14 +715,14 @@ describe(`${emailTransactionalRoute}/send`, () => {
     ])
   })
 
-  test('Email with more than two attachments should fail', async () => {
+  test('Email with more than five attachments should fail', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     await EmailFromAddress.create({
       email: user.email,
       name: 'Agency ABC',
     } as EmailFromAddress)
 
-    // at time of writing this test default value of FILE_ATTACHMENT_MAX_NUM is 2
+    // at time of writing this test default value of FILE_ATTACHMENT_MAX_NUM is 5
     // not sure how to create a variable number of attachments + API call (probably not possible?)
     const attachment2 = Buffer.from('wassup dog')
     const attachment2Name = 'hey.txt'
@@ -730,6 +730,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
     const attachment3Name = 'hi there.txt'
     const attachment4 = Buffer.from('hello there')
     const attachment4Name = 'hello friends.txt'
+    const attachment5 = Buffer.from('hello there')
+    const attachment5Name = 'hello friends.txt'
+    const attachment6 = Buffer.from('hello there')
+    const attachment6Name = 'hello friends.txt'
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -742,6 +746,8 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .attach('attachments', attachment2, attachment2Name)
       .attach('attachments', attachment3, attachment3Name)
       .attach('attachments', attachment4, attachment4Name)
+      .attach('attachments', attachment5, attachment5Name)
+      .attach('attachments', attachment6, attachment6Name)
 
     expect(res.status).toBe(413)
     expect(mockSendEmail).not.toBeCalled()
