@@ -2,7 +2,7 @@
 
 // todo: find a way to deduplicate the code
 const formatDefaultCredentialName = (name) =>
-  `demo/${process.env.NODE_ENV}/${name}`
+  `demo/${process.env.APP_ENV}/${name}`
 
 const CREDENTIAL_NAMES = [
   'EMAIL_DEFAULT',

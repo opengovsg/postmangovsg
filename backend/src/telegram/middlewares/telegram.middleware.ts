@@ -68,7 +68,7 @@ export const InitTelegramMiddleware = (
     const { telegram_bot_token: telegramBotToken } = req.body
 
     res.locals.credentials = { telegramBotToken }
-    res.locals.credentialName = `${process.env.NODE_ENV}-${botId(
+    res.locals.credentialName = `${process.env.APP_ENV}-${botId(
       telegramBotToken
     )}`
     return next()

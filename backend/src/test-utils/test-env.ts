@@ -1,5 +1,6 @@
 import bcrypt from 'bcrypt'
 
+process.env.APP_ENV = 'development'
 process.env.REDIS_OTP_URI = 'redis://localhost:6379/3'
 process.env.REDIS_SESSION_URI = 'redis://localhost:6379/4'
 process.env.REDIS_RATE_LIMIT_URI = 'redis://localhost:6379/5'

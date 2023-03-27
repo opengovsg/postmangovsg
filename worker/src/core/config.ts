@@ -82,7 +82,7 @@ const config: Config<ConfigSchema> = convict({
     doc: 'The application environment.',
     format: ['production', 'staging', 'development'],
     default: 'production',
-    env: 'NODE_ENV',
+    env: 'APP_ENV',
   },
   aws: {
     awsRegion: {
