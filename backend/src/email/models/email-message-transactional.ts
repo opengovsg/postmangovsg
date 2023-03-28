@@ -17,6 +17,12 @@ export enum TransactionalEmailMessageStatus {
   Complaint = 'COMPLAINT',
 }
 
+export enum TransactionalEmailClassification {
+  Urgent = 'URGENT',
+  ForAction = 'FOR_ACTION',
+  ForInfo = 'FOR_INFO',
+}
+
 export type AttachmentsMetadata = AttachmentMetadata[]
 
 interface AttachmentMetadata {
@@ -85,4 +91,13 @@ export class EmailMessageTransactional extends Model<EmailMessageTransactional> 
 
   @Column({ type: DataType.DATE, allowNull: true })
   openedAt: Date | null
+
+  @Column({
+    type: DataType.ENUM(...Object.values(TransactionalEmailClassification)),
+    allowNull: true,
+  })
+  classification: TransactionalEmailClassification | null
+
+  @Column({ type: DataType.STRING, allowNull: true })
+  tag: string | null
 }

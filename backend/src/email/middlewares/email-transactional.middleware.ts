@@ -12,6 +12,7 @@ import {
 } from '@core/errors'
 import {
   EmailMessageTransactional,
+  TransactionalEmailClassification,
   TransactionalEmailMessageStatus,
 } from '@email/models'
 
@@ -53,6 +54,8 @@ export const InitEmailTransactionalMiddleware = (
     recipient: string
     reply_to: string
     attachments?: { data: Buffer; name: string; size: number }[]
+    classification: TransactionalEmailClassification
+    tag: string
   }
 
   function convertMessageModelToResponse(message: EmailMessageTransactional) {
@@ -71,6 +74,8 @@ export const InitEmailTransactionalMiddleware = (
       opened_at: message.openedAt?.toISOString() || null,
       created_at: message.createdAt.toISOString(),
       updated_at: message.updatedAt.toISOString(),
+      classification: message.classification,
+      tag: message.tag,
     }
   }
 
@@ -88,6 +93,8 @@ export const InitEmailTransactionalMiddleware = (
       recipient,
       reply_to: replyTo,
       attachments,
+      classification,
+      tag,
     }: ReqBody = req.body
 
     const attachmentsMetadata = attachments
@@ -112,6 +119,8 @@ export const InitEmailTransactionalMiddleware = (
       status: TransactionalEmailMessageStatus.Unsent,
       errorCode: null,
       sentAt: null,
+      classification,
+      tag,
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
     } as unknown as EmailMessageTransactional)
     req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
