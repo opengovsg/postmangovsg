@@ -1766,6 +1766,14 @@ paths:
                 reply_to:
                   type: string
                   nullable: true
+                classification:
+                  type: string
+                  nullable: true
+                  enum:
+                    [URGENT, FOR_ACTION, FOR_INFO]
+                tag:
+                  type: string
+                  nullable: true
           multipart/form-data:
             schema:
               type: object
@@ -1791,6 +1799,14 @@ paths:
                   items:
                     type: string
                     format: binary
+                classification:
+                  type: string
+                  nullable: true
+                  enum:
+                    [URGENT, FOR_ACTION, FOR_INFO]
+                tag:
+                  type: string
+                  nullable: true
       responses:
         '201':
           description: Created. The message is being sent.
