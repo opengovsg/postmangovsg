@@ -5,12 +5,11 @@ import { readFileSync, writeFileSync } from 'fs';
 
 import {
   DASHBOARD_URL,
-  MAILBOX,
-  POSTMAN_FROM,
   SMS_NUMBER,
   TWILIO_ACC_SID,
   TWILIO_AUTH_TOKEN,
 } from '../config';
+import moment from 'moment';
 
 let page: Page;
 test.beforeAll(async ({ browser }) => {
@@ -21,19 +20,7 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test.describe.serial('SMS campaign', () => {
-  const currDate = new Date();
-  const dateTime =
-    currDate.getDate() +
-    '/' +
-    (currDate.getMonth() + 1) +
-    '/' +
-    currDate.getFullYear() +
-    '@' +
-    currDate.getHours() +
-    ':' +
-    currDate.getMinutes() +
-    ':' +
-    currDate.getSeconds();
+  const dateTime = moment().format('DD/MM/YYYY@HH:mm:ss');
   const campaignName = `sms_${dateTime}`;
 
   const randomString = '_'.concat(

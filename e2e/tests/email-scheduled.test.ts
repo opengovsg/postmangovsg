@@ -4,6 +4,7 @@ import path from 'path';
 import { writeFileSync } from 'fs';
 
 import { DASHBOARD_URL, MAILBOX } from '../config';
+import moment from 'moment';
 
 let page: Page;
 test.beforeAll(async ({ browser }) => {
@@ -14,19 +15,7 @@ test.beforeAll(async ({ browser }) => {
 });
 
 test.describe.serial('Scheduled email campaign', () => {
-  const currDate = new Date();
-  const dateTime =
-    currDate.getDate() +
-    '/' +
-    (currDate.getMonth() + 1) +
-    '/' +
-    currDate.getFullYear() +
-    '@' +
-    currDate.getHours() +
-    ':' +
-    currDate.getMinutes() +
-    ':' +
-    currDate.getSeconds();
+  const dateTime = moment().format('DD/MM/YYYY@HH:mm:ss');
   const campaignName = `emailscheduled_${dateTime}`;
 
   const randomString = '_'.concat(
@@ -75,18 +64,14 @@ test.describe.serial('Scheduled email campaign', () => {
   });
 
   test('should be able to be scheduled', async () => {
-    const scheduledDate = new Date(currDate.getTime() + 3600 * 1000); // 1 hour from now
+    const scheduledDate = moment().add(1, 'hour');
     await page.getByRole('button', { name: 'Schedule for later' }).click();
     await page
       .locator('input[type="date"]')
-      .type(
-        `${scheduledDate.getDate()}-${
-          scheduledDate.getMonth() + 1
-        }-${scheduledDate.getFullYear()}`,
-      ); // has to type here to handle single-digit month and date, if we fill value they will be invalid like 2023-3-2 (needs to be 03-02)
+      .fill(scheduledDate.format('yyyy-MM-DD'));
     await page
       .locator('input[type="time"]')
-      .fill(`${scheduledDate.getHours()}:${scheduledDate.getMinutes()}`);
+      .fill(scheduledDate.format('HH:mm'));
     await page.getByRole('button', { name: 'Schedule campaign' }).click();
     await expect(page.getByRole('row', { name: /1 Scheduled/ })).toBeVisible();
   });
