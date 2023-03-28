@@ -1,16 +1,19 @@
 # Forking and configuring this product
 
-- [Backend](#backend)
-  - [Minimal environment variables](#minimal-environment-variables)
-  - [Full set of environment variables that can be set](#full-set-of-environment-variables-that-can-be-set)
-    - [General](#general)
-    - [Database](#database)
-    - [Cache](#cache)
-    - [AWS Settings](#aws-settings)
-    - [Login sessions](#login-sessions)
-    - [OTP and API Keys](#otp-and-api-keys)
-    - [Sending emails](#sending-emails)
-    - [Sending smses](#sending-smses)
+- [Forking and configuring this product](#forking-and-configuring-this-product)
+  - [Backend](#backend)
+    - [Minimal set of environment variables](#minimal-set-of-environment-variables)
+    - [Full set of environment variables that can be set](#full-set-of-environment-variables-that-can-be-set)
+      - [General](#general)
+      - [Database](#database)
+      - [Cache](#cache)
+      - [AWS Settings](#aws-settings)
+      - [Login sessions](#login-sessions)
+      - [OTP and API Keys](#otp-and-api-keys)
+      - [Sending emails](#sending-emails)
+      - [Sending smses](#sending-smses)
+      - [Transactional messages](#transactional-messages)
+      - [Credential cache](#credential-cache)
 
 ## Backend
 
@@ -18,7 +21,7 @@ Depending on the environment, a set of sane defaults for non-sensitive configura
 
 - [backend/src/core/config.ts](../../backend/src/core/config.ts).
 
-Setting `NODE_ENV=development` or `NODE_ENV=staging` will override some defaults. If `NODE_ENV` is unset,
+Setting `APP_ENV=development` or `APP_ENV=staging` will override some defaults. If `APP_ENV` is unset,
 default `production` configuration is used.
 
 These defaults can be modified as you wish or overridden with environment variables.
@@ -48,7 +51,7 @@ Sensitive configuration has to be set with environment variables.
 
 | Name                           | Description                                                                                                                                                                      |
 | ------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `NODE_ENV`                     | Set to `production` or `staging` for deployment                                                                                                                                  |
+| `APP_ENV`                      | Set to `production` or `staging` for deployment                                                                                                                                  |
 | `APP_NAME`                     | Name of the app                                                                                                                                                                  |
 | `DOMAIN_WHITELIST`             | Semi-colon separated list of domains that can sign in to the app. Example: `.gov.sg;@xyz.abc.sg` will allow any emails ending in `@<agency>.gov.sg` and `@xyz.abc.sg` to sign in |
 | `FRONTEND_URL`                 | CORS: accept requests from this origin. Can be a string, or regex                                                                                                                |
@@ -133,7 +136,7 @@ Further reference: [AWS SES documentation](https://docs.aws.amazon.com/ses/lates
 | `SMS_FALLBACK_ACTIVATE`  | Switch to true to use SNS fallback for all SMS campaigns |
 | `SMS_FALLBACK_SENDER_ID` | Sender ID to use for all SNS SMS                         |
 
-This set of twilio credentials is used for testing locally only (ie, `NODE_ENV=development`). When in production, users will have to upload their credentials, which will be stored and retrieved from Secrets Manager.
+This set of twilio credentials is used for testing locally only (ie, `APP_ENV=development`). When in production, users will have to upload their credentials, which will be stored and retrieved from Secrets Manager.
 If not set, smses cannot be sent.
 
 | Name                           | Description                               |
