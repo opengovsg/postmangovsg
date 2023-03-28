@@ -1,4 +1,5 @@
 import test, { expect, Page } from '@playwright/test';
+import moment from 'moment';
 import { API_KEY, API_URL, MAILBOX, POSTMAN_FROM } from '../config';
 import { checkGmail } from '../gmail-check';
 
@@ -12,15 +13,13 @@ test.afterAll(async () => {
 
 test.describe.serial('Email transactional messages', () => {
   test('should be successfully sent out', async () => {
-    const currentTimestamp = new Date();
+    const dateTime = moment().format('DD/MM/YYYY@HH:mm:ss');
     const randomString = '_'.concat(
       Math.floor(Math.random() * 1000000 + 1).toString(),
     );
 
     const messageContent = `Hello postman ${randomString}`;
-    const messageSubject = 'sub_'
-      .concat(currentTimestamp.toISOString())
-      .concat(randomString);
+    const messageSubject = 'sub_'.concat(dateTime).concat(randomString);
 
     await page.goto('/docs');
 

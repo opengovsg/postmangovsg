@@ -684,7 +684,7 @@ const config: Config<ConfigSchema> = convict({
     },
     maxAttachmentNum: {
       doc: 'Maximum number of file attachments',
-      default: 2, // limit set in docs/api-usage.md
+      default: 5, // limit set in docs/api-usage.md
       env: 'FILE_ATTACHMENT_MAX_NUM',
       format: Number,
     },
