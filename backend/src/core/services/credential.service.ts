@@ -64,6 +64,11 @@ export interface CredentialService {
     userId: number,
     announcementVersion: string | null
   ): Promise<{ announcementVersion: string }>
+
+  generateApiKey(
+    userId: number,
+    label: string
+  ): Promise<ApiKey & { api_key: string }>
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -363,16 +368,33 @@ export const InitCredentialService = (redisService: RedisService) => {
     const name = user.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
     const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
     const apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
-    await Promise.all([
-      user.save(),
-      ApiKey.create({
-        userId: user.id.toString(),
-        hash: apiKeyHash,
-        lastFive: apiKeyPlainText.slice(-5),
-        label: 'default',
-      } as ApiKey),
-    ])
+    await ApiKey.create({
+      userId: user.id.toString(),
+      hash: apiKeyHash,
+      lastFive: apiKeyPlainText.slice(-5),
+      label: 'default',
+    } as ApiKey)
     return apiKeyPlainText
+  }
+
+  const generateApiKey = async (
+    userId: number,
+    label: string
+  ): Promise<ApiKey & { api_key: string }> => {
+    const user = await User.findByPk(userId)
+    if (!user) {
+      throw new Error('User not found')
+    }
+    const name = user.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
+    const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
+    const apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
+    const apiKey = await ApiKey.create({
+      userId: user.id.toString(),
+      hash: apiKeyHash,
+      lastFive: apiKeyPlainText.slice(-5),
+      label,
+    } as ApiKey)
+    return Object.assign({}, apiKey.toJSON(), { api_key: apiKeyPlainText })
   }
 
   const updateDemoDisplayed = async (
@@ -448,5 +470,6 @@ export const InitCredentialService = (redisService: RedisService) => {
     // User metadata
     updateDemoDisplayed,
     updateAnnouncementVersion,
+    generateApiKey,
   }
 }
