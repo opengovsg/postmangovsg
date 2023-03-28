@@ -36,7 +36,7 @@ const generateScheduledCampaignNotificationEmail = async (
   sentCount: number,
   invalidCount: number
 ): Promise<MailToSend> => {
-  const subject = `Your scheduled campaign "${campaignName}" was successfully sent out`
+  const subject = `Your campaign "${campaignName}" was successfully sent out`
   // hardcode the email body for notification
   const totalCount = unsentCount + errorCount + sentCount + invalidCount
   // manually build the params set
@@ -51,7 +51,7 @@ const generateScheduledCampaignNotificationEmail = async (
   }
   const templateBody =
     '<p>Greetings,</p>' +
-    '<p>Your scheduled campaign <b>{{campaignName}}</b> has been sent!</p>' +
+    '<p>Your campaign <b>{{campaignName}}</b> has been sent!</p>' +
     '<p>You may log in to Postman.gov.sg to view your campaign statistics and download your delivery report.</p>' +
     '<p>Thank you,</p>' +
     '<p>Postman.gov.sg</p>'
