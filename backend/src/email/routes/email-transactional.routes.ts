@@ -7,7 +7,10 @@ import {
 } from '@email/middlewares'
 import { fromAddressValidator } from '@core/utils/from-address'
 import { FileAttachmentMiddleware } from '@core/middlewares'
-import { TransactionalEmailMessageStatus } from '@email/models'
+import {
+  TransactionalEmailMessageStatus,
+  TransactionalEmailClassification,
+} from '@email/models'
 import { TransactionalEmailSortField } from '@core/constants'
 import config from '@core/config'
 
@@ -44,6 +47,11 @@ export const InitEmailTransactionalRoute = (
         .options({ convert: true })
         .lowercase(),
       attachments: Joi.array().items(Joi.object().keys().required()),
+      classification: Joi.string()
+        .uppercase()
+        .valid(...Object.values(TransactionalEmailClassification))
+        .optional(),
+      tag: Joi.string().max(255).optional(),
     }),
   }
   const getByIdValidator = {
