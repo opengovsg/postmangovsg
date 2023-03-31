@@ -1,0 +1,6 @@
+@import 'styles/_variables';
+
+.errorMessage {
+  @extend %caption;
+  color: $error;
+}

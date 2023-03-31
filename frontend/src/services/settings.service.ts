@@ -40,16 +40,6 @@ async function getUserSettings(): Promise<{
   }
 }
 
-async function regenerateApiKey(): Promise<string> {
-  try {
-    const response = await axios.post('/settings/regen')
-    const { api_key: apiKey } = response.data
-    return apiKey
-  } catch (e) {
-    errorHandler(e, 'Error regenerating api key')
-  }
-}
-
 async function deleteCredential(label: string): Promise<void> {
   try {
     await axios.delete('/settings/credentials', {
@@ -107,7 +97,6 @@ function errorHandler(e: unknown, defaultMsg: string): never {
 }
 
 export {
-  regenerateApiKey,
   getUserSettings,
   deleteCredential,
   getCustomFromAddresses,
