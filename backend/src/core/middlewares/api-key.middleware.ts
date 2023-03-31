@@ -32,7 +32,7 @@ export const InitApikeyMiddleware = (
       userId.toString(),
       +apiKeyId
     )
-    if (deletedRows == 0) {
+    if (deletedRows === 0) {
       return res.status(404).json({
         code: 'not_found',
         message: 'Could not find API key to delete',
@@ -43,7 +43,7 @@ export const InitApikeyMiddleware = (
       action: 'deleteApiKey',
     })
     return res.status(200).json({
-      api_key_id: apiKeyId,
+      id: apiKeyId,
     })
   }
   const generateApiKey = async (
