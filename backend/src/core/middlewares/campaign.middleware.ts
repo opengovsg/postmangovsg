@@ -2,11 +2,11 @@ import { NextFunction, Request, Response } from 'express'
 import { loggerWithLabel } from '@core/logger'
 import {
   CampaignSortField,
+  CampaignStatus,
   ChannelType,
   Ordering,
-  CampaignStatus,
 } from '@core/constants'
-import { CampaignService, UploadService } from '@core/services'
+import { CampaignService, JobService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
 
 const logger = loggerWithLabel(module)
@@ -200,6 +200,9 @@ const deleteCampaign = async (
         .status(404)
         .json({ message: `Campaign ${campaignId} not found` })
     }
+    // also delete any related job_queues, possible cases include
+    // scheduled campaigns, and campaigns that queue up due to high load.
+    await JobService.cancelJobQueues(campaignId)
 
     res.json({})
   } catch (e) {

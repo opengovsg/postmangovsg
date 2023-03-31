@@ -128,7 +128,7 @@ const cancelScheduledCampaign = async (
       message: 'Cancel Scheduled Campaign...',
       logMeta,
     })
-    await JobService.cancelScheduledCampaign(+campaignId)
+    await JobService.cancelJobQueues(+campaignId)
     return res.status(200).json({ campaignId })
   } catch (err) {
     return next(err)
