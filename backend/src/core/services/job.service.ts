@@ -162,7 +162,7 @@ const updateScheduledCampaign = async (
   return jobCount
 }
 // indiscriminately delete JobQueue records that have the campaignId
-const cancelScheduledCampaign = async (campaignId: number) => {
+const cancelJobQueues = async (campaignId: number) => {
   await JobQueue.destroy({ where: { campaignId } })
 }
 
@@ -172,5 +172,5 @@ export const JobService = {
   stopCampaign,
   retryCampaign,
   updateScheduledCampaign,
-  cancelScheduledCampaign,
+  cancelJobQueues,
 }
