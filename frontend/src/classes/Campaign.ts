@@ -69,7 +69,16 @@ export class Campaign {
     this.demoMessageLimit = input['demo_message_limit']
     this.costPerMessage = input['cost_per_message']
     this.shouldSaveList = input['should_save_list']
-    this.visibleAt = input['visible_at']
+    this.visibleAt = input['visibleAt']
+    // override sentAt if it's a scheduled campaign
+    if (this.visibleAt) {
+      if (new Date(this.visibleAt) > new Date()) {
+        // don't show sent at if it's scheduled but not sent out yet
+        this.sentAt = undefined
+      } else {
+        this.sentAt = this.visibleAt
+      }
+    }
     if (this.status === Status.Scheduled) {
       const jobs = input['job_queue'] as Array<{ visible_at: string }>
       const jobsVisibleTime = jobs
