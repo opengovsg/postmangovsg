@@ -131,7 +131,7 @@ const Settings = () => {
         />
         <div className={styles.detailsContainer}>
           <Routes>
-            <Route path="/api" element={<ApiKey hasApiKey={hasApiKey} />} />
+            <Route path="/api" element={<ApiKey />} />
             {hasCustomFromAddresses && (
               <Route
                 path="/email"
