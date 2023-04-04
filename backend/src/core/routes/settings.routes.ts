@@ -69,28 +69,6 @@ export const InitSettingsRoute = (
 
   /**
    * paths:
-   *  /settings/regen:
-   *    post:
-   *      summary: Regenerates api key
-   *      tags:
-   *        - Settings
-   *
-   *      responses:
-   *        200:
-   *          description: Success
-   *          content:
-   *             application/json:
-   *               schema:
-   *                 type: object
-   *                 properties:
-   *                   api_key:
-   *                     type: string
-   *
-   */
-  router.post('/regen', settingsMiddleware.regenerateApiKey)
-
-  /**
-   * paths:
    *  /settings/credentials:
    *    delete:
    *      summary: Deletes stored credential for user

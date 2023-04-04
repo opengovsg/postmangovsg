@@ -32,9 +32,10 @@ beforeEach(async () => {
     email: 'user_1@agency.gov.sg',
   } as User)
   const userId = user.id
-  apiKey = await (
+  const { key } = await (
     app as any as { credentialService: CredentialService }
-  ).credentialService.regenerateApiKey(user.id)
+  ).credentialService.generateApiKey(user.id, 'test api key')
+  apiKey = key
 
   credential = await Credential.create({ name: 'twilio' } as Credential)
   await UserCredential.create({

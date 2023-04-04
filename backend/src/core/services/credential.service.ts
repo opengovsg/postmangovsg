@@ -51,9 +51,6 @@ export interface CredentialService {
 
   getUserSettings(userId: number): Promise<UserSettings | null>
 
-  // Api Key
-  regenerateApiKey(userId: number): Promise<string>
-
   // User metadata
   updateDemoDisplayed(
     userId: number,
@@ -350,33 +347,6 @@ export const InitCredentialService = (redisService: RedisService) => {
     }
   }
 
-  /**
-   * Generates an api key for the specified user
-   * @param userId
-   * @throws Error if user is not found
-   */
-  const regenerateApiKey = async (userId: number): Promise<string> => {
-    const user = await User.findByPk(userId)
-    if (!user) {
-      throw new Error('User not found')
-    }
-    await ApiKey.destroy({
-      where: {
-        userId: user.id.toString(),
-      },
-    })
-    const name = user.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
-    const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
-    const apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
-    await ApiKey.create({
-      userId: user.id.toString(),
-      hash: apiKeyHash,
-      lastFive: apiKeyPlainText.slice(-5),
-      label: 'default',
-    } as ApiKey)
-    return apiKeyPlainText
-  }
-
   const generateApiKey = async (
     userId: number,
     label: string
@@ -465,8 +435,6 @@ export const InitCredentialService = (redisService: RedisService) => {
     getSmsUserCredentialLabels,
     getTelegramUserCredentialLabels,
     getUserSettings,
-    // Api Key
-    regenerateApiKey,
     // User metadata
     updateDemoDisplayed,
     updateAnnouncementVersion,

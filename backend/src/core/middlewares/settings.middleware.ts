@@ -10,7 +10,6 @@ export interface SettingsMiddleware {
   checkAndStoreLabelIfExists: Handler
   getChannelSpecificCredentials: Handler
   deleteUserCredential: Handler
-  regenerateApiKey: Handler
   updateDemoDisplayed: Handler
   updateAnnouncementVersion: Handler
 }
@@ -217,26 +216,6 @@ export const InitSettingsMiddleware = (
   }
 
   /**
-   * Generate and associate an api key with that user
-   * @param req
-   * @param res
-   * @param next
-   */
-  const regenerateApiKey = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> => {
-    try {
-      const userId = req.session?.user?.id
-      const apiKey = await credentialService.regenerateApiKey(+userId)
-      return res.json({ api_key: apiKey })
-    } catch (e) {
-      next(e)
-    }
-  }
-
-  /**
    * Update whether demos should be displayed for user
    * @param req
    * @param res
@@ -288,7 +267,6 @@ export const InitSettingsMiddleware = (
     checkAndStoreLabelIfExists,
     getChannelSpecificCredentials,
     deleteUserCredential,
-    regenerateApiKey,
     updateDemoDisplayed,
     updateAnnouncementVersion,
   }
