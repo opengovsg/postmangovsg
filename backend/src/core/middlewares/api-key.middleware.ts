@@ -11,7 +11,7 @@ export interface ApiKeyMiddleware {
   generateApiKey: Handler
 }
 
-export const InitApikeyMiddleware = (
+export const InitApiKeyMiddleware = (
   credentialService: CredentialService
 ): ApiKeyMiddleware => {
   const listApiKeys = async (

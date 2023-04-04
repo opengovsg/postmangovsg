@@ -4,6 +4,8 @@ import { useState, useContext, useEffect } from 'react'
 
 import type { FunctionComponent } from 'react'
 
+import { OutboundLink } from 'react-ga'
+
 import styles from './ApiKey.module.scss'
 
 import { CopyModal } from './CopyModal'
@@ -60,10 +62,9 @@ const ApiKey: FunctionComponent = () => {
     modalContext.setModalContent(
       <ConfirmModal
         title={`Are you sure you want to delete API key "${apiKey.label}"?`}
-        subtitle="Deleting your API key is irreversible, and any integrations using this key will need to be updated with a new API key to continue working."
+        subtitle="Deleting your API key is immediate and irreversible. To ensure a smooth API key rotation, please replace this key with a new API key before deleting."
         onConfirm={() => {
-          removeApiKey(keyId)
-          void deleteApiKey(keyId)
+          void deleteApiKey(keyId).then(() => removeApiKey(keyId))
         }}
         onCancel={() => modalContext.close()}
         buttonText="Confirm delete"
@@ -91,15 +92,22 @@ const ApiKey: FunctionComponent = () => {
         </PrimaryButton>
       </div>
       <p className={styles.helpText}>
-        Creating a new API key gives you access to our platform's data and
-        features, and allows you to build custom integrations, automate tasks,
-        and streamline workflows. It also helps keep your data more secure.
+        You can create an API key to access our programmatic email and
+        programmatic SMS APIs. For more information, go to our{' '}
+        <OutboundLink
+          eventLabel="https://guide.postman.gov.sg/developer-guide/api-doc"
+          to="https://guide.postman.gov.sg/developer-guide/api-doc"
+          target="_blank"
+        >
+          API Guide
+        </OutboundLink>
+        .
       </p>
       {apiKeys.length > 0 && (
         <table className={styles.apiKeyTable}>
           <thead>
             <tr>
-              <th className="lg">Key name</th>
+              <th className="lg">Key Label</th>
               <th className="sm">Last 5 Digits</th>
               <th className="sm"></th>
             </tr>
@@ -108,7 +116,7 @@ const ApiKey: FunctionComponent = () => {
             {apiKeys.map((k) => (
               <tr key={k.id}>
                 <td className="lg">{k.label}</td>
-                <td className="sm">••••• {k.lastFive}</td>
+                <td className="sm">••••• {k.last_five}</td>
                 <td className={cx('sm', styles.buttonContainer)}>
                   {/* <button>
                 <i className={cx('bx bx-pencil', styles.pencil)} />

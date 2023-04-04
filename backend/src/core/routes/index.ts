@@ -44,7 +44,7 @@ import {
 } from '@email/middlewares'
 import { InitTelegramMiddleware } from '@telegram/middlewares'
 import { InitApiKeyRoute } from '@core/routes/api-key.routes'
-import { InitApikeyMiddleware } from '@core/middlewares/api-key.middleware'
+import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -92,7 +92,7 @@ export const InitV1Route = (app: Application): Router => {
     telegramMiddleware,
     settingsMiddleware
   )
-  const apiKeyMiddleware = InitApikeyMiddleware((app as any).credentialService)
+  const apiKeyMiddleware = InitApiKeyMiddleware((app as any).credentialService)
   const apiKeyRoutes = InitApiKeyRoute(apiKeyMiddleware)
 
   const CHANNEL_ROUTES = Object.values(ChannelType).map(

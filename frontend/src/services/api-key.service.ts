@@ -3,10 +3,8 @@ import axios from 'axios'
 export interface ApiKey {
   id: string
   label: string
-  lastFive: string
-  createdAt: Date
-  updatedAt: Date
-  key?: string
+  last_five: string
+  plain_text_key?: string
 }
 
 export async function listApiKeys(): Promise<ApiKey[]> {

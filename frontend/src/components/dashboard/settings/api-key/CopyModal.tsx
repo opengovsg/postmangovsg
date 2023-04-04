@@ -14,18 +14,18 @@ export const CopyModal = ({ apiKey }: { apiKey: ApiKey }) => {
         <img src={successImg} alt="Success image" />
       </div>
       <h2 className={styles.title}>
-        Your API Key has been successfully created
+        Your API key has been successfully created
       </h2>
       <div className={styles.copier}>
         <p>{apiKey.label}</p>
         <TextInputWithButton
           className={styles.greenButton}
-          value={apiKey.key}
+          value={apiKey.plain_text_key}
           onChange={() => {
             return
           }}
           onClick={() => {
-            void navigator.clipboard.writeText(apiKey.key as string)
+            void navigator.clipboard.writeText(apiKey.plain_text_key as string)
             setHasCopied(true)
             setTimeout(() => setHasCopied(false), 3000)
           }}
@@ -38,8 +38,8 @@ export const CopyModal = ({ apiKey }: { apiKey: ApiKey }) => {
         />
         <InfoBlock className={styles.infoBlock}>
           Please save a copy your API key immediately as this will only be shown
-          only once. If you leave or refresh this page, the key will already be
-          hidden.
+          once. If you leave or refresh this page, the API key will no longer be
+          accessible.
         </InfoBlock>
       </div>
     </div>

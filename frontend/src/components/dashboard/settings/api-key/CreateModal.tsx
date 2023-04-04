@@ -27,7 +27,6 @@ export const CreateModal = ({
             const apiKey = await generateApiKey({ label: keyLabel })
             await onSuccess(apiKey)
           } catch (e) {
-            console.log(e)
             setIsError(true)
             setTimeout(() => setIsError(false), 5000)
           } finally {
@@ -40,15 +39,15 @@ export const CreateModal = ({
         <h2>
           <label htmlFor="apiKeyLabel">Create a new API key</label>
         </h2>
-        <h4>Key Name</h4>
+        <h4>Key Label</h4>
         <p>
-          The name you choose for your API key will be permanent and cannot be
+          The label you choose for your API key is be permanent and cannot be
           changed once it has been created.
         </p>
         <TextInput
           id="apiKeyLabel"
           type="text"
-          placeholder="Give your key a reference name"
+          placeholder="The label that you can identify your API key with"
           value={keyLabel}
           onChange={setKeyLabel}
         ></TextInput>
