@@ -6,7 +6,7 @@ on:
   workflow_call:
     outputs:
       e2e_result:
-        description: "Outcome of the cypress suite, enum<success, failure, skipped, cancelled>"
+        description: "Outcome of the e2e suite, enum<success, failure, skipped, cancelled>"
         value: ${{ jobs.playwright-run.outputs.outcome }}
 
 jobs:
