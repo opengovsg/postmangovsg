@@ -44,8 +44,8 @@ const getApiKeyRecord = async (hash: string): Promise<ApiKey | null> => {
   })
 }
 
-const getApiKeys = async (userId: string): Promise<ApiKey[] | null> => {
-  return await ApiKey.findAll({
+const getApiKeys = async (userId: string): Promise<ApiKey[]> => {
+  return ApiKey.findAll({
     where: {
       userId,
     },

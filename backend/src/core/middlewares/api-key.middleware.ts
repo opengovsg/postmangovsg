@@ -1,6 +1,7 @@
 import { loggerWithLabel } from '@core/logger'
 import { Handler, Request, Response } from 'express'
 import { ApiKeyService, CredentialService } from '@core/services'
+import { ApiKey } from '@core/models'
 
 const logger = loggerWithLabel(module)
 
@@ -19,7 +20,7 @@ export const InitApikeyMiddleware = (
   ): Promise<Response> => {
     const userId = req.session?.user?.id
     const apiKeys = await ApiKeyService.getApiKeys(userId.toString())
-    return res.status(200).json(apiKeys)
+    return res.status(200).json(apiKeys.map(convertApiKeyModelToResponse))
   }
   const deleteApiKey = async (
     req: Request,
@@ -55,7 +56,18 @@ export const InitApikeyMiddleware = (
       +userId,
       req.body.label
     )
-    return res.status(201).json(apiKey)
+    return res.status(201).json(convertApiKeyModelToResponse(apiKey))
+  }
+
+  function convertApiKeyModelToResponse(
+    key: ApiKey & { plainTextKey?: string }
+  ) {
+    return {
+      id: key.id,
+      last_five: key.lastFive,
+      label: key.label,
+      plain_text_key: key.plainTextKey,
+    }
   }
 
   return {

@@ -68,7 +68,7 @@ export interface CredentialService {
   generateApiKey(
     userId: number,
     label: string
-  ): Promise<ApiKey & { key: string }>
+  ): Promise<ApiKey & { plainTextKey: string }>
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -380,21 +380,21 @@ export const InitCredentialService = (redisService: RedisService) => {
   const generateApiKey = async (
     userId: number,
     label: string
-  ): Promise<ApiKey & { key: string }> => {
+  ): Promise<ApiKey & { plainTextKey: string }> => {
     const user = await User.findByPk(userId)
     if (!user) {
       throw new Error('User not found')
     }
     const name = user.email.split('@')[0].replace(/[^a-zA-Z0-9]/g, '')
-    const apiKeyPlainText = ApiKeyService.generateApiKeyFromName(name)
-    const apiKeyHash = await ApiKeyService.getApiKeyHash(apiKeyPlainText)
+    const plainTextKey = ApiKeyService.generateApiKeyFromName(name)
+    const apiKeyHash = await ApiKeyService.getApiKeyHash(plainTextKey)
     const apiKey = await ApiKey.create({
       userId: user.id.toString(),
       hash: apiKeyHash,
-      lastFive: apiKeyPlainText.slice(-5),
+      lastFive: plainTextKey.slice(-5),
       label,
     } as ApiKey)
-    return Object.assign({}, apiKey.toJSON(), { key: apiKeyPlainText })
+    return Object.assign({}, apiKey.toJSON(), { plainTextKey })
   }
 
   const updateDemoDisplayed = async (
