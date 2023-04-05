@@ -6,7 +6,7 @@ on:
   workflow_call:
     outputs:
       e2e_result:
-        description: "Outcome of the cypress suite, enum<success, failure, skipped, cancelled>"
+        description: "Outcome of the e2e suite, enum<success, failure, skipped, cancelled>"
         value: ${{ jobs.playwright-run.outputs.outcome }}
 
 jobs:
@@ -48,8 +48,6 @@ jobs:
         env:
           API_URL: ${{ github.ref == 'refs/heads/master' && 'https://api.postman.gov.sg' || 'https://api-staging.postman.gov.sg' }}
           DASHBOARD_URL: ${{ github.ref == 'refs/heads/master' && 'https://postman.gov.sg' || 'https://staging.postman.gov.sg' }}
-          # Reusing env var from cypress
-          # TODO: rename this once we've migrated away from Cypress
           API_KEY: ${{ secrets.E2E_API_KEY }}
           TWILIO_ACC_SID: ${{ secrets.E2E_TWILIO_ACC_SID }}
           TWILIO_AUTH_TOKEN: ${{ secrets.E2E_TWILIO_AUTH_TOKEN }}
