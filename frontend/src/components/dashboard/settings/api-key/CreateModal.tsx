@@ -47,7 +47,7 @@ export const CreateModal = ({
         <TextInput
           id="apiKeyLabel"
           type="text"
-          placeholder="The label that you can identify your API key with"
+          placeholder="The label with which you can identify your API key with"
           value={keyLabel}
           onChange={setKeyLabel}
         ></TextInput>
