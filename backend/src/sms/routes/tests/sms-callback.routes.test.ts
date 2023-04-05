@@ -31,10 +31,10 @@ beforeEach(async () => {
     email: 'sms_callback@agency.gov.sg',
   } as User)
   const userId = user.id
-  const { key } = await (
+  const { plainTextKey } = await (
     app as any as { credentialService: CredentialService }
   ).credentialService.generateApiKey(user.id, 'test api key')
-  apiKey = key
+  apiKey = plainTextKey
   credential = await Credential.create({ name: 'twilio' } as Credential)
   await UserCredential.create({
     label: `twilio-callback-${userId}`,
