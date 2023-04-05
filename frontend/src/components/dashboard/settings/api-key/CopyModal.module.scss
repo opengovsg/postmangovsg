@@ -1,0 +1,34 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.modal {
+  @include flex-vertical;
+  align-items: center;
+}
+
+.modalImg {
+  width: 16rem;
+  margin-bottom: 2rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 500;
+  margin-top: 0;
+  margin-bottom: 2rem;
+}
+
+.copier {
+  .infoBlock {
+    background: $yellow-300;
+    color: $yellow-900;
+    border-left-color: $yellow-900;
+    i {
+      color: $yellow-900;
+    }
+  }
+}
+
+.greenButton {
+  @extend %success-btn;
+}

@@ -16,6 +16,7 @@ interface PrimaryButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   alignRight?: boolean
   onClick?: (...args: any[]) => void | Promise<void>
   loadingPlaceholder?: string | ReactElement
+  type?: 'button' | 'submit' | 'reset'
 }
 
 const PrimaryButton: FunctionComponent<PrimaryButtonProps> = ({
@@ -25,6 +26,7 @@ const PrimaryButton: FunctionComponent<PrimaryButtonProps> = ({
   onClick,
   children,
   loadingPlaceholder,
+  type,
   ...otherProps
 }) => {
   const [asyncLoading, setAsyncLoading] = useState(false)
@@ -50,7 +52,7 @@ const PrimaryButton: FunctionComponent<PrimaryButtonProps> = ({
 
   return (
     <button
-      type="button"
+      type={type || 'button'}
       className={cx(
         styles.button,
         { [styles.alignRight]: alignRight },

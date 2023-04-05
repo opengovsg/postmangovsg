@@ -8,7 +8,8 @@ import { ApiKey } from '@core/models'
  * @param name
  */
 const generateApiKeyFromName = (name: string): string => {
-  const randomString = crypto.randomBytes(32).toString('base64')
+  // use 33 bytes to ensure that the last character is not always `=`
+  const randomString = crypto.randomBytes(33).toString('base64')
   return `${name}_${config.get('apiKey.version')}_${randomString}`
 }
 

@@ -1,155 +1,135 @@
 import cx from 'classnames'
 
-import { useState, useRef, useContext, useEffect } from 'react'
+import { useState, useContext, useEffect } from 'react'
 
 import type { FunctionComponent } from 'react'
 
+import { OutboundLink } from 'react-ga'
+
 import styles from './ApiKey.module.scss'
 
-import {
-  TextInputWithButton,
-  ConfirmModal,
-  StepHeader,
-} from 'components/common'
+import { CopyModal } from './CopyModal'
+import { CreateModal } from './CreateModal'
+
+import { ConfirmModal, PrimaryButton } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
 
-import { regenerateApiKey } from 'services/settings.service'
+import {
+  ApiKey as ApiKeyType,
+  deleteApiKey,
+  listApiKeys,
+} from 'services/api-key.service'
 
-const RESET_COPY_TIMEOUT = 1000
+const ApiKey: FunctionComponent = () => {
+  const [apiKeys, setApiKeys] = useState<ApiKeyType[]>([])
+  function addApiKey(key: ApiKeyType) {
+    setApiKeys([key, ...apiKeys])
+  }
+  function removeApiKey(id: string) {
+    setApiKeys(apiKeys.filter((k) => k.id !== id))
+  }
 
-interface ApiKeyProps {
-  hasApiKey: boolean
-  onGenerate?: () => void
-}
+  const [isPageLoading, setIsPageLoading] = useState<boolean>(false)
 
-enum ApiKeyState {
-  GENERATE = 'GENERATE',
-  COPY = 'COPY',
-  COPIED = 'COPIED',
-  REGENERATE = 'REGENERATE',
-}
-
-const ApiKey: FunctionComponent<ApiKeyProps> = ({ hasApiKey, onGenerate }) => {
-  const [apiKey, setApiKey] = useState('')
-  const [errorMsg, setErrorMsg] = useState('')
-  const [apiKeyState, setApiKeyState] = useState<ApiKeyState>(
-    ApiKeyState.GENERATE
-  )
+  useEffect(() => {
+    void (async () => {
+      setIsPageLoading(true)
+      setApiKeys(await listApiKeys())
+      setIsPageLoading(false)
+    })()
+  }, [])
 
   const modalContext = useContext(ModalContext)
-  const apiKeyRef = useRef<HTMLInputElement>()
 
-  useEffect(() => {
-    setApiKey(hasApiKey ? '*'.repeat(30) : '')
-    setApiKeyState(hasApiKey ? ApiKeyState.REGENERATE : ApiKeyState.GENERATE)
-  }, [hasApiKey])
-
-  useEffect(() => {
-    if (apiKeyState !== ApiKeyState.COPIED) return
-
-    const timeoutId = setTimeout(() => {
-      setApiKeyState(ApiKeyState.COPY)
-
-      if (!apiKeyRef.current) return
-      apiKeyRef.current.blur()
-    }, RESET_COPY_TIMEOUT)
-
-    return () => clearTimeout(timeoutId)
-  }, [apiKeyState])
-
-  async function onButtonClick() {
-    switch (apiKeyState) {
-      case ApiKeyState.GENERATE:
-      case ApiKeyState.REGENERATE:
-        if (apiKey) {
-          modalContext.setModalContent(
-            <ConfirmModal
-              title="Are you sure?"
-              subtitle="Generating a new API key will revoke your current one."
-              buttonText="Confirm"
-              onConfirm={onGenerateConfirm}
-            />
-          )
-        } else {
-          await onGenerateConfirm()
-        }
-        break
-      case ApiKeyState.COPY:
-        if (!apiKeyRef.current) return
-        apiKeyRef.current.select()
-        document.execCommand('copy')
-        setApiKeyState(ApiKeyState.COPIED)
-        break
-      default:
-        break
-    }
+  function openCopyModal(apiKey: ApiKeyType) {
+    modalContext.setModalContent(<CopyModal apiKey={apiKey} />)
   }
 
-  async function onGenerateConfirm() {
-    setErrorMsg('')
-    try {
-      const newApiKey = await regenerateApiKey()
-      setApiKey(newApiKey)
-      setApiKeyState(ApiKeyState.COPY)
-    } catch (e) {
-      setErrorMsg((e as Error).message)
-    }
-    if (onGenerate) onGenerate()
-  }
-
-  let buttonLabel = ''
-  let buttonIcon = ''
-  let buttonClass = ''
-  switch (apiKeyState) {
-    case ApiKeyState.GENERATE:
-      buttonLabel = 'Generate'
-      buttonIcon = 'bx-key'
-      buttonClass = styles.greenButton
-      break
-    case ApiKeyState.COPY:
-      buttonLabel = 'Copy'
-      buttonIcon = 'bx-copy'
-      buttonClass = styles.greenButton
-      break
-    case ApiKeyState.COPIED:
-      buttonLabel = 'Copied'
-      buttonIcon = 'bx-check'
-      buttonClass = styles.blueButton
-      break
-    case ApiKeyState.REGENERATE:
-      buttonLabel = 'Regenerate'
-      buttonIcon = 'bx-refresh'
-      buttonClass = styles.blueButton
-      break
-    default:
-      break
-  }
-
-  return (
-    <>
-      <StepHeader title="API Key">
-        <p className={styles.helpText}>
-          After generating your API key, please make a copy of it immediately as
-          it will only be shown once. Upon leaving or refreshing this page, the
-          key will be hidden.
-        </p>
-      </StepHeader>
-      <TextInputWithButton
-        value={apiKey}
-        onChange={() => {
-          return
+  function openGenerateModal() {
+    modalContext.setModalContent(
+      <CreateModal
+        onSuccess={(apiKey: ApiKeyType) => {
+          addApiKey(apiKey)
+          openCopyModal(apiKey)
         }}
-        onClick={onButtonClick}
-        className={buttonClass}
-        textRef={apiKeyRef}
-        errorMessage={errorMsg}
-        buttonLabel={
-          <>
-            {buttonLabel} API key
-            <i className={cx('bx', buttonIcon)} />
-          </>
-        }
       />
+    )
+  }
+
+  function openDeleteModal(keyId: string) {
+    const apiKey = apiKeys.find((k) => k.id === keyId)
+    if (!apiKey) return
+    modalContext.setModalContent(
+      <ConfirmModal
+        title={`Are you sure you want to delete API key "${apiKey.label}"?`}
+        subtitle="Deleting your API key is immediate and irreversible. To ensure a smooth API key rotation, please replace this key with a new API key before deleting."
+        onConfirm={() => {
+          void deleteApiKey(keyId).then(() => removeApiKey(keyId))
+        }}
+        onCancel={() => modalContext.close()}
+        buttonText="Confirm delete"
+        buttonIcon="bx-trash"
+        cancelText="Cancel"
+        destructive
+      />
+    )
+  }
+
+  return isPageLoading ? (
+    <div className={styles.loader}>
+      <i className="bx bx-loader-alt bx-spin" />
+    </div>
+  ) : (
+    <>
+      <div className={styles.header}>
+        <h3>API Key</h3>
+        <PrimaryButton
+          className={styles.blueButton}
+          onClick={openGenerateModal}
+        >
+          <i className="bx bx-plus"></i>
+          Generate API Key
+        </PrimaryButton>
+      </div>
+      <p className={styles.helpText}>
+        You can create an API key to access our programmatic email and
+        programmatic SMS APIs. For more information, go to our{' '}
+        <OutboundLink
+          eventLabel="https://guide.postman.gov.sg/developer-guide/api-doc"
+          to="https://guide.postman.gov.sg/developer-guide/api-doc"
+          target="_blank"
+        >
+          API Guide
+        </OutboundLink>
+        .
+      </p>
+      {apiKeys.length > 0 && (
+        <table className={styles.apiKeyTable}>
+          <thead>
+            <tr>
+              <th className="lg">Key Label</th>
+              <th className="sm">Last 5 Digits</th>
+              <th className="sm"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {apiKeys.map((k) => (
+              <tr key={k.id}>
+                <td className="lg">{k.label}</td>
+                <td className="sm">••••• {k.last_five}</td>
+                <td className={cx('sm', styles.buttonContainer)}>
+                  {/* <button>
+                <i className={cx('bx bx-pencil', styles.pencil)} />
+              </button> */}
+                  <button onClick={() => openDeleteModal(k.id)}>
+                    <i className={cx('bx bx-trash', styles.trash)} />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
     </>
   )
 }
