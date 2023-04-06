@@ -9,7 +9,8 @@ import config from '@core/config'
 import MailClient from '@shared/clients/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import { ThemeClient } from '@shared/theme'
-import { Message } from './interface'
+import { EmailResultRow, Message } from './interface'
+import { getContactPrefLinksForEmail } from './util/contact-preference'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 const logger = loggerWithLabel(module)
@@ -59,18 +60,36 @@ class Email {
   }
 
   async getMessages(jobId: number, rate: number): Promise<Message[]> {
-    interface ResultRow {
-      message: Message & { senderEmail: string }
-    }
-
     const showMastheadDomain = config.get('showMastheadDomain')
-    const result = await this.connection.query<ResultRow>(
+
+    const result = await this.connection.query<EmailResultRow>(
       'SELECT get_messages_to_send_email_with_agency(:job_id, :rate) AS message;',
       {
         replacements: { job_id: jobId, rate },
         type: QueryTypes.SELECT,
       }
     )
+    const showContactPref = config.get('phonebookContactPref.enabled')
+    if (showContactPref) {
+      try {
+        return await getContactPrefLinksForEmail(result)
+      } catch (error) {
+        logger.error({
+          message: 'Unable to fetch contact preferences',
+          error,
+          workerId: this.workerId,
+        })
+        // If phonebook is down, we still want to send the email
+        return map(result, (row) => {
+          const { senderEmail } = row.message
+          const showMasthead = senderEmail.endsWith(showMastheadDomain)
+          return {
+            ...row.message,
+            showMasthead,
+          }
+        })
+      }
+    }
     return map(result, (row) => {
       const { senderEmail } = row.message
       const showMasthead = senderEmail.endsWith(showMastheadDomain)
@@ -117,6 +136,7 @@ class Email {
     agencyName,
     agencyLogoURI,
     showMasthead,
+    contactPrefLink,
   }: Message): Promise<void> {
     try {
       if (!validator.isEmail(recipient)) {
@@ -137,6 +157,7 @@ class Email {
         agencyName,
         agencyLogoURI,
         showMasthead,
+        contactPrefLink,
       })
 
       await this.mailService.sendMail({

@@ -10,4 +10,15 @@ export interface Message {
   agencyName?: string
   agencyLogoURI?: string
   showMasthead?: boolean
+  contactPrefLink?: string
+}
+
+export interface ContactPreference {
+  channel: string
+  channelId: string
+  contactPrefLink?: string
+}
+
+export interface EmailResultRow {
+  message: Message & { senderEmail: string }
 }

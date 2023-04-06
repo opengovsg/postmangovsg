@@ -8,6 +8,7 @@ import { PhoneNumberService } from '@core/services/phone-number.service'
 import { TemplateClient, XSS_SMS_OPTION } from '@shared/templating'
 import TwilioClient from '@sms/services/twilio-client.class'
 import SnsSmsClient from '@sms/services/sns-sms-client.class'
+import { getMessagesWithContactPrefLinks } from './util/contact-preference'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const logger = loggerWithLabel(module)
@@ -48,7 +49,7 @@ class SMS {
       })
   }
 
-  getMessages(
+  async getMessages(
     jobId: number,
     rate: number
   ): Promise<
@@ -60,12 +61,29 @@ class SMS {
       campaignId: number
     }[]
   > {
-    return this.connection
-      .query('SELECT get_messages_to_send_sms(:job_id, :rate);', {
+    const dbResults = await this.connection.query(
+      'SELECT get_messages_to_send_sms(:job_id, :rate);',
+      {
         replacements: { job_id: jobId, rate },
         type: QueryTypes.SELECT,
-      })
-      .then((result) => map(result, 'get_messages_to_send_sms'))
+      }
+    )
+    const result = map(dbResults, 'get_messages_to_send_sms')
+
+    const showContactPref = config.get('phonebookContactPref.enabled')
+    if (showContactPref) {
+      try {
+        return await getMessagesWithContactPrefLinks(result)
+      } catch (error) {
+        logger.error({
+          message: 'Unable to fetch contact preferences',
+          error,
+          workerId: this.workerId,
+        })
+        return result
+      }
+    }
+    return result
   }
 
   sendMessage({

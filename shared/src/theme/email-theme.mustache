@@ -190,6 +190,22 @@
         <div>
           {{{body}}}
         </div>
+        {{#contactPrefLink}}
+        <div style="display: flex; flex-direction: row; background: #F5F6FC; justify-content: center; align-items: center; padding: 8px 4px 8px 12px; height: 88px;">
+          <img width="60" height="60" style="vertical-align: middle; margin-right: 18px; margin-left: -8px; padding: 12px" src="https://file.go.gov.sg/phonebook-channel.png" alt="Set channel" >
+          <div style="width: 225px; font-style: normal; font-weight: 500; font-size: 14px; line-height: 20px">
+            <div style="height: 42px; padding-bottom: 8px; color: #040651;">
+              Prefer hearing from this agency a different way?
+            </div>
+            <div style="height: 26px; color: #2C2CDC;">
+              <a href={{{contactPrefLink}}}>Set your preference here → </a>
+            </div>
+          </div>
+        </div>
+        <div style="width: 333px; height: 32px; text-align: center; margin-top: 32px; font-style: normal; font-weight: 400; font-size: 12px; line-height: 16px">
+        Important: To keep this link secure, it will be available for only 7 days, and can be clicked just once.
+        </div>
+        {{/contactPrefLink}}
         <div class="body-vertical-spacer-bottom" style="line-height: 0px; height: 0px; margin-top: 48px;">&#8202;</div>
     
     <!--[if false]><!-->
@@ -202,6 +218,7 @@
     <table role="presentation" style="width: 728px;" align="center">
       <tr><td>
     <![endif]-->
+    
       <div class="footer-content" style="max-width: 728px; padding: 0 64px; mso-padding-alt: 0 64px; text-align: center; line-height: 1.45;">
         <div class="footer-vertical-spacer-top" style="line-height: 32px; height: 32px;">&#8202;</div>
         <div style="font-size: 11px; color: #64707D">
