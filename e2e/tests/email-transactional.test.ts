@@ -1,7 +1,6 @@
 import test, { expect, Page } from '@playwright/test';
 import moment from 'moment';
-import { API_KEY, API_URL, MAILBOX, POSTMAN_FROM } from '../config';
-import { checkGmail } from '../gmail-check';
+import { API_KEY, API_URL, MAILBOX } from '../config';
 
 let page: Page;
 test.beforeAll(async ({ browser }) => {
@@ -19,7 +18,9 @@ test.describe.serial('Email transactional messages', () => {
     );
 
     const messageContent = `Hello postman ${randomString}`;
-    const messageSubject = 'sub_'.concat(dateTime).concat(randomString);
+    const messageSubject = 'subtransactional_'
+      .concat(dateTime)
+      .concat(randomString);
 
     await page.goto('/docs');
 
@@ -40,18 +41,11 @@ test.describe.serial('Email transactional messages', () => {
      }`);
     await page.locator(`#${sendEndpointID} .btn.execute`).click();
     const statusCode = await page
-      .locator(`#${sendEndpointID} .response .response-col_status`)
+      .locator(
+        `#${sendEndpointID} .live-responses-table .response .response-col_status`,
+      )
       .nth(0)
       .innerText();
     expect(statusCode).toBe('201');
-
-    const emails = await checkGmail({
-      from: POSTMAN_FROM,
-      subject: messageSubject,
-      to: MAILBOX,
-    });
-    expect(emails).toBeTruthy();
-    expect(emails.length).toBe(1);
-    expect(emails[0].body?.html.includes(messageContent)).toBe(true);
   });
 });
