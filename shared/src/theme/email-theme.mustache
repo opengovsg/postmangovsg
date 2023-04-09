@@ -66,6 +66,16 @@
         line-height: 24px !important;
         height: 24px !important;
       }
+
+       .contact-pref-cta-mobile {
+        display: block !important;
+      }
+    }
+
+    @media only screen and (min-width: 501px) {
+      .contact-pref-cta-desktop {
+        display: block !important;
+      }
     }
 
     h1 {
@@ -191,20 +201,45 @@
           {{{body}}}
         </div>
         {{#contactPrefLink}}
-        <div style="display: flex; flex-direction: row; background: #F5F6FC; justify-content: center; align-items: center; padding: 8px 4px 8px 12px; height: 88px;">
-          <img width="60" height="60" style="vertical-align: middle; margin-right: 18px; margin-left: -8px; padding: 12px" src="https://file.go.gov.sg/phonebook-channel.png" alt="Set channel" >
-          <div style="width: 225px; font-style: normal; font-weight: 500; font-size: 14px; line-height: 20px">
-            <div style="height: 42px; padding-bottom: 8px; color: #040651;">
-              Prefer hearing from this agency a different way?
-            </div>
-            <div style="height: 26px; color: #2C2CDC;">
-              <a href={{{contactPrefLink}}}>Set your preference here → </a>
+          <div class="contact-pref-cta-mobile" style="display:none">
+            <div onclick="window.open(`{{{contactPrefLink}}}`, '_blank');" 
+              style="cursor: pointer; display: flex; flex-direction: column; background: #F5F6FC; justify-content: center; 
+              align-items: center; padding: 0px 4px 8px 12px; height: 156px; max-width: 600px;">
+              <div style="display: flex; flex-direction: row">
+                  <img width="60" height="60" style="vertical-align: middle; margin-right: 18px; margin-left: -8px; padding: 12px" src="https://file.go.gov.sg/phonebook-channel.png" alt="Set channel" >
+                  <div style="font-style: normal; font-weight: 500; font-size: 14px; line-height: 20px; color: #040651; padding-top: 8px">
+                    Prefer to receive your message via different channel? Set your <br/>preference here &rarr;
+                  </div>
+              </div>
+              <!-- <hr color="#B5C4FF" size="0.5" width="90%"> -->
+              <div style="line-height: 0px; height: 0px; margin-top: 4px; border-bottom: 1px solid #B5C4FF; width: 100%">&#8202;</div>
+              <div style="height: 32px; margin-top: 12px; font-style: normal; font-weight: 400; font-size: 12px; line-height: 16px; color:#2C2CDC;">
+                  To keep this link secure, it is available for 7 days, and can be clicked just once.
+              </div>
             </div>
           </div>
-        </div>
-        <div style="width: 333px; height: 32px; text-align: center; margin-top: 32px; font-style: normal; font-weight: 400; font-size: 12px; line-height: 16px">
-        Important: To keep this link secure, it will be available for only 7 days, and can be clicked just once.
-        </div>
+          <div class="contact-pref-cta-desktop" style="display:none">
+            <div onclick="window.open(`{{{contactPrefLink}}}`, '_blank');" 
+              style="cursor: pointer; display: flex; flex-direction: row; background: #F5F6FC; justify-content: center; 
+              align-items: center; height: 116px; max-width: 600px;">
+              <img width="60" height="60" style="vertical-align: middle; margin-right: 18px; " src="https://file.go.gov.sg/phonebook-channel.png" alt="Set channel" >
+              <div style="display: flex; flex-direction: column">
+                  <div style="font-style: normal; font-weight: 500; font-size: 14px; line-height: 20px; 
+                    color: #040651; padding-top: 8px">
+                    Prefer to receive your message via different channel? 
+                    <br/>
+                    Set your preference here &rarr;
+                  </div>
+                  <div style="line-height: 0px; height: 0px; margin-top: 4px; 
+                    border-bottom: 1px solid #B5C4FF; width: 100%">&#8202;</div>
+                  <div style="height: 32px; margin-top: 12px; font-style: normal; 
+                    font-weight: 400; font-size: 12px; line-height: 16px; color:#2C2CDC;">
+                    To keep this link secure, it is available for 7 days, and can be clicked just once.
+                  </div>
+              </div>
+              <!-- <hr color="#B5C4FF" size="0.5" width="90%"> -->
+            </div>
+          </div>
         {{/contactPrefLink}}
         <div class="body-vertical-spacer-bottom" style="line-height: 0px; height: 0px; margin-top: 48px;">&#8202;</div>
     

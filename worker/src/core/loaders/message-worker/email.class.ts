@@ -70,25 +70,16 @@ class Email {
       }
     )
     const showContactPref = config.get('phonebookContactPref.enabled')
-    if (showContactPref) {
+    if (showContactPref && result.length > 0) {
       try {
-        const res = await getContactPrefLinksForEmail(result)
-        return res
+        return await getContactPrefLinksForEmail(result)
       } catch (error) {
         logger.error({
           message: 'Unable to fetch contact preferences',
           error,
           workerId: this.workerId,
         })
-        // If phonebook is down, we still want to send the email
-        return map(result, (row) => {
-          const { senderEmail } = row.message
-          const showMasthead = senderEmail.endsWith(showMastheadDomain)
-          return {
-            ...row.message,
-            showMasthead,
-          }
-        })
+        // If phonebook is down, we still want to continue sending the messages
       }
     }
     return map(result, (row) => {

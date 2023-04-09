@@ -71,7 +71,7 @@ class SMS {
     const result = map(dbResults, 'get_messages_to_send_sms')
 
     const showContactPref = config.get('phonebookContactPref.enabled')
-    if (showContactPref) {
+    if (showContactPref && result.length > 0) {
       try {
         return await getMessagesWithContactPrefLinks(result)
       } catch (error) {
@@ -80,7 +80,7 @@ class SMS {
           error,
           workerId: this.workerId,
         })
-        return result
+        // If phonebook is down, we still want to continue sending the messages
       }
     }
     return result
