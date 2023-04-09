@@ -10,16 +10,24 @@ const options = {
   resetTimeout: 30000, // After 30 seconds, half open the circuit and try again.
 }
 
-async function getContactPrefLinks(request: ContactPreference[]) {
-  return axios.post(
-    config.get('phonebookContactPref.url'),
-    JSON.stringify(request),
-    {
+type ContactPreferenceRequest = {
+  userChannels: ContactPreference[]
+}
+
+async function getContactPrefLinks(request: ContactPreferenceRequest) {
+  const url = `${config.get(
+    'phonebookContactPref.url'
+  )}/api/v1/generate_pref_links`
+  return axios
+    .post(url, JSON.stringify(request), {
       headers: {
         'Content-Type': 'application/json',
       },
-    }
-  )
+    })
+    .then((resp) => resp.data)
+    .catch((err) => {
+      throw err
+    })
 }
 
 const breaker = new CircuitBreaker(getContactPrefLinks, options)
@@ -29,17 +37,22 @@ export const getContactPrefLinksForEmail = async (
   channel = 'Email'
 ) => {
   const showMastheadDomain = config.get('showMastheadDomain')
-  const request: ContactPreference[] = result.map((row) => {
-    return { channel, channelId: row.message.recipient }
+  const contactPrefs: ContactPreference[] = result.map((row) => {
+    return {
+      channel,
+      channelId: row.message.recipient,
+      postmanCampaignId: row.message.campaignId,
+    }
   })
+  const request = { userChannels: contactPrefs }
   return breaker
     .fire(request)
     .then((resp) => {
-      const contactPreferences = resp.data as ContactPreference[]
+      const { userChannels } = resp as ContactPreferenceRequest
       return map(result, (row) => {
         const { senderEmail } = row.message
         const showMasthead = senderEmail.endsWith(showMastheadDomain)
-        const contactPreference = contactPreferences.find(
+        const contactPreference = userChannels.find(
           (preference: ContactPreference) =>
             preference.channelId === row.message.recipient
         )
@@ -65,15 +78,20 @@ export const getMessagesWithContactPrefLinks = async (
   }[],
   channel = 'Sms'
 ) => {
-  const request: ContactPreference[] = result.map((message) => {
-    return { channel, channelId: message.recipient }
+  const contactPrefs: ContactPreference[] = result.map((message) => {
+    return {
+      channel,
+      channelId: message.recipient,
+      postmanCampaignId: message.campaignId,
+    }
   })
+  const request = { userChannels: contactPrefs }
   return breaker
     .fire(request)
     .then((resp) => {
-      const contactPreferences = resp.data as ContactPreference[]
+      const { userChannels } = resp as ContactPreferenceRequest
       return map(result, (message) => {
-        const contactPreference = contactPreferences.find(
+        const contactPreference = userChannels.find(
           (preference: ContactPreference) =>
             preference.channelId === message.recipient
         )

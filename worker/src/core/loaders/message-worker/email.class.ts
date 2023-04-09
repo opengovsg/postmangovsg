@@ -72,7 +72,8 @@ class Email {
     const showContactPref = config.get('phonebookContactPref.enabled')
     if (showContactPref) {
       try {
-        return await getContactPrefLinksForEmail(result)
+        const res = await getContactPrefLinksForEmail(result)
+        return res
       } catch (error) {
         logger.error({
           message: 'Unable to fetch contact preferences',

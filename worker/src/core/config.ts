@@ -77,7 +77,7 @@ export interface ConfigSchema {
   showMastheadDomain: string
   phonebookContactPref: {
     enabled: boolean
-    uri: string
+    url: string
   }
 }
 
@@ -320,10 +320,10 @@ const config: Config<ConfigSchema> = convict({
       default: false,
       env: 'SHOW_PHONEBOOK_CONTACT_PREF',
     },
-    uri: {
+    url: {
       doc: 'Phonebook uri to fetch contact preferences',
       default: 'phonebook.postman.gov.sg',
-      env: 'PHONEBOOK_URI',
+      env: 'PHONEBOOK_URL',
     },
   },
 })
