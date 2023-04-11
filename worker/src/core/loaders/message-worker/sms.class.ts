@@ -73,7 +73,25 @@ class SMS {
     const showContactPref = config.get('phonebookContactPref.enabled')
     if (showContactPref && result.length > 0) {
       try {
-        return await getMessagesWithContactPrefLinks(result)
+        const campaignId = result[0].campaignId as number
+        const emailResult = await this.connection.query<{ email: string }>(
+          'select u.email as email from users u where u.id = (select c.user_id from campaigns c where c.id = :campaignId);',
+          {
+            replacements: { campaignId },
+            type: QueryTypes.SELECT,
+          }
+        )
+        if (!emailResult || emailResult.length === 0) {
+          throw new Error(
+            'Unable to fetch user email from campaign for phonebook contact preference api'
+          )
+        }
+        const userEmail = emailResult[0].email
+        return await getMessagesWithContactPrefLinks(
+          result,
+          campaignId,
+          userEmail
+        )
       } catch (error) {
         logger.error({
           message: 'Unable to fetch contact preferences',

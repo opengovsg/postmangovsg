@@ -13,7 +13,7 @@ export interface Message {
   contactPrefLink?: string
 }
 
-export interface ContactPreference {
+export interface ContactChannel {
   channel: string
   channelId: string
   contactPrefLink?: string

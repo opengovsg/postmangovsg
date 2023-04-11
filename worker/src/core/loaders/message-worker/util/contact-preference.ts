@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { ContactPreference, EmailResultRow } from '../interface'
+import { ContactChannel, EmailResultRow } from '../interface'
 import config from '@core/config'
 import { map } from 'lodash'
 import CircuitBreaker from 'opossum'
@@ -11,7 +11,7 @@ const options = {
 }
 
 type ContactPreferenceRequest = {
-  userChannels: ContactPreference[]
+  userChannels: ContactChannel[]
 }
 
 async function getContactPrefLinks(request: ContactPreferenceRequest) {
@@ -34,26 +34,31 @@ const breaker = new CircuitBreaker(getContactPrefLinks, options)
 
 export const getContactPrefLinksForEmail = async (
   result: EmailResultRow[],
+  campaignId: number,
+  campaignOwnerEmail: string,
   channel = 'Email'
 ) => {
   const showMastheadDomain = config.get('showMastheadDomain')
-  const contactPrefs: ContactPreference[] = result.map((row) => {
+  const userChannels: ContactChannel[] = result.map((row) => {
     return {
       channel,
       channelId: row.message.recipient,
-      postmanCampaignId: row.message.campaignId,
     }
   })
-  const request = { userChannels: contactPrefs }
+  const request = {
+    userChannels,
+    postmanCampaignId: campaignId,
+    postmanCampaignOwner: campaignOwnerEmail,
+  }
   return breaker
     .fire(request)
     .then((resp) => {
-      const { userChannels } = resp as ContactPreferenceRequest
+      const userChannels = resp as ContactChannel[]
       return map(result, (row) => {
         const { senderEmail } = row.message
         const showMasthead = senderEmail.endsWith(showMastheadDomain)
         const contactPreference = userChannels.find(
-          (preference: ContactPreference) =>
+          (preference: ContactChannel) =>
             preference.channelId === row.message.recipient
         )
         return {
@@ -76,23 +81,28 @@ export const getMessagesWithContactPrefLinks = async (
     body: string
     campaignId: number
   }[],
+  campaignId: number,
+  campaignOwnerEmail: string,
   channel = 'Sms'
 ) => {
-  const contactPrefs: ContactPreference[] = result.map((message) => {
+  const userChannels: ContactChannel[] = result.map((message) => {
     return {
       channel,
       channelId: message.recipient,
-      postmanCampaignId: message.campaignId,
     }
   })
-  const request = { userChannels: contactPrefs }
+  const request = {
+    userChannels,
+    postmanCampaignId: campaignId,
+    postmanCampaignOwner: campaignOwnerEmail,
+  }
   return breaker
     .fire(request)
     .then((resp) => {
-      const { userChannels } = resp as ContactPreferenceRequest
+      const userChannels = resp as ContactChannel[]
       return map(result, (message) => {
         const contactPreference = userChannels.find(
-          (preference: ContactPreference) =>
+          (preference: ContactChannel) =>
             preference.channelId === message.recipient
         )
         const bodyWithLink = `${message.body}\n\nPrefer hearing from this agency a different way? Set your preference at: ${contactPreference?.contactPrefLink}`
