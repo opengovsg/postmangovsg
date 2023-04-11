@@ -95,8 +95,8 @@ const ApiKey: FunctionComponent = () => {
         You can create an API key to access our programmatic email and
         programmatic SMS APIs. For more information, go to our{' '}
         <OutboundLink
-          eventLabel="https://guide.postman.gov.sg/developer-guide/api-doc"
-          to="https://guide.postman.gov.sg/developer-guide/api-doc"
+          eventLabel="https://go.gov.sg/postman-api"
+          to="https://go.gov.sg/postman-api"
           target="_blank"
         >
           API Guide
