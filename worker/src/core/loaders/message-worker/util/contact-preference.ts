@@ -95,7 +95,7 @@ export const getMessagesWithContactPrefLinks = async (
           (preference: ContactPreference) =>
             preference.channelId === message.recipient
         )
-        const bodyWithLink = `${message.body}\n Prefer hearing from this agency a different way? Set your preference at: ${contactPreference?.contactPrefLink}`
+        const bodyWithLink = `${message.body}\n\nPrefer hearing from this agency a different way? Set your preference at: ${contactPreference?.contactPrefLink}`
         return {
           ...message,
           body: bodyWithLink,
