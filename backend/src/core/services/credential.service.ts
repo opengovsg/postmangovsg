@@ -17,6 +17,7 @@ import { RedisService } from './redis.service'
 import { TwilioCredentials } from '@shared/clients/twilio-client.class'
 import { ApiKeyService } from './api-key.service'
 import { ApiKey } from '@core/models/user/api-key'
+import moment from 'moment'
 
 export interface CredentialService {
   // Credentials (cred_name)
@@ -363,6 +364,7 @@ export const InitCredentialService = (redisService: RedisService) => {
       hash: apiKeyHash,
       lastFive: plainTextKey.slice(-5),
       label,
+      validUntil: moment().add(6, 'month').toDate(),
     } as ApiKey)
     return Object.assign({}, apiKey.toJSON(), { plainTextKey })
   }

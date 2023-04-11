@@ -67,6 +67,7 @@ export const InitApiKeyMiddleware = (
       last_five: key.lastFive,
       label: key.label,
       plain_text_key: key.plainTextKey,
+      valid_until: key.validUntil.toISOString(),
     }
   }
 
