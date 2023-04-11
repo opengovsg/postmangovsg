@@ -1,29 +1,8 @@
 # API Documentation
 
-
-
-| Type                   | Programmatic Email API                                    | Campaigns API\*                                          |
-| ---------------------- | --------------------------------------------------------- | -------------------------------------------------------- |
-| **How it works**       | Sends to one recipient at a time                          | Sends to multiple recipients at once                     |
-| **Examples use cases** | Application Approval, Email Receipt, Reminder to pay fine | Mass event invitation, mass broadcast of a policy update |
-
-\*Campaigns API is still a work in progress so you may not find the full documentation on this. However, you may still refer to the endpoints on our [Swagger Docs](https://api.postman.gov.sg/docs/).
-
-{% hint style="info" %}
-The use of the API is limited to non-password protected campaigns only.
-{% endhint %}
-
 ## Getting Started
 
-This guide covers **how to send emails** using either the _programmatic_ _API_.&#x20;
-
-You may try out the other endpoints listed in the swagger docs.&#x20;
-
-{% embed url="https://api.postman.gov.sg/docs/" %}
-Access our swagger docs for all the API endpoints available
-{% endembed %}
-
-We have since renamed our transactional API to programmatic API to better reflect what it does. However, this change has not been applied to the specific endpoints yet. You may find that the programmatic endpoints are still listed as `/transactional/` in our Swagger Docs**.**&#x20;
+This guide covers **how to send emails** using the _programmatic_ _API_.
 
 ### Pre-requisite
 
