@@ -4,6 +4,7 @@ interface AWSEndpointConfig {
   aws: { awsEndpoint: any; awsRegion: any }
 }
 
+// todo: refactor to sth simpler if we don't use localstack
 /**
  * Provide an Object containing either the endpoint to send AWS requests to,
  * or if that is absent, the region from which to generate the endpoint.
