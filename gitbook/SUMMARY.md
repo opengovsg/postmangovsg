@@ -27,14 +27,15 @@
     * [Add Twilio Credentials in Postman](campaign-guide/quick-start/sms/credentials.md)
     * [Use your Saved SMS Credentials](campaign-guide/quick-start/sms/use-saved-sms-credential-in-the-campaign.md)
     * [Sending an SMS to a Foreign Number](campaign-guide/quick-start/sms/send-sms-to-a-foreign-number.md)
+    * [Send Rate](campaign-guide/quick-start/sms/send-rate.md)
     * [SMS Best Practices](campaign-guide/quick-start/sms/sms-best-practices.md)
   * [📊 SMS Statistics](campaign-guide/quick-start/sms-statistics.md)
   * [🤖 Telegram Bot](campaign-guide/quick-start/telegram-bot/README.md)
     * [Add Telegram Bot Token in PostmanSG](campaign-guide/quick-start/telegram-bot/add-telegram-bot-token-in-postman.md)
     * [Instructions for Recipient Onboarding](campaign-guide/quick-start/telegram-bot/instructions-recipient-telegram.md)
     * [Use the Bot in the Campaign](campaign-guide/quick-start/telegram-bot/use-the-bot-in-the-campaign.md)
+    * [Telegram Formatting](campaign-guide/quick-start/telegram-bot/telegram-formatting.md)
     * [Telegram Bot Statistics](campaign-guide/quick-start/telegram-bot/telegram-bot-statistics.md)
-* [💪 Power Users](campaign-guide/power-users.md)
 * [📹 Video Guide](campaign-guide/video-guide.md)
 
 ## API Guide

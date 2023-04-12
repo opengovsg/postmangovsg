@@ -41,7 +41,7 @@ Your account name will be assigned by the Postman team for identification. It wi
 
 <figure><img src="../../../.gitbook/assets/Screenshot 2023-02-03 at 4.51.12 PM.png" alt=""><figcaption><p>Sign up for an account</p></figcaption></figure>
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2023-02-06 at 5.20.53 PM (1).png" alt=""><figcaption></figcaption></figure>
+<figure><img src="../../../.gitbook/assets/Screenshot 2023-02-06 at 5.20.53 PM.png" alt=""><figcaption></figcaption></figure>
 
 <figure><img src="../../../.gitbook/assets/Screenshot 2023-02-06 at 5.21.44 PM.png" alt=""><figcaption></figcaption></figure>
 
@@ -54,7 +54,7 @@ Important information:
 {% hint style="warning" %}
 **Information about Twilio Billing**
 
-Twilio works like a prepaid phone card. You will need to top up the credits in your account to start sending SMSes. We recommend using your **corporate credit card** for this.&#x20;
+Twilio works like a prepaid phone card. You will need to top up the credits in your account to start sending SMSes. We recommend using your **corporate credit card** for this.
 
 The alternative is through direct invoicing, which is only available as an option if you send more than 19,000 SMSes a month. If the latter is your preferred option, please contact us so we can put you in touch with our Twilio account manager.
 
@@ -70,6 +70,3 @@ Then, fill in the request billing account information.
 <figure><img src="../../../.gitbook/assets/Screenshot 2023-02-03 at 4.59.17 PM.png" alt=""><figcaption><p>Insert your tax number (GST number)</p></figcaption></figure>
 
 <figure><img src="../../../.gitbook/assets/Screenshot 2023-02-03 at 4.59.45 PM.png" alt=""><figcaption><p>Add in your corporate credit card details</p></figcaption></figure>
-
-
-

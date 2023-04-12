@@ -18,11 +18,9 @@ As well as the footer:
 
 <figure><img src="../../../.gitbook/assets/Screenshot 2022-09-22 at 10.25.36 AM.png" alt=""><figcaption></figcaption></figure>
 
-
-
 ## Why does an unsubscribe option exist?
 
-In order to comply with [Singapore's Spam Control Act ](https://sso.agc.gov.sg/Act/SCA2007)and align with international bulk email practices ([CAN-SPAM Act](https://www.ftc.gov/tips-advice/business-center/guidance/can-spam-act-compliance-guide-business) or [EU’s ePrivacy Directive](https://ec.europa.eu/information\_society/doc/factsheets/024-privacy-and-spam-en.pdf)), all emails sent from PostmanSG contain an unsubscribe option in the standard footer for recipients to unsubscribe to future emails that are promotional in nature, or not to their interests.&#x20;
+In order to comply with [Singapore's Spam Control Act ](https://sso.agc.gov.sg/Act/SCA2007)and align with international bulk email practices ([CAN-SPAM Act](https://www.ftc.gov/tips-advice/business-center/guidance/can-spam-act-compliance-guide-business) or [EU’s ePrivacy Directive](https://ec.europa.eu/information\_society/doc/factsheets/024-privacy-and-spam-en.pdf)), all emails sent from PostmanSG contain an unsubscribe option in the standard footer for recipients to unsubscribe to future emails that are promotional in nature, or not to their interests.
 
 As a data controller since you manage the recipient lists, you should also ensure good data control and privacy protection, and respect their unsubscribe wishes.
 
@@ -32,7 +30,7 @@ As a campaign owner, you will receive a weekly unsubscription digest.
 
 <figure><img src="../../../.gitbook/assets/Screenshot 2022-09-22 at 1.53.15 PM.png" alt=""><figcaption></figcaption></figure>
 
-Please exercise your best judgment to determine whether or not to remove these recipients from your mailing list based on the content of your email.&#x20;
+Please exercise your best judgment to determine whether or not to remove these recipients from your mailing list based on the content of your email.
 
 If your email is **promotional** in nature, please remove these recipients from your mailing list to respect their wishes.
 
@@ -52,7 +50,6 @@ Do note that if a recipient unsubscribes some time after the campaign is sent, y
 
 <figure><img src="../../../.gitbook/assets/Screenshot 2022-09-22 at 4.14.07 PM.png" alt=""><figcaption></figcaption></figure>
 
-3\.  In the recipient unsubscription flow, they will be asked for the reason for their unsubscribe request (e.g. they no longer want to receive emails from this campaign, they never signed up, etc.). This helps you gather more information on your campaigns and why people unsubscribe.
+3\. In the recipient unsubscription flow, they will be asked for the reason for their unsubscribe request (e.g. they no longer want to receive emails from this campaign, they never signed up, etc.). This helps you gather more information on your campaigns and why people unsubscribe.
 
-<figure><img src="../../../.gitbook/assets/Screenshot 2022-09-28 at 6.15.37 PM (1).png" alt=""><figcaption></figcaption></figure>
-
+<figure><img src="../../../.gitbook/assets/Screenshot 2022-09-28 at 6.15.37 PM.png" alt=""><figcaption></figcaption></figure>
