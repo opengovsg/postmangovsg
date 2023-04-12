@@ -78,6 +78,7 @@ export interface ConfigSchema {
   phonebookContactPref: {
     enabled: boolean
     url: string
+    apiKey: string
   }
 }
 
@@ -324,6 +325,11 @@ const config: Config<ConfigSchema> = convict({
       doc: 'Phonebook uri to fetch contact preferences',
       default: 'phonebook.postman.gov.sg',
       env: 'PHONEBOOK_URL',
+    },
+    apiKey: {
+      doc: 'API key for Phonebook contact preferences api',
+      default: '',
+      env: 'PHONEBOOK_API_KEY',
     },
   },
 })

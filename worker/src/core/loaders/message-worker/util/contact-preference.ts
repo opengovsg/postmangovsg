@@ -22,6 +22,7 @@ async function getContactPrefLinks(request: ContactPreferenceRequest) {
     .post(url, JSON.stringify(request), {
       headers: {
         'Content-Type': 'application/json',
+        'x-api-key': config.get('phonebookContactPref.apiKey'),
       },
     })
     .then((resp) => resp.data)
