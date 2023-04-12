@@ -4,11 +4,6 @@ description: This page is under construction
 
 # Overview
 
-| Type                   | Programmatic Email API                                    | Campaigns API\*                                          |
-| ---------------------- | --------------------------------------------------------- | -------------------------------------------------------- |
-| **How it works**       | Sends to one recipient at a time                          | Sends to multiple recipients at once                     |
-| **Examples use cases** | Application Approval, Email Receipt, Reminder to pay fine | Mass event invitation, mass broadcast of a policy update |
-
 ## Programmatic APIs
 
 TODO
@@ -25,4 +20,11 @@ Access our swagger docs for all the API endpoints available
 Campaign APIs currently do not support non-password protected campaigns only.
 {% endhint %}
 
-_If you have additional enquiries or potential use cases using the Campaigns API, please_ [_contact us_](https://go.gov.sg/postman-contact-us)_._&#x20;
+_If you have additional enquiries or potential use cases using the Campaigns API, please_ [_contact us_](https://go.gov.sg/postman-contact-us)_._
+
+## Programmatic APIs vs Campaign APIs
+
+| Type                   | Programmatic APIs                                        | Campaign APIs                                            |
+| ---------------------- | -------------------------------------------------------- | -------------------------------------------------------- |
+| **How it works**       | Sends to one recipient at a time                         | Bulk sends to multiple recipients at once                |
+| **Examples use cases** | Application approval, OTP, email receipt, reminders etc. | Mass event invitation, mass broadcast of a policy update |
