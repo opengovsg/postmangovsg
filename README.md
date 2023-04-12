@@ -62,12 +62,6 @@ Set up a **postgresql@11** database, and **redis** cache. PostgreSQL and Redis u
 npm run dev:services
 ```
 
-#### Optionally, run the following to install and use `cw` to tail Cloudwatch logs
-
-````zsh
-brew tap lucagrulla/tap
-brew install cw
-
 ### Secrets detection
 
 This project makes of [detect-secrets](https://github.com/Yelp/detect-secrets) to prevent secrets and credentials from being committed to the repository.
@@ -78,7 +72,7 @@ Run the following to install:
 
 ```zsh
 pip install detect-secrets==1.2.0
-````
+```
 
 Upon blockage by `detect-secrets-hook`, please take these steps:
 
@@ -318,7 +312,7 @@ The production branch is `master` and each PR is deployed when it is merged into
 - Clone the forked repository to your machine
 - Create a branch, make changes and commit those changes.
 - Push these changes to Github
-- Submit a pull request against `basefork/develop` (that's us!)
+- Submit a pull request against `basefork/master` (that's us!)
 - Describe the issue as thoroughly as possible, and with screenshots if applicable. A picture speaks a thousand words!
 
 For more information, see [CONTRIBUTING.md](docs/CONTRIBUTING.md)
