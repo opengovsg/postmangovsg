@@ -280,14 +280,9 @@ export async function uploadPartWithPresignedUrl({
     const contentType = 'text/csv'
     const blob = new Blob(data, { type: contentType })
 
-    // todo refactor for simplicity after removing localstack
     const response = await axios.put(presignedUrl, blob, {
       withCredentials: false,
       timeout: 0,
-      headers: {
-        // Localstack requires Content-Type to be stated explicitly in order to parse the request body properly.
-        'Content-Type': contentType,
-      },
     })
     return response.headers.etag
   } catch (e) {
