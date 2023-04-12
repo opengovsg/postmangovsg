@@ -29,7 +29,7 @@ WORKDIR /usr/home/postmangovsg
 
 # this means npm will only install production deps, and optimizations in the node
 # engine will take place as well
-ENV NODE_ENV=production 
+ENV NODE_ENV=production
 
 # expose port and copy these files first as they're unlikely to change
 EXPOSE 4000
@@ -37,7 +37,7 @@ COPY ./docker-entrypoint.sh ./
 RUN ["chmod", "+x", "docker-entrypoint.sh"]
 
 COPY --from=builder /usr/home/shared/package* ../shared/
-RUN cd ../shared && npm install 
+RUN cd ../shared && npm install
 
 COPY --from=builder /usr/home/postmangovsg/package* ./
 RUN npm install
@@ -46,5 +46,6 @@ COPY --from=builder /usr/home/shared/build ../shared/build
 
 COPY --from=builder /usr/home/postmangovsg/build ./build
 
+USER node
 ENTRYPOINT [ "tini", "--" ]
 CMD ["./docker-entrypoint.sh"]
