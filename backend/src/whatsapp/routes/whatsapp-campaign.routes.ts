@@ -7,5 +7,7 @@ export const InitWhatsappCampaignRoute = (
   const router = Router({ mergeParams: true })
 
   router.get('/', whatsappMiddleware.getCampaignDetails)
+
+  router.post('/send', whatsappMiddleware.sendMessage)
   return router
 }

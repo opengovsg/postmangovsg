@@ -155,7 +155,7 @@ interface ConfigSchema {
   }
   whatsapp: {
     endpointUrl: string
-    endpointVersion: number
+    endpointVersion: string
     callbackUrl: string
     callbackVerifyToken: string
     bearerToken: string
@@ -704,8 +704,7 @@ const config: Config<ConfigSchema> = convict({
     },
     endpointVersion: {
       doc: 'Whatsapp current version',
-      default: 0,
-      format: 'int',
+      default: '',
       env: 'WHATSAPP_ENDPOINT_VERSION',
     },
     callbackUrl: {

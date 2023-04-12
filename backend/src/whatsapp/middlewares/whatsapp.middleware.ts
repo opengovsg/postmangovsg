@@ -1,10 +1,13 @@
 import { loggerWithLabel } from '@core/logger'
 import { Handler, Request, Response } from 'express'
 import { CredentialService } from '@core/services'
+import { WhatsappService } from '../services'
 
 export interface WhatsappMiddleware {
   getCredentialsFromBody: Handler
   getCampaignDetails: Handler
+
+  sendMessage: Handler
 }
 
 export const InitWhatsappMiddleware = (
@@ -25,8 +28,26 @@ export const InitWhatsappMiddleware = (
     const { campaignId } = req.params
     return res.json({ campaignId })
   }
+
+  const sendMessage = async (
+    req: Request,
+    res: Response
+  ): Promise<void | Response> => {
+    const { recipient, from, content } = req.body
+    try {
+      const resp = await WhatsappService.sendMessage(from, recipient, content)
+      return res.json(resp)
+    } catch (e) {
+      logger.error({
+        message: 'Something went wrong with sending a message',
+        error: e,
+      })
+      return res.status(401).json({ message: e })
+    }
+  }
   return {
     getCredentialsFromBody,
     getCampaignDetails,
+    sendMessage,
   }
 }

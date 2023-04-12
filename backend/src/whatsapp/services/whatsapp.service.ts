@@ -1,9 +1,31 @@
-import { loggerWithLabel } from '@core/logger'
+import { PhoneNumberService } from '@core/services'
+import config from '@core/config'
+import { InvalidRecipientError } from '@core/errors'
+import WhatsappClient from '@shared/clients/whatsapp-client.class'
 
-const logger = loggerWithLabel(module)
+// const logger = loggerWithLabel(module)
 
-const sendMessage = () => {
-  logger.info('sending message')
+const sendMessage = (from: string, recipient: string, content: any) => {
+  try {
+    recipient = PhoneNumberService.normalisePhoneNumber(
+      recipient,
+      config.get('defaultCountry')
+    ).substring(1)
+    // strip out the plus sign afterwards
+  } catch (err) {
+    throw new InvalidRecipientError('Invalid phone number')
+  }
+
+  const client = initializeBasicClient()
+  return client.sendMessage(from, recipient, content)
+}
+
+const initializeBasicClient = () => {
+  return new WhatsappClient({
+    baseUrl: config.get('whatsapp.endpointUrl'),
+    bearerToken: config.get('whatsapp.bearerToken'),
+    version: config.get('whatsapp.endpointVersion'),
+  })
 }
 export const WhatsappService = {
   sendMessage,
