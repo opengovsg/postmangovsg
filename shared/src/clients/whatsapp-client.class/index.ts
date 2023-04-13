@@ -13,10 +13,11 @@ export default class WhatsappClient {
 
   // This function wraps our requests with some default options
   private request(options: RequestOptions, body?: any): Promise<any> {
+    // replace path with the version, as this is how graph API wants it
     options.path = `/v${this.version}/${options.path}`
     const defaultOptions: RequestOptions = {
       method: 'POST', // default method will be post
-      host: this.buildHost(),
+      host: this.baseUrl,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.bearerToken}`,
@@ -26,12 +27,11 @@ export default class WhatsappClient {
     return new Promise((resolve, reject) => {
       const req = https.request({ ...defaultOptions, ...options }, (res) => {
         let data = ''
-        // A chunk of data has been received.
         res.on('data', (chunk) => {
           data += chunk
         })
 
-        // The whole response has been received. Print out the result.
+        // The whole response has been received
         res.on('end', () => {
           // parse the data
           resolve(JSON.parse(data))
@@ -40,16 +40,12 @@ export default class WhatsappClient {
           reject(`HTTP call failed ${err.message}`)
         })
       })
+      // this portion is writing to the request body, not the response object
       if (body) {
         req.write(JSON.stringify({ messaging_product: 'whatsapp', ...body }))
       }
       req.end()
     })
-  }
-
-  // change this if graphAPI changes its api format
-  private buildHost(): string {
-    return this.baseUrl
   }
 
   public sendMessage(from: string, to: string, body: any): Promise<string> {
@@ -60,8 +56,12 @@ export default class WhatsappClient {
       },
       { to, ...body }
     )
+    // tentatively hold it in promise, so we can extract out campaign id and do operations if we want to
+    // such as callback status and stuff
     return new Promise((resolve, reject) => {
       void resolution.then((res) => {
+        // graphAPI docs state that even for errors, it would return status 200 but have an error object
+        // so we check for error object instead of http status.
         if (!res.error) {
           resolve(res)
         } else {
