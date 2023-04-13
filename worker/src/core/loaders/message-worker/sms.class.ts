@@ -87,11 +87,7 @@ class SMS {
           )
         }
         const userEmail = emailResult[0].email
-        return await getMessagesWithContactPrefLinks(
-          result,
-          campaignId,
-          userEmail
-        )
+        return getMessagesWithContactPrefLinks(result, campaignId, userEmail)
       } catch (error) {
         logger.error({
           message: 'Unable to fetch contact preferences',

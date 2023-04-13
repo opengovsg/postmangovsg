@@ -325,11 +325,13 @@ const config: Config<ConfigSchema> = convict({
       doc: 'Phonebook uri to fetch contact preferences',
       default: 'phonebook.postman.gov.sg',
       env: 'PHONEBOOK_URL',
+      format: 'required-string',
     },
     apiKey: {
       doc: 'API key for Phonebook contact preferences api',
-      default: '',
+      default: 'somekey',
       env: 'PHONEBOOK_API_KEY',
+      format: 'required-string',
     },
   },
 })

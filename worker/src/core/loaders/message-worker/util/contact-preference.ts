@@ -18,17 +18,13 @@ async function getContactPrefLinks(request: ContactPreferenceRequest) {
   const url = `${config.get(
     'phonebookContactPref.url'
   )}/api/v1/generate_pref_links`
-  return axios
-    .post(url, JSON.stringify(request), {
-      headers: {
-        'Content-Type': 'application/json',
-        'x-api-key': config.get('phonebookContactPref.apiKey'),
-      },
-    })
-    .then((resp) => resp.data)
-    .catch((err) => {
-      throw err
-    })
+  const response = await axios.post(url, JSON.stringify(request), {
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': config.get('phonebookContactPref.apiKey'),
+    },
+  })
+  return response?.data
 }
 
 const breaker = new CircuitBreaker(getContactPrefLinks, options)
@@ -40,38 +36,37 @@ export const getContactPrefLinksForEmail = async (
   channel = 'Email'
 ) => {
   const showMastheadDomain = config.get('showMastheadDomain')
-  const userChannels: ContactChannel[] = result.map((row) => {
+  const userChannelsRequest: ContactChannel[] = result.map((row) => {
     return {
       channel,
       channelId: row.message.recipient,
     }
   })
   const request = {
-    userChannels,
+    userChannels: userChannelsRequest,
     postmanCampaignId: campaignId,
     postmanCampaignOwner: campaignOwnerEmail,
   }
-  return breaker
-    .fire(request)
-    .then((resp) => {
-      const userChannels = resp as ContactChannel[]
-      return map(result, (row) => {
-        const { senderEmail } = row.message
-        const showMasthead = senderEmail.endsWith(showMastheadDomain)
-        const contactPreference = userChannels.find(
-          (preference: ContactChannel) =>
-            preference.channelId === row.message.recipient
-        )
-        return {
-          ...row.message,
-          showMasthead,
-          contactPrefLink: contactPreference?.contactPrefLink || '',
-        }
-      })
-    })
-    .catch((error) => {
-      throw error
-    })
+  const response = await breaker.fire(request)
+  const userChannelsResp = response as ContactChannel[]
+  const userChannelMap = userChannelsResp.reduce(
+    (map: Map<string, ContactChannel>, contactChannel: ContactChannel) => {
+      map.set(contactChannel.channelId, contactChannel)
+      return map
+    },
+    new Map<string, ContactChannel>()
+  )
+
+  return map(result, (row) => {
+    const { senderEmail } = row.message
+    const showMasthead = senderEmail.endsWith(showMastheadDomain)
+    const contactPreference = userChannelMap.get(row.message.recipient)
+    return {
+      ...row.message,
+      showMasthead,
+      contactPrefLink: contactPreference?.contactPrefLink || '',
+    }
+  })
 }
 
 export const getMessagesWithContactPrefLinks = async (
@@ -86,34 +81,33 @@ export const getMessagesWithContactPrefLinks = async (
   campaignOwnerEmail: string,
   channel = 'Sms'
 ) => {
-  const userChannels: ContactChannel[] = result.map((message) => {
+  const userChannelsRequest: ContactChannel[] = result.map((message) => {
     return {
       channel,
       channelId: message.recipient,
     }
   })
   const request = {
-    userChannels,
+    userChannels: userChannelsRequest,
     postmanCampaignId: campaignId,
     postmanCampaignOwner: campaignOwnerEmail,
   }
-  return breaker
-    .fire(request)
-    .then((resp) => {
-      const userChannels = resp as ContactChannel[]
-      return map(result, (message) => {
-        const contactPreference = userChannels.find(
-          (preference: ContactChannel) =>
-            preference.channelId === message.recipient
-        )
-        const bodyWithLink = `${message.body}\n\nPrefer hearing from this agency a different way? Set your preference at: ${contactPreference?.contactPrefLink}`
-        return {
-          ...message,
-          body: bodyWithLink,
-        }
-      })
-    })
-    .catch((error) => {
-      throw error
-    })
+  const response = await breaker.fire(request)
+  const userChannelsResp = response as ContactChannel[]
+  const userChannelMap = userChannelsResp.reduce(
+    (map: Map<string, ContactChannel>, contactChannel: ContactChannel) => {
+      map.set(contactChannel.channelId, contactChannel)
+      return map
+    },
+    new Map<string, ContactChannel>()
+  )
+
+  return map(result, (message) => {
+    const contactPreference = userChannelMap.get(message.recipient)
+    const bodyWithLink = `${message.body}\n\nPrefer hearing from this agency a different way? Set your preference at: ${contactPreference?.contactPrefLink}`
+    return {
+      ...message,
+      body: bodyWithLink,
+    }
+  })
 }

@@ -86,7 +86,7 @@ class Email {
           )
         }
         const userEmail = emailResult[0].email
-        return await getContactPrefLinksForEmail(result, campaignId, userEmail)
+        return getContactPrefLinksForEmail(result, campaignId, userEmail)
       } catch (error) {
         logger.error({
           message: 'Unable to fetch contact preferences',
