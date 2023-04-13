@@ -1,2 +1,2 @@
 export * from './whatsapp-campaign.routes'
-export * from './whatsapp-callback.routes'
+export { default as whatsappCallbackRoutes } from './whatsapp-callback.routes'

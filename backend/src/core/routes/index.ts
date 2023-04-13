@@ -46,8 +46,10 @@ import { InitTelegramMiddleware } from '@telegram/middlewares'
 import { InitApiKeyRoute } from '@core/routes/api-key.routes'
 import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 import { InitWhatsappMiddleware } from '@whatsapp/middlewares'
-import { InitWhatsappCampaignRoute } from '@whatsapp/routes'
-import whatsappCallbackRoutes from '@whatsapp/routes/whatsapp-callback.routes'
+import {
+  InitWhatsappCampaignRoute,
+  whatsappCallbackRoutes,
+} from '@whatsapp/routes'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
