@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { WhatsappCallbackMiddleware } from '../middlewares'
+import { WhatsappCallbackMiddleware } from '@whatsapp/middlewares'
 
 const router = Router()
 

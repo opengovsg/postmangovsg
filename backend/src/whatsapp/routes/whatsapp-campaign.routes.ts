@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { WhatsappMiddleware } from '../middlewares'
+import { WhatsappMiddleware } from '@whatsapp/middlewares'
 
 export const InitWhatsappCampaignRoute = (
   whatsappMiddleware: WhatsappMiddleware

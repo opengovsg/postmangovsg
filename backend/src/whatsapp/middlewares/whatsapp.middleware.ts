@@ -1,7 +1,7 @@
 import { loggerWithLabel } from '@core/logger'
 import { Handler, Request, Response } from 'express'
 import { CredentialService } from '@core/services'
-import { WhatsappService } from '../services'
+import { WhatsappService } from '@whatsapp/services'
 
 export interface WhatsappMiddleware {
   getCredentialsFromBody: Handler

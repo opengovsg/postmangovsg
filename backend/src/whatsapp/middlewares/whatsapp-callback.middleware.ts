@@ -1,6 +1,6 @@
 import { loggerWithLabel } from '@core/logger'
 import { NextFunction, Request, Response } from 'express'
-import { WhatsappCallbackService } from '../services'
+import { WhatsappCallbackService } from '@whatsapp/services'
 
 const logger = loggerWithLabel(module)
 
