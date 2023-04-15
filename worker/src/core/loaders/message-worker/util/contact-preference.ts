@@ -18,13 +18,17 @@ async function getContactPrefLinks(request: ContactPreferenceRequest) {
   const url = `${config.get(
     'phonebookContactPref.url'
   )}/api/v1/generate_pref_links`
-  const response = await axios.post(url, JSON.stringify(request), {
-    headers: {
-      'Content-Type': 'application/json',
-      'x-api-key': config.get('phonebookContactPref.apiKey'),
-    },
-  })
-  return response?.data
+  return axios
+    .post(url, JSON.stringify(request), {
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': config.get('phonebookContactPref.apiKey'),
+      },
+    })
+    .then((resp) => resp.data)
+    .catch((err) => {
+      throw err
+    })
 }
 
 const breaker = new CircuitBreaker(getContactPrefLinks, options)
@@ -47,26 +51,32 @@ export const getContactPrefLinksForEmail = async (
     postmanCampaignId: campaignId,
     postmanCampaignOwner: campaignOwnerEmail,
   }
-  const response = await breaker.fire(request)
-  const userChannelsResp = response as ContactChannel[]
-  const userChannelMap = userChannelsResp.reduce(
-    (map: Map<string, ContactChannel>, contactChannel: ContactChannel) => {
-      map.set(contactChannel.channelId, contactChannel)
-      return map
-    },
-    new Map<string, ContactChannel>()
-  )
 
-  return map(result, (row) => {
-    const { senderEmail } = row.message
-    const showMasthead = senderEmail.endsWith(showMastheadDomain)
-    const contactPreference = userChannelMap.get(row.message.recipient)
-    return {
-      ...row.message,
-      showMasthead,
-      contactPrefLink: contactPreference?.contactPrefLink || '',
-    }
-  })
+  return breaker
+    .fire(request)
+    .then((resp) => {
+      const userChannelsResp = resp as ContactChannel[]
+      const userChannelMap = userChannelsResp.reduce(
+        (map: Map<string, ContactChannel>, contactChannel: ContactChannel) => {
+          map.set(contactChannel.channelId, contactChannel)
+          return map
+        },
+        new Map<string, ContactChannel>()
+      )
+      return map(result, (row) => {
+        const { senderEmail } = row.message
+        const showMasthead = senderEmail.endsWith(showMastheadDomain)
+        const contactPreference = userChannelMap.get(row.message.recipient)
+        return {
+          ...row.message,
+          showMasthead,
+          contactPrefLink: contactPreference?.contactPrefLink || '',
+        }
+      })
+    })
+    .catch((error) => {
+      throw error
+    })
 }
 
 export const getMessagesWithContactPrefLinks = async (
@@ -92,22 +102,27 @@ export const getMessagesWithContactPrefLinks = async (
     postmanCampaignId: campaignId,
     postmanCampaignOwner: campaignOwnerEmail,
   }
-  const response = await breaker.fire(request)
-  const userChannelsResp = response as ContactChannel[]
-  const userChannelMap = userChannelsResp.reduce(
-    (map: Map<string, ContactChannel>, contactChannel: ContactChannel) => {
-      map.set(contactChannel.channelId, contactChannel)
-      return map
-    },
-    new Map<string, ContactChannel>()
-  )
-
-  return map(result, (message) => {
-    const contactPreference = userChannelMap.get(message.recipient)
-    const bodyWithLink = `${message.body}\n\nPrefer hearing from this agency a different way? Set your preference at: ${contactPreference?.contactPrefLink}`
-    return {
-      ...message,
-      body: bodyWithLink,
-    }
-  })
+  return breaker
+    .fire(request)
+    .then((resp) => {
+      const userChannelsResp = resp as ContactChannel[]
+      const userChannelMap = userChannelsResp.reduce(
+        (map: Map<string, ContactChannel>, contactChannel: ContactChannel) => {
+          map.set(contactChannel.channelId, contactChannel)
+          return map
+        },
+        new Map<string, ContactChannel>()
+      )
+      return map(result, (message) => {
+        const contactPreference = userChannelMap.get(message.recipient)
+        const bodyWithLink = `${message.body}\n\nPrefer hearing from this agency a different way? Set your preference at: ${contactPreference?.contactPrefLink}`
+        return {
+          ...message,
+          body: bodyWithLink,
+        }
+      })
+    })
+    .catch((error) => {
+      throw error
+    })
 }
