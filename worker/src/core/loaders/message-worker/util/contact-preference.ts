@@ -115,10 +115,15 @@ export const getMessagesWithContactPrefLinks = async (
       )
       return map(result, (message) => {
         const contactPreference = userChannelMap.get(message.recipient)
-        const bodyWithLink = `${message.body}\n\nPrefer hearing from this agency a different way? Set your preference at: ${contactPreference?.contactPrefLink}`
+        let body: string
+        if (contactPreference?.contactPrefLink) {
+          body = `${message.body}\n\nPrefer hearing from this agency a different way? Set your preference at: ${contactPreference?.contactPrefLink}`
+        } else {
+          body = message.body
+        }
         return {
           ...message,
-          body: bodyWithLink,
+          body,
         }
       })
     })
