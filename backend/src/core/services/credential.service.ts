@@ -17,6 +17,7 @@ import { RedisService } from './redis.service'
 import { TwilioCredentials } from '@shared/clients/twilio-client.class'
 import { ApiKeyService } from './api-key.service'
 import { ApiKey } from '@core/models/user/api-key'
+import { DomainCredential } from '@core/models/domain-credential'
 
 export interface CredentialService {
   // Credentials (cred_name)
@@ -30,6 +31,8 @@ export interface CredentialService {
 
   getTelegramCredential(name: string): Promise<string>
 
+  getWhatsappCredential(name: string): Promise<string>
+
   // User credentials (user - label - cred_name)
   createUserCredential(
     label: string,
@@ -40,6 +43,12 @@ export interface CredentialService {
 
   deleteUserCredential(userId: number, label: string): Promise<number>
 
+  getDomainCredential(
+    domain: string,
+    label: string
+  ): Promise<DomainCredential | null>
+
+  getAllCredentialsUnderDomain(domain?: string | null): Promise<string[]>
   getUserCredential(
     userId: number,
     label: string
@@ -252,6 +261,41 @@ export const InitCredentialService = (redisService: RedisService) => {
   }
 
   /**
+   * Checks if the domain already has this credential label associated with them
+   * @param domain
+   * @param label
+   */
+  const getDomainCredential = (
+    domain: string,
+    label: string
+  ): Promise<DomainCredential | null> => {
+    return DomainCredential.findOne({
+      where: {
+        domain,
+        label,
+      },
+      attributes: ['credName'],
+    })
+  }
+
+  /**
+   * Given a user domain, find all the credentials tagged to the user, and return the label only
+   * @param domain
+   */
+  const getAllCredentialsUnderDomain = async (
+    domain?: string
+  ): Promise<string[]> => {
+    const domainCredentials = await DomainCredential.findAll({
+      where: {
+        domain,
+      },
+      attributes: ['label'],
+    })
+
+    return domainCredentials.map((c) => c.label)
+  }
+
+  /**
    * Checks if a user already has this credential label associated with them
    * @param userId
    * @param label
@@ -432,6 +476,9 @@ export const InitCredentialService = (redisService: RedisService) => {
     createUserCredential,
     deleteUserCredential,
     getUserCredential,
+    // Domain credentials
+    getDomainCredential,
+    getAllCredentialsUnderDomain,
     getSmsUserCredentialLabels,
     getTelegramUserCredentialLabels,
     getUserSettings,

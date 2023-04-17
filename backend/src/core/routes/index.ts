@@ -48,6 +48,7 @@ import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 import { InitWhatsappMiddleware } from '@whatsapp/middlewares'
 import {
   InitWhatsappCampaignRoute,
+  InitWhatsappSettingsRoute,
   whatsappCallbackRoutes,
 } from '@whatsapp/routes'
 
@@ -101,6 +102,7 @@ export const InitV1Route = (app: Application): Router => {
     (app as any).credentialService
   )
   const whatsappCampaignRoutes = InitWhatsappCampaignRoute(whatsappMiddleware)
+  const whatsappSettingsRoutes = InitWhatsappSettingsRoute(whatsappMiddleware)
   const apiKeyMiddleware = InitApiKeyMiddleware((app as any).credentialService)
   const apiKeyRoutes = InitApiKeyRoute(apiKeyMiddleware)
 
@@ -241,6 +243,11 @@ export const InitV1Route = (app: Application): Router => {
     '/settings/telegram',
     authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     telegramSettingsRoutes
+  )
+  router.use(
+    '/settings/whatsapp',
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
+    whatsappSettingsRoutes
   )
   router.use(
     '/settings',
