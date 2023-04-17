@@ -3,6 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { ApiKey, User } from '@core/models'
 import request from 'supertest'
+import moment from 'moment'
 
 const app = initialiseServer()
 const appWithUserSession = initialiseServer(true)
@@ -43,6 +44,7 @@ describe('DELETE /api-key/:apiKeyId', () => {
       hash: 'hash',
       label: 'label',
       lastFive: '12345',
+      validUntil: moment().add(6, 'month').toDate(),
     } as ApiKey)
     const res = await request(appWithUserSession).delete('/api-key/1')
     expect(res.status).toBe(200)
@@ -71,6 +73,7 @@ describe('GET /api-key/', () => {
       hash: 'hash',
       label: 'label',
       lastFive: '12345',
+      validUntil: moment().add(6, 'month').toDate(),
     } as ApiKey)
     await ApiKey.create({
       id: 2,
@@ -78,6 +81,7 @@ describe('GET /api-key/', () => {
       hash: 'hash1',
       label: 'label1',
       lastFive: '22345',
+      validUntil: moment().add(6, 'month').toDate(),
     } as ApiKey)
     await ApiKey.create({
       id: 3,
@@ -85,6 +89,7 @@ describe('GET /api-key/', () => {
       hash: 'hash2',
       label: 'label2',
       lastFive: '32345',
+      validUntil: moment().add(6, 'month').toDate(),
     } as ApiKey)
     const res = await request(appWithUserSession).get('/api-key')
     expect(res.status).toBe(200)
