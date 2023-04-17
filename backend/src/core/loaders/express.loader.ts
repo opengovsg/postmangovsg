@@ -1,5 +1,5 @@
 import cors from 'cors'
-import { errors as celebrateErrorMiddleware } from 'celebrate'
+import { isCelebrate } from 'celebrate'
 import express, { Request, Response, NextFunction } from 'express'
 import expressWinston from 'express-winston'
 import * as Sentry from '@sentry/node'
@@ -165,7 +165,22 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(sentrySessionMiddleware)
 
   app.use('/v1', InitV1Route(app))
-  app.use(celebrateErrorMiddleware())
+  app.use(
+    (
+      err: Error,
+      _req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ): express.Response | void => {
+      if (isCelebrate(err)) {
+        return res.status(400).json({
+          code: 'api_validation',
+          message: err.message,
+        })
+      }
+      next()
+    }
+  )
   app.use(Sentry.Handlers.errorHandler())
 
   app.use(
