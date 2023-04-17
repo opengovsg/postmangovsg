@@ -21,12 +21,13 @@ export const InitWhatsappMiddleware = (
   ): Promise<void | Response> => {
     const userId = req.session?.user?.id
     const userDomain = await DomainService.getUserDomain(userId)
-    logger.info('user domain:', userDomain)
     // if empty or user not found
     if (!userDomain) {
-      res
-        .sendStatus(401)
-        .json({ message: 'User does not belong to any domain' })
+      logger.error({
+        message: 'User does not belong to a domain',
+        action: 'getTemplates',
+      })
+      res.sendStatus(401)
     }
     const domainCredentialLabels =
       await credentialService.getAllCredentialsUnderDomain(userDomain)
@@ -46,10 +47,36 @@ export const InitWhatsappMiddleware = (
     res: Response
   ): Promise<void | Response> => {
     const userId = req.session?.user?.id
-    // first identify the users domain
-    // then use domain to map against the waba ID
-    // then use waba id to get templates
-    return res.json(userId)
+    const userDomain = await DomainService.getUserDomain(userId)
+    const credLabel = req.body.label
+    if (!userDomain) {
+      logger.error({
+        message: 'User does not belong to a domain',
+        action: 'getTemplates',
+      })
+      res.sendStatus(401)
+    }
+    if (!credLabel) {
+      logger.error({
+        message: 'Empty credentials label in body',
+        action: 'getTemplates',
+      })
+      res.sendStatus(400)
+    }
+
+    const domainCreds = await credentialService.getDomainCredential(
+      userDomain,
+      credLabel
+    )
+    if (!domainCreds) {
+      logger.error({
+        message: 'Credentials do not belong to this user',
+        action: 'getTemplates',
+      })
+      res.sendStatus(401)
+    }
+
+    return res.json(domainCreds)
   }
 
   const sendMessage = async (

@@ -48,7 +48,7 @@ export interface CredentialService {
     label: string
   ): Promise<DomainCredential | null>
 
-  getAllCredentialsUnderDomain(domain?: string | null): Promise<string[]>
+  getAllCredentialsUnderDomain(domain: string): Promise<string[]>
   getUserCredential(
     userId: number,
     label: string
@@ -222,6 +222,15 @@ export const InitCredentialService = (redisService: RedisService) => {
     return secretString
   }
 
+  const getWhatsappCredential = async (name: string): Promise<string> => {
+    const logMeta = { name, action: 'getTwilioCredentials' }
+
+    logger.info(logMeta)
+    return new Promise((resolve) => {
+      resolve(JSON.parse(name))
+    })
+  }
+
   /**
    * Creates a label for the credential, associated with a user
    * @param label
@@ -283,7 +292,7 @@ export const InitCredentialService = (redisService: RedisService) => {
    * @param domain
    */
   const getAllCredentialsUnderDomain = async (
-    domain?: string
+    domain: string
   ): Promise<string[]> => {
     const domainCredentials = await DomainCredential.findAll({
       where: {
@@ -472,6 +481,7 @@ export const InitCredentialService = (redisService: RedisService) => {
     storeCredential,
     getTwilioCredentials,
     getTelegramCredential,
+    getWhatsappCredential,
     // User credentials (user - label - cred_name)
     createUserCredential,
     deleteUserCredential,
