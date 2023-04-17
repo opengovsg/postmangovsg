@@ -13,15 +13,17 @@ export class WhatsappTemplate extends Model<WhatsappTemplate> {
     type: DataType.STRING,
     primaryKey: true,
   })
-  whatsappTemplateId!: string
+  whatsappTemplateLabel!: string
 
   @Column({
     type: DataType.TEXT,
+    allowNull: true,
   })
   body?: string
 
   @Column({
     type: DataType.TEXT,
+    allowNull: true,
   })
   subject?: string
 

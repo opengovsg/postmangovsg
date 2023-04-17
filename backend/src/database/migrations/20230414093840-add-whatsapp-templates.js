@@ -9,7 +9,7 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
-      whatsapp_template_id: {
+      whatsapp_template_label: {
         allowNull: false,
         primaryKey: true,
         type: Sequelize.DataTypes.STRING(255),
