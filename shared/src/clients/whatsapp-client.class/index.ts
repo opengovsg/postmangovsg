@@ -1,4 +1,4 @@
-import { WhatsappCredentials } from './interfaces'
+import { WhatsappCredentials, WhatsappTemplate } from './interfaces'
 import https, { RequestOptions } from 'https'
 
 export default class WhatsappClient {
@@ -62,6 +62,22 @@ export default class WhatsappClient {
       void resolution.then((res) => {
         // graphAPI docs state that even for errors, it would return status 200 but have an error object
         // so we check for error object instead of http status.
+        if (!res.error) {
+          resolve(res)
+        } else {
+          reject(res)
+        }
+      })
+    })
+  }
+
+  public getTemplates(wabaId: string): Promise<WhatsappTemplate[]> {
+    const resolution = this.request({
+      method: 'GET',
+      path: `${wabaId}/message_templates`,
+    })
+    return new Promise((resolve, reject) => {
+      void resolution.then((res) => {
         if (!res.error) {
           resolve(res)
         } else {

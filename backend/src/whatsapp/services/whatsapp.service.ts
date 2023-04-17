@@ -2,8 +2,9 @@ import { PhoneNumberService } from '@core/services'
 import config from '@core/config'
 import { InvalidRecipientError } from '@core/errors'
 import WhatsappClient from '@shared/clients/whatsapp-client.class'
+import { loggerWithLabel } from '@core/logger'
 
-// const logger = loggerWithLabel(module)
+const logger = loggerWithLabel(module)
 
 const sendMessage = (from: string, recipient: string, content: any) => {
   try {
@@ -20,6 +21,11 @@ const sendMessage = (from: string, recipient: string, content: any) => {
   return client.sendMessage(from, recipient, content)
 }
 
+const getTemplates = (wabaId: string) => {
+  logger.info({ message: wabaId })
+  const client = initializeBasicClient()
+  return client.getTemplates(wabaId)
+}
 const initializeBasicClient = () => {
   return new WhatsappClient({
     baseUrl: config.get('whatsapp.endpointUrl'),
@@ -29,4 +35,5 @@ const initializeBasicClient = () => {
 }
 export const WhatsappService = {
   sendMessage,
+  getTemplates,
 }

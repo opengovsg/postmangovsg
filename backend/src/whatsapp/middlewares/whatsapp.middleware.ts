@@ -74,9 +74,11 @@ export const InitWhatsappMiddleware = (
         action: 'getTemplates',
       })
       res.sendStatus(401)
+      return
     }
 
-    return res.json(domainCreds)
+    const resp = await WhatsappService.getTemplates(domainCreds.credName)
+    return res.json(resp)
   }
 
   const sendMessage = async (
