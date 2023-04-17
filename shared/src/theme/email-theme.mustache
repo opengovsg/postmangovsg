@@ -66,6 +66,24 @@
         line-height: 24px !important;
         height: 24px !important;
       }
+
+       .contact-pref-cta-mobile {
+        display: block !important;
+      }
+
+      .contact-pref-cta-desktop {
+        display: none !important;
+      }
+    }
+
+    @media only screen and (min-width: 501px) {
+      .contact-pref-cta-desktop {
+        display: block !important;
+      }
+
+      .contact-pref-cta-desktop {
+        display: block !important;
+      }
     }
 
     h1 {
@@ -190,6 +208,18 @@
         <div>
           {{{body}}}
         </div>
+        {{#contactPrefLink}}
+          <div class="contact-pref-cta-mobile" style="display: none;">
+            <a href={{{contactPrefLink}}} target="_blank" style="text-decoration: none;">
+              <img src="https://file.go.gov.sg/phonebook-email-cta-mobile.png" alt="Set channel">
+            </a>
+          </div>  
+          <div class="contact-pref-cta-desktop" style="display: none;">
+            <a href={{{contactPrefLink}}} target="_blank" style="text-decoration: none;">
+              <img src="https://file.go.gov.sg/phonebook-email-cta-desktop.png" alt="Set channel">
+            </a>
+          </div>
+        {{/contactPrefLink}}
         <div class="body-vertical-spacer-bottom" style="line-height: 0px; height: 0px; margin-top: 48px;">&#8202;</div>
     
     <!--[if false]><!-->
@@ -202,6 +232,7 @@
     <table role="presentation" style="width: 728px;" align="center">
       <tr><td>
     <![endif]-->
+    
       <div class="footer-content" style="max-width: 728px; padding: 0 64px; mso-padding-alt: 0 64px; text-align: center; line-height: 1.45;">
         <div class="footer-vertical-spacer-top" style="line-height: 32px; height: 32px;">&#8202;</div>
         <div style="font-size: 11px; color: #64707D">
