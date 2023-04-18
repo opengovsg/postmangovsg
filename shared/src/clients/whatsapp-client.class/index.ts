@@ -1,4 +1,8 @@
-import { WhatsappCredentials, WhatsappTemplate } from './interfaces'
+import {
+  WhatsappCredentials,
+  WhatsappTemplate,
+  WhatsappTemplateStatus,
+} from './interfaces'
 import https, { RequestOptions } from 'https'
 
 export default class WhatsappClient {
@@ -79,7 +83,12 @@ export default class WhatsappClient {
     return new Promise((resolve, reject) => {
       void resolution.then((res) => {
         if (!res.error) {
-          resolve(res)
+          resolve(
+            (res.data as WhatsappTemplate[]).filter(
+              (t: { status: WhatsappTemplateStatus }) =>
+                t.status === WhatsappTemplateStatus.APPROVED
+            )
+          )
         } else {
           reject(res)
         }

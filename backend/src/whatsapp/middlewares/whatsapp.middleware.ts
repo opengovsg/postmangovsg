@@ -77,7 +77,15 @@ export const InitWhatsappMiddleware = (
       return
     }
 
-    const resp = await WhatsappService.getTemplates(domainCreds.credName)
+    let resp
+    try {
+      resp = await WhatsappService.getTemplates(domainCreds.credName)
+    } catch (e) {
+      logger.error({
+        message: e,
+        action: 'getTemplates',
+      })
+    }
     return res.json(resp)
   }
 

@@ -8,11 +8,11 @@ const logger = loggerWithLabel(module)
 
 const sendMessage = (from: string, recipient: string, content: any) => {
   try {
+    // strip out the plus sign afterwards
     recipient = PhoneNumberService.normalisePhoneNumber(
       recipient,
       config.get('defaultCountry')
     ).substring(1)
-    // strip out the plus sign afterwards
   } catch (err) {
     throw new InvalidRecipientError('Invalid phone number')
   }
