@@ -16,6 +16,10 @@ import {
   InvalidPhoneNumberError,
   RateLimitError,
 } from '@shared/clients/twilio-client.class/errors'
+import {
+  ApiInvalidRecipientError,
+  ApiInvalidSmsCredentialsError,
+} from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -98,19 +102,13 @@ async function sendMessage(
       err instanceof InvalidPhoneNumberError ||
       err instanceof InvalidRecipientError
     ) {
-      res.status(400).json({
-        code: 'invalid_recipient',
-        message: `Phone number ${req.body.recipient} is invalid`,
-      })
-      return
+      throw new ApiInvalidRecipientError(
+        `Phone number ${req.body.recipient} is invalid`
+      )
     }
 
     if (err instanceof AuthenticationError) {
-      res.status(400).json({
-        code: 'invalid_sms_credentials',
-        message: 'Invalid Twilio credentials',
-      })
-      return
+      throw new ApiInvalidSmsCredentialsError('Invalid Twilio credentials')
     }
 
     if (err instanceof RateLimitError) {

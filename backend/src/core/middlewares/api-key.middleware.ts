@@ -2,6 +2,7 @@ import { loggerWithLabel } from '@core/logger'
 import { Handler, Request, Response } from 'express'
 import { ApiKeyService, CredentialService } from '@core/services'
 import { ApiKey } from '@core/models'
+import { ApiNotFoundError } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -35,10 +36,7 @@ export const InitApiKeyMiddleware = (
       +apiKeyId
     )
     if (deletedRows === 0) {
-      return res.status(404).json({
-        code: 'not_found',
-        message: 'Could not find API key to delete',
-      })
+      throw new ApiNotFoundError('Could not find API key to delete')
     }
     logger.info({
       message: 'Successfully deleted api key',
