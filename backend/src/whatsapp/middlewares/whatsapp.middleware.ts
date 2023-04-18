@@ -85,6 +85,7 @@ export const InitWhatsappMiddleware = (
         message: e,
         action: 'getTemplates',
       })
+      res.sendStatus(400)
     }
     return res.json(resp)
   }

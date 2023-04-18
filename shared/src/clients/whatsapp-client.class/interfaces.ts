@@ -46,5 +46,37 @@ export enum WhatsappTemplateCategory {
 export interface WhatsappTemplateComponent {
   format: string
   text: string
-  type: string
+  type: WhatsappTemplateComponentType
+}
+
+export enum WhatsappTemplateComponentType {
+  HEADER = 'HEADER',
+  BODY = 'BODY',
+  FOOTER = 'FOOTER',
+}
+
+export interface WhatsappCallbackPayload {
+  entry: WhatsappCallbackEntry[]
+  // should technically be an enum, but it will always be the same value as we are only subscribing whatsapp webhooks
+  object: string
+}
+
+export interface WhatsappCallbackEntry {
+  id: string
+  time: number
+  changes: WhatsappCallbackChange[]
+}
+
+export interface WhatsappCallbackChange {
+  field: WhatsappCallbackChangeField
+  // Each type of callback change field would have it's own different value object...
+  value: any
+}
+
+export enum WhatsappCallbackChangeField {
+  MESSAGE_TEMPLATE_STATUS_UPDATE = 'message_template_status_update',
+  MESSAGES = 'messages',
+  ACCOUNT_UPDATE = 'account_update',
+
+  // there are others but they won't be handled.
 }

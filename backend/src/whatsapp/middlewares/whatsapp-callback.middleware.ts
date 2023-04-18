@@ -1,21 +1,21 @@
 import { loggerWithLabel } from '@core/logger'
-import { NextFunction, Request, Response } from 'express'
+import { Request, Response } from 'express'
 import { WhatsappCallbackService } from '@whatsapp/services'
 
 const logger = loggerWithLabel(module)
 
 const parseEvent = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
+  let resp
   try {
-    await WhatsappCallbackService.parseEvent(req)
-    logger.info({ message: 'Successfully parsed event', action: 'parseEvent' })
-    return res.sendStatus(200)
+    resp = await WhatsappCallbackService.parseEvent(req)
   } catch (err) {
-    return next(err)
+    logger.error({ message: err, action: 'parseEvent' })
+    res.sendStatus(400)
   }
+  return res.json(resp)
 }
 export const WhatsappCallbackMiddleware = {
   parseEvent,

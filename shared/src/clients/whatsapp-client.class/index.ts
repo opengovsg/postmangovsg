@@ -86,7 +86,7 @@ export default class WhatsappClient {
           resolve(
             (res.data as WhatsappTemplate[]).filter(
               (t: { status: WhatsappTemplateStatus }) =>
-                t.status === WhatsappTemplateStatus.APPROVED
+                t.status !== WhatsappTemplateStatus.REJECTED
             )
           )
         } else {
