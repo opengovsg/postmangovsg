@@ -8,6 +8,7 @@ import config from '@core/config'
 import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
+import { ApiValidationError, RestApiError } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
@@ -169,18 +170,37 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     (
       err: Error,
       _req: express.Request,
-      res: express.Response,
+      _res: express.Response,
       next: express.NextFunction
-    ): express.Response | void => {
+    ) => {
       if (isCelebrate(err)) {
-        return res.status(400).json({
-          code: 'api_validation',
-          message: err.message,
-        })
+        throw new ApiValidationError(err.message)
+      } else if (err) {
+        return next(err)
       }
       next()
     }
   )
+
+  app.use(
+    (
+      err: Error,
+      _req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ): express.Response | void => {
+      if (err instanceof RestApiError) {
+        return res.status(err.httpStatusCode).json({
+          code: err.errorCode,
+          message: err.message,
+        })
+      } else if (err) {
+        return next(err)
+      }
+      next()
+    }
+  )
+
   app.use(Sentry.Handlers.errorHandler())
 
   app.use(
