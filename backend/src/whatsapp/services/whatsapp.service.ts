@@ -5,6 +5,12 @@ import WhatsappClient from '@shared/clients/whatsapp-client.class'
 
 // const logger = loggerWithLabel(module)
 
+const whatsappClient: WhatsappClient = new WhatsappClient({
+  baseUrl: config.get('whatsapp.endpointUrl'),
+  bearerToken: config.get('whatsapp.bearerToken'),
+  version: config.get('whatsapp.endpointVersion'),
+})
+
 const sendMessage = (from: string, recipient: string, content: any) => {
   try {
     recipient = PhoneNumberService.normalisePhoneNumber(
@@ -16,17 +22,10 @@ const sendMessage = (from: string, recipient: string, content: any) => {
     throw new InvalidRecipientError('Invalid phone number')
   }
 
-  const client = initializeBasicClient()
-  return client.sendMessage(from, recipient, content)
+  return whatsappClient.sendMessage(from, recipient, content)
 }
 
-const initializeBasicClient = () => {
-  return new WhatsappClient({
-    baseUrl: config.get('whatsapp.endpointUrl'),
-    bearerToken: config.get('whatsapp.bearerToken'),
-    version: config.get('whatsapp.endpointVersion'),
-  })
-}
 export const WhatsappService = {
+  whatsappClient,
   sendMessage,
 }
