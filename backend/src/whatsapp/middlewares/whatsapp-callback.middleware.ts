@@ -8,14 +8,9 @@ const parseEvent = async (
   req: Request,
   res: Response
 ): Promise<Response | void> => {
-  let resp
-  try {
-    resp = await WhatsappCallbackService.parseEvent(req)
-  } catch (err) {
-    logger.error({ message: err, action: 'parseEvent' })
-    res.sendStatus(400)
-  }
-  return res.json(resp)
+  await WhatsappCallbackService.parseEvent(req)
+  logger.info({ message: 'Successfully parsed event', action: 'parseEvent' })
+  return res.sendStatus(200)
 }
 export const WhatsappCallbackMiddleware = {
   parseEvent,

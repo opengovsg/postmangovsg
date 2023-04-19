@@ -6,6 +6,12 @@ import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
 
+const whatsappClient: WhatsappClient = new WhatsappClient({
+  baseUrl: config.get('whatsapp.endpointUrl'),
+  bearerToken: config.get('whatsapp.bearerToken'),
+  version: config.get('whatsapp.endpointVersion'),
+})
+
 const sendMessage = (from: string, recipient: string, content: any) => {
   try {
     // strip out the plus sign afterwards
@@ -17,23 +23,15 @@ const sendMessage = (from: string, recipient: string, content: any) => {
     throw new InvalidRecipientError('Invalid phone number')
   }
 
-  const client = initializeBasicClient()
-  return client.sendMessage(from, recipient, content)
+  return whatsappClient.sendMessage(from, recipient, content)
 }
 
 const getTemplates = (wabaId: string) => {
   logger.info({ message: wabaId })
-  const client = initializeBasicClient()
-  return client.getTemplates(wabaId)
-}
-const initializeBasicClient = () => {
-  return new WhatsappClient({
-    baseUrl: config.get('whatsapp.endpointUrl'),
-    bearerToken: config.get('whatsapp.bearerToken'),
-    version: config.get('whatsapp.endpointVersion'),
-  })
+  return whatsappClient.getTemplates(wabaId)
 }
 export const WhatsappService = {
+  whatsappClient,
   sendMessage,
   getTemplates,
 }

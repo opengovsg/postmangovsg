@@ -1,78 +1,63 @@
-import {
-  WhatsappCredentials,
-  WhatsappTemplate,
-  WhatsappTemplateStatus,
-} from './interfaces'
-import https, { RequestOptions } from 'https'
+import { WhatsappCredentials } from './interfaces'
+import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 export default class WhatsappClient {
   private bearerToken: string
   private baseUrl: string
   private version: string
+  private axiosClient: AxiosInstance
   constructor(credential: WhatsappCredentials) {
     this.bearerToken = credential.bearerToken
     this.baseUrl = credential.baseUrl
     this.version = credential.version
-  }
-
-  // This function wraps our requests with some default options
-  private request(options: RequestOptions, body?: any): Promise<any> {
-    // replace path with the version, as this is how graph API wants it
-    options.path = `/v${this.version}/${options.path}`
-    const defaultOptions: RequestOptions = {
-      method: 'POST', // default method will be post
-      host: this.baseUrl,
+    this.axiosClient = axios.create({
+      baseURL: this.baseUrl,
+      timeout: 1000,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.bearerToken}`,
       },
-    }
-
-    return new Promise((resolve, reject) => {
-      const req = https.request({ ...defaultOptions, ...options }, (res) => {
-        let data = ''
-        res.on('data', (chunk) => {
-          data += chunk
-        })
-
-        // The whole response has been received
-        res.on('end', () => {
-          // parse the data
-          resolve(JSON.parse(data))
-        })
-        res.on('error', (err) => {
-          reject(`HTTP call failed ${err.message}`)
-        })
-      })
-      // this portion is writing to the request body, not the response object
-      if (body) {
-        req.write(JSON.stringify({ messaging_product: 'whatsapp', ...body }))
-      }
-      req.end()
     })
   }
 
-  public sendMessage(from: string, to: string, body: any): Promise<string> {
-    const resolution = this.request(
+  // This function wraps our requests with some default options
+  private request(options: AxiosRequestConfig, body?: any): Promise<any> {
+    // replace path with the version, as this is how graph API wants it
+    options.url = `/v${this.version}/${options.url}`
+    const defaultOptions: AxiosRequestConfig = {
+      method: 'post', // default method will be post
+    }
+    if (body) {
+      body.messaging_product = 'whatsapp'
+    }
+    return this.axiosClient
+      .request({
+        ...defaultOptions,
+        ...options,
+        data: { ...body },
+      })
+      .then((res) => {
+        return res.data
+      })
+  }
+
+  public async sendMessage(from: string, to: string, body: any) {
+    const res = await this.request(
       {
-        method: 'POST',
-        path: `${from}/messages`,
+        method: 'post',
+        url: `${from}/messages`,
       },
       { to, ...body }
-    )
-    // tentatively hold it in promise, so we can extract out campaign id and do operations if we want to
-    // such as callback status and stuff
-    return new Promise((resolve, reject) => {
-      void resolution.then((res) => {
-        // graphAPI docs state that even for errors, it would return status 200 but have an error object
-        // so we check for error object instead of http status.
-        if (!res.error) {
-          resolve(res)
-        } else {
-          reject(res)
-        }
-      })
+    ).catch((e) => {
+      // this would mean whatsapp server is down
+      throw new Error(e)
     })
+    // even if whatsapp returned an error, it would still have status code: 200
+    // we must check for the error object instead
+    if (res.error) {
+      throw new Error(res)
+    }
+    return res
   }
 
   public getTemplates(wabaId: string): Promise<WhatsappTemplate[]> {

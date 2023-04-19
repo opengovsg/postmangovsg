@@ -103,7 +103,7 @@ export const InitWhatsappMiddleware = (
         message: 'Something went wrong with sending a message',
         error: e,
       })
-      return res.status(401).json({ message: e })
+      res.sendStatus(500)
     }
   }
   return {
