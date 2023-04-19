@@ -1,4 +1,8 @@
-import { WhatsappCredentials } from './interfaces'
+import {
+  WhatsappCredentials,
+  WhatsappTemplate,
+  WhatsappTemplateStatus,
+} from './interfaces'
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
 
 export default class WhatsappClient {
@@ -60,24 +64,22 @@ export default class WhatsappClient {
     return res
   }
 
-  public getTemplates(wabaId: string): Promise<WhatsappTemplate[]> {
-    const resolution = this.request({
-      method: 'GET',
-      path: `${wabaId}/message_templates`,
+  public async getTemplates(wabaId: string): Promise<WhatsappTemplate[]> {
+    const res = await this.request({
+      method: 'get',
+      url: `${wabaId}/message_templates`,
+    }).catch((e) => {
+      // this would mean whatsapp server is down
+      throw new Error(e)
     })
-    return new Promise((resolve, reject) => {
-      void resolution.then((res) => {
-        if (!res.error) {
-          resolve(
-            (res.data as WhatsappTemplate[]).filter(
-              (t: { status: WhatsappTemplateStatus }) =>
-                t.status !== WhatsappTemplateStatus.REJECTED
-            )
-          )
-        } else {
-          reject(res)
-        }
-      })
-    })
+    // even if whatsapp returned an error, it would still have status code: 200
+    // we must check for the error object instead
+    if (res.error) {
+      throw new Error(res)
+    }
+    return (res.data as WhatsappTemplate[]).filter(
+      (t: { status: WhatsappTemplateStatus }) =>
+        t.status !== WhatsappTemplateStatus.REJECTED
+    )
   }
 }
