@@ -36,7 +36,7 @@ export const InitWhatsappMiddleware = (
     const { recipient, from, content } = req.body
     try {
       const resp = await WhatsappService.sendMessage(from, recipient, content)
-      return res.json({ resp })
+      return res.json(resp)
     } catch (e) {
       logger.error({
         message: 'Something went wrong with sending a message',
