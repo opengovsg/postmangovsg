@@ -70,6 +70,7 @@
     "@sms": "build/sms",
     "@email": "build/email",
     "@telegram": "build/telegram",
+    "@whatsapp": "build/whatsapp",
     "@shared": "../shared/build"
   },
   "repository": {
