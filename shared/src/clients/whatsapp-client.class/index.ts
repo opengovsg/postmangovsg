@@ -48,26 +48,22 @@ export default class WhatsappClient {
     })
   }
 
-  public sendMessage(from: string, to: string, body: any): Promise<string> {
-    const resolution = this.request(
+  public async sendMessage(from: string, to: string, body: any) {
+    const res = await this.request(
       {
         method: 'POST',
         path: `${from}/messages`,
       },
       { to, ...body }
-    )
-    // tentatively hold it in promise, so we can extract out campaign id and do operations if we want to
-    // such as callback status and stuff
-    return new Promise((resolve, reject) => {
-      void resolution.then((res) => {
-        // graphAPI docs state that even for errors, it would return status 200 but have an error object
-        // so we check for error object instead of http status.
-        if (!res.error) {
-          resolve(res)
-        } else {
-          reject(res)
-        }
-      })
+    ).catch((e) => {
+      // this would mean whatsapp server is down
+      throw new Error(e)
     })
+    // even if whatsapp returned an error, it would still have status code: 200
+    // we must check for the error object instead
+    if (res.error) {
+      throw new Error(res)
+    }
+    return res
   }
 }
