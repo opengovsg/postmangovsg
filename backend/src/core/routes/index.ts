@@ -216,7 +216,7 @@ export const InitV1Route = (app: Application): Router => {
   )
   router.use(
     '/campaign/:campaignId/whatsapp',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     celebrate(campaignIdValidator),
     whatsappCampaignRoutes
   )

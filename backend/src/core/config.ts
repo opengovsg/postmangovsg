@@ -699,28 +699,34 @@ const config: Config<ConfigSchema> = convict({
   whatsapp: {
     endpointUrl: {
       doc: 'Whatsapp endpoint URL',
-      default: '',
+      default: 'graph.facebook.com',
       env: 'WHATSAPP_ENDPOINT_URL',
+      format: 'required-string',
     },
     endpointVersion: {
       doc: 'Whatsapp current version',
-      default: '',
+      default: '16.0',
       env: 'WHATSAPP_ENDPOINT_VERSION',
+      format: 'required-string',
     },
     callbackUrl: {
       doc: 'Whatsapp Callback URL',
-      default: '',
+      default: '/v1/callback/whatsapp',
       env: 'WHATSAPP_CALLBACK_URL',
+      format: 'required-string',
     },
     callbackVerifyToken: {
       doc: 'Whatsapp Callback Verify Token',
-      default: '',
+      default: 'sample-token',
       env: 'WHATSAPP_CALLBACK_VERIFY_TOKEN',
+      format: 'required-string',
     },
     bearerToken: {
       doc: 'Whatsapp Permanent Access Token',
       default: '',
       env: 'WHATSAPP_BEARER_TOKEN',
+      format: 'required-string',
+      sensitive: true,
     },
   },
 })
