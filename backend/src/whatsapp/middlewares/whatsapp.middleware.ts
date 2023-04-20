@@ -1,5 +1,5 @@
 import { loggerWithLabel } from '@core/logger'
-import { Handler, Request, Response } from 'express'
+import { Handler, NextFunction, Request, Response } from 'express'
 import { CredentialService, DomainService } from '@core/services'
 import { WhatsappService } from '@whatsapp/services'
 
@@ -7,7 +7,8 @@ export interface WhatsappMiddleware {
   getCredentials: Handler
   getCampaignDetails: Handler
   getTemplates: Handler
-
+  isWhatsappCampaignOwnedByUser: Handler
+  setCampaignCredentials: Handler
   sendMessage: Handler
 }
 
@@ -90,6 +91,33 @@ export const InitWhatsappMiddleware = (
     return res.json(resp)
   }
 
+  const isWhatsappCampaignOwnedByUser = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const { campaignId } = req.params
+    const userId = req.session?.user?.id
+    const campaign = await WhatsappService.findCampaign(+campaignId, +userId)
+    if (campaign) {
+      return next()
+    } else {
+      return res.sendStatus(403)
+    }
+  }
+
+  const setCampaignCredentials = async (
+    req: Request,
+    res: Response
+  ): Promise<Response | void> => {
+    const { campaignId } = req.params
+    const { credentialName } = res.locals
+    if (!credentialName) {
+      throw new Error('Credential does not exist')
+    }
+    await WhatsappService.setCampaignCredentials(+campaignId, credentialName)
+    return res.json({ message: 'OK' })
+  }
   const sendMessage = async (
     req: Request,
     res: Response
@@ -110,6 +138,8 @@ export const InitWhatsappMiddleware = (
     getCampaignDetails,
     getCredentials,
     getTemplates,
+    isWhatsappCampaignOwnedByUser,
+    setCampaignCredentials,
     sendMessage,
   }
 }

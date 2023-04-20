@@ -3,6 +3,8 @@ import config from '@core/config'
 import { InvalidRecipientError } from '@core/errors'
 import WhatsappClient from '@shared/clients/whatsapp-client.class'
 import { loggerWithLabel } from '@core/logger'
+import { Campaign } from '@core/models'
+import { ChannelType } from '@core/constants'
 
 const logger = loggerWithLabel(module)
 
@@ -11,6 +13,19 @@ const whatsappClient: WhatsappClient = new WhatsappClient({
   bearerToken: config.get('whatsapp.bearerToken'),
   version: config.get('whatsapp.endpointVersion'),
 })
+
+const findCampaign = (
+  campaignId: number,
+  userId: number
+): Promise<Campaign> => {
+  return Campaign.findOne({
+    where: {
+      id: campaignId,
+      userId,
+      type: ChannelType.Whatsapp,
+    },
+  }) as Promise<Campaign>
+}
 
 const sendMessage = (from: string, recipient: string, content: any) => {
   try {
@@ -26,12 +41,29 @@ const sendMessage = (from: string, recipient: string, content: any) => {
   return whatsappClient.sendMessage(from, recipient, content)
 }
 
+const setCampaignCredentials = (
+  campaignId: number,
+  credentialName: string
+): Promise<[number]> => {
+  return Campaign.update(
+    { credName: credentialName },
+    {
+      where: {
+        id: campaignId,
+      },
+      returning: false,
+    }
+  )
+}
+
 const getTemplates = (wabaId: string) => {
   logger.info({ message: wabaId })
   return whatsappClient.getTemplates(wabaId)
 }
 export const WhatsappService = {
+  findCampaign,
   whatsappClient,
   sendMessage,
+  setCampaignCredentials,
   getTemplates,
 }
