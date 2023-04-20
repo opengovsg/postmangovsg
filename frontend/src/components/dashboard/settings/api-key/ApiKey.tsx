@@ -1,5 +1,6 @@
 import cx from 'classnames'
 
+import moment from 'moment'
 import { useState, useContext, useEffect } from 'react'
 
 import type { FunctionComponent } from 'react'
@@ -9,7 +10,7 @@ import { OutboundLink } from 'react-ga'
 import styles from './ApiKey.module.scss'
 
 import { CopyModal } from './CopyModal'
-import { CreateModal } from './CreateModal'
+import { CreateUpdateModal } from './CreateUpdateModal'
 
 import { ConfirmModal, PrimaryButton } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
@@ -24,6 +25,11 @@ const ApiKey: FunctionComponent = () => {
   const [apiKeys, setApiKeys] = useState<ApiKeyType[]>([])
   function addApiKey(key: ApiKeyType) {
     setApiKeys([key, ...apiKeys])
+  }
+  function updateApiKey(key: ApiKeyType) {
+    const index = apiKeys.findIndex((k) => k.id === key.id)
+    if (index === -1) return
+    setApiKeys([...apiKeys.slice(0, index), key, ...apiKeys.slice(index + 1)])
   }
   function removeApiKey(id: string) {
     setApiKeys(apiKeys.filter((k) => k.id !== id))
@@ -47,10 +53,21 @@ const ApiKey: FunctionComponent = () => {
 
   function openGenerateModal() {
     modalContext.setModalContent(
-      <CreateModal
+      <CreateUpdateModal
         onSuccess={(apiKey: ApiKeyType) => {
           addApiKey(apiKey)
           openCopyModal(apiKey)
+        }}
+      />
+    )
+  }
+  function openUpdateModal(apiKey: ApiKeyType) {
+    modalContext.setModalContent(
+      <CreateUpdateModal
+        originalApiKey={apiKey}
+        onSuccess={(apiKey: ApiKeyType) => {
+          updateApiKey(apiKey)
+          modalContext.close()
         }}
       />
     )
@@ -109,6 +126,8 @@ const ApiKey: FunctionComponent = () => {
             <tr>
               <th className="lg">Key Label</th>
               <th className="sm">Last 5 Digits</th>
+              <th className="lg">Contacts</th>
+              <th className="sm">Expires At</th>
               <th className="sm"></th>
             </tr>
           </thead>
@@ -117,10 +136,17 @@ const ApiKey: FunctionComponent = () => {
               <tr key={k.id}>
                 <td className="lg">{k.label}</td>
                 <td className="sm">••••• {k.last_five}</td>
+                <td className="lg">
+                  {k.notification_contacts &&
+                    k.notification_contacts.join('\n')}
+                </td>
+                <td className="sm">
+                  {moment(k.valid_until).format('DD MMM YYYY, HH:mm')}
+                </td>
                 <td className={cx('sm', styles.buttonContainer)}>
-                  {/* <button>
-                <i className={cx('bx bx-pencil', styles.pencil)} />
-              </button> */}
+                  <button onClick={() => openUpdateModal(k)}>
+                    <i className={cx('bx bx-pencil', styles.pencil)} />
+                  </button>
                   <button onClick={() => openDeleteModal(k.id)}>
                     <i className={cx('bx bx-trash', styles.trash)} />
                   </button>

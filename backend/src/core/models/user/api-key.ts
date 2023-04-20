@@ -29,4 +29,8 @@ export class ApiKey extends Model<ApiKey> {
 
   @Column({ type: DataType.DATE, allowNull: false })
   validUntil: Date
+
+  // we're enforcing not-null only for new keys via application logic
+  @Column({ type: DataType.ARRAY(DataType.STRING), allowNull: true })
+  notificationContacts: string[]
 }

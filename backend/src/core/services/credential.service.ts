@@ -65,7 +65,8 @@ export interface CredentialService {
 
   generateApiKey(
     userId: number,
-    label: string
+    label: string,
+    notificationContacts: string[]
   ): Promise<ApiKey & { plainTextKey: string }>
 }
 
@@ -350,7 +351,8 @@ export const InitCredentialService = (redisService: RedisService) => {
 
   const generateApiKey = async (
     userId: number,
-    label: string
+    label: string,
+    notificationContacts: string[]
   ): Promise<ApiKey & { plainTextKey: string }> => {
     const user = await User.findByPk(userId)
     if (!user) {
@@ -365,6 +367,7 @@ export const InitCredentialService = (redisService: RedisService) => {
       lastFive: plainTextKey.slice(-5),
       label,
       validUntil: moment().add(6, 'month').toDate(),
+      notificationContacts,
     } as ApiKey)
     return Object.assign({}, apiKey.toJSON(), { plainTextKey })
   }

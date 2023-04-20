@@ -76,3 +76,15 @@
     }
   }
 }
+.textInputDisabled {
+  border: 1px solid $light-grey;
+  background: $grey-500;
+  input {
+    color: $grey-700;
+  }
+  &:focus,
+  &:hover {
+    border-color: $light-grey;
+    border-width: 1px;
+  }
+}

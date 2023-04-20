@@ -43,7 +43,7 @@ beforeEach(async () => {
   } as User)
   const { plainTextKey } = await (
     app as any as { credentialService: CredentialService }
-  ).credentialService.generateApiKey(user.id, 'test api key')
+  ).credentialService.generateApiKey(user.id, 'test api key', [user.email])
   apiKey = plainTextKey
 })
 
@@ -1254,7 +1254,9 @@ describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
     } as User)
     const { plainTextKey: anotherApiKey } = await (
       app as any as { credentialService: CredentialService }
-    ).credentialService.generateApiKey(anotherUser.id, 'another test api key')
+    ).credentialService.generateApiKey(anotherUser.id, 'another test api key', [
+      anotherUser.email,
+    ])
     const message = await EmailMessageTransactional.create({
       userId: user.id,
       recipient: 'recipient@agency.gov.sg',
