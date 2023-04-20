@@ -137,8 +137,8 @@ const ApiKey: FunctionComponent = () => {
                 <td className="lg">{k.label}</td>
                 <td className="sm">••••• {k.last_five}</td>
                 <td className="lg">
-                  {k.notification_addresses &&
-                    k.notification_addresses.join('\n')}
+                  {k.notification_contacts &&
+                    k.notification_contacts.join('\n')}
                 </td>
                 <td className="sm">
                   {moment(k.valid_until).format('DD MMM YYYY, HH:mm')}

@@ -32,5 +32,5 @@ export class ApiKey extends Model<ApiKey> {
 
   // we're enforcing not-null only for new keys via application logic
   @Column({ type: DataType.ARRAY(DataType.STRING), allowNull: true })
-  notificationAddresses: string[]
+  notificationContacts: string[]
 }

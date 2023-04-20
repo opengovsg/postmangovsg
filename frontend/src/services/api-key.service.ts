@@ -6,7 +6,7 @@ export interface ApiKey {
   last_five: string
   plain_text_key?: string
   valid_until: string
-  notification_addresses: string[]
+  notification_contacts: string[]
 }
 
 export async function listApiKeys(): Promise<ApiKey[]> {
@@ -16,27 +16,27 @@ export async function listApiKeys(): Promise<ApiKey[]> {
 
 export async function generateApiKey({
   label,
-  notificationAddresses,
+  notificationContacts,
 }: {
   label: string
-  notificationAddresses: string[]
+  notificationContacts: string[]
 }): Promise<ApiKey> {
   const { data } = await axios.post('/api-key', {
     label,
-    notification_addresses: notificationAddresses,
+    notification_contacts: notificationContacts,
   })
   return data as ApiKey
 }
 
 export async function updateApiKey({
   id,
-  notificationAddresses,
+  notificationContacts,
 }: {
   id: string
-  notificationAddresses: string[]
+  notificationContacts: string[]
 }): Promise<ApiKey> {
   const { data } = await axios.put(`/api-key/${id}`, {
-    notification_addresses: notificationAddresses,
+    notification_contacts: notificationContacts,
   })
   return data as ApiKey
 }

@@ -56,7 +56,7 @@ export const InitApiKeyMiddleware = (
     const apiKey = await credentialService.generateApiKey(
       +userId,
       req.body.label,
-      req.body.notification_addresses
+      req.body.notification_contacts
     )
     return res.status(201).json(convertApiKeyModelToResponse(apiKey))
   }
@@ -78,7 +78,7 @@ export const InitApiKeyMiddleware = (
         message: `API key with ID ${apiKeyId} doesn't exist.`,
       })
     }
-    apiKey.set('notificationAddresses', req.body.notification_addresses)
+    apiKey.set('notificationContacts', req.body.notification_contacts)
     await apiKey.save()
     return res.status(200).json(convertApiKeyModelToResponse(apiKey))
   }
@@ -92,7 +92,7 @@ export const InitApiKeyMiddleware = (
       label: key.label,
       plain_text_key: key.plainTextKey,
       valid_until: key.validUntil.toISOString(),
-      notification_addresses: key.notificationAddresses,
+      notification_contacts: key.notificationContacts,
     }
   }
 

@@ -9,7 +9,7 @@ export const InitApiKeyRoute = (apiKeyMiddleware: ApiKeyMiddleware): Router => {
     celebrate({
       [Segments.BODY]: Joi.object({
         label: Joi.string().max(255).required(),
-        notification_addresses: Joi.array()
+        notification_contacts: Joi.array()
           .items(Joi.string().email())
           .min(1)
           .required(),
@@ -21,7 +21,7 @@ export const InitApiKeyRoute = (apiKeyMiddleware: ApiKeyMiddleware): Router => {
     '/:apiKeyId',
     celebrate({
       [Segments.BODY]: Joi.object({
-        notification_addresses: Joi.array().items(Joi.string().email()).min(1),
+        notification_contacts: Joi.array().items(Joi.string().email()).min(1),
       }),
     }),
     apiKeyMiddleware.updateApiKey

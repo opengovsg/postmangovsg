@@ -18,7 +18,7 @@ export const CreateUpdateModal = ({
   const [errMsg, setErrMsg] = useState<string>('')
   const errDisplayTimer = useRef<NodeJS.Timeout | null>(null)
   const [contactList, setContactList] = useState<string[]>(
-    originalApiKey?.notification_addresses || ['']
+    originalApiKey?.notification_contacts || ['']
   )
   function displayError(msg: string) {
     setErrMsg(msg)
@@ -67,9 +67,10 @@ export const CreateUpdateModal = ({
     }
     try {
       setIsLoading(true)
+      const deduplicatedContactList = Array.from(new Set(contactList))
       const apiKey = await generateApiKey({
         label: keyLabel,
-        notificationAddresses: contactList,
+        notificationContacts: deduplicatedContactList,
       })
       await onSuccess(apiKey)
     } catch (e) {
@@ -92,9 +93,10 @@ export const CreateUpdateModal = ({
 
     try {
       setIsLoading(true)
+      const deduplicatedContactList = Array.from(new Set(contactList))
       const apiKey = await updateApiKey({
         id: originalApiKey.id,
-        notificationAddresses: contactList,
+        notificationContacts: deduplicatedContactList,
       })
       await onSuccess(apiKey)
     } catch (e) {
@@ -106,7 +108,7 @@ export const CreateUpdateModal = ({
 
   const submitButtonText = {
     loading: isUpdateMode ? 'Updating Key' : 'Generating Key',
-    default: isUpdateMode ? 'Update Key' : 'Updating Key',
+    default: isUpdateMode ? 'Update Key' : 'Generate Key',
   }
   return (
     <form onSubmit={isUpdateMode ? handleUpdateSubmit : handleCreateSubmit}>
@@ -129,8 +131,10 @@ export const CreateUpdateModal = ({
         ></TextInput>
         <h4>Contact Emails</h4>
         <p>
-          Please provide the email contacts in the event we need to reach out to
-          you and your team about your API key.
+          Please provide email addresses that will receive updates regarding
+          this API key (e.g. reminders to rotate expiring key, information about
+          new features etc.). It is recommended to keep these email addresses
+          updated so that critical updates will not be missed.
         </p>
         {contactList.map((c, i) => (
           <div key={i} className={styles.contactContainer}>
