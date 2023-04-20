@@ -2,6 +2,7 @@ import bcrypt from 'bcrypt'
 import crypto from 'crypto'
 import config from '@core/config'
 import { ApiKey } from '@core/models'
+import { Op } from 'sequelize'
 
 /**
  * Generates a random base64 string as an api key
@@ -37,10 +38,12 @@ const hasValidApiKey = async (userId: string): Promise<boolean> => {
 }
 
 const getApiKeyRecord = async (hash: string): Promise<ApiKey | null> => {
-  // In future, add validity date and status checks as well here
-  return await ApiKey.findOne({
+  return ApiKey.findOne({
     where: {
       hash,
+      validUntil: {
+        [Op.gte]: new Date(),
+      },
     },
   })
 }

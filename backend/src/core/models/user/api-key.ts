@@ -26,4 +26,7 @@ export class ApiKey extends Model<ApiKey> {
 
   @Column({ type: DataType.STRING, allowNull: false })
   lastFive: string
+
+  @Column({ type: DataType.DATE, allowNull: false })
+  validUntil: Date
 }
