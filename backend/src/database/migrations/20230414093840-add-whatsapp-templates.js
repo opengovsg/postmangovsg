@@ -9,6 +9,15 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER,
       },
+      cred_name: {
+        type: Sequelize.DataTypes.STRING(255),
+        allowNull: true,
+        references: {
+          model: 'credentials',
+          key: 'name',
+        },
+        onUpdate: 'CASCADE',
+      },
       whatsapp_template_label: {
         allowNull: false,
         primaryKey: true,
