@@ -6,8 +6,8 @@ import { WhatsappService } from '@whatsapp/services'
 export interface WhatsappMiddleware {
   getCredentials: Handler
   getCampaignDetails: Handler
+  getPhoneNumbers: Handler
   getTemplates: Handler
-
   sendMessage: Handler
 }
 
@@ -40,6 +40,50 @@ export const InitWhatsappMiddleware = (
   ): Promise<void | Response> => {
     const { campaignId } = req.params
     return res.json({ campaignId })
+  }
+
+  /**
+   * Given these credentials, retrieve the phone numbers from the selected credentials
+   * @param req
+   * @param res
+   */
+  const getPhoneNumbers = async (
+    req: Request,
+    res: Response
+  ): Promise<void | Response> => {
+    const userId = req.session?.user?.id
+    const userDomain = await DomainService.getUserDomain(userId)
+    const credLabel = req.body.label
+    if (!userDomain) {
+      logger.error({
+        message: 'User does not belong to a domain',
+        action: 'getTemplates',
+      })
+      res.sendStatus(401)
+    }
+    if (!credLabel) {
+      logger.error({
+        message: 'Empty credentials label in body',
+        action: 'getTemplates',
+      })
+      res.sendStatus(400)
+    }
+
+    const domainCreds = await credentialService.getDomainCredential(
+      userDomain,
+      credLabel
+    )
+    if (!domainCreds) {
+      logger.error({
+        message: 'Credentials do not belong to this user',
+        action: 'getTemplates',
+      })
+      res.sendStatus(401)
+      return
+    }
+
+    // given the creds, retrieve list of possible numbers tied to this account, and it's display name.
+    // Also to note, the 'from' is the phone number ID, not the phone number itself
   }
 
   const getTemplates = async (
@@ -109,6 +153,7 @@ export const InitWhatsappMiddleware = (
   return {
     getCampaignDetails,
     getCredentials,
+    getPhoneNumbers,
     getTemplates,
     sendMessage,
   }

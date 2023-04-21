@@ -7,5 +7,6 @@ export const InitWhatsappSettingsRoute = (
   const router = Router()
   router.get('/credentials', whatsappMiddleware.getCredentials)
   router.get('/templates', whatsappMiddleware.getTemplates)
+  router.get('/phone-numbers', whatsappMiddleware.getPhoneNumbers)
   return router
 }
