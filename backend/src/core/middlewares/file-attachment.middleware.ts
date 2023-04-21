@@ -3,7 +3,6 @@ import fileUpload from 'express-fileupload'
 import config from '@core/config'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
-import bytes from 'bytes'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')
@@ -25,7 +24,9 @@ const fileUploadHandler = fileUpload({
   },
   abortOnLimit: true,
   limitHandler: function (_: Request, res: Response) {
-    res.status(413).json({ message: 'Size of attachments exceeds limit' })
+    res
+      .status(413)
+      .json({ message: 'Size of one or more attachments exceeds limit' })
   },
 })
 
@@ -82,12 +83,9 @@ async function checkAttachmentValidity(
     (acc, attachment) => acc + attachment.size,
     0
   )
-  const totalAttachmentsSizeLimit = `${bytes.format(
-    TOTAL_ATTACHMENT_SIZE_LIMIT
-  )}`
   if (totalAttachmentsSize > TOTAL_ATTACHMENT_SIZE_LIMIT) {
     res.status(413).json({
-      message: `Cumulative attachment size exceeds limit of ${totalAttachmentsSizeLimit}`,
+      message: 'Cumulative attachment size exceeds limit',
     })
     return
   }
