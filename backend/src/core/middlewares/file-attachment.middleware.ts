@@ -3,13 +3,18 @@ import fileUpload from 'express-fileupload'
 import config from '@core/config'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
+import bytes from 'bytes'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')
+const TOTAL_ATTACHMENT_SIZE_LIMIT = config.get(
+  'file.maxCumulativeAttachmentsSize'
+)
 const BODY_SIZE_LIMIT = config.get('transactionalEmail.bodySizeLimit')
 
 const fileUploadHandler = fileUpload({
   limits: {
+    // this limit is on a per-file basis, that's why subsequent check is required
     fileSize: FILE_ATTACHMENT_MAX_SIZE,
     // this is necessary as express-fileupload relies on busboy, which has a
     // default field size limit of 1MB and does not throw any error
@@ -42,24 +47,47 @@ function preprocessPotentialIncomingFile(
      * exceeded, instead truncates array to specified num
      */
     if (req.body.attachments.length > FILE_ATTACHMENT_MAX_NUM) {
-      res.status(413).json({ message: 'Number of attachments exceeds limit' })
+      res.status(413).json({
+        message: `Number of attachments exceeds limit of ${FILE_ATTACHMENT_MAX_NUM}`,
+      })
       return
     }
   }
   next()
 }
 
-// forbid user from sending attachments from default from address to minimize risk
-async function checkAttachmentPermission(
+// two checks: (1) must use custom domain for attachment; (2) global attachment size limit respected
+async function checkAttachmentValidity(
   req: Request,
   res: Response,
   next: NextFunction
 ): Promise<void> {
+  // return early if no attachments
+  if (!req.files?.attachments) {
+    next()
+    return
+  }
+  // forbid user from sending attachments from default @mail.postman.gov.sg
   const { from } = req.body
-  if (req.files?.attachments && isDefaultFromAddress(from)) {
+  if (isDefaultFromAddress(from)) {
     res.status(403).json({
       message:
-        'Attachments are not allowed for Postman default from email address',
+        'Attachments cannot be sent from the default @mail.postman.gov.sg domain',
+    })
+    return
+  }
+  // ensuring global attachment size limit is not exceeded
+  const attachments = ensureAttachmentsFieldIsArray(req.files.attachments)
+  const totalAttachmentsSize = attachments.reduce(
+    (acc, attachment) => acc + attachment.size,
+    0
+  )
+  const totalAttachmentsSizeLimit = `${bytes.format(
+    TOTAL_ATTACHMENT_SIZE_LIMIT
+  )}`
+  if (totalAttachmentsSize > TOTAL_ATTACHMENT_SIZE_LIMIT) {
+    res.status(413).json({
+      message: `Cumulative attachment size exceeds limit of ${totalAttachmentsSizeLimit}`,
     })
     return
   }
@@ -67,7 +95,7 @@ async function checkAttachmentPermission(
 }
 
 export const FileAttachmentMiddleware = {
-  checkAttachmentPermission,
+  checkAttachmentValidity,
   fileUploadHandler,
   preprocessPotentialIncomingFile,
 }
