@@ -645,6 +645,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       email: user.email,
       name: 'Agency ABC',
     } as EmailFromAddress)
+    const onepointnineMbAttachment = generateRandomFileSizeInMb(1.9)
 
     const res = await request(app)
       .post(endpoint)
@@ -654,12 +655,12 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .field('body', validApiCallAttachment.body)
       .field('from', validApiCallAttachment.from)
       .field('reply_to', validApiCallAttachment.reply_to)
-      .attach('attachments', generateRandomFileSizeInMb(2), 'attachment1')
-      .attach('attachments', generateRandomFileSizeInMb(2), 'attachment2')
-      .attach('attachments', generateRandomFileSizeInMb(2), 'attachment3')
-      .attach('attachments', generateRandomFileSizeInMb(2), 'attachment4')
-      .attach('attachments', generateRandomFileSizeInMb(2), 'attachment5')
-      .attach('attachments', generateRandomFileSizeInMb(2), 'attachment6')
+      .attach('attachments', onepointnineMbAttachment, 'attachment1')
+      .attach('attachments', onepointnineMbAttachment, 'attachment2')
+      .attach('attachments', onepointnineMbAttachment, 'attachment3')
+      .attach('attachments', onepointnineMbAttachment, 'attachment4')
+      .attach('attachments', onepointnineMbAttachment, 'attachment5')
+      .attach('attachments', onepointnineMbAttachment, 'attachment6')
 
     expect(res.status).toBe(413)
     expect(mockSendEmail).not.toBeCalled()
