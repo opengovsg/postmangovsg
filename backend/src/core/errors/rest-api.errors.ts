@@ -31,3 +31,21 @@ export class ApiNotFoundError extends RestApiError {
     super(404, 'not_found', message)
   }
 }
+
+export class ApiAuthenticationError extends RestApiError {
+  constructor(message: string) {
+    super(401, 'unauthenticated', message)
+  }
+}
+
+export class ApiMalformError extends RestApiError {
+  constructor(message: string) {
+    super(400, 'malformed', message)
+  }
+}
+
+export class ApiAuthorizationError extends RestApiError {
+  constructor(message: string) {
+    super(403, 'unauthorized', message)
+  }
+}

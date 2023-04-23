@@ -4,6 +4,7 @@ import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
 import { DEFAULT_TX_EMAIL_RATE_LIMIT } from '@core/models'
+import { ApiAuthenticationError } from '@core/errors/rest-api.errors'
 
 export interface AuthMiddleware {
   getOtp: Handler
@@ -167,21 +168,19 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     (acceptedAuthTypes: AuthType[]) =>
     async (
       req: Request,
-      res: Response,
+      _res: Response,
       next: NextFunction
     ): Promise<Response | void> => {
-      try {
-        for (const authType of acceptedAuthTypes) {
-          const authenticated = await authenticators[authType](req)
-          if (authenticated) {
-            return next()
-          }
+      for (const authType of acceptedAuthTypes) {
+        const authenticated = await authenticators[authType](req)
+        if (authenticated) {
+          return next()
         }
-
-        return res.sendStatus(401)
-      } catch (e) {
-        return next(e)
       }
+
+      throw new ApiAuthenticationError(
+        'Unauthenticated request. Please try again with correct authentication'
+      )
     }
 
   /**

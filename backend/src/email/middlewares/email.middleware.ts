@@ -7,6 +7,7 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { ThemeClient } from '@shared/theme'
 import { EmailMessageTransactional } from '@email/models'
+import { ApiAuthorizationError } from '@core/errors/rest-api.errors'
 
 export interface EmailMiddleware {
   isEmailCampaignOwnedByUser: Handler
@@ -42,21 +43,19 @@ export const InitEmailMiddleware = (
    */
   const isEmailCampaignOwnedByUser = async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
   ): Promise<Response | void> => {
     const { campaignId } = req.params
     const userId = req.session?.user?.id
-    try {
-      const campaign = await EmailService.findCampaign(+campaignId, +userId)
-      if (campaign) {
-        return next()
-      } else {
-        return res.sendStatus(403)
-      }
-    } catch (err) {
-      return next(err)
+    const campaign = await EmailService.findCampaign(+campaignId, +userId)
+    if (campaign) {
+      return next()
     }
+
+    throw new ApiAuthorizationError(
+      "User doesn't have access to this campaign."
+    )
   }
 
   /**
