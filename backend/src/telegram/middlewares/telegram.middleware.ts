@@ -4,6 +4,7 @@ import { CredentialService } from '@core/services'
 import { TelegramService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
 import { formatDefaultCredentialName } from '@core/utils'
+import { ApiAuthorizationError } from '@core/errors/rest-api.errors'
 
 export interface TelegramMiddleware {
   getCredentialsFromBody: Handler
@@ -287,21 +288,19 @@ export const InitTelegramMiddleware = (
    */
   const isTelegramCampaignOwnedByUser = async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
   ): Promise<Response | void> => {
-    try {
-      const { campaignId } = req.params
-      const userId = req.session?.user?.id
-      const campaign = await TelegramService.findCampaign(+campaignId, userId)
-      if (campaign) {
-        return next()
-      } else {
-        return res.sendStatus(403)
-      }
-    } catch (err) {
-      return next(err)
+    const { campaignId } = req.params
+    const userId = req.session?.user?.id
+    const campaign = await TelegramService.findCampaign(+campaignId, userId)
+    if (campaign) {
+      return next()
     }
+
+    throw new ApiAuthorizationError(
+      "User doesn't have access to this campaign."
+    )
   }
 
   /**
