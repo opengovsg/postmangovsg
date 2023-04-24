@@ -49,3 +49,9 @@ export class ApiAuthorizationError extends RestApiError {
     super(403, 'unauthorized', message)
   }
 }
+
+export class ApiInvalidParametersError extends RestApiError {
+  constructor(message: string) {
+    super(400, 'invalid_parameters', message)
+  }
+}

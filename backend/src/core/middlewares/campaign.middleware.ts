@@ -8,6 +8,10 @@ import {
 } from '@core/constants'
 import { CampaignService, JobService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
+import {
+  ApiInvalidParametersError,
+  ApiNotFoundError,
+} from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -98,9 +102,9 @@ const createCampaign = async (
       demoMessageLimit,
     })
     if (!campaign) {
-      return res.status(400).json({
-        message: `Unable to create campaign with these parameters`,
-      })
+      throw new ApiInvalidParametersError(
+        'Unable to create campaign with these parameters'
+      )
     }
     logger.info({
       message: 'Successfully created new campaign',
@@ -183,64 +187,49 @@ const isCampaignRedacted = async (
 
 const deleteCampaign = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
-  try {
-    const campaignId = +req.params.campaignId
-    const deletedRows = await CampaignService.deleteCampaign(campaignId)
-    if (deletedRows < 1) {
-      logger.error({
-        message: 'Campaign not found',
-        campaignId: campaignId,
-        action: 'deleteCampaign',
-      })
+  const campaignId = +req.params.campaignId
+  const deletedRows = await CampaignService.deleteCampaign(campaignId)
+  if (deletedRows < 1) {
+    logger.error({
+      message: 'Campaign not found',
+      campaignId: campaignId,
+      action: 'deleteCampaign',
+    })
 
-      return res
-        .status(404)
-        .json({ message: `Campaign ${campaignId} not found` })
-    }
-    // also delete any related job_queues, possible cases include
-    // scheduled campaigns, and campaigns that queue up due to high load.
-    await JobService.cancelJobQueues(campaignId)
-
-    res.json({})
-  } catch (e) {
-    console.error(e)
-    return next(e)
+    throw new ApiNotFoundError(`Campaign ${campaignId} not found`)
   }
+  // also delete any related job_queues, possible cases include
+  // scheduled campaigns, and campaigns that queue up due to high load.
+  await JobService.cancelJobQueues(campaignId)
+
+  res.status(200).json({ id: campaignId })
 }
 
 const updateCampaign = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    const { name, should_save_list, should_bcc_to_me } = req.body
-    const [count, rows] = await CampaignService.updateCampaign({
-      id: +campaignId,
-      name,
-      shouldSaveList: should_save_list,
-      shouldBccToMe: should_bcc_to_me,
-    } as Campaign)
-    if (count < 1) {
-      logger.error({
-        message: 'Campaign not found',
-        campaignId: campaignId,
-        action: 'updateCampaign',
-      })
+  const { campaignId } = req.params
+  const { name, should_save_list, should_bcc_to_me } = req.body
+  const [count, rows] = await CampaignService.updateCampaign({
+    id: +campaignId,
+    name,
+    shouldSaveList: should_save_list,
+    shouldBccToMe: should_bcc_to_me,
+  } as Campaign)
+  if (count < 1) {
+    logger.error({
+      message: 'Campaign not found',
+      campaignId: campaignId,
+      action: 'updateCampaign',
+    })
 
-      return res
-        .status(404)
-        .json({ message: `Campaign ${campaignId} not found` })
-    }
-
-    res.json(rows[0])
-  } catch (err) {
-    return next(err)
+    throw new ApiNotFoundError(`Campaign ${campaignId} not found`)
   }
+
+  res.json(rows[0])
 }
 
 export const CampaignMiddleware = {

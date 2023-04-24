@@ -89,19 +89,6 @@ paths:
                     type: integer
         '401':
           description: Unauthorized
-        '403':
-          description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -157,19 +144,6 @@ paths:
                 $ref: '#/components/schemas/CampaignMeta'
         '401':
           description: Unauthorized
-        '403':
-          description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -214,24 +188,21 @@ paths:
         '200':
           description: Successfully deleted
           content:
-            schema: {} # TODO
+            application/json:
+              schema:
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: string
+                    example: '20'
         '401':
           description: Unauthorized
         '404':
           description: Campaign not found
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -291,19 +262,6 @@ paths:
           description: Unauthorized
         '404':
           description: Not found
-        '403':
-          description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -344,23 +302,20 @@ paths:
           schema:
             type: string
       responses:
-        '201':
+        '200':
           description: Successfully cancelled the campaign
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden, campaign not owned by user
-        '429':
-          description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
+                type: object
+                required:
+                  - id
+                properties:
+                  id:
+                    type: string
+                    example: '20'
+        '401':
+          description: Unauthorized
         '500':
           description: Internal Server Error
           content:
@@ -1769,8 +1724,7 @@ paths:
                 classification:
                   type: string
                   nullable: true
-                  enum:
-                    [URGENT, FOR_ACTION, FOR_INFO]
+                  enum: [URGENT, FOR_ACTION, FOR_INFO]
                 tag:
                   type: string
                   nullable: true
@@ -1802,8 +1756,7 @@ paths:
                 classification:
                   type: string
                   nullable: true
-                  enum:
-                    [URGENT, FOR_ACTION, FOR_INFO]
+                  enum: [URGENT, FOR_ACTION, FOR_INFO]
                 tag:
                   type: string
                   nullable: true
