@@ -3,11 +3,13 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript'
 
 import { Credential } from '@core/models/credential'
+import { Campaign } from '@core/models'
 
 // whatsapp templates work a little differently from normal templates
 // whatsapp templates do not belong to any specific campaigns
@@ -16,7 +18,7 @@ import { Credential } from '@core/models/credential'
 // instead, whatsapp templates belong to a specific set of credentials (i.e.e WABA id)
 @Table({ tableName: 'whatsapp_templates', underscored: true, timestamps: true })
 export class WhatsappTemplate extends Model<WhatsappTemplate> {
-  // @HasMany(() => Campaign, { as: 'campaign' })
+  @HasMany(() => Campaign, { as: 'campaign_whatsapp_templates' })
   @Column({
     type: DataType.BIGINT,
     autoIncrement: true,

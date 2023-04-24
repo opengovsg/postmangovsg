@@ -1,6 +1,7 @@
 import { mapKeys } from 'lodash'
 import {
   BelongsTo,
+  BelongsToMany,
   Column,
   DataType,
   Default,
@@ -19,6 +20,7 @@ import { Statistic } from './statistic'
 import { EmailTemplate } from '@email/models'
 import { SmsTemplate } from '@sms/models'
 import { TelegramTemplate } from '@telegram/models'
+import { WhatsappTemplate } from '@whatsapp/models/whatsapp-template'
 
 @Table({
   tableName: 'campaigns',
@@ -31,7 +33,9 @@ export class Campaign extends Model<Campaign> {
   @HasOne(() => EmailTemplate, { as: 'email_templates' })
   @HasOne(() => SmsTemplate, { as: 'sms_templates' })
   @HasOne(() => TelegramTemplate, { as: 'telegram_templates' })
-  // @BelongsToMany(() => WhatsappTemplate, { as: 'whatsapp_templates' })
+  @BelongsToMany(() => WhatsappTemplate, {
+    through: 'campaign_whatsapp_templates',
+  })
   @Column({
     type: DataType.INTEGER,
     primaryKey: true,
