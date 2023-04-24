@@ -38,6 +38,10 @@ import {
   TelegramSubscriber,
   TelegramTemplate,
 } from '@telegram/models'
+import { CampaignWhatsappTemplate } from '@whatsapp/models/campaign-whatsapp-template'
+import { WhatsappMessage } from '@whatsapp/models/whatsapp-message'
+import { WhatsappOp } from '@whatsapp/models/whatsapp-op'
+import { WhatsappTemplate } from '@whatsapp/models/whatsapp-template'
 
 export const initializeModels = (sequelize: Sequelize): void => {
   const coreModels = [
@@ -74,11 +78,18 @@ export const initializeModels = (sequelize: Sequelize): void => {
     TelegramTemplate,
     TelegramSubscriber,
   ]
+  const whatsappModels = [
+    CampaignWhatsappTemplate,
+    WhatsappMessage,
+    WhatsappOp,
+    WhatsappTemplate,
+  ]
   sequelize.addModels([
     ...coreModels,
     ...emailModels,
     ...smsModels,
     ...telegramModels,
+    ...whatsappModels,
   ])
 }
 
