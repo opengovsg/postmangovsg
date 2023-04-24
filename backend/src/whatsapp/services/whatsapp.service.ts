@@ -26,6 +26,11 @@ const sendMessage = (from: string, recipient: string, content: any) => {
   return whatsappClient.sendMessage(from, recipient, content)
 }
 
+const getPhoneNumbers = (wabaId: string) => {
+  logger.info({ message: wabaId })
+  return whatsappClient.getPhoneNumbers(wabaId)
+}
+
 const getTemplates = (wabaId: string) => {
   logger.info({ message: wabaId })
   return whatsappClient.getTemplates(wabaId)
@@ -33,5 +38,6 @@ const getTemplates = (wabaId: string) => {
 export const WhatsappService = {
   whatsappClient,
   sendMessage,
+  getPhoneNumbers,
   getTemplates,
 }

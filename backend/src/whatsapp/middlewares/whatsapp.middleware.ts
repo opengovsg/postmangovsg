@@ -60,6 +60,7 @@ export const InitWhatsappMiddleware = (
         action: 'getTemplates',
       })
       res.sendStatus(401)
+      return
     }
     if (!credLabel) {
       logger.error({
@@ -67,6 +68,7 @@ export const InitWhatsappMiddleware = (
         action: 'getTemplates',
       })
       res.sendStatus(400)
+      return
     }
 
     const domainCreds = await credentialService.getDomainCredential(
@@ -84,6 +86,10 @@ export const InitWhatsappMiddleware = (
 
     // given the creds, retrieve list of possible numbers tied to this account, and it's display name.
     // Also to note, the 'from' is the phone number ID, not the phone number itself
+    const phoneNumbers = await WhatsappService.getPhoneNumbers(
+      domainCreds.credName
+    )
+    return res.json(phoneNumbers)
   }
 
   const getTemplates = async (
@@ -99,6 +105,7 @@ export const InitWhatsappMiddleware = (
         action: 'getTemplates',
       })
       res.sendStatus(401)
+      return
     }
     if (!credLabel) {
       logger.error({
@@ -106,6 +113,7 @@ export const InitWhatsappMiddleware = (
         action: 'getTemplates',
       })
       res.sendStatus(400)
+      return
     }
 
     const domainCreds = await credentialService.getDomainCredential(
