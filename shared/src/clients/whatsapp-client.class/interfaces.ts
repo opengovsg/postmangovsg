@@ -80,3 +80,17 @@ export enum WhatsappCallbackChangeField {
 
   // there are others but they won't be handled.
 }
+
+export interface WhatsappPhoneNumber {
+  id: string
+  verified_name: string
+  code_verification_status: WhatsappPhoneNumberVerificationStatus
+  display_phone_number: string
+  quality_rating: string
+}
+
+export enum WhatsappPhoneNumberVerificationStatus {
+  EXPIRED = 'EXPIRED',
+  VERIFIED = 'VERIFIED',
+  NOT_VERIFIED = 'NOT_VERIFIED',
+}

@@ -20,7 +20,6 @@ module.exports = {
       },
       whatsapp_template_label: {
         allowNull: false,
-        primaryKey: true,
         type: Sequelize.DataTypes.STRING(255),
       },
       body: {

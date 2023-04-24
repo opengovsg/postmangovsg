@@ -41,6 +41,11 @@ const sendMessage = (from: string, recipient: string, content: any) => {
   return whatsappClient.sendMessage(from, recipient, content)
 }
 
+const getPhoneNumbers = (wabaId: string) => {
+  logger.info({ message: wabaId })
+  return whatsappClient.getPhoneNumbers(wabaId)
+}
+
 const setCampaignCredentials = (
   campaignId: number,
   credentialName: string
@@ -64,6 +69,7 @@ export const WhatsappService = {
   findCampaign,
   whatsappClient,
   sendMessage,
+  getPhoneNumbers,
   setCampaignCredentials,
   getTemplates,
 }

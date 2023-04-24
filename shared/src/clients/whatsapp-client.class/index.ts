@@ -1,5 +1,6 @@
 import {
   WhatsappCredentials,
+  WhatsappPhoneNumber,
   WhatsappTemplate,
   WhatsappTemplateStatus,
 } from './interfaces'
@@ -81,5 +82,18 @@ export default class WhatsappClient {
       (t: { status: WhatsappTemplateStatus }) =>
         t.status !== WhatsappTemplateStatus.REJECTED
     )
+  }
+
+  public async getPhoneNumbers(wabaId: string): Promise<WhatsappPhoneNumber[]> {
+    const res = await this.request({
+      method: 'get',
+      url: `${wabaId}/phone_numbers`,
+    }).catch((e) => {
+      throw new Error(e)
+    })
+    if (res.error) {
+      throw new Error(res)
+    }
+    return res.data
   }
 }
