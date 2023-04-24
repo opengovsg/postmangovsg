@@ -20,9 +20,9 @@ export class ApiInvalidRecipientError extends RestApiError {
   }
 }
 
-export class ApiInvalidSmsCredentialsError extends RestApiError {
+export class ApiInvalidCredentialsError extends RestApiError {
   constructor(message: string) {
-    super(400, 'invalid_sms_credentials', message)
+    super(400, 'invalid_credentials', message)
   }
 }
 
@@ -53,5 +53,35 @@ export class ApiAuthorizationError extends RestApiError {
 export class ApiInvalidParametersError extends RestApiError {
   constructor(message: string) {
     super(400, 'invalid_parameters', message)
+  }
+}
+
+export class ApiInvalidFromAddressError extends RestApiError {
+  constructor(message: string) {
+    super(400, 'invalid_from_address', message)
+  }
+}
+
+export class ApiInvalidTemplateError extends RestApiError {
+  constructor(message: string) {
+    super(400, 'invalid_template', message)
+  }
+}
+
+export class ApiInternalServerError extends RestApiError {
+  constructor(message: string) {
+    super(500, 'internal_server', message)
+  }
+}
+
+export class ApiAlreadySentError extends RestApiError {
+  constructor(message: string) {
+    super(403, 'already_sent', message)
+  }
+}
+
+export class ApiCampaignRedactedError extends RestApiError {
+  constructor(message: string) {
+    super(410, 'campaign_redacted', message)
   }
 }

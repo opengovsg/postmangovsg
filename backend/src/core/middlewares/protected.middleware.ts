@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { ProtectedService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import { ApiInvalidTemplateError } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -35,7 +36,7 @@ const isProtectedCampaign = async (
  */
 const verifyTemplate = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   try {
@@ -65,7 +66,7 @@ const verifyTemplate = async (
       error: err,
       action: 'verifyTemplate',
     })
-    return res.status(400).json({ message: (err as Error).message })
+    throw new ApiInvalidTemplateError((err as Error).message)
   }
 }
 

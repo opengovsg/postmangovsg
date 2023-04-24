@@ -19,6 +19,7 @@ import { StoreTemplateOutput } from '@email/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { ThemeClient } from '@shared/theme'
 import { ChannelType } from '@core/constants'
+import { ApiInvalidTemplateError } from '@core/errors/rest-api.errors'
 
 export interface EmailTemplateMiddleware {
   storeTemplate: Handler
@@ -109,7 +110,7 @@ export const InitEmailTemplateMiddleware = (
           error: err,
           ...logMeta,
         })
-        return res.status(400).json({ message: err.message })
+        throw new ApiInvalidTemplateError(err.message)
       }
       return next(err)
     }
@@ -156,7 +157,7 @@ export const InitEmailTemplateMiddleware = (
         filename,
       })
 
-      res.sendStatus(202)
+      res.status(202).json({ id: campaignId })
     } catch (err) {
       logger.error({
         message: 'Failed to complete upload to s3',
@@ -170,7 +171,7 @@ export const InitEmailTemplateMiddleware = (
         InvalidRecipientError,
       ]
       if (userErrors.some((errType) => err instanceof errType)) {
-        return res.status(400).json({ message: (err as Error).message })
+        throw new ApiInvalidTemplateError((err as Error).message)
       }
       return next(err)
     }
@@ -300,16 +301,11 @@ export const InitEmailTemplateMiddleware = (
    */
   const deleteCsvErrorHandler = async (
     req: Request,
-    res: Response,
-    next: NextFunction
+    res: Response
   ): Promise<Response | void> => {
-    try {
-      const { campaignId } = req.params
-      await UploadService.deleteS3TempKeys(+campaignId)
-      res.sendStatus(200)
-    } catch (e) {
-      next(e)
-    }
+    const { campaignId } = req.params
+    await UploadService.deleteS3TempKeys(+campaignId)
+    res.status(200).json({ id: campaignId })
   }
 
   // TODO: refactor this handler with uploadCompleteHandler to share the same function

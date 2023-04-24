@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express'
 
 import { loggerWithLabel } from '@core/logger'
 import { UploadService, MultipartUploadService } from '@core/services'
+import { ApiInternalServerError } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -33,7 +34,7 @@ const uploadStartHandler = async (
       error: err,
       ...logMeta,
     })
-    return res.status(500).json({ message: 'Unable to generate presigned URL' })
+    throw new ApiInternalServerError('Unable to generate presigned URL')
   }
 }
 

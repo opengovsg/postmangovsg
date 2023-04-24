@@ -150,8 +150,6 @@ export const InitTelegramCampaignMiddleware = (
     JobMiddleware.sendCampaign
   )
 
-  router.post('/stop', JobMiddleware.stopCampaign)
-
   router.post(
     '/retry',
     CampaignMiddleware.canEditCampaign,

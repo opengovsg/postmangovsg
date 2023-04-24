@@ -18,7 +18,7 @@ import {
 } from '@shared/clients/twilio-client.class/errors'
 import {
   ApiInvalidRecipientError,
-  ApiInvalidSmsCredentialsError,
+  ApiInvalidCredentialsError,
 } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
@@ -108,7 +108,7 @@ async function sendMessage(
     }
 
     if (err instanceof AuthenticationError) {
-      throw new ApiInvalidSmsCredentialsError('Invalid Twilio credentials')
+      throw new ApiInvalidCredentialsError('Invalid Twilio credentials')
     }
 
     if (err instanceof RateLimitError) {
