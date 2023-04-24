@@ -45,6 +45,11 @@ import {
 import { InitTelegramMiddleware } from '@telegram/middlewares'
 import { InitApiKeyRoute } from '@core/routes/api-key.routes'
 import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
+import { InitWhatsappMiddleware } from '@whatsapp/middlewares'
+import {
+  InitWhatsappCampaignRoute,
+  whatsappCallbackRoutes,
+} from '@whatsapp/routes'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -92,6 +97,10 @@ export const InitV1Route = (app: Application): Router => {
     telegramMiddleware,
     settingsMiddleware
   )
+  const whatsappMiddleware = InitWhatsappMiddleware(
+    (app as any).credentialService
+  )
+  const whatsappCampaignRoutes = InitWhatsappCampaignRoute(whatsappMiddleware)
   const apiKeyMiddleware = InitApiKeyMiddleware((app as any).credentialService)
   const apiKeyRoutes = InitApiKeyRoute(apiKeyMiddleware)
 
@@ -206,6 +215,12 @@ export const InitV1Route = (app: Application): Router => {
     telegramCampaignRoutes
   )
   router.use(
+    '/campaign/:campaignId/whatsapp',
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
+    celebrate(campaignIdValidator),
+    whatsappCampaignRoutes
+  )
+  router.use(
     '/campaign/:campaignId',
     authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     celebrate(campaignIdValidator),
@@ -250,6 +265,8 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/callback/sms', smsCallbackRoutes)
 
   router.use('/callback/telegram', telegramCallbackRoutes)
+
+  router.use('/callback/whatsapp', whatsappCallbackRoutes)
 
   router.use(
     '/lists',

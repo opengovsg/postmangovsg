@@ -131,6 +131,7 @@
     "@sms": "build/sms",
     "@email": "build/email",
     "@telegram": "build/telegram",
+    "@whatsapp": "build/whatsapp",
     "@database": "build/database",
     "@shared": "../shared/build/"
   },

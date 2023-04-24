@@ -153,6 +153,13 @@ interface ConfigSchema {
     maxAttachmentSize: number
     maxAttachmentNum: number
   }
+  whatsapp: {
+    endpointUrl: string
+    endpointVersion: string
+    callbackUrl: string
+    callbackVerifyToken: string
+    bearerToken: string
+  }
 }
 
 convict.addFormats({
@@ -687,6 +694,39 @@ const config: Config<ConfigSchema> = convict({
       default: 5,
       env: 'FILE_ATTACHMENT_MAX_NUM',
       format: Number,
+    },
+  },
+  whatsapp: {
+    endpointUrl: {
+      doc: 'Whatsapp endpoint URL',
+      default: 'graph.facebook.com',
+      env: 'WHATSAPP_ENDPOINT_URL',
+      format: 'required-string',
+    },
+    endpointVersion: {
+      doc: 'Whatsapp current version',
+      default: '16.0',
+      env: 'WHATSAPP_ENDPOINT_VERSION',
+      format: 'required-string',
+    },
+    callbackUrl: {
+      doc: 'Whatsapp Callback URL',
+      default: '/v1/callback/whatsapp',
+      env: 'WHATSAPP_CALLBACK_URL',
+      format: 'required-string',
+    },
+    callbackVerifyToken: {
+      doc: 'Whatsapp Callback Verify Token',
+      default: 'sample-token',
+      env: 'WHATSAPP_CALLBACK_VERIFY_TOKEN',
+      format: 'required-string',
+    },
+    bearerToken: {
+      doc: 'Whatsapp Permanent Access Token',
+      default: '',
+      env: 'WHATSAPP_BEARER_TOKEN',
+      format: 'required-string',
+      sensitive: true,
     },
   },
 })

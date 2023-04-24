@@ -34,6 +34,7 @@
       "@sms/*": ["sms/*"],
       "@email/*": ["email/*"],
       "@telegram/*": ["telegram/*"],
+      "@whatsapp/*": ["whatsapp/*"],
       "@shared/*": ["../../shared/src/*"]
     },
     "esModuleInterop": true,
