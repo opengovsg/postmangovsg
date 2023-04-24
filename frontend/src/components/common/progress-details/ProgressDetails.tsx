@@ -25,7 +25,6 @@ const ProgressDetails = ({
 }: {
   stats: CampaignStats
   redacted: boolean
-  handlePause: () => Promise<void>
   handleRetry: () => Promise<void>
 }) => {
   const { campaign } = useContext(CampaignContext)
@@ -63,10 +62,6 @@ const ProgressDetails = ({
       )
     }
 
-    if (!isSent) {
-      // removed pause button for the duration of this experiment to see if anyone uses it
-      return null
-    }
     if (!isComplete) {
       return (
         <PrimaryButton className={styles.retry} onClick={handleRetry}>

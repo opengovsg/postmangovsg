@@ -190,13 +190,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                properties:
-                  id:
-                    type: string
-                    example: '20'
+                $ref: '#/components/schemas/CampaignIdObject'
         '401':
           description: Unauthorized
         '404':
@@ -307,13 +301,7 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                required:
-                  - id
-                properties:
-                  id:
-                    type: string
-                    example: '20'
+                $ref: '#/components/schemas/CampaignIdObject'
         '401':
           description: Unauthorized
         '500':
@@ -361,23 +349,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/EmailCampaign'
-        '400':
-          description: Invalid campaign type or not owned by user
         '401':
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -485,17 +460,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -565,17 +529,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -631,23 +584,16 @@ paths:
       responses:
         '202':
           description: Accepted. The uploaded file is being processed.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignIdObject'
         '400':
           description: Bad Request
         '401':
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -736,17 +682,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -785,23 +720,16 @@ paths:
           schema:
             type: string
       responses:
-        200:
+        '200':
           description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignIdObject'
         '401':
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -857,23 +785,18 @@ paths:
             application/json:
               schema:
                 type: object
+                required:
+                  - message
+                properties:
+                  message:
+                    type: string
+                    example: 'OK'
         '400':
           description: Bad Request
         '401':
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -945,17 +868,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -1014,80 +926,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
-        '500':
-          description: Internal Server Error
-          content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
-  /campaign/{campaignId}/email/stop:
-    post:
-      security:
-        - bearerAuth: []
-      tags:
-        - Email
-      summary: Stop sending campaign
-      parameters:
-        - name: campaignId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Success
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  campaign_id:
-                    type: integer
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -1140,17 +978,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden as there is a job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -1208,17 +1035,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -1276,17 +1092,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -1348,17 +1153,6 @@ paths:
           description: Forbidden, campaign not owned by user
         '410':
           description: Campaign has been redacted
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -4735,6 +4529,14 @@ components:
         - EMAIL
         - TELEGRAM
 
+    CampaignIdObject:
+      type: object
+      required:
+        - id
+      properties:
+        id:
+          type: string
+          example: '20'
     CampaignMeta:
       type: object
       properties:

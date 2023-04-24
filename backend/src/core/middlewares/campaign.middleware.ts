@@ -9,6 +9,9 @@ import {
 import { CampaignService, JobService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
 import {
+  ApiAlreadySentError,
+  ApiAuthorizationError,
+  ApiCampaignRedactedError,
   ApiInvalidParametersError,
   ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
@@ -23,46 +26,43 @@ const logger = loggerWithLabel(module)
  */
 const canEditCampaign = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    const [hasJob, csvStatus] = await Promise.all([
-      CampaignService.hasJobInProgress(+campaignId),
-      UploadService.getCsvStatus(+campaignId),
-    ])
-    if (!hasJob && !csvStatus?.isCsvProcessing) {
-      return next()
-    }
-    return res.sendStatus(403)
-  } catch (err) {
-    return next(err)
+): Promise<void> => {
+  const { campaignId } = req.params
+  const [hasJob, csvStatus] = await Promise.all([
+    CampaignService.hasJobInProgress(+campaignId),
+    UploadService.getCsvStatus(+campaignId),
+  ])
+  if (!hasJob && !csvStatus?.isCsvProcessing) {
+    return next()
   }
+
+  throw new ApiAuthorizationError(
+    "Campaign can't be edited at the moment as there're ongoing uploads or jobs"
+  )
 }
 
 const canSendCampaign = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    const [sentJobs] = await Promise.all([
-      CampaignService.hasAlreadyBeenSent(+campaignId),
-    ])
-    logger.info({
-      message: 'Checking can send campaign',
-      sentJobs,
-      action: 'canSendCampaign',
-    })
-    if (sentJobs <= 0) {
-      return next()
-    }
-    return res.sendStatus(403)
-  } catch (err) {
-    return next(err)
+): Promise<void> => {
+  const { campaignId } = req.params
+  const [sentJobs] = await Promise.all([
+    CampaignService.hasAlreadyBeenSent(+campaignId),
+  ])
+  logger.info({
+    message: 'Checking can send campaign',
+    sentJobs,
+    action: 'canSendCampaign',
+  })
+  if (sentJobs <= 0) {
+    return next()
   }
+  throw new ApiAlreadySentError(
+    "Campaign has been sent before and can't be resent"
+  )
 }
 
 /**
@@ -162,27 +162,23 @@ const listCampaigns = async (
  */
 const isCampaignRedacted = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-): Promise<Response | void> => {
+): Promise<void> => {
   const { campaignId } = req.params
-  try {
-    const campaign = await CampaignService.getCampaignDetails(+campaignId, [])
-    if (campaign.redacted) {
-      logger.error({
-        message: 'Campaign has been redacted',
-        campaignId: campaign.id,
-        action: 'isCampaignRedacted',
-      })
+  const campaign = await CampaignService.getCampaignDetails(+campaignId, [])
+  if (campaign.redacted) {
+    logger.error({
+      message: 'Campaign has been redacted',
+      campaignId: campaign.id,
+      action: 'isCampaignRedacted',
+    })
 
-      return res.status(410).json({
-        message: 'Campaign has been redacted',
-      })
-    }
-    next()
-  } catch (err) {
-    return next(err)
+    throw new ApiCampaignRedactedError(
+      `Campaign ${campaignId} has been redacted`
+    )
   }
+  next()
 }
 
 const deleteCampaign = async (

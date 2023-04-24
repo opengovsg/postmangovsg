@@ -7,7 +7,11 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { ThemeClient } from '@shared/theme'
 import { EmailMessageTransactional } from '@email/models'
-import { ApiAuthorizationError } from '@core/errors/rest-api.errors'
+import {
+  ApiAuthorizationError,
+  ApiInvalidCredentialsError,
+  ApiInvalidFromAddressError,
+} from '@core/errors/rest-api.errors'
 
 export interface EmailMiddleware {
   isEmailCampaignOwnedByUser: Handler
@@ -83,7 +87,11 @@ export const InitEmailMiddleware = (
         error: err,
         ...logMeta,
       })
-      return res.status(400).json({ message: `${(err as Error).message}` })
+      // This should be 500 instead because we're using the default email creds
+      // for all of our campaigns hence this failure is catastrophic, but we're
+      // keeping it 400 here for consistency and backward compatibility. To
+      // protect the downside, we have alerts on our email service providers
+      throw new ApiInvalidCredentialsError((err as Error).message)
     }
     return res.json({ message: 'OK' })
   }
@@ -239,9 +247,7 @@ export const InitEmailMiddleware = (
           }
         )
       }
-      return res
-        .status(400)
-        .json({ message: INVALID_FROM_ADDRESS_ERROR_MESSAGE })
+      throw new ApiInvalidFromAddressError(INVALID_FROM_ADDRESS_ERROR_MESSAGE)
     }
 
     res.locals.fromName = fromName
@@ -262,25 +268,26 @@ export const InitEmailMiddleware = (
     const { from } = req.body
     if (isDefaultFromAddress(from)) return next()
     const { fromName, fromAddress } = res.locals
-    try {
-      // can only reach here if user supplied own email
-      // if user supplied a different email, error from isFromAddressAccepted will be thrown
-      // therefore, can simply check whether own email is in the list of verified emails
-      // this is not great as the function is impure and relies on the order of middleware...
-      const exists = await CustomDomainService.existsFromAddress(fromAddress)
-      if (!exists) throw new Error(UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE)
-    } catch (err) {
+
+    // can only reach here if user supplied own email
+    // if user supplied a different email, error from isFromAddressAccepted will be thrown
+    // therefore, can simply check whether own email is in the list of verified emails
+    // this is not great as the function is impure and relies on the order of middleware...
+    const exists = await CustomDomainService.existsFromAddress(fromAddress)
+    if (!exists) {
       logger.error({
         message: "Invalid 'from' email address",
         from,
         defaultEmail: config.get('mailFrom'),
         fromName,
         fromAddress,
-        error: err,
         action: 'existsFromAddress',
       })
-      return res.status(400).json({ message: (err as Error).message })
+      throw new ApiInvalidFromAddressError(
+        UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE
+      )
     }
+
     return next()
   }
 
@@ -309,7 +316,7 @@ export const InitEmailMiddleware = (
         error: err,
         action: 'verifyFromAddress',
       })
-      return res.status(400).json({ message: (err as Error).message })
+      throw new ApiInvalidFromAddressError((err as Error).message)
     }
     return next()
   }
