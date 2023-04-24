@@ -17,7 +17,7 @@ export default class WhatsappClient {
     this.version = credential.version
     this.axiosClient = axios.create({
       baseURL: this.baseUrl,
-      timeout: 1000,
+      timeout: 5000,
       headers: {
         'Content-Type': 'application/json',
         Authorization: `Bearer ${this.bearerToken}`,
