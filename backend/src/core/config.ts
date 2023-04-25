@@ -152,6 +152,7 @@ interface ConfigSchema {
   file: {
     maxAttachmentSize: number
     maxAttachmentNum: number
+    maxCumulativeAttachmentsSize: number
   }
 }
 
@@ -685,8 +686,14 @@ const config: Config<ConfigSchema> = convict({
     },
     maxAttachmentNum: {
       doc: 'Maximum number of file attachments',
-      default: 5,
+      default: 10,
       env: 'FILE_ATTACHMENT_MAX_NUM',
+      format: Number,
+    },
+    maxCumulativeAttachmentsSize: {
+      doc: 'Maximum cumulative size of all file attachments in bytes',
+      default: 10 * 1024 * 1024,
+      env: 'FILE_ATTACHMENT_MAX_CUMULATIVE_SIZE',
       format: Number,
     },
   },
