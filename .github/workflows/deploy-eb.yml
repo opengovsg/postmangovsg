@@ -50,9 +50,9 @@ jobs:
         options: --entrypoint redis-server
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version-file: .nvmrc
       - name: Lint lock file
         run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       - name: Lint and test app code
@@ -80,9 +80,9 @@ jobs:
       image_tag: ${{ steps.set-image-tag.outputs.image_tag }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version-file: .nvmrc
       - name: Before deploy
         env:
           SECRET_ID: ${{ vars.SECRET_ID }}
@@ -119,7 +119,7 @@ jobs:
       - name: Create and push EB config files
         run: |
           sed -i -e "s|@TAG|$IMAGE_TAG|g" Dockerrun.aws.json
-          sed -i -e "s|@REPO|$ECR_REPOSITORY|g" Dockerrun.aws.json 
+          sed -i -e "s|@REPO|$ECR_REPOSITORY|g" Dockerrun.aws.json
           zip -r "$IMAGE_TAG.zip" .ebextensions .platform Dockerrun.aws.json
         working-directory: ${{ env.DIRECTORY }}
         env:

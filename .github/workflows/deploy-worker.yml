@@ -31,9 +31,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: "16"
+          node-version-file: .nvmrc
       - name: Lint lock file
         run: cd $DIRECTORY && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
       - name: Lint app code
@@ -58,9 +58,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: "18"
+          node-version-file: .nvmrc
       - name: Build shared package
         env:
           NODE_OPTIONS: "--max-old-space-size=4096"
