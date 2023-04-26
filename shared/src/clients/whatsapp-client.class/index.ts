@@ -46,7 +46,11 @@ export default class WhatsappClient {
       })
   }
 
-  public async sendMessage(from: string, to: string, body: any) {
+  public async sendMessage(
+    from: string,
+    to: string,
+    body: any
+  ): Promise<string> {
     const res = await this.request(
       {
         method: 'post',
@@ -62,7 +66,7 @@ export default class WhatsappClient {
     if (res.error) {
       throw new Error(res)
     }
-    return res
+    return res.messages[0].id
   }
 
   public async getTemplates(wabaId: string): Promise<WhatsappTemplate[]> {

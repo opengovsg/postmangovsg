@@ -5,6 +5,7 @@ import { TwilioCredentials } from '@sms/interfaces'
 import { TelegramCredentials } from '@telegram/interfaces'
 import { get } from 'lodash'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
+import { WhatsappCredentials } from '@shared/clients/whatsapp-client.class/interfaces'
 
 const logger = loggerWithLabel(module)
 const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
@@ -46,7 +47,14 @@ const getTelegramCredentials = async (
   return await getCredentialsFromSecretsManager(name)
 }
 
+const getWhatsappCredentials = async (
+  name: string
+): Promise<WhatsappCredentials> => {
+  return await getCredentialsFromSecretsManager(name)
+}
+
 export const CredentialService = {
   getTwilioCredentials,
   getTelegramCredentials,
+  getWhatsappCredentials,
 }
