@@ -1,5 +1,4 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -9,33 +8,20 @@ import {
 import { Campaign } from '@core/models'
 import { WhatsappTemplate } from '@whatsapp/models/whatsapp-template'
 
-@Table({
-  tableName: 'campaign_whatsapp_templates',
-  underscored: true,
-  timestamps: true,
-})
+@Table({ tableName: 'campaign_whatsapp_templates', underscored: true })
 export class CampaignWhatsappTemplate extends Model<CampaignWhatsappTemplate> {
   @Column({
-    type: DataType.BIGINT,
-    autoIncrement: true,
+    type: DataType.INTEGER,
     primaryKey: true,
+    autoIncrement: true,
   })
   id!: number
+
   @ForeignKey(() => Campaign)
-  @Column({
-    type: DataType.INTEGER,
-  })
+  @Column(DataType.INTEGER)
   campaignId!: number
 
-  @BelongsTo(() => Campaign)
-  campaign!: Campaign
-
   @ForeignKey(() => WhatsappTemplate)
-  @Column({
-    type: DataType.INTEGER,
-  })
+  @Column(DataType.INTEGER)
   whatsappTemplateId!: number
-
-  @BelongsTo(() => WhatsappTemplate)
-  whatsappTemplate: WhatsappTemplate
 }

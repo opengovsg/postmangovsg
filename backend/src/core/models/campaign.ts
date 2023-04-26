@@ -21,6 +21,7 @@ import { EmailTemplate } from '@email/models'
 import { SmsTemplate } from '@sms/models'
 import { TelegramTemplate } from '@telegram/models'
 import { WhatsappTemplate } from '@whatsapp/models/whatsapp-template'
+import { CampaignWhatsappTemplate } from '@whatsapp/models/campaign-whatsapp-template'
 
 @Table({
   tableName: 'campaigns',
@@ -34,7 +35,8 @@ export class Campaign extends Model<Campaign> {
   @HasOne(() => SmsTemplate, { as: 'sms_templates' })
   @HasOne(() => TelegramTemplate, { as: 'telegram_templates' })
   @BelongsToMany(() => WhatsappTemplate, {
-    through: 'campaign_whatsapp_templates',
+    through: () => CampaignWhatsappTemplate,
+    as: 'campaignId',
   })
   @Column({
     type: DataType.INTEGER,
@@ -114,6 +116,10 @@ export class Campaign extends Model<Campaign> {
     defaultValue: false,
   })
   shouldBccToMe!: boolean
+
+  @ForeignKey(() => WhatsappTemplate)
+  @Column(DataType.INTEGER)
+  campaignWhatsappTemplateId?: number
 
   // Sets key in s3Object json
   static async updateS3ObjectKey(
