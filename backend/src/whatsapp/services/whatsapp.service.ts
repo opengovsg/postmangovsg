@@ -46,6 +46,9 @@ const getPhoneNumbers = (wabaId: string) => {
   return whatsappClient.getPhoneNumbers(wabaId)
 }
 
+const getHydratedMessage = async (campaignId: number): Promise<any> => {
+  return campaignId
+}
 const setCampaignCredentials = (
   campaignId: number,
   credentialName: string
@@ -71,5 +74,6 @@ export const WhatsappService = {
   sendMessage,
   getPhoneNumbers,
   setCampaignCredentials,
+  getHydratedMessage,
   getTemplates,
 }

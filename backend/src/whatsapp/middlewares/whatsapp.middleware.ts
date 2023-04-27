@@ -5,12 +5,15 @@ import { WhatsappService } from '@whatsapp/services'
 
 export interface WhatsappMiddleware {
   getCredentials: Handler
+  getCredentialsFromLabelForCampaign: Handler
   getCampaignDetails: Handler
   getPhoneNumbers: Handler
   getTemplates: Handler
   isWhatsappCampaignOwnedByUser: Handler
-  setCampaignCredentials: Handler
+  previewFirstMessage: Handler
   sendMessage: Handler
+  validateAndStoreCredentials: Handler
+  setCampaignCredentials: Handler
 }
 
 export const InitWhatsappMiddleware = (
@@ -34,6 +37,39 @@ export const InitWhatsappMiddleware = (
     const domainCredentialLabels =
       await credentialService.getAllCredentialsUnderDomain(userDomain)
     return res.json(domainCredentialLabels)
+  }
+
+  /**
+   * Store local credentials first for this campaign
+   * @param req
+   * @param res
+   * @param next
+   */
+  const getCredentialsFromLabelForCampaign = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response> => {
+    const { campaignId } = req.params // May be undefined if invoked from settings page
+    const { label } = req.body
+    const userId = req.session?.user?.id
+    const logMeta = {
+      campaignId,
+      userId,
+      label,
+      action: 'getCredentialsFromLabelForCampaign',
+    }
+
+    try {
+      return next()
+    } catch (err) {
+      const errAsError = err as Error
+      logger.error({
+        ...logMeta,
+        message: `${errAsError.stack}`,
+      })
+      return res.status(400).json({ message: `${errAsError.message}` })
+    }
   }
 
   const getCampaignDetails = async (
@@ -144,6 +180,17 @@ export const InitWhatsappMiddleware = (
     return res.json(resp)
   }
 
+  const previewFirstMessage = async (
+    req: Request,
+    res: Response
+  ): Promise<Response | void> => {
+    const { campaignId } = req.params
+    const message = ''
+    if (!message) return res.json({})
+
+    return res.json({ campaignId })
+  }
+
   const isWhatsappCampaignOwnedByUser = async (
     req: Request,
     res: Response,
@@ -187,13 +234,36 @@ export const InitWhatsappMiddleware = (
       res.sendStatus(500)
     }
   }
+
+  const validateAndStoreCredentials = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<void | Response> => {
+    const { campaignId } = req.params
+    const { recipient, template } = req.body
+    const { credentials, credentialName } = res.locals
+    const logMeta = {
+      campaignId,
+      recipient,
+      template,
+      credentials,
+      credentialName,
+      action: 'validateAndStoreCredentials',
+    }
+    logger.info({ ...logMeta })
+    next()
+  }
   return {
     getCampaignDetails,
+    getCredentialsFromLabelForCampaign,
     getCredentials,
     getPhoneNumbers,
     getTemplates,
+    previewFirstMessage,
     isWhatsappCampaignOwnedByUser,
-    setCampaignCredentials,
     sendMessage,
+    validateAndStoreCredentials,
+    setCampaignCredentials,
   }
 }

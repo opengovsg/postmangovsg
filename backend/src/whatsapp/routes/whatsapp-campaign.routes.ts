@@ -16,6 +16,7 @@ export const InitWhatsappCampaignRoute = (
     [Segments.BODY]: Joi.object({
       label: Joi.string().required(),
       recipient: Joi.string().trim().required(),
+      template: Joi.string().required(),
     }),
   }
   const uploadStartValidator = {
@@ -36,8 +37,13 @@ export const InitWhatsappCampaignRoute = (
   router.post(
     '/credentials',
     celebrate(useCredentialsValidator),
-    CampaignMiddleware.canEditCampaign
+    CampaignMiddleware.canEditCampaign,
+    whatsappMiddleware.getCredentialsFromLabelForCampaign,
+    whatsappMiddleware.validateAndStoreCredentials,
+    whatsappMiddleware.setCampaignCredentials
   )
+
+  router.get('/preview', whatsappMiddleware.previewFirstMessage)
   router.post(
     '/send',
     CampaignMiddleware.canEditCampaign,
@@ -57,5 +63,6 @@ export const InitWhatsappCampaignRoute = (
     CampaignMiddleware.canEditCampaign,
     SmsTemplateMiddleware.uploadCompleteHandler
   )
+
   return router
 }
