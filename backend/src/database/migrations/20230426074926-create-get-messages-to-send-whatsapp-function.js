@@ -11,10 +11,6 @@ module.exports = {
         'TABLE(result json)',
         'plpgsql',
         `
-        CREATE OR REPLACE FUNCTION public.get_messages_to_send_whatsapp(jid integer, lim integer)
- RETURNS TABLE(result json)
- LANGUAGE plpgsql
-AS $function$  BEGIN 
         RETURN QUERY
         -- Set sent_at for messages belonging to a job that is in SENDING state only (it will not pick up any other states like STOPPED or LOGGED)
         WITH
@@ -42,7 +38,6 @@ AS $function$  BEGIN
         IF NOT FOUND THEN
           UPDATE job_queue SET status = 'SENT', updated_at = clock_timestamp() where id = jid AND status = 'SENDING';
         END IF;
-       END; $function$
 `, [], { force: true}
     )
   },
