@@ -12,7 +12,7 @@ export interface WhatsappMiddleware {
   isWhatsappCampaignOwnedByUser: Handler
   previewFirstMessage: Handler
   sendMessage: Handler
-  validateAndStoreCredentials: Handler
+  validateCredentials: Handler
   setCampaignCredentials: Handler
 }
 
@@ -211,11 +211,11 @@ export const InitWhatsappMiddleware = (
     res: Response
   ): Promise<Response | void> => {
     const { campaignId } = req.params
-    const { credentialName } = res.locals
-    if (!credentialName) {
+    const { label } = req.body
+    if (!label) {
       throw new Error('Credential does not exist')
     }
-    await WhatsappService.setCampaignCredentials(+campaignId, credentialName)
+    await WhatsappService.setCampaignCredentials(+campaignId, label)
     return res.json({ message: 'OK' })
   }
   const sendMessage = async (
@@ -235,23 +235,47 @@ export const InitWhatsappMiddleware = (
     }
   }
 
-  const validateAndStoreCredentials = async (
+  /**
+   * For whatsapp, credentials are already saved as wabaId in the database
+   * We only validate to let the user see if this is the phone number the intended to send from
+   * and if their message is pieced together accurately
+   * @param req
+   * @param res
+   * @param next
+   */
+  const validateCredentials = async (
     req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void | Response> => {
     const { campaignId } = req.params
-    const { recipient, template } = req.body
-    const { credentials, credentialName } = res.locals
+    const { recipient, template, from } = req.body
+
     const logMeta = {
       campaignId,
       recipient,
       template,
-      credentials,
-      credentialName,
       action: 'validateAndStoreCredentials',
     }
-    logger.info({ ...logMeta })
+    try {
+      if (campaignId && template) {
+        await WhatsappService.sendCampaignTemplateMessage(
+          +campaignId,
+          template,
+          from,
+          recipient
+        )
+      } else {
+        await WhatsappService.sendValidationMessage(from, recipient)
+      }
+    } catch (err) {
+      logger.error({
+        message: 'Failed to validate credentials',
+        error: err,
+        ...logMeta,
+      })
+      return res.status(400)
+    }
     next()
   }
   return {
@@ -263,7 +287,7 @@ export const InitWhatsappMiddleware = (
     previewFirstMessage,
     isWhatsappCampaignOwnedByUser,
     sendMessage,
-    validateAndStoreCredentials,
+    validateCredentials,
     setCampaignCredentials,
   }
 }

@@ -14,6 +14,19 @@ const whatsappClient: WhatsappClient = new WhatsappClient({
   version: config.get('whatsapp.endpointVersion'),
 })
 
+// this is just used to validate credentials or verify that a set of credentials work
+const whatsappDefaultMessage = {
+  content: {
+    type: 'template',
+    template: {
+      name: 'hello_world',
+      language: {
+        code: 'en_US',
+      },
+    },
+  },
+}
+
 const findCampaign = (
   campaignId: number,
   userId: number
@@ -46,8 +59,11 @@ const getPhoneNumbers = (wabaId: string) => {
   return whatsappClient.getPhoneNumbers(wabaId)
 }
 
-const getHydratedMessage = async (campaignId: number): Promise<any> => {
-  return campaignId
+const getHydratedMessage = async (
+  campaignId: number,
+  template: string
+): Promise<any> => {
+  return { campaignId, template }
 }
 const setCampaignCredentials = (
   campaignId: number,
@@ -68,6 +84,28 @@ const getTemplates = (wabaId: string) => {
   logger.info({ message: wabaId })
   return whatsappClient.getTemplates(wabaId)
 }
+
+const sendValidationMessage = (
+  from: string,
+  recipient: string
+): Promise<string | void> => {
+  return whatsappClient.sendMessage(from, recipient, {
+    ...whatsappDefaultMessage,
+  })
+}
+
+const sendCampaignTemplateMessage = async (
+  campaignId: number,
+  template: string,
+  from: string,
+  recipient: string
+): Promise<string | void> => {
+  const msg = await getHydratedMessage(campaignId, template)
+  if (!msg) {
+    throw new Error('No message to send')
+  }
+  return sendMessage(from, recipient, '')
+}
 export const WhatsappService = {
   findCampaign,
   whatsappClient,
@@ -76,4 +114,6 @@ export const WhatsappService = {
   setCampaignCredentials,
   getHydratedMessage,
   getTemplates,
+  sendValidationMessage,
+  sendCampaignTemplateMessage,
 }

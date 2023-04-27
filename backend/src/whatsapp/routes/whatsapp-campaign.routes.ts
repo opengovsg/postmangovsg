@@ -17,6 +17,9 @@ export const InitWhatsappCampaignRoute = (
       label: Joi.string().required(),
       recipient: Joi.string().trim().required(),
       template: Joi.string().required(),
+      // this is part that is different from other campaigns
+      // credentials now also include the phone number that the user sends by
+      from: Joi.string().required(),
     }),
   }
   const uploadStartValidator = {
@@ -39,7 +42,7 @@ export const InitWhatsappCampaignRoute = (
     celebrate(useCredentialsValidator),
     CampaignMiddleware.canEditCampaign,
     whatsappMiddleware.getCredentialsFromLabelForCampaign,
-    whatsappMiddleware.validateAndStoreCredentials,
+    whatsappMiddleware.validateCredentials,
     whatsappMiddleware.setCampaignCredentials
   )
 
