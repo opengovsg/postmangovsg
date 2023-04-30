@@ -11,6 +11,7 @@ import {
   ApiAuthorizationError,
   ApiInvalidCredentialsError,
   ApiInvalidFromAddressError,
+  ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
 
 export interface EmailMiddleware {
@@ -374,7 +375,7 @@ export const InitEmailMiddleware = (
    */
   const sendValidationMessage = async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
   ): Promise<Response | void> => {
     const { recipient, from } = req.body
@@ -389,7 +390,7 @@ export const InitEmailMiddleware = (
         error: err,
         action: 'sendValidationMessage',
       })
-      return res.status(400).json({ message: (err as Error).message })
+      throw new ApiInvalidFromAddressError((err as Error).message)
     }
     return next()
   }
@@ -402,37 +403,32 @@ export const InitEmailMiddleware = (
    */
   const duplicateCampaign = async (
     req: Request,
-    res: Response,
-    next: NextFunction
+    res: Response
   ): Promise<Response | void> => {
-    try {
-      const { campaignId } = req.params
-      const { name } = req.body
-      const campaign = await EmailService.duplicateCampaign({
-        campaignId: +campaignId,
-        name,
-      })
-      if (!campaign) {
-        return res.status(400).json({
-          message: `Unable to duplicate campaign with these parameters`,
-        })
-      }
-      logger.info({
-        message: 'Successfully copied campaign',
-        campaignId: campaign.id,
-        action: 'duplicateCampaign',
-      })
-      return res.status(201).json({
-        id: campaign.id,
-        name: campaign.name,
-        created_at: campaign.createdAt,
-        type: campaign.type,
-        protect: campaign.protect,
-        demo_message_limit: campaign.demoMessageLimit,
-      })
-    } catch (err) {
-      return next(err)
+    const { campaignId } = req.params
+    const { name } = req.body
+    const campaign = await EmailService.duplicateCampaign({
+      campaignId: +campaignId,
+      name,
+    })
+    if (!campaign) {
+      throw new ApiNotFoundError(
+        `Cannot duplicate. Campaign ${campaignId} was not found`
+      )
     }
+    logger.info({
+      message: 'Successfully copied campaign',
+      campaignId: campaign.id,
+      action: 'duplicateCampaign',
+    })
+    return res.status(201).json({
+      id: campaign.id,
+      name: campaign.name,
+      created_at: campaign.createdAt,
+      type: campaign.type,
+      protect: campaign.protect,
+      demo_message_limit: campaign.demoMessageLimit,
+    })
   }
 
   return {

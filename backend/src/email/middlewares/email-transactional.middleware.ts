@@ -22,6 +22,10 @@ import {
   TimestampFilter,
   TransactionalEmailSortField,
 } from '@core/constants'
+import {
+  ApiInvalidTemplateError,
+  ApiRateLimitError,
+} from '@core/errors/rest-api.errors'
 
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler
@@ -188,8 +192,7 @@ export const InitEmailTransactionalMiddleware = (
         UnsupportedFileTypeError,
       ]
       if (BAD_REQUEST_ERRORS.some((errType) => error instanceof errType)) {
-        res.status(400).json({ message: (error as Error).message })
-        return
+        throw new ApiInvalidTemplateError((error as Error).message)
       }
       next(error)
     }
@@ -245,18 +248,12 @@ export const InitEmailTransactionalMiddleware = (
     windowMs: TRANSACTIONAL_EMAIL_WINDOW * 1000,
     max: (req: Request) => req.session?.rateLimit,
     draft_polli_ratelimit_headers: true,
-    message: {
-      status: 429,
-      message: 'Too many requests. Please try again later.',
-    },
-    handler: (req: Request, res: Response) => {
+    handler: (req: Request, _res: Response) => {
       logger.warn({
         message: 'Rate limited request to send transactional email',
         userId: req?.session?.user.id,
       })
-      res
-        .status(429)
-        .json({ message: 'Too many requests. Please try again later.' })
+      throw new ApiRateLimitError('Too many requests. Please try again later.')
     },
   })
 
