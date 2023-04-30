@@ -3,6 +3,10 @@ import fileUpload from 'express-fileupload'
 import config from '@core/config'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
+import {
+  ApiAttachmentLimitError,
+  ApiAuthorizationError,
+} from '@core/errors/rest-api.errors'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')
@@ -19,8 +23,8 @@ const fileUploadHandler = fileUpload({
     fieldSize: BODY_SIZE_LIMIT + 1,
   },
   abortOnLimit: true,
-  limitHandler: function (_: Request, res: Response) {
-    res.status(413).json({ message: 'Size of attachments exceeds limit' })
+  limitHandler: function (_: Request, _res: Response, _next: NextFunction) {
+    throw new ApiAttachmentLimitError('Size of attachments exceeds limit')
   },
 })
 
@@ -30,7 +34,7 @@ const fileUploadHandler = fileUpload({
  */
 function preprocessPotentialIncomingFile(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void {
   if (req.files?.attachments) {
@@ -42,8 +46,7 @@ function preprocessPotentialIncomingFile(
      * exceeded, instead truncates array to specified num
      */
     if (req.body.attachments.length > FILE_ATTACHMENT_MAX_NUM) {
-      res.status(413).json({ message: 'Number of attachments exceeds limit' })
-      return
+      throw new ApiAttachmentLimitError('Number of attachments exceeds limit')
     }
   }
   next()
@@ -52,16 +55,14 @@ function preprocessPotentialIncomingFile(
 // forbid user from sending attachments from default from address to minimize risk
 async function checkAttachmentPermission(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> {
   const { from } = req.body
   if (req.files?.attachments && isDefaultFromAddress(from)) {
-    res.status(403).json({
-      message:
-        'Attachments are not allowed for Postman default from email address',
-    })
-    return
+    throw new ApiAuthorizationError(
+      'Attachments are not allowed for Postman default from email address'
+    )
   }
   next()
 }

@@ -226,7 +226,7 @@ export const InitEmailTemplateMiddleware = (
         filename,
       })
 
-      res.sendStatus(202)
+      res.status(202).json({ list_id: listId })
     } catch (err) {
       logger.error({
         message: 'Failed to select managed list',
@@ -240,7 +240,7 @@ export const InitEmailTemplateMiddleware = (
         InvalidRecipientError,
       ]
       if (userErrors.some((errType) => err instanceof errType)) {
-        return res.status(400).json({ message: (err as Error).message })
+        throw new ApiInvalidTemplateError((err as Error).message)
       }
       return next(err)
     }
@@ -357,7 +357,7 @@ export const InitEmailTemplateMiddleware = (
         true
       )
 
-      res.sendStatus(202)
+      res.status(202).json({ transaction_id: transactionId })
     } catch (err) {
       logger.error({
         message: 'Failed to complete upload to s3',
@@ -372,7 +372,7 @@ export const InitEmailTemplateMiddleware = (
       ]
 
       if (userErrors.some((errType) => err instanceof errType)) {
-        return res.status(400).json({ message: (err as Error).message })
+        throw new ApiInvalidTemplateError((err as Error).message)
       }
       return next(err)
     }

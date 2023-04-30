@@ -85,3 +85,15 @@ export class ApiCampaignRedactedError extends RestApiError {
     super(410, 'campaign_redacted', message)
   }
 }
+
+export class ApiRateLimitError extends RestApiError {
+  constructor(message: string) {
+    super(429, 'rate_limit', message)
+  }
+}
+
+export class ApiAttachmentLimitError extends RestApiError {
+  constructor(message: string) {
+    super(413, 'attachment_limit', message)
+  }
+}
