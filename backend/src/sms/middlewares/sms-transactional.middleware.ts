@@ -19,6 +19,8 @@ import {
 import {
   ApiInvalidRecipientError,
   ApiInvalidCredentialsError,
+  ApiRateLimitError,
+  ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
@@ -117,8 +119,7 @@ async function sendMessage(
         userId: req?.session?.user.id,
         label: credentials.label,
       })
-      res.sendStatus(429)
-      return
+      throw new ApiRateLimitError('Too many requests. Please try again later.')
     }
 
     next(err)
@@ -150,7 +151,7 @@ async function listMessages(req: Request, res: Response): Promise<void> {
   })
 }
 
-async function getById(req: Request, res: Response): Promise<void> {
+async function getById(req: Request, res: Response): Promise<Response> {
   const { smsId } = req.params
   const message = await SmsMessageTransactional.findOne({
     where: {
@@ -159,10 +160,9 @@ async function getById(req: Request, res: Response): Promise<void> {
     },
   })
   if (!message) {
-    res.status(404).json({ message: `Sms message with ID ${smsId} not found.` })
-    return
+    throw new ApiNotFoundError(`Sms message with ID ${smsId} not found.`)
   }
-  res.status(200).json(convertMessageModelToResponse(message))
+  return res.status(200).json(convertMessageModelToResponse(message))
 }
 
 export const SmsTransactionalMiddleware = {

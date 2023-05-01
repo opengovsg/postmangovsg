@@ -12,6 +12,7 @@ import { SmsTemplateService, SmsService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
+import { ApiInvalidTemplateError } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 /**
@@ -74,7 +75,7 @@ const storeTemplate = async (
         error: err,
         ...logMeta,
       })
-      return res.status(400).json({ message: err.message })
+      throw new ApiInvalidTemplateError(err.message)
     }
     return next(err)
   }
@@ -125,7 +126,7 @@ const uploadCompleteHandler = async (
     })
 
     // Return early because bulk insert is slow
-    res.sendStatus(202)
+    res.status(202).json({ id: campaignId })
   } catch (err) {
     logger.error({
       message: 'Failed to complete upload to s3',
@@ -140,7 +141,7 @@ const uploadCompleteHandler = async (
     ]
 
     if (userErrors.some((errType) => err instanceof errType)) {
-      return res.status(400).json({ message: (err as Error).message })
+      throw new ApiInvalidTemplateError((err as Error).message)
     }
     return next(err)
   }
@@ -191,7 +192,7 @@ const selectListHandler = async (
     })
 
     // Return early because bulk insert is slow
-    res.sendStatus(202)
+    res.status(202).json({ list_id: listId })
   } catch (err) {
     logger.error({
       message: 'Failed to complete upload to s3',
@@ -206,7 +207,7 @@ const selectListHandler = async (
     ]
 
     if (userErrors.some((errType) => err instanceof errType)) {
-      return res.status(400).json({ message: (err as Error).message })
+      throw new ApiInvalidTemplateError((err as Error).message)
     }
     return next(err)
   }
@@ -252,16 +253,11 @@ const pollCsvStatusHandler = async (
  */
 const deleteCsvErrorHandler = async (
   req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    await UploadService.deleteS3TempKeys(+campaignId)
-    res.sendStatus(200)
-  } catch (e) {
-    next(e)
-  }
+  res: Response
+): Promise<Response> => {
+  const { campaignId } = req.params
+  await UploadService.deleteS3TempKeys(+campaignId)
+  return res.status(200).json({ id: campaignId })
 }
 
 export const SmsTemplateMiddleware = {
