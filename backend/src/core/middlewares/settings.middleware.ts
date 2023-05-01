@@ -2,6 +2,7 @@ import { Handler, NextFunction, Request, Response } from 'express'
 import { ChannelType } from '@core/constants'
 import { ApiKeyService, CredentialService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import { ApiInvalidCredentialLabelError } from '@core/errors/rest-api.errors'
 
 export interface SettingsMiddleware {
   getUserSettings: Handler
@@ -119,7 +120,7 @@ export const InitSettingsMiddleware = (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response | void> => {
+  ): Promise<void> => {
     const { label } = req.body
     if (!label) {
       return next()
@@ -127,26 +128,22 @@ export const InitSettingsMiddleware = (
     const userId = req.session?.user?.id
     const { credentialName, channelType } = res.locals
 
-    try {
-      const result = await credentialService.getUserCredential(userId, label)
-      if (result) {
-        return res.status(400).json({
-          message: 'User credential with the same label already exists.',
-        })
-      }
-      if (!credentialName || !channelType) {
-        throw new Error('Credential or credential type does not exist')
-      }
-      await credentialService.createUserCredential(
-        label,
-        channelType,
-        credentialName,
-        +userId
+    const result = await credentialService.getUserCredential(userId, label)
+    if (result) {
+      throw new ApiInvalidCredentialLabelError(
+        'User credential with the same label already exists.'
       )
-      next()
-    } catch (e) {
-      next(e)
     }
+    if (!credentialName || !channelType) {
+      throw new Error('Credential or credential type does not exist')
+    }
+    await credentialService.createUserCredential(
+      label,
+      channelType,
+      credentialName,
+      +userId
+    )
+    next()
   }
 
   /**

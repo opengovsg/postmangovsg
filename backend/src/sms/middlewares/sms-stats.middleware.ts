@@ -58,17 +58,12 @@ const updateAndGetStats = async (
  */
 const getDeliveredRecipients = async (
   req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
+  res: Response
+): Promise<Response> => {
   const { campaignId } = req.params
-  try {
-    res.set('Content-Type', 'application/json')
-    await SmsStatsService.getDeliveredRecipients(+campaignId, res)
-    return res.end()
-  } catch (err) {
-    next(err)
-  }
+  res.set('Content-Type', 'application/json')
+  await SmsStatsService.getDeliveredRecipients(+campaignId, res)
+  return res.end()
 }
 
 export const SmsStatsMiddleware = {
