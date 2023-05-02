@@ -2586,34 +2586,23 @@ paths:
                   num_recipients:
                     type: number
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/template:
     put:
@@ -2673,35 +2662,28 @@ paths:
                           type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/upload/start:
     get:
@@ -2740,35 +2722,28 @@ paths:
                     type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/upload/complete:
     post:
@@ -2802,35 +2777,28 @@ paths:
           description: Accepted. The uploaded file is being processed.
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/upload/status:
     get:
@@ -2869,35 +2837,28 @@ paths:
                         type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden as there is a job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
     delete:
       security:
         - bearerAuth: []
@@ -2914,34 +2875,23 @@ paths:
         200:
           description: Success
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden as there is a job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/preview:
     get:
@@ -2971,34 +2921,23 @@ paths:
                       body:
                         type: string
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/new-credentials:
     post:
@@ -3043,35 +2982,28 @@ paths:
                     example: OK
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/credentials:
     post:
@@ -3111,35 +3043,28 @@ paths:
                     example: OK
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/credentials/verify:
     post:
@@ -3178,37 +3103,34 @@ paths:
                     example: OK
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '404':
           description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/send:
     post:
@@ -3252,35 +3174,28 @@ paths:
                       type: number
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/retry:
     post:
@@ -3306,34 +3221,23 @@ paths:
                   campaign_id:
                     type: integer
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/stats:
     get:
@@ -3357,34 +3261,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignStats'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/refresh-stats:
     post:
@@ -3408,34 +3301,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignStats'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/export:
     get:
@@ -3461,36 +3343,29 @@ paths:
                 items:
                   $ref: '#/components/schemas/CampaignRecipient'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '410':
-          description: Campaign has been redacted
+          description: Data No Longer Available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error410Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/telegram/duplicate:
     post:
@@ -3523,34 +3398,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignDuplicateMeta'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
 components:
   securitySchemes:
@@ -3646,39 +3516,6 @@ components:
         - SENT
         - STOPPED
         - LOGGED
-
-    ValidationError:
-      description: any one of the params failed validation
-      type: object
-      properties:
-        statusCode:
-          type: integer
-          example: 400
-        error:
-          type: string
-          example: Bad Request
-        message:
-          type: string
-          example: |-
-            "from" must be a valid email
-        validation:
-          type: object
-          properties:
-            source:
-              type: string
-              example: body
-            keys:
-              type: array
-              items:
-                type: string
-                example: from
-    Error:
-      type: object
-      properties:
-        message:
-          type: string
-        code:
-          type: string
     ErrorStatus:
       type: object
       properties:
