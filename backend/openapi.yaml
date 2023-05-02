@@ -988,6 +988,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error403Response'
+        '410':
+          description: Data No Longer Available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error410Response'
         '500':
           description: Internal Server Error
           content:
@@ -1169,6 +1175,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error403Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
         '500':
           description: Internal Server Error
           content:
@@ -1446,12 +1458,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error401Response'
-        '403':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
@@ -1491,12 +1497,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error401Response'
-        '403':
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/Error403Response'
         '404':
           description: Not Found
           content:
@@ -1536,36 +1536,24 @@ paths:
                     properties:
                       cost_per_message:
                         type: number
-
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/template:
     put:
       security:
@@ -1624,35 +1612,34 @@ paths:
                           type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/upload/start:
     get:
       security:
@@ -1690,35 +1677,28 @@ paths:
                     type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/upload/complete:
     post:
       security:
@@ -1751,35 +1731,28 @@ paths:
           description: Accepted. The uploaded file is being processed.
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/upload/status:
     get:
       security:
@@ -1817,12 +1790,28 @@ paths:
                         type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden as there is a job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
     delete:
       security:
         - bearerAuth: []
@@ -1839,34 +1828,23 @@ paths:
         '200':
           description: Success
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden as there is a job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/new-credentials:
     post:
       security:
@@ -1912,35 +1890,28 @@ paths:
                     example: OK
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/credentials:
     post:
       security:
@@ -1980,35 +1951,28 @@ paths:
                     example: OK
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/preview:
     get:
       security:
@@ -2037,34 +2001,23 @@ paths:
                       body:
                         type: string
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/send:
     post:
       security:
@@ -2105,35 +2058,28 @@ paths:
                       type: number
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/retry:
     post:
       security:
@@ -2158,34 +2104,23 @@ paths:
                   campaign_id:
                     type: integer
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user or job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/stats:
     get:
       security:
@@ -2207,34 +2142,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignStats'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/refresh-stats:
     post:
       security:
@@ -2256,34 +2180,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignStats'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/export:
     get:
       security:
@@ -2308,36 +2221,29 @@ paths:
                 items:
                   $ref: '#/components/schemas/CampaignRecipient'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '410':
-          description: Campaign has been redacted
+          description: Data No Longer Available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error410Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/duplicate:
     post:
       security:
@@ -2370,34 +2276,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignDuplicateMeta'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/sms/select-list:
     post:
       security:
@@ -2425,34 +2326,23 @@ paths:
         '201':
           description: A duplicate of the campaign was created
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /transactional/sms/send:
     post:
       security:
@@ -2484,12 +2374,28 @@ paths:
                 $ref: '#/components/schemas/SmsMessageTransactional'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '429':
-          description: Too many requests. Please try again later.
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error429Response'
         '500':
           description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /transactional/sms:
     get:
       security:
@@ -2591,37 +2497,23 @@ paths:
                     items:
                       $ref: '#/components/schemas/SmsMessageTransactional'
         '400':
-          description: Bad Request. Failed parameter validations.
-        '401':
-          description: Unauthorized.
+          description: Bad Request
           content:
-            text/plain:
-              example: Unauthorized
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /transactional/sms/{smsId}:
     get:
       security:
@@ -2644,41 +2536,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/SmsMessageTransactional'
         '400':
-          description: Bad Request. Failed parameter validations.
-        '401':
-          description: Unauthorized.
+          description: Bad Request
           content:
-            text/plain:
-              example: Unauthorized
-        '403':
-          description: Forbidden. Request violates firewall rules.
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '404':
-          description: Not Found. No transactional message with such ID found
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/telegram:
     get:
       security:
@@ -4172,6 +4052,18 @@ components:
         message:
           type: string
           example: Phone number 84206920 is invalid
+    Error410Response:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum: ['campaign_redacted']
+        message:
+          type: string
+          example: Campaign 20 has been redacted
     Error413Response:
       type: object
       required:
