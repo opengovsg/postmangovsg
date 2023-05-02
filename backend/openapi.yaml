@@ -88,32 +88,17 @@ paths:
                   total_count:
                     type: integer
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
     post:
       security:
         - bearerAuth: []
@@ -143,32 +128,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignMeta'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+
   /campaigns/{campaignId}:
     delete:
       security:
@@ -192,36 +163,29 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignIdObject'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '404':
-          description: Campaign not found
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
     put:
       security:
         - bearerAuth: []
@@ -253,34 +217,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignMeta'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '404':
-          description: Not found
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaigns/{campaignId}/cancel:
     post:
@@ -303,32 +256,18 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignIdObject'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+
   /campaign/{campaignId}/email:
     get:
       security:
@@ -350,34 +289,24 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailCampaign'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+
   /campaign/{campaignId}/email/template:
     put:
       security:
@@ -456,35 +385,29 @@ paths:
                         type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+
   /campaign/{campaignId}/email/upload/start:
     get:
       security:
@@ -525,35 +448,29 @@ paths:
                     type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+
   /campaign/{campaignId}/email/upload/complete:
     post:
       security:
@@ -590,35 +507,29 @@ paths:
                 $ref: '#/components/schemas/CampaignIdObject'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+
   /campaign/{campaignId}/email/upload/status:
     get:
       security:
@@ -678,35 +589,28 @@ paths:
                         type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
     delete:
       security:
         - bearerAuth: []
@@ -727,34 +631,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignIdObject'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/email/credentials:
     post:
@@ -793,35 +686,28 @@ paths:
                     example: 'OK'
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /campaign/{campaignId}/email/preview:
     get:
@@ -865,34 +751,23 @@ paths:
                       themed_body:
                         type: string
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/email/send:
     post:
       security:
@@ -920,37 +795,24 @@ paths:
                     type: array
                     items:
                       type: number
-        '400':
-          description: Bad Request
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/email/retry:
     post:
       security:
@@ -975,34 +837,23 @@ paths:
                   campaign_id:
                     type: integer
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden as there is a job in progress
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/email/stats:
     get:
       security:
@@ -1032,34 +883,23 @@ paths:
                       unsubscribed:
                         type: number
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/email/refresh-stats:
     post:
       security:
@@ -1089,34 +929,23 @@ paths:
                       unsubscribed:
                         type: number
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/email/export:
     get:
       security:
@@ -1148,36 +977,23 @@ paths:
                         'unsubscriber.reason':
                           type: string
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
-        '410':
-          description: Campaign has been redacted
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/email/protect/upload/start:
     get:
       security:
@@ -1218,38 +1034,30 @@ paths:
                     type: array
                     items:
                       type: string
-
         '400':
-          description: Invalid campaign type, not owned by user
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/email/protect/upload/complete:
     post:
       security:
@@ -1295,35 +1103,28 @@ paths:
                     type: string
         '400':
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/email/duplicate:
     post:
       security:
@@ -1357,34 +1158,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignDuplicateMeta'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/email/select-list:
     post:
       security:
@@ -1415,34 +1205,23 @@ paths:
               schema:
                 $ref: '#/components/schemas/CampaignMeta'
         '401':
-          description: Unauthorized
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden, campaign not owned by user
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
 
   /transactional/email/send:
     post:
@@ -1518,93 +1297,42 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailMessageTransactional'
         '400':
-          description: Bad Request. Failed parameter validations, message is malformed, or attachments are rejected.
+          description: Bad Request
           content:
-            text/plain:
-              examples:
-                InvalidRecipientError:
-                  value: Recipient email is blacklisted
-                TemplateError:
-                  value: Message is invalid as the subject or body only contains invalid HTML tags.
-                MaliciousFileError:
-                  value: 'Error: One or more attachments may be potentially malicious. Please check the attached files.'
-                UnsupportedFileTypeError:
-                  value: 'Error: One or more attachments may be an unsupported file type. Please check the attached files.'
             application/json:
               schema:
-                oneOf:
-                  - $ref: '#/components/schemas/ValidationError'
-                  - $ref: '#/components/schemas/Error'
-              examples:
-                ValidationError:
-                  value:
-                    statusCode: 400
-                    error: Bad Request
-                    message: |-
-                      "from" must be a valid email
-                    validation: { source: body, keys: [from] }
-                FromError:
-                  # align with message in backend/src/email/middlewares/email.middleware.ts
-                  value:
-                    {
-                      message: Invalid 'from' email address,
-                      which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more.,
-                    }
-
+                $ref: '#/components/schemas/Error400Response'
         '401':
-          description: Unauthorized.
+          description: Unauthenticated
           content:
-            text/plain:
-              example: Unauthorized
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '413':
           description: Number of attachments or size of attachments exceeded limit.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Error'
-              examples:
-                AttachmentQtyLimit:
-                  value: { message: Number of attachments exceeds limit }
-                AttachmentSizeLimit:
-                  value: { message: Size of attachments exceeds limit }
+                $ref: '#/components/schemas/Error413Response'
         '429':
           description: Rate limit exceeded. Too many requests.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
+                $ref: '#/components/schemas/Error429Response'
         '500':
-          description: Internal Server Error (includes error such as custom domain passed email validation but is incorrect; see https://github.com/opengovsg/postmangovsg/issues/1837)
+          description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+
   /transactional/email:
     get:
       security:
@@ -1707,37 +1435,29 @@ paths:
                     items:
                       $ref: '#/components/schemas/EmailMessageTransactional'
         '400':
-          description: Bad Request. Failed parameter validations.
-        '401':
-          description: Unauthorized.
+          description: Bad Request
           content:
-            text/plain:
-              example: Unauthorized
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /transactional/email/{emailId}:
     get:
       security:
@@ -1760,39 +1480,36 @@ paths:
               schema:
                 $ref: '#/components/schemas/EmailMessageTransactional'
         '400':
-          description: Bad Request. Failed parameter validations.
-        '401':
-          description: Unauthorized.
+          description: Bad Request
           content:
-            text/plain:
-              example: Unauthorized
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
         '404':
-          description: Not Found. No transactional message with such ID found
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
         '500':
           description: Internal Server Error
           content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+
   /campaign/{campaignId}/sms:
     get:
       security:
@@ -4385,3 +4102,97 @@ components:
               type: array
               items:
                 type: string
+    Error401Response:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum: ['unathenticated']
+        message:
+          type: string
+          example: Unauthenticated request. Please try again with correct authentication
+    Error500Response:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum: ['internal_server']
+        message:
+          type: string
+          example: Intetnal server error. Please try again later
+    Error404Response:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum: ['not_found']
+        message:
+          type: string
+          example: Campaign with ID 20 not found.
+    Error403Response:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum: ['unauthorized', 'already_sent']
+        message:
+          type: string
+          example: Campaign can't be edited at the moment as there're ongoing uploads or jobs
+    Error400Response:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum:
+            [
+              'api_validation',
+              'invalid_recipient',
+              'invalid_credentials',
+              'malformed',
+              'invalid_parameters',
+              'invalid_from_address',
+              'invalid_template',
+              'invalid_credential_label',
+            ]
+        message:
+          type: string
+          example: Phone number 84206920 is invalid
+    Error413Response:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum: ['attachment_limit']
+        message:
+          type: string
+          example: Size of attachments exceeds limit
+    Error429Response:
+      type: object
+      required:
+        - code
+        - message
+      properties:
+        code:
+          type: string
+          enum: ['rate_limit']
+        message:
+          type: string
+          example: Too many requests. Please try again later.
