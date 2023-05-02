@@ -2992,17 +2992,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3091,17 +3080,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3169,17 +3147,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3242,17 +3209,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3320,17 +3276,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden as there is a job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3375,17 +3320,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden as there is a job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3443,17 +3377,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3527,17 +3450,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden. Request violates firewall rules.
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3606,17 +3518,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3684,17 +3585,8 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
+        '404':
+          description: Not Found
         '500':
           description: Internal Server Error
           content:
@@ -3767,81 +3659,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
-        '500':
-          description: Internal Server Error
-          content:
-            text/plain:
-              example: Internal Server Error
-        '502':
-          description: Bad Gateway
-        '504':
-          description: Gateway Timeout
-        '503':
-          description: Service Temporarily Unavailable
-        '520':
-          description: Web Server Returns An Unknown Error
-        '521':
-          description: Web Server Is Down
-        '522':
-          description: Connection Timed Out
-        '523':
-          description: Origin Is Unreachable
-        '524':
-          description: A Timeout occurred
-        '525':
-          description: SSL handshake failed
-        '526':
-          description: Invalid SSL certificate
-
-  /campaign/{campaignId}/telegram/stop:
-    post:
-      security:
-        - bearerAuth: []
-      tags:
-        - Telegram
-      summary: Stop sending campaign
-      parameters:
-        - name: campaignId
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        '200':
-          description: OK
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  campaign_id:
-                    type: integer
-        '401':
-          description: Unauthorized
-        '403':
-          description: Forbidden, campaign not owned by user
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3895,17 +3712,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user or job in progress
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3957,17 +3763,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -3994,7 +3789,7 @@ paths:
         '526':
           description: Invalid SSL certificate
 
-  /campaign/{campaignId}/telegram/update-stats:
+  /campaign/{campaignId}/telegram/refresh-stats:
     post:
       security:
         - bearerAuth: []
@@ -4019,17 +3814,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -4085,17 +3869,6 @@ paths:
           description: Forbidden, campaign not owned by user
         '410':
           description: Campaign has been redacted
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
@@ -4156,17 +3929,6 @@ paths:
           description: Unauthorized
         '403':
           description: Forbidden, campaign not owned by user
-        '429':
-          description: Rate limit exceeded. Too many requests.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/ErrorStatus'
-              example:
-                {
-                  status: 429,
-                  message: Too many requests. Please try again later.,
-                }
         '500':
           description: Internal Server Error
           content:
