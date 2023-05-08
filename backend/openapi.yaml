@@ -1854,7 +1854,14 @@ paths:
             text/plain:
               example: Unauthorized
         '403':
-          description: Forbidden. Request violates firewall rules.
+          description: Forbidden. Request comes from an invalid `from` address, violates firewall rules.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              examples:
+                FromError:
+                  value: { message:  Attachments cannot be sent from the default @mail.postman.gov.sg domain }
         '413':
           description: Number of attachments or size of attachments exceeded limit.
           content:
@@ -1865,7 +1872,9 @@ paths:
                 AttachmentQtyLimit:
                   value: { message: Number of attachments exceeds limit }
                 AttachmentSizeLimit:
-                  value: { message: Size of attachments exceeds limit }
+                  value: { message: Size of one or more attachments exceeds limit }
+                CumulativeAttachmentSizeLimit:
+                  value: { message: Cumulative attachment size exceeds limit }
         '429':
           description: Rate limit exceeded. Too many requests.
           content:

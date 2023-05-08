@@ -226,7 +226,6 @@ const enqueueAndSend = async (): Promise<void> => {
           numMessages: messages.length,
           action: 'enqueueAndSend',
         })
-
         const start = Date.now()
         await Promise.all(
           messages.map((m) =>

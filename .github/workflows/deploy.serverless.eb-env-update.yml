@@ -22,9 +22,9 @@ jobs:
         run: |
           echo "Running on branch ${{ github.ref }}"
           if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            echo "::set-output name=current_env::production"
+            echo "current_env=production" >> $GITHUB_OUTPUT
           else
-             echo "::set-output name=current_env::staging"
+            echo "current_env=staging" >> $GITHUB_OUTPUT
           fi
 
   lint-test:
@@ -50,25 +50,25 @@ jobs:
         with:
           node-version: "16"
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v1
+        uses: aws-actions/configure-aws-credentials@v2
         with:
           aws-access-key-id: "${{ secrets.AWS_ACCESS_KEY_ID }}"
           aws-secret-access-key: "${{ secrets.AWS_SECRET_ACCESS_KEY }}"
           aws-region: "${{ vars.AWS_DEFAULT_REGION }}"
       - name: Set function name according to environment
         id: function-name
-        run: echo "::set-output name=value::$FUNCTION-${{ needs.set_environment.outputs.current_env }}"
+        run: echo "value=$FUNCTION-${{ needs.set_environment.outputs.current_env }}" >> $GITHUB_OUTPUT
       - name: Build
         id: build-lambda
         env:
           ZIP_FILE: code.zip
         run: |
           cd "$DIRECTORY"
-          npm ci 
+          npm ci
           npm run build
           npm prune --production
           sudo zip -qr "$ZIP_FILE" build package.json node_modules/
-          echo "::set-output name=zip_path::$DIRECTORY/$ZIP_FILE"
+          echo "zip_path=$DIRECTORY/$ZIP_FILE" >> $GITHUB_OUTPUT
 
       - name: Check if lambda can be updated (1)
         run: |

@@ -52,7 +52,14 @@ const TelegramDetail = () => {
   }, [isDemo, setModalContent, stats.status])
 
   function renderProgressHeader() {
-    if (stats.waitTime && stats.waitTime > 0) {
+    if (campaign.status === Status.Scheduled) {
+      return (
+        <CampaignScheduledInfo
+          campaign={campaign}
+          updateCampaign={updateCampaign}
+        />
+      )
+    } else if (stats.waitTime && stats.waitTime > 0) {
       const waitMin = Math.ceil(stats.waitTime / 60)
       return (
         <StepHeader title="Other campaigns are queued ahead of this campaign.">
@@ -73,13 +80,6 @@ const TelegramDetail = () => {
             the Campaigns tab.
           </p>
         </StepHeader>
-      )
-    } else if (campaign.status === Status.Scheduled) {
-      return (
-        <CampaignScheduledInfo
-          campaign={campaign}
-          updateCampaign={updateCampaign}
-        />
       )
     } else {
       return (

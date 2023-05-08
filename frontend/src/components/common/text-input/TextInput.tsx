@@ -13,18 +13,26 @@ const TextInput = forwardRef(
       badge,
       iconLabel,
       overrideStyles,
+      disabled,
       ...otherProps
     } = props
     const styles = overrideStyles || defaultStyles
 
     return (
-      <div className={cx(styles.textInput, className)}>
+      <div
+        className={cx(
+          styles.textInput,
+          className,
+          disabled ? styles.textInputDisabled : ''
+        )}
+      >
         {iconLabel}
         <input
           ref={ref}
           onChange={(e: ChangeEvent<HTMLInputElement>) =>
             onChange(e.target.value)
           }
+          disabled={disabled}
           {...otherProps}
         />
         {badge && (
