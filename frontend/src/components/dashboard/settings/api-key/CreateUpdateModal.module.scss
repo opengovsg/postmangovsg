@@ -1,0 +1,21 @@
+@import 'styles/_variables';
+
+.errorMessage {
+  @extend %caption;
+  color: $error;
+}
+
+.contactContainer {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.addContactBtn {
+  display: flex;
+  align-items: center;
+
+  i {
+    margin-left: 0;
+  }
+}

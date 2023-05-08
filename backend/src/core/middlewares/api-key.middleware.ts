@@ -9,6 +9,7 @@ export interface ApiKeyMiddleware {
   listApiKeys: Handler
   deleteApiKey: Handler
   generateApiKey: Handler
+  updateApiKey: Handler
 }
 
 export const InitApiKeyMiddleware = (
@@ -54,9 +55,32 @@ export const InitApiKeyMiddleware = (
     const userId = req.session?.user?.id
     const apiKey = await credentialService.generateApiKey(
       +userId,
-      req.body.label
+      req.body.label,
+      req.body.notification_contacts
     )
     return res.status(201).json(convertApiKeyModelToResponse(apiKey))
+  }
+  const updateApiKey = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    const userId = req.session?.user?.id
+    const apiKeyId = req.params.apiKeyId
+    const apiKey = await ApiKey.findOne({
+      where: {
+        userId: userId.toString(),
+        id: +apiKeyId,
+      },
+    })
+    if (!apiKey) {
+      return res.status(404).json({
+        code: 'not_found',
+        message: `API key with ID ${apiKeyId} doesn't exist.`,
+      })
+    }
+    apiKey.set('notificationContacts', req.body.notification_contacts)
+    await apiKey.save()
+    return res.status(200).json(convertApiKeyModelToResponse(apiKey))
   }
 
   function convertApiKeyModelToResponse(
@@ -67,6 +91,8 @@ export const InitApiKeyMiddleware = (
       last_five: key.lastFive,
       label: key.label,
       plain_text_key: key.plainTextKey,
+      valid_until: key.validUntil.toISOString(),
+      notification_contacts: key.notificationContacts,
     }
   }
 
@@ -74,5 +100,6 @@ export const InitApiKeyMiddleware = (
     listApiKeys,
     deleteApiKey,
     generateApiKey,
+    updateApiKey,
   }
 }

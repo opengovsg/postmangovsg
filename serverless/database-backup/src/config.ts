@@ -67,6 +67,7 @@ const config = convict({
   aws: {
     awsRegion: {
       doc: 'Region for the S3 bucket that is used to store file uploads',
+      format: 'required-string',
       default: 'ap-southeast-1',
       env: 'AWS_REGION',
     },

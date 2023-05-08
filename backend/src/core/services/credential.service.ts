@@ -17,6 +17,7 @@ import { RedisService } from './redis.service'
 import { TwilioCredentials } from '@shared/clients/twilio-client.class'
 import { ApiKeyService } from './api-key.service'
 import { ApiKey } from '@core/models/user/api-key'
+import moment from 'moment'
 
 export interface CredentialService {
   // Credentials (cred_name)
@@ -64,7 +65,8 @@ export interface CredentialService {
 
   generateApiKey(
     userId: number,
-    label: string
+    label: string,
+    notificationContacts: string[]
   ): Promise<ApiKey & { plainTextKey: string }>
 }
 
@@ -349,7 +351,8 @@ export const InitCredentialService = (redisService: RedisService) => {
 
   const generateApiKey = async (
     userId: number,
-    label: string
+    label: string,
+    notificationContacts: string[]
   ): Promise<ApiKey & { plainTextKey: string }> => {
     const user = await User.findByPk(userId)
     if (!user) {
@@ -363,6 +366,8 @@ export const InitCredentialService = (redisService: RedisService) => {
       hash: apiKeyHash,
       lastFive: plainTextKey.slice(-5),
       label,
+      validUntil: moment().add(6, 'month').toDate(),
+      notificationContacts,
     } as ApiKey)
     return Object.assign({}, apiKey.toJSON(), { plainTextKey })
   }
