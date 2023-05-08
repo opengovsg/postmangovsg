@@ -148,7 +148,7 @@ const CreateModal = ({
               <p className={styles.subtext}>Telegram</p>
               {selectedChannel === ChannelType.Telegram && (
                 <p className={styles.infotext}>
-                  Set up your Telegram Bot. &nsbp;
+                  Set up your Telegram Bot. &nbsp;
                   <OutboundLink
                     className={styles.link}
                     eventLabel="https://go.gov.sg/postman-telegram"
