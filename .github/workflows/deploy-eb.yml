@@ -26,7 +26,32 @@ jobs:
           else
              echo "current_env=staging" >> $GITHUB_OUTPUT
           fi
-
+  file_change_check:
+    outputs:
+      has_changes: ${{steps.check_files.outputs.has_changes}}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 2
+      - name: Check modified files
+        id: check_files
+        run: |
+          echo "=============== list modified files ==============="
+          git diff --name-only HEAD^ HEAD
+          echo "========== check paths of modified files =========="
+          git diff --name-only HEAD^ HEAD &gt; files.txt
+          while IFS= read -r file
+          do
+            echo $file
+            if [[ $file != backend/* ]]; then
+              echo "::set-output name=has_changes::false"
+              break
+            else
+              echo "::set-output name=has_changes::true"
+            fi
+          done &lt; files.txt
   lint-test:
     runs-on: ubuntu-latest
     services:
@@ -149,7 +174,8 @@ jobs:
         run: echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   deploy_backend:
-    needs: [set_environment, build_application]
+    needs: [set_environment, build_application, file_change_check]
+    if: needs.file_change_check.outputs.has_changes == 'true'
     environment:
       name: ${{ needs.set_environment.outputs.current_env }}
     outputs:
