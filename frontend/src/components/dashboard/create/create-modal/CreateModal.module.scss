@@ -9,7 +9,7 @@ $modal-width: $tablet;
 }
 
 .channelTypes {
-  @include flex-horizontal;
+  @include flex-vertical;
   align-items: flex-start;
   justify-content: space-between;
 
@@ -18,13 +18,12 @@ $modal-width: $tablet;
   }
 
   .channelContainer {
-    @include flex-vertical;
+    @include flex-horizontal;
     flex: 1;
     margin-right: 1rem;
-
-    &:last-child {
-      margin-right: 0;
-    }
+    margin-bottom: 1rem;
+    line-height: 1.5rem;
+    height: 1.5rem;
 
     @include mobile() {
       margin-right: 0;
@@ -57,12 +56,6 @@ $modal-width: $tablet;
           color: $primary;
           cursor: pointer;
         }
-      }
-    }
-
-    .subtext {
-      @include mobile() {
-        margin-bottom: 1rem;
       }
     }
     .protectedOption {
@@ -101,11 +94,16 @@ $modal-width: $tablet;
 }
 
 .subtext {
-  height: 1.5rem;
-  font-size: 0.8rem;
-  margin-top: 1rem;
+  font-size: 0.85rem;
   margin-bottom: 0;
+  margin-left: 16px;
+}
 
+.infotext {
+  font-size: 0.8rem;
+  margin-bottom: 0;
+  margin-left: 12px;
+  color: $grey-700;
   .link {
     font-size: 0.8rem;
     font-style: italic;

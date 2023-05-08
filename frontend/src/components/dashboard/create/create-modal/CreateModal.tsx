@@ -1,22 +1,15 @@
 import { i18n } from '@lingui/core'
-
 import cx from 'classnames'
 
-import { useState, useContext, useEffect } from 'react'
+import { useContext, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
-
 import { useNavigate } from 'react-router-dom'
 
 import styles from './CreateModal.module.scss'
 
-import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
-import {
-  TextInput,
-  PrimaryButton,
-  Checkbox,
-  ErrorBlock,
-} from 'components/common'
+import { Campaign, ChannelType } from 'classes/Campaign'
+import { ErrorBlock, PrimaryButton, TextInput } from 'components/common'
 import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
 import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
@@ -37,16 +30,13 @@ const CreateModal = ({
   const [selectedName, setSelectedName] = useState(name)
   const [protect, setProtected] = useState(false)
 
-  useEffect(() => {
-    setProtected(false)
-  }, [selectedChannel])
-
   async function handleCreateCampaign() {
     try {
       const campaign: Campaign = await createCampaign({
         name: selectedName,
         type: selectedChannel,
-        protect,
+        // pass in protect=true only if channel type is email and protect is true
+        protect: protect && selectedChannel === ChannelType.Email,
       })
       // close modal and go to create view
       modalContext.close()
@@ -99,29 +89,17 @@ const CreateModal = ({
 
           <div className={styles.channelTypes}>
             <div className={styles.channelContainer}>
-              <PrimaryButton
-                className={cx(styles.button, {
-                  [styles.active]: selectedChannel === ChannelType.SMS,
-                })}
-                onClick={
-                  selectedChannel === ChannelType.SMS
-                    ? undefined
-                    : () => setSelectedChannel(ChannelType.SMS)
-                }
-              >
-                SMS
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    channelIcons[ChannelType.SMS]
-                  )}
-                ></i>
-              </PrimaryButton>
-
+              <input
+                type="radio"
+                name={ChannelType.SMS}
+                value={ChannelType.SMS}
+                checked={selectedChannel === ChannelType.SMS}
+                onChange={() => setSelectedChannel(ChannelType.SMS)}
+              />
+              <p className={styles.subtext}>SMS</p>
               {selectedChannel === ChannelType.SMS && (
-                <p className={styles.subtext}>
-                  Get your credentials ready.&nbsp;
+                <p className={styles.infotext}>
+                  Get your credentials ready. &nbsp;
                   <OutboundLink
                     className={styles.link}
                     eventLabel={i18n._(LINKS.guideSmsUrl)}
@@ -134,79 +112,174 @@ const CreateModal = ({
               )}
             </div>
             <div className={styles.channelContainer}>
-              <PrimaryButton
-                className={cx(styles.button, {
-                  [styles.active]: selectedChannel === ChannelType.Telegram,
-                })}
-                onClick={
-                  selectedChannel === ChannelType.Telegram
-                    ? undefined
-                    : () => setSelectedChannel(ChannelType.Telegram)
-                }
-              >
-                Telegram
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    channelIcons[ChannelType.Telegram]
-                  )}
-                ></i>
-              </PrimaryButton>
-              {selectedChannel === ChannelType.Telegram && (
-                <p className={styles.subtext}>
-                  It is best to
-                  <span
+              <input
+                type="radio"
+                name={ChannelType.Email}
+                value={ChannelType.Email}
+                checked={selectedChannel === ChannelType.Email && !protect}
+                onChange={() => {
+                  setSelectedChannel(ChannelType.Email)
+                  setProtected(false)
+                }}
+              />
+              <p className={styles.subtext}>Email</p>
+            </div>
+            <div className={styles.channelContainer}>
+              <input
+                type="radio"
+                name={ChannelType.Email}
+                value={ChannelType.Email}
+                checked={selectedChannel === ChannelType.Email && protect}
+                onChange={() => {
+                  setSelectedChannel(ChannelType.Email)
+                  setProtected(true)
+                }}
+              />
+              <p className={styles.subtext}>Password Protected Email</p>
+              {selectedChannel === ChannelType.Email && protect && (
+                <p className={styles.infotext}>
+                  Send sensitive content using Password Protected Email. &nbsp;
+                  <OutboundLink
                     className={styles.link}
-                    onClick={() => handleAddCredentials(ChannelType.Telegram)}
+                    eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    target="_blank"
                   >
-                    store and validate your credentials
-                  </span>
-                  &nbsp;before you start.
+                    Learn more
+                  </OutboundLink>
                 </p>
               )}
             </div>
             <div className={styles.channelContainer}>
-              <PrimaryButton
-                className={cx(styles.button, {
-                  [styles.active]: selectedChannel === ChannelType.Email,
-                })}
-                onClick={
-                  selectedChannel === ChannelType.Email
-                    ? undefined
-                    : () => setSelectedChannel(ChannelType.Email)
-                }
-              >
-                Email
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    channelIcons[ChannelType.Email]
-                  )}
-                ></i>
-              </PrimaryButton>
-              {selectedChannel === ChannelType.Email && (
-                <Checkbox
-                  className={styles.protectedOption}
-                  checked={protect}
-                  onChange={setProtected}
-                >
-                  <p className={styles.subtext}>
-                    Password protected.
-                    {/* TODO: change url to passsword protected section in guide */}
-                    <OutboundLink
-                      className={styles.link}
-                      eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
-                      to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
-                      target="_blank"
-                    >
-                      Learn more
-                    </OutboundLink>
-                  </p>
-                </Checkbox>
+              <input
+                type="radio"
+                name={ChannelType.Telegram}
+                value={ChannelType.Telegram}
+                checked={selectedChannel === ChannelType.Telegram}
+                onChange={() => setSelectedChannel(ChannelType.Telegram)}
+              />
+              <p className={styles.subtext}>Telegram</p>
+              {selectedChannel === ChannelType.Telegram && (
+                <p className={styles.infotext}>
+                  <span
+                    className={styles.link}
+                    onClick={() => handleAddCredentials(ChannelType.Telegram)}
+                  >
+                    Store and validate
+                  </span>
+                  &nbsp; your credentials before you start.
+                </p>
               )}
             </div>
+            {/*<div className={styles.channelContainer}>*/}
+            {/*  <PrimaryButton*/}
+            {/*    className={cx(styles.button, {*/}
+            {/*      [styles.active]: selectedChannel === ChannelType.SMS,*/}
+            {/*    })}*/}
+            {/*    onClick={*/}
+            {/*      selectedChannel === ChannelType.SMS*/}
+            {/*        ? undefined*/}
+            {/*        : () => setSelectedChannel(ChannelType.SMS)*/}
+            {/*    }*/}
+            {/*  >*/}
+            {/*    SMS*/}
+            {/*    <i*/}
+            {/*      className={cx(*/}
+            {/*        'bx',*/}
+            {/*        styles.icon,*/}
+            {/*        channelIcons[ChannelType.SMS]*/}
+            {/*      )}*/}
+            {/*    ></i>*/}
+            {/*  </PrimaryButton>*/}
+
+            {/*  {selectedChannel === ChannelType.SMS && (*/}
+            {/*    <p className={styles.subtext}>*/}
+            {/*      Get your credentials ready.&nbsp;*/}
+            {/*      <OutboundLink*/}
+            {/*        className={styles.link}*/}
+            {/*        eventLabel={i18n._(LINKS.guideSmsUrl)}*/}
+            {/*        to={i18n._(LINKS.guideSmsUrl)}*/}
+            {/*        target="_blank"*/}
+            {/*      >*/}
+            {/*        What is this?*/}
+            {/*      </OutboundLink>*/}
+            {/*    </p>*/}
+            {/*  )}*/}
+            {/*</div>*/}
+            {/*<div className={styles.channelContainer}>*/}
+            {/*  <PrimaryButton*/}
+            {/*    className={cx(styles.button, {*/}
+            {/*      [styles.active]: selectedChannel === ChannelType.Telegram,*/}
+            {/*    })}*/}
+            {/*    onClick={*/}
+            {/*      selectedChannel === ChannelType.Telegram*/}
+            {/*        ? undefined*/}
+            {/*        : () => setSelectedChannel(ChannelType.Telegram)*/}
+            {/*    }*/}
+            {/*  >*/}
+            {/*    Telegram*/}
+            {/*    <i*/}
+            {/*      className={cx(*/}
+            {/*        'bx',*/}
+            {/*        styles.icon,*/}
+            {/*        channelIcons[ChannelType.Telegram]*/}
+            {/*      )}*/}
+            {/*    ></i>*/}
+            {/*  </PrimaryButton>*/}
+            {/*  {selectedChannel === ChannelType.Telegram && (*/}
+            {/*    <p className={styles.subtext}>*/}
+            {/*      It is best to*/}
+            {/*      <span*/}
+            {/*        className={styles.link}*/}
+            {/*        onClick={() => handleAddCredentials(ChannelType.Telegram)}*/}
+            {/*      >*/}
+            {/*        store and validate your credentials*/}
+            {/*      </span>*/}
+            {/*      &nbsp;before you start.*/}
+            {/*    </p>*/}
+            {/*  )}*/}
+            {/*</div>*/}
+            {/*<div className={styles.channelContainer}>*/}
+            {/*  <PrimaryButton*/}
+            {/*    className={cx(styles.button, {*/}
+            {/*      [styles.active]: selectedChannel === ChannelType.Email,*/}
+            {/*    })}*/}
+            {/*    onClick={*/}
+            {/*      selectedChannel === ChannelType.Email*/}
+            {/*        ? undefined*/}
+            {/*        : () => setSelectedChannel(ChannelType.Email)*/}
+            {/*    }*/}
+            {/*  >*/}
+            {/*    Email*/}
+            {/*    <i*/}
+            {/*      className={cx(*/}
+            {/*        'bx',*/}
+            {/*        styles.icon,*/}
+            {/*        channelIcons[ChannelType.Email]*/}
+            {/*      )}*/}
+            {/*    ></i>*/}
+            {/*  </PrimaryButton>*/}
+            {/*  {selectedChannel === ChannelType.Email && (*/}
+            {/*    <Checkbox*/}
+            {/*      className={styles.protectedOption}*/}
+            {/*      checked={protect}*/}
+            {/*      onChange={setProtected}*/}
+            {/*    >*/}
+            {/*      <p className={styles.subtext}>*/}
+            {/*        Password protected.*/}
+            {/*        /!* TODO: change url to passsword protected section in guide *!/*/}
+            {/*        <OutboundLink*/}
+            {/*          className={styles.link}*/}
+            {/*          eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}*/}
+            {/*          to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}*/}
+            {/*          target="_blank"*/}
+            {/*        >*/}
+            {/*          Learn more*/}
+            {/*        </OutboundLink>*/}
+            {/*      </p>*/}
+            {/*    </Checkbox>*/}
+            {/*  )}*/}
+            {/*</div>*/}
           </div>
         </div>
 
