@@ -78,7 +78,7 @@ const CreateModal = ({
             <div className={styles.channelContainer}>
               <input
                 type="radio"
-                name={ChannelType.SMS}
+                aria-label={ChannelType.SMS}
                 value={ChannelType.SMS}
                 checked={selectedChannel === ChannelType.SMS}
                 onChange={() => setSelectedChannel(ChannelType.SMS)}
@@ -101,7 +101,7 @@ const CreateModal = ({
             <div className={styles.channelContainer}>
               <input
                 type="radio"
-                name={ChannelType.Email}
+                aria-label={ChannelType.Email}
                 value={ChannelType.Email}
                 checked={selectedChannel === ChannelType.Email && !protect}
                 onChange={() => {
@@ -114,7 +114,7 @@ const CreateModal = ({
             <div className={styles.channelContainer}>
               <input
                 type="radio"
-                name={ChannelType.Email}
+                aria-label={`protect-${ChannelType.Email}`}
                 value={ChannelType.Email}
                 checked={selectedChannel === ChannelType.Email && protect}
                 onChange={() => {
@@ -140,7 +140,7 @@ const CreateModal = ({
             <div className={styles.channelContainer}>
               <input
                 type="radio"
-                name={ChannelType.Telegram}
+                aria-label={ChannelType.Telegram}
                 value={ChannelType.Telegram}
                 checked={selectedChannel === ChannelType.Telegram}
                 onChange={() => setSelectedChannel(ChannelType.Telegram)}
