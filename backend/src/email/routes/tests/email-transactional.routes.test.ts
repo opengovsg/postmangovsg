@@ -43,7 +43,7 @@ beforeEach(async () => {
   } as User)
   const { plainTextKey } = await (
     app as any as { credentialService: CredentialService }
-  ).credentialService.generateApiKey(user.id, 'test api key')
+  ).credentialService.generateApiKey(user.id, 'test api key', [user.email])
   apiKey = plainTextKey
 })
 
@@ -73,13 +73,21 @@ describe(`${emailTransactionalRoute}/send`, () => {
     from: 'Postman <donotreply@mail.postman.gov.sg>',
     reply_to: 'user@agency.gov.sg',
   }
+  const generateRandomSmallFile = () => {
+    const randomFile = Buffer.from(Math.random().toString(36).substring(2))
+    return randomFile
+  }
+  const generateRandomFileSizeInMb = (sizeInMb: number) => {
+    const randomFile = Buffer.alloc(sizeInMb * 1024 * 1024, '.')
+    return randomFile
+  }
 
   // attachment only allowed when sent from user's own email
   const validApiCallAttachment = {
     ...validApiCall,
     from: `User <${userEmail}>`,
   }
-  const validAttachment = Buffer.from('hello world')
+  const validAttachment = generateRandomSmallFile()
   const validAttachmentName = 'hi.txt'
   const validAttachmentHashRegex = /^[a-f0-9]{32}$/ // MD5 32 characters
   const validAttachmentSize = Buffer.byteLength(validAttachment)
@@ -445,7 +453,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
   test('Should throw an error if file type of attachment is not supported and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually an invalid file type; FileExtensionService checks magic number
-    const invalidFileTypeAttachment = Buffer.alloc(1024 * 1024, '.')
+    const invalidFileTypeAttachment = generateRandomFileSizeInMb(1)
     const invalidFileTypeAttachmentName = 'invalid.exe'
     // instead, we just mock the service to return false
     const mockFileTypeCheck = jest
@@ -603,9 +611,9 @@ describe(`${emailTransactionalRoute}/send`, () => {
     ])
   })
 
-  test('Email with attachment that exceeds limit should fail', async () => {
+  test('Email with attachment that exceeds size limit should fail', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
-    const invalidAttachmentTooBig = Buffer.alloc(1024 * 1024 * 10, '.') // 10MB
+    const invalidAttachmentTooBig = generateRandomFileSizeInMb(10)
     const invalidAttachmentTooBigName = 'too big.txt'
 
     await EmailFromAddress.create({
@@ -631,6 +639,33 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(mockSendEmail).not.toBeCalled()
     // no need to check EmailMessageTransactional since this is rejected before db record is saved
   })
+  test('Email with more than 10MB cumulative attachments should fail', async () => {
+    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+    await EmailFromAddress.create({
+      email: user.email,
+      name: 'Agency ABC',
+    } as EmailFromAddress)
+    const onepointnineMbAttachment = generateRandomFileSizeInMb(1.9)
+
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCallAttachment.recipient)
+      .field('subject', validApiCallAttachment.subject)
+      .field('body', validApiCallAttachment.body)
+      .field('from', validApiCallAttachment.from)
+      .field('reply_to', validApiCallAttachment.reply_to)
+      .attach('attachments', onepointnineMbAttachment, 'attachment1')
+      .attach('attachments', onepointnineMbAttachment, 'attachment2')
+      .attach('attachments', onepointnineMbAttachment, 'attachment3')
+      .attach('attachments', onepointnineMbAttachment, 'attachment4')
+      .attach('attachments', onepointnineMbAttachment, 'attachment5')
+      .attach('attachments', onepointnineMbAttachment, 'attachment6')
+
+    expect(res.status).toBe(413)
+    expect(mockSendEmail).not.toBeCalled()
+    // no need to check EmailMessageTransactional since this is rejected before db record is saved
+  })
 
   test('Should send email with two valid attachments and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
@@ -642,7 +677,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       name: 'Agency ABC',
     } as EmailFromAddress)
 
-    const validAttachment2 = Buffer.from('wassup dog')
+    const validAttachment2 = generateRandomSmallFile()
     const validAttachment2Name = 'hey.txt'
     const validAttachment2Size = Buffer.byteLength(validAttachment2)
 
@@ -716,25 +751,13 @@ describe(`${emailTransactionalRoute}/send`, () => {
     ])
   })
 
-  test('Email with more than five attachments should fail', async () => {
+  test('Email with more than ten attachments should fail', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     await EmailFromAddress.create({
       email: user.email,
       name: 'Agency ABC',
     } as EmailFromAddress)
 
-    // at time of writing this test default value of FILE_ATTACHMENT_MAX_NUM is 5
-    // not sure how to create a variable number of attachments + API call (probably not possible?)
-    const attachment2 = Buffer.from('wassup dog')
-    const attachment2Name = 'hey.txt'
-    const attachment3 = Buffer.from('wassup pal')
-    const attachment3Name = 'hi there.txt'
-    const attachment4 = Buffer.from('hello there')
-    const attachment4Name = 'hello friends.txt'
-    const attachment5 = Buffer.from('hello there')
-    const attachment5Name = 'hello friends.txt'
-    const attachment6 = Buffer.from('hello there')
-    const attachment6Name = 'hello friends.txt'
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -744,11 +767,16 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .field('from', validApiCallAttachment.from)
       .field('reply_to', validApiCallAttachment.reply_to)
       .attach('attachments', validAttachment, validAttachmentName)
-      .attach('attachments', attachment2, attachment2Name)
-      .attach('attachments', attachment3, attachment3Name)
-      .attach('attachments', attachment4, attachment4Name)
-      .attach('attachments', attachment5, attachment5Name)
-      .attach('attachments', attachment6, attachment6Name)
+      .attach('attachments', generateRandomSmallFile(), 'attachment2')
+      .attach('attachments', generateRandomSmallFile(), 'attachment3')
+      .attach('attachments', generateRandomSmallFile(), 'attachment4')
+      .attach('attachments', generateRandomSmallFile(), 'attachment5')
+      .attach('attachments', generateRandomSmallFile(), 'attachment6')
+      .attach('attachments', generateRandomSmallFile(), 'attachment7')
+      .attach('attachments', generateRandomSmallFile(), 'attachment8')
+      .attach('attachments', generateRandomSmallFile(), 'attachment9')
+      .attach('attachments', generateRandomSmallFile(), 'attachment10')
+      .attach('attachments', generateRandomSmallFile(), 'attachment11')
 
     expect(res.status).toBe(413)
     expect(mockSendEmail).not.toBeCalled()
@@ -1254,7 +1282,9 @@ describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
     } as User)
     const { plainTextKey: anotherApiKey } = await (
       app as any as { credentialService: CredentialService }
-    ).credentialService.generateApiKey(anotherUser.id, 'another test api key')
+    ).credentialService.generateApiKey(anotherUser.id, 'another test api key', [
+      anotherUser.email,
+    ])
     const message = await EmailMessageTransactional.create({
       userId: user.id,
       recipient: 'recipient@agency.gov.sg',

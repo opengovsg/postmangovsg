@@ -87,7 +87,7 @@ const ExportRecipients = ({
       const exportedAt = moment().format('LLL').replace(',', '')
       const explanation =
         `"Exported ${exportedAt}. Reports are updated as and when Postman receives new notifications about message status."\n` +
-        `"'Read' status may not show up accurately for corporate and Singapore government recipients due to email filtering policies."\n\n`
+        `"'Read' status may not show up accurately for corporate and Singapore Government recipients due to email filtering policies."\n\n`
 
       let content = [explanation]
 
