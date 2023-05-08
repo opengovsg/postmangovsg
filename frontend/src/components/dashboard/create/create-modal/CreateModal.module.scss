@@ -69,6 +69,19 @@ $modal-width: $tablet;
         margin-bottom: 0;
       }
     }
+    input[type='radio']:checked:after {
+      width: 4px;
+      height: 4px;
+      border-radius: 15px;
+      top: -4.5px;
+      left: 2px;
+      position: relative;
+      background-color: $blue-500;
+      content: '';
+      display: inline-block;
+      visibility: visible;
+      border: 2.5px solid $blue-500;
+    }
   }
 }
 
