@@ -10,7 +10,6 @@ import styles from './CreateModal.module.scss'
 
 import { Campaign, ChannelType } from 'classes/Campaign'
 import { ErrorBlock, PrimaryButton, TextInput } from 'components/common'
-import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
 import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
 
@@ -45,18 +44,6 @@ const CreateModal = ({
       console.error(err)
       setErrorMessage((err as Error).message)
     }
-  }
-
-  function handleAddCredentials(channelType: ChannelType) {
-    const saved = (
-      <CreateModal name={selectedName} channelType={selectedChannel} />
-    )
-    modalContext.setModalContent(
-      <AddCredentialModal
-        credType={channelType}
-        onSuccess={() => modalContext.setModalContent(saved)}
-      ></AddCredentialModal>
-    )
   }
 
   return (
@@ -99,14 +86,14 @@ const CreateModal = ({
               <p className={styles.subtext}>SMS</p>
               {selectedChannel === ChannelType.SMS && (
                 <p className={styles.infotext}>
-                  Get your credentials ready. &nbsp;
+                  Set up your Twilio credentials. &nbsp;
                   <OutboundLink
                     className={styles.link}
                     eventLabel={i18n._(LINKS.guideSmsUrl)}
                     to={i18n._(LINKS.guideSmsUrl)}
                     target="_blank"
                   >
-                    What is this?
+                    Learn more.
                   </OutboundLink>
                 </p>
               )}
@@ -138,14 +125,14 @@ const CreateModal = ({
               <p className={styles.subtext}>Password Protected Email</p>
               {selectedChannel === ChannelType.Email && protect && (
                 <p className={styles.infotext}>
-                  Send sensitive content using Password Protected Email. &nbsp;
+                  Send sensitive content using Postman. &nbsp;
                   <OutboundLink
                     className={styles.link}
                     eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
                     to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
                     target="_blank"
                   >
-                    Learn more
+                    Learn more.
                   </OutboundLink>
                 </p>
               )}
@@ -161,13 +148,15 @@ const CreateModal = ({
               <p className={styles.subtext}>Telegram</p>
               {selectedChannel === ChannelType.Telegram && (
                 <p className={styles.infotext}>
-                  <span
+                  Set up your Telegram Bot. &nsbp;
+                  <OutboundLink
                     className={styles.link}
-                    onClick={() => handleAddCredentials(ChannelType.Telegram)}
+                    eventLabel="https://go.gov.sg/postman-telegram"
+                    to="https://go.gov.sg/postman-telegram"
+                    target="_blank"
                   >
-                    Store and validate
-                  </span>
-                  &nbsp; your credentials before you start.
+                    Learn more.
+                  </OutboundLink>
                 </p>
               )}
             </div>
