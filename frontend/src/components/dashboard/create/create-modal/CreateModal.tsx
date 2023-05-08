@@ -87,6 +87,19 @@ const CreateModal = ({
                 }}
               />
               <p className={styles.subtext}>Email</p>
+              {selectedChannel === ChannelType.Email && !protect && (
+                <p className={styles.infotext}>
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel="https://go.gov.sg/postman-email"
+                    to="https://go.gov.sg/postman-email"
+                    target="_blank"
+                  >
+                    Learn more
+                  </OutboundLink>
+                  &nbsp; about sending emails on Postman.
+                </p>
+              )}
             </div>
             <div className={styles.channelContainer}>
               <input
