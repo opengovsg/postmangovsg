@@ -1,7 +1,11 @@
 import { MessageCountryPricing, TwilioCredentials } from './interfaces'
 import twilio from 'twilio'
 import { getSha256Hash } from '../../utils/crypto'
-import { AuthenticationError, InvalidPhoneNumberError } from './errors'
+import {
+  AuthenticationError,
+  InvalidPhoneNumberError,
+  RateLimitError,
+} from './errors'
 
 export * from './interfaces'
 
@@ -64,6 +68,9 @@ export default class TwilioClient {
         }
         if (/Authenticate/i.test(error.message)) {
           return Promise.reject(new AuthenticationError(error.message))
+        }
+        if (/Too Many Requests/i.test(error.message)) {
+          return Promise.reject(new RateLimitError())
         }
         return Promise.reject(new Error(error.message))
       })

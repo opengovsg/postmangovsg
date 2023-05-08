@@ -1,7 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { SmsTransactionalService } from '@sms/services'
 import { loggerWithLabel } from '@core/logger'
-import { InvalidRecipientError, RateLimitError } from '@core/errors'
+import { InvalidRecipientError } from '@core/errors'
 import {
   SmsMessageTransactional,
   TransactionalSmsMessageStatus,
@@ -14,6 +14,7 @@ import {
 import {
   AuthenticationError,
   InvalidPhoneNumberError,
+  RateLimitError,
 } from '@shared/clients/twilio-client.class/errors'
 
 const logger = loggerWithLabel(module)

@@ -9,3 +9,9 @@ export class InvalidPhoneNumberError extends Error {
     super(message)
   }
 }
+
+export class RateLimitError extends Error {
+  constructor(message = 'Too Many Requests') {
+    super(message)
+  }
+}
