@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize-typescript'
 
 import { Credential, User, UserCredential } from '@core/models'
 import { ChannelType } from '@core/constants'
-import { InvalidRecipientError, RateLimitError } from '@core/errors'
+import { InvalidRecipientError } from '@core/errors'
 import { SmsService } from '@sms/services'
 
 import { mockSecretsManager } from '@mocks/aws-sdk'
@@ -11,6 +11,7 @@ import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { SmsMessageTransactional } from '@sms/models'
 import { CredentialService } from '@core/services'
+import { RateLimitError } from '@shared/clients/twilio-client.class/errors'
 
 const TEST_TWILIO_CREDENTIALS = {
   accountSid: '',
