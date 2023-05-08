@@ -17,7 +17,7 @@ import { createCampaign } from 'services/campaign.service'
 
 const CreateModal = ({
   name = '',
-  channelType = ChannelType.SMS,
+  channelType = ChannelType.Email,
 }: {
   name?: string
   channelType?: ChannelType
@@ -78,29 +78,6 @@ const CreateModal = ({
             <div className={styles.channelContainer}>
               <input
                 type="radio"
-                aria-label={ChannelType.SMS}
-                value={ChannelType.SMS}
-                checked={selectedChannel === ChannelType.SMS}
-                onChange={() => setSelectedChannel(ChannelType.SMS)}
-              />
-              <p className={styles.subtext}>SMS</p>
-              {selectedChannel === ChannelType.SMS && (
-                <p className={styles.infotext}>
-                  Set up your Twilio credentials. &nbsp;
-                  <OutboundLink
-                    className={styles.link}
-                    eventLabel={i18n._(LINKS.guideSmsUrl)}
-                    to={i18n._(LINKS.guideSmsUrl)}
-                    target="_blank"
-                  >
-                    Learn more.
-                  </OutboundLink>
-                </p>
-              )}
-            </div>
-            <div className={styles.channelContainer}>
-              <input
-                type="radio"
                 aria-label={ChannelType.Email}
                 value={ChannelType.Email}
                 checked={selectedChannel === ChannelType.Email && !protect}
@@ -137,6 +114,30 @@ const CreateModal = ({
                 </p>
               )}
             </div>
+            <div className={styles.channelContainer}>
+              <input
+                type="radio"
+                aria-label={ChannelType.SMS}
+                value={ChannelType.SMS}
+                checked={selectedChannel === ChannelType.SMS}
+                onChange={() => setSelectedChannel(ChannelType.SMS)}
+              />
+              <p className={styles.subtext}>SMS</p>
+              {selectedChannel === ChannelType.SMS && (
+                <p className={styles.infotext}>
+                  Set up your Twilio credentials. &nbsp;
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel={i18n._(LINKS.guideSmsUrl)}
+                    to={i18n._(LINKS.guideSmsUrl)}
+                    target="_blank"
+                  >
+                    Learn more.
+                  </OutboundLink>
+                </p>
+              )}
+            </div>
+
             <div className={styles.channelContainer}>
               <input
                 type="radio"
