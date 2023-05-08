@@ -1,9 +1,9 @@
-import test, { expect } from '@playwright/test';
-import { Page } from 'playwright';
+import test, {expect} from '@playwright/test';
+import {Page} from 'playwright';
 import path from 'path';
-import { writeFileSync } from 'fs';
+import {writeFileSync} from 'fs';
 
-import { DASHBOARD_URL, MAILBOX } from '../config';
+import {DASHBOARD_URL, MAILBOX} from '../config';
 import moment from 'moment';
 
 let page: Page;
@@ -28,7 +28,7 @@ test.describe.serial('Scheduled email campaign', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Create', exact: true }).click();
     await page.locator('input[id="nameCampaign"]').fill(campaignName);
-    await page.getByRole('button', { name: /email/i }).click();
+    await page.getByRole('radio', { name: /^email$/i }).click();
     await page.getByRole('button', { name: 'Create campaign' }).click();
     await expect(page.getByText(/Step 1/)).toBeVisible();
   });

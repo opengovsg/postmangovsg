@@ -1,14 +1,9 @@
-import test, { expect, request } from '@playwright/test';
-import { Page } from 'playwright';
+import test, {expect, request} from '@playwright/test';
+import {Page} from 'playwright';
 import path from 'path';
-import { readFileSync, writeFileSync } from 'fs';
+import {readFileSync, writeFileSync} from 'fs';
 
-import {
-  DASHBOARD_URL,
-  SMS_NUMBER,
-  TWILIO_ACC_SID,
-  TWILIO_AUTH_TOKEN,
-} from '../config';
+import {DASHBOARD_URL, SMS_NUMBER, TWILIO_ACC_SID, TWILIO_AUTH_TOKEN,} from '../config';
 import moment from 'moment';
 
 let page: Page;
@@ -33,7 +28,7 @@ test.describe.serial('SMS campaign', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Create', exact: true }).click();
     await page.locator('input[id="nameCampaign"]').fill(campaignName);
-    await page.getByRole('button', { name: /sms/i }).click();
+    await page.getByRole('radio', { name: /sms/i }).click();
     await page.getByRole('button', { name: 'Create campaign' }).click();
     await expect(page.getByText(/Step 1/)).toBeVisible();
   });

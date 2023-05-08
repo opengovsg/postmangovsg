@@ -1,10 +1,10 @@
-import test, { expect } from '@playwright/test';
-import { Page } from 'playwright';
+import test, {expect} from '@playwright/test';
+import {Page} from 'playwright';
 import path from 'path';
-import { readFileSync, writeFileSync } from 'fs';
+import {readFileSync, writeFileSync} from 'fs';
 
-import { DASHBOARD_URL, MAILBOX, POSTMAN_FROM } from '../config';
-import { checkGmail } from '../gmail-check';
+import {DASHBOARD_URL, MAILBOX, POSTMAN_FROM} from '../config';
+import {checkGmail} from '../gmail-check';
 import moment from 'moment';
 
 let page: Page;
@@ -30,8 +30,7 @@ test.describe.serial('Protected email campaign', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Create', exact: true }).click();
     await page.locator('input[id="nameCampaign"]').fill(campaignName);
-    await page.getByRole('button', { name: /email/i }).click();
-    await page.locator('i[class*="checkbox"]').click();
+    await page.getByRole('radio', { name: /^protect-email$/i }).click();
     await page.getByRole('button', { name: 'Create campaign' }).click();
     await expect(page.getByText(/Step 1/)).toBeVisible();
   });
