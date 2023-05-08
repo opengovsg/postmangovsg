@@ -9,6 +9,7 @@ type EmailThemeFields = {
   agencyLogoURI?: string
   unsubLink: string
   showMasthead?: boolean
+  contactPrefLink?: string
 }
 
 export class ThemeClient {

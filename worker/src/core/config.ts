@@ -75,6 +75,11 @@ export interface ConfigSchema {
   smsFallback: { activate: boolean; senderId: string }
   emailFallback: { activate: boolean }
   showMastheadDomain: string
+  phonebookContactPref: {
+    enabled: boolean
+    url: string
+    apiKey: string
+  }
 }
 
 const config: Config<ConfigSchema> = convict({
@@ -309,6 +314,25 @@ const config: Config<ConfigSchema> = convict({
     doc: 'Show masthead within email template if logged-in user has email ending with this domain',
     default: '.gov.sg',
     env: 'SHOW_MASTHEAD_DOMAIN',
+  },
+  phonebookContactPref: {
+    enabled: {
+      doc: 'Enable display of phonebook contact preferences',
+      default: false,
+      env: 'SHOW_PHONEBOOK_CONTACT_PREF',
+    },
+    url: {
+      doc: 'Phonebook uri to fetch contact preferences',
+      default: 'phonebook.postman.gov.sg',
+      env: 'PHONEBOOK_URL',
+      format: 'required-string',
+    },
+    apiKey: {
+      doc: 'API key for Phonebook contact preferences api',
+      default: 'somekey',
+      env: 'PHONEBOOK_API_KEY',
+      format: 'required-string',
+    },
   },
 })
 

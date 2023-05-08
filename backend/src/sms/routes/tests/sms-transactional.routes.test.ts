@@ -34,7 +34,7 @@ beforeEach(async () => {
   const userId = user.id
   const { plainTextKey } = await (
     app as any as { credentialService: CredentialService }
-  ).credentialService.generateApiKey(user.id, 'test api key')
+  ).credentialService.generateApiKey(user.id, 'test api key', [user.email])
   apiKey = plainTextKey
 
   credential = await Credential.create({ name: 'twilio' } as Credential)

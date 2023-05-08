@@ -283,10 +283,6 @@ export async function uploadPartWithPresignedUrl({
     const response = await axios.put(presignedUrl, blob, {
       withCredentials: false,
       timeout: 0,
-      headers: {
-        // Localstack requires Content-Type to be stated explicitly in order to parse the request body properly.
-        'Content-Type': contentType,
-      },
     })
     return response.headers.etag
   } catch (e) {

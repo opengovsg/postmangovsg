@@ -33,7 +33,7 @@
     "@google-cloud/kms": "3.0.1",
     "@google-cloud/storage": "5.20.5",
     "@sentry/node": "5.30.0",
-    "aws-sdk": "2.1153.0",
+    "aws-sdk": "2.1359.0",
     "axios": "0.27.2",
     "convict": "6.2.4",
     "dotenv": "8.6.0",
