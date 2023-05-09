@@ -2,7 +2,7 @@ import { i18n } from '@lingui/core'
 
 import cx from 'classnames'
 
-import { useState, useContext, useEffect } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
@@ -10,12 +10,12 @@ import { useNavigate } from 'react-router-dom'
 
 import styles from './CreateModal.module.scss'
 
-import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
+import { Campaign, channelIcons, ChannelType } from 'classes/Campaign'
 import {
-  TextInput,
-  PrimaryButton,
   Checkbox,
   ErrorBlock,
+  PrimaryButton,
+  TextInput,
 } from 'components/common'
 import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
 import { LINKS } from 'config'
@@ -98,6 +98,9 @@ const CreateModal = ({
           </h5>
 
           <div className={styles.channelTypes}>
+            <div onClick={() => setSelectedChannel(ChannelType.Whatsapp)}>
+              Whatsapp
+            </div>
             <div className={styles.channelContainer}>
               <PrimaryButton
                 className={cx(styles.button, {
