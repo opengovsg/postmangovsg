@@ -14,7 +14,7 @@ test.describe.serial('Email transactional messages', () => {
   test('should be successfully sent out', async () => {
     const dateTime = moment().format('DD/MM/YYYY@HH:mm:ss');
     const randomString = '_'.concat(
-      Math.floor(Math.random() * 1000000 + 1).toString()
+      Math.floor(Math.random() * 1000000 + 1).toString(),
     );
 
     const messageContent = `Hello postman ${randomString}`;
@@ -42,7 +42,7 @@ test.describe.serial('Email transactional messages', () => {
     await page.locator(`#${sendEndpointID} .btn.execute`).click();
     const statusCode = await page
       .locator(
-        `#${sendEndpointID} .live-responses-table .response .response-col_status`
+        `#${sendEndpointID} .live-responses-table .response .response-col_status`,
       )
       .nth(0)
       .innerText();

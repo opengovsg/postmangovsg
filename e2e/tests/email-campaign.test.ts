@@ -20,7 +20,7 @@ test.describe.serial('Email campaign', () => {
   const campaignName = `email_${dateTime}`;
 
   const randomString = '_'.concat(
-    Math.floor(Math.random() * 1000000 + 1).toString()
+    Math.floor(Math.random() * 1000000 + 1).toString(),
   );
   const subjectLine = 'sub_'.concat(dateTime).concat(randomString);
   const messageContent = `Dear {{ name }} ${randomString}`;
@@ -45,7 +45,7 @@ test.describe.serial('Email campaign', () => {
   test('should have messages generated from uploaded recipient list', async () => {
     writeFileSync(
       './email-recipients.csv',
-      `recipient,name\n${MAILBOX},postman`
+      `recipient,name\n${MAILBOX},postman`,
     );
     await page
       .locator('input[type="file"]')
@@ -79,7 +79,7 @@ test.describe.serial('Email campaign', () => {
     await expect(page.getByText(/Sending completed/)).toBeVisible();
     // wait for the email to be successfully sent
     await expect(
-      page.getByRole('row', { name: /Sent Sent to recipient 1/ })
+      page.getByRole('row', { name: /Sent Sent to recipient 1/ }),
     ).toBeVisible();
 
     expect(emails).toBeTruthy();
@@ -92,7 +92,7 @@ test.describe.serial('Email campaign', () => {
 
   test('should be able to have a report generated', async () => {
     await expect(
-      page.getByRole('button', { name: 'Report' }).locator('i')
+      page.getByRole('button', { name: 'Report' }).locator('i'),
     ).toHaveClass(/bx-download/, { timeout: 60000 });
     const downloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Report' }).click();

@@ -19,7 +19,7 @@ test.describe.serial('Scheduled email campaign', () => {
   const campaignName = `emailscheduled_${dateTime}`;
 
   const randomString = '_'.concat(
-    Math.floor(Math.random() * 1000000 + 1).toString()
+    Math.floor(Math.random() * 1000000 + 1).toString(),
   );
   const subjectLine = 'subscheduled_'.concat(dateTime).concat(randomString);
   const messageContent = `Dear {{ name }} ${randomString}`;
@@ -43,7 +43,7 @@ test.describe.serial('Scheduled email campaign', () => {
   test('should have messages generated from uploaded recipient list', async () => {
     writeFileSync(
       './email-recipients.csv',
-      `recipient,name\n${MAILBOX},postman`
+      `recipient,name\n${MAILBOX},postman`,
     );
     await page
       .locator('input[type="file"]')

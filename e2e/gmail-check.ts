@@ -24,7 +24,7 @@ export const checkGmail = async ({
       max_wait_time_sec: 60,
       include_body: true,
       after: new Date(),
-    }
+    },
   );
   console.log = oldLog;
   return emails;

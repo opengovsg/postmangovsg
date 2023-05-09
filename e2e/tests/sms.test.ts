@@ -24,7 +24,7 @@ test.describe.serial('SMS campaign', () => {
   const campaignName = `sms_${dateTime}`;
 
   const randomString = '_'.concat(
-    Math.floor(Math.random() * 1000000 + 1).toString()
+    Math.floor(Math.random() * 1000000 + 1).toString(),
   );
   const messageContent = `Dear {{ name }} ${randomString}`;
   const messageToVerify = `Dear postman ${randomString}`;
@@ -47,7 +47,7 @@ test.describe.serial('SMS campaign', () => {
   test('should have messages generated from uploaded recipient list', async () => {
     writeFileSync(
       './sms-recipients.csv',
-      `recipient,name\n${SMS_NUMBER},postman`
+      `recipient,name\n${SMS_NUMBER},postman`,
     );
     await page
       .locator('input[type="file"]')
@@ -65,7 +65,7 @@ test.describe.serial('SMS campaign', () => {
     await page.locator('input[type="tel"]').fill(SMS_NUMBER);
     await page.locator('button[type="submit"]').click();
     await expect(
-      page.getByRole('heading', { name: /validated/ })
+      page.getByRole('heading', { name: /validated/ }),
     ).toBeVisible();
     await page.getByRole('button', { name: 'Next' }).click();
     await expect(page.getByText(/Step 4/)).toBeVisible();
@@ -85,7 +85,7 @@ test.describe.serial('SMS campaign', () => {
       },
     });
     const res = await ctx.get(
-      `/2010-04-01/Accounts/${TWILIO_ACC_SID}/Messages.json?to=${SMS_NUMBER}`
+      `/2010-04-01/Accounts/${TWILIO_ACC_SID}/Messages.json?to=${SMS_NUMBER}`,
     );
     expect(res.status()).toBe(200);
     interface TwilioMessage {
@@ -102,7 +102,7 @@ test.describe.serial('SMS campaign', () => {
 
   test('should be able to have a report generated', async () => {
     await expect(
-      page.getByRole('button', { name: 'Report' }).locator('i')
+      page.getByRole('button', { name: 'Report' }).locator('i'),
     ).toHaveClass(/bx-download/, { timeout: 60000 });
     const downloadPromise = page.waitForEvent('download');
     await page.getByRole('button', { name: 'Report' }).click();
