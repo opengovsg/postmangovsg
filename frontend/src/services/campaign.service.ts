@@ -15,6 +15,7 @@ import {
   StatusFilter,
   TelegramCampaign,
   TelegramCampaignRecipient,
+  WhatsappCampaign,
 } from 'classes'
 
 function getJobTimestamps(
@@ -115,7 +116,7 @@ export async function getCampaignStats(
 
 export async function getCampaignDetails(
   campaignId: number
-): Promise<EmailCampaign | SMSCampaign | TelegramCampaign> {
+): Promise<EmailCampaign | SMSCampaign | TelegramCampaign | WhatsappCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
     const campaign = response.data
     const { sentAt, visibleAt } = getJobTimestamps(campaign.job_queue)
@@ -124,7 +125,6 @@ export async function getCampaignDetails(
       sentAt,
       visibleAt,
     }
-
     switch (campaign.type) {
       case ChannelType.SMS:
         return new SMSCampaign(details)
@@ -132,6 +132,8 @@ export async function getCampaignDetails(
         return new EmailCampaign(details)
       case ChannelType.Telegram:
         return new TelegramCampaign(details)
+      case ChannelType.Whatsapp:
+        return new WhatsappCampaign(details)
       default:
         throw new Error('Invalid channel type')
     }

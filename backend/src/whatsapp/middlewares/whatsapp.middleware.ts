@@ -77,7 +77,8 @@ export const InitWhatsappMiddleware = (
     res: Response
   ): Promise<void | Response> => {
     const { campaignId } = req.params
-    return res.json({ campaignId })
+    const result = await WhatsappService.getCampaignDetails(+campaignId)
+    return res.json({ ...result })
   }
 
   /**

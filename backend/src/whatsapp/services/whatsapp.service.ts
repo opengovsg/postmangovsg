@@ -1,10 +1,11 @@
-import { PhoneNumberService } from '@core/services'
+import { CampaignService, PhoneNumberService } from '@core/services'
 import config from '@core/config'
 import { InvalidRecipientError } from '@core/errors'
 import WhatsappClient from '@shared/clients/whatsapp-client.class'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
 import { ChannelType } from '@core/constants'
+import { CampaignDetails } from '@core/interfaces'
 
 const logger = loggerWithLabel(module)
 
@@ -27,6 +28,11 @@ const whatsappDefaultMessage = {
   },
 }
 
+const getCampaignDetails = async (
+  campaignId: number
+): Promise<CampaignDetails> => {
+  return await CampaignService.getCampaignDetails(campaignId, [])
+}
 const findCampaign = (
   campaignId: number,
   userId: number
@@ -110,6 +116,7 @@ export const WhatsappService = {
   findCampaign,
   whatsappClient,
   sendMessage,
+  getCampaignDetails,
   getPhoneNumbers,
   setCampaignCredentials,
   getHydratedMessage,

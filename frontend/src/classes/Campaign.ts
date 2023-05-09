@@ -35,7 +35,7 @@ export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
   [ChannelType.Email]: 'bx-envelope-open',
   [ChannelType.Telegram]: 'bx-paper-plane',
-  [ChannelType.Whatsapp]: 'bx-whatsapp',
+  [ChannelType.Whatsapp]: 'bx1-whatsapp',
 }
 
 export class Campaign {
