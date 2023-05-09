@@ -6,6 +6,7 @@ import styles from '../Create.module.scss'
 import { Status } from 'classes/Campaign'
 import { WhatsappCampaign, WhatsappProgress } from 'classes/WhatsappCampaign'
 import { ProgressPane } from 'components/common'
+import WhatsappCredentials from 'components/dashboard/create/whatsapp/WhatsappCredentials'
 import WhatsappDetail from 'components/dashboard/create/whatsapp/WhatsappDetail'
 import { CampaignContext } from 'contexts/campaign.context'
 
@@ -30,6 +31,7 @@ const CreateWhatsapp = () => {
   function renderStep() {
     switch (activeStep) {
       case WhatsappProgress.SelectCredentials:
+        return <WhatsappCredentials setActiveStep={setActiveStep} />
       case WhatsappProgress.PreviewTemplate:
       case WhatsappProgress.SendTestMessage:
       case WhatsappProgress.Send:
