@@ -1,10 +1,18 @@
-import React, { Dispatch, SetStateAction, useContext, useState } from 'react'
+import React, {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+} from 'react'
 
 import { OutboundLink } from 'react-ga'
 
 import { WhatsappProgress } from 'classes'
 import {
   ButtonGroup,
+  Dropdown,
+  ErrorBlock,
   NextButton,
   StepHeader,
   StepSection,
@@ -13,6 +21,7 @@ import {
 } from 'components/common'
 import styles from 'components/dashboard/create/Create.module.scss'
 import { CampaignContext } from 'contexts/campaign.context'
+import { getStoredCredentials } from 'services/whatsapp.service'
 
 const WhatsappCredentials = ({
   setActiveStep,
@@ -22,6 +31,25 @@ const WhatsappCredentials = ({
   const { campaign } = useContext(CampaignContext)
   const { hasCredential: initialHasCredential } = campaign
   const [hasCredential] = useState(initialHasCredential)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const [storedCredentials, setStoredCredentials] = useState(
+    [] as { label: string; value: string }[]
+  )
+  const [selectedCredential, setSelectedCredential] = useState('')
+
+  useEffect(() => {
+    async function populateStoredCredentials() {
+      try {
+        const labels = await getStoredCredentials()
+        setStoredCredentials(labels.map((c) => ({ label: c, value: c })))
+      } catch (e) {
+        console.error(e)
+        setErrorMessage((e as Error).message)
+      }
+    }
+    void populateStoredCredentials()
+  }, [])
 
   return (
     <>
@@ -58,8 +86,18 @@ const WhatsappCredentials = ({
               here.
             </OutboundLink>
           </p>
+          <p>Account</p>
+          <Dropdown
+            onSelect={setSelectedCredential}
+            options={storedCredentials}
+            defaultLabel={storedCredentials[0]?.label}
+            aria-label="Whatsapp credentials"
+          ></Dropdown>
+          <p>{selectedCredential}</p>
         </StepHeader>
       </StepSection>
+      <ErrorBlock>{errorMessage}</ErrorBlock>
+
       <ButtonGroup>
         <NextButton
           disabled={!hasCredential}
