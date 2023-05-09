@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { useEffect, useState, useContext } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { useNavigate, useParams } from 'react-router-dom'
 
@@ -13,7 +13,8 @@ import SMSCreate from './sms/SMSCreate'
 import TelegramCreate from './telegram/TelegramCreate'
 
 import { ChannelType, Status } from 'classes'
-import { TitleBar, PrimaryButton } from 'components/common'
+import { PrimaryButton, TitleBar } from 'components/common'
+import WhatsappCreate from 'components/dashboard/create/whatsapp/WhatsappCreate'
 import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import Error from 'components/error'
 import { CampaignContext } from 'contexts/campaign.context'
@@ -68,6 +69,8 @@ const Create = () => {
         return <EmailCreate />
       case ChannelType.Telegram:
         return <TelegramCreate />
+      case ChannelType.Whatsapp:
+        return <WhatsappCreate />
       default:
         return <p>Invalid Channel Type</p>
     }

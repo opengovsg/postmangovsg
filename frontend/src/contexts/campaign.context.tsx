@@ -1,11 +1,15 @@
 import { cloneDeep } from 'lodash'
-import { createContext, useState, useCallback } from 'react'
+import type { Dispatch, ReactNode, SetStateAction } from 'react'
+import { createContext, useCallback, useState } from 'react'
 
-import type { ReactNode, Dispatch, SetStateAction } from 'react'
+import { Campaign, EmailCampaign, SMSCampaign, TelegramCampaign } from 'classes'
+import { WhatsappCampaign } from 'classes/WhatsappCampaign'
 
-import { SMSCampaign, EmailCampaign, TelegramCampaign, Campaign } from 'classes'
-
-type PossibleCampaign = SMSCampaign | EmailCampaign | TelegramCampaign
+type PossibleCampaign =
+  | SMSCampaign
+  | EmailCampaign
+  | TelegramCampaign
+  | WhatsappCampaign
 
 interface ContextProps {
   campaign: PossibleCampaign

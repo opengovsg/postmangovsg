@@ -4,6 +4,7 @@ export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
   Telegram = 'TELEGRAM',
+  Whatsapp = 'WHATSAPP',
 }
 
 export enum Status {
