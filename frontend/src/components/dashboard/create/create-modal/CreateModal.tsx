@@ -79,6 +79,7 @@ const CreateModal = ({
               <input
                 type="radio"
                 aria-label={ChannelType.Email}
+                id={ChannelType.Email}
                 value={ChannelType.Email}
                 checked={selectedChannel === ChannelType.Email && !protect}
                 onChange={() => {
@@ -86,7 +87,9 @@ const CreateModal = ({
                   setProtected(false)
                 }}
               />
-              <p className={styles.subtext}>Email</p>
+              <label htmlFor={ChannelType.Email} className={styles.subtext}>
+                Email
+              </label>
               {selectedChannel === ChannelType.Email && !protect && (
                 <p className={styles.infotext}>
                   <OutboundLink
@@ -105,6 +108,7 @@ const CreateModal = ({
               <input
                 type="radio"
                 aria-label={`protect-${ChannelType.Email}`}
+                id={`protect-${ChannelType.Email}`}
                 value={ChannelType.Email}
                 checked={selectedChannel === ChannelType.Email && protect}
                 onChange={() => {
@@ -112,7 +116,12 @@ const CreateModal = ({
                   setProtected(true)
                 }}
               />
-              <p className={styles.subtext}>Password Protected Email</p>
+              <label
+                htmlFor={`protect-${ChannelType.Email}`}
+                className={styles.subtext}
+              >
+                Password Protected Email
+              </label>
               {selectedChannel === ChannelType.Email && protect && (
                 <p className={styles.infotext}>
                   Send sensitive content using Postman. &nbsp;
@@ -131,11 +140,14 @@ const CreateModal = ({
               <input
                 type="radio"
                 aria-label={ChannelType.SMS}
+                id={ChannelType.SMS}
                 value={ChannelType.SMS}
                 checked={selectedChannel === ChannelType.SMS}
                 onChange={() => setSelectedChannel(ChannelType.SMS)}
               />
-              <p className={styles.subtext}>SMS</p>
+              <label htmlFor={ChannelType.SMS} className={styles.subtext}>
+                SMS
+              </label>
               {selectedChannel === ChannelType.SMS && (
                 <p className={styles.infotext}>
                   Set up your Twilio credentials. &nbsp;
@@ -155,11 +167,14 @@ const CreateModal = ({
               <input
                 type="radio"
                 aria-label={ChannelType.Telegram}
+                id={ChannelType.Telegram}
                 value={ChannelType.Telegram}
                 checked={selectedChannel === ChannelType.Telegram}
                 onChange={() => setSelectedChannel(ChannelType.Telegram)}
               />
-              <p className={styles.subtext}>Telegram</p>
+              <label htmlFor={ChannelType.Telegram} className={styles.subtext}>
+                Telegram
+              </label>
               {selectedChannel === ChannelType.Telegram && (
                 <p className={styles.infotext}>
                   Set up your Telegram Bot. &nbsp;
