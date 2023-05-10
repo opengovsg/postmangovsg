@@ -1,6 +1,7 @@
 import React, {
   Dispatch,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -32,8 +33,7 @@ const WhatsappCredentials = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<WhatsappProgress>>
 }) => {
-  const { campaign } = useContext(CampaignContext)
-  const { hasCredential } = campaign
+  const { updateCampaign } = useContext(CampaignContext)
   const [errorMessage, setErrorMessage] = useState('')
 
   const [storedCredentials, setStoredCredentials] = useState(
@@ -50,6 +50,11 @@ const WhatsappCredentials = ({
     [] as { label: string; value: string }[]
   )
   const [selectedNumber, setSelectedNumber] = useState('')
+
+  const handleSelectCredentials = useCallback((credentials: string) => {
+    setSelectedCredential(credentials)
+    updateCampaign({ hasCredential: true })
+  }, [])
 
   useEffect(() => {
     async function populateStoredCredentials() {
@@ -122,7 +127,7 @@ const WhatsappCredentials = ({
             </span>
           </WarningBlock>
         </StepHeader>
-        {!hasCredential && (
+        {storedCredentials.length == 0 && (
           <ErrorBlock>
             You do not have valid whatsapp credentials! Unable to proceed
           </ErrorBlock>
@@ -144,7 +149,7 @@ const WhatsappCredentials = ({
           </p>
           <p>Account</p>
           <Dropdown
-            onSelect={setSelectedCredential}
+            onSelect={handleSelectCredentials}
             options={storedCredentials}
             defaultLabel={selectedCredential}
             aria-label="Whatsapp credentials"
