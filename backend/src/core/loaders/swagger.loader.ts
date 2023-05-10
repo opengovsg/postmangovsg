@@ -1,4 +1,5 @@
-import { Application, Request, Response, NextFunction } from 'express'
+import express, { Application, Request, Response, NextFunction } from 'express'
+import cors from 'cors'
 import path from 'path'
 import swaggerUi from 'swagger-ui-express'
 import YAML from 'yamljs'
@@ -33,6 +34,14 @@ const swaggerLoader = ({ app }: { app: Application }): void => {
     removeCspHeader,
     swaggerUi.serve,
     swaggerUi.setup(swaggerDocument, swaggerUiOptions)
+  )
+  app.use(
+    '/openapi.yaml',
+    cors({
+      origin: '*',
+      methods: ['GET'],
+    }),
+    express.static(path.resolve(__dirname, '../../../openapi.yaml'))
   )
   logger.info({
     message: 'Swagger docs generated.',
