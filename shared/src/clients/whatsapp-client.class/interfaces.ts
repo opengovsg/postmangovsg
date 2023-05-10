@@ -11,6 +11,8 @@ export interface WhatsappTemplate {
   id: string
   language: string
   status: WhatsappTemplateStatus
+
+  name: string
 }
 
 export enum WhatsappTemplateStatus {

@@ -14,12 +14,12 @@ export const InitWhatsappSettingsRoute = (
     }),
   }
   router.get('/credentials', whatsappMiddleware.getCredentials)
-  router.get(
+  router.post(
     '/templates',
     celebrate(credentialValidator),
     whatsappMiddleware.getTemplates
   )
-  router.get(
+  router.post(
     '/phone-numbers',
     celebrate(credentialValidator),
     whatsappMiddleware.getPhoneNumbers
