@@ -93,7 +93,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(
     express.json({
       // this must be significantly bigger than transactionalEmail.bodySizeLimit
-      //  so that users who exceed limit will trigger Joi validation rather than body-parser error
+      // so that users who exceed limit will trigger Joi validation rather than body-parser error
       // see https://github.com/opengovsg/postmangovsg/pull/2025
       limit: config.get('transactionalEmail.bodySizeLimit') * 10,
     })
@@ -102,7 +102,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     express.urlencoded({
       extended: false,
       // this must be significantly bigger than transactionalEmail.bodySizeLimit
-      //  so that users who exceed limit will trigger Joi validation rather than body-parser error
+      // so that users who exceed limit will trigger Joi validation rather than body-parser error
       // see https://github.com/opengovsg/postmangovsg/pull/2025
       limit: config.get('transactionalEmail.bodySizeLimit') * 10,
     })
