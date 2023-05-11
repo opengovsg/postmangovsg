@@ -74,7 +74,7 @@ export async function validateCsv({
           if (e instanceof TemplateError) {
             return reject(
               new Error(
-                `The following error occured while generating the message preview. ` +
+                `The following error occurred while generating the message preview. ` +
                   `Please check your template and the first row of your recipient list.\n\n${e}`
               )
             )
