@@ -1821,10 +1821,8 @@ paths:
               examples:
                 InvalidRecipientError:
                   value: Recipient email is blacklisted
-                TemplateError:
+                MessageError:
                   value: Message is invalid as the subject or body only contains invalid HTML tags.
-                MaliciousFileError:
-                  value: 'Error: One or more attachments may be potentially malicious. Please check the attached files.'
                 UnsupportedFileTypeError:
                   value: 'Error: One or more attachments may be an unsupported file type. Please check the attached files.'
             application/json:
