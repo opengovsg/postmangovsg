@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk'
+import { SecretsManager } from '@aws-sdk/client-secrets-manager'
 import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { TwilioCredentials } from '@sms/interfaces'
@@ -7,7 +7,7 @@ import { get } from 'lodash'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 
 const logger = loggerWithLabel(module)
-const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
+const secretsManager = new SecretsManager(configureEndpoint(config))
 
 const getCredentialsFromSecretsManager = async (name: string): Promise<any> => {
   logger.info({
@@ -15,7 +15,7 @@ const getCredentialsFromSecretsManager = async (name: string): Promise<any> => {
     name,
     action: 'getCredentialsFromSecretsManager',
   })
-  const data = await secretsManager.getSecretValue({ SecretId: name }).promise()
+  const data = await secretsManager.getSecretValue({ SecretId: name })
   logger.info({
     message: 'Retreived secret from AWS secrets manager.',
     name,
