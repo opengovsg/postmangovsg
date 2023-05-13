@@ -7,7 +7,11 @@ import {
   FileExtensionService,
   UNSUPPORTED_FILE_TYPE_ERROR_CODE,
 } from '@core/services'
-import { TRANSACTIONAL_EMAIL_WINDOW } from '@email/middlewares'
+import {
+  INVALID_FROM_ADDRESS_ERROR_MESSAGE,
+  TRANSACTIONAL_EMAIL_WINDOW,
+  UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE,
+} from '@email/middlewares'
 import {
   EmailFromAddress,
   EmailMessageTransactional,
@@ -236,6 +240,16 @@ describe(`${emailTransactionalRoute}/send`, () => {
 
     expect(res.status).toBe(400)
     expect(mockSendEmail).not.toBeCalled()
+    const transactionalEmail = await EmailMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalEmail).not.toBeNull()
+    expect(transactionalEmail).toMatchObject({
+      recipient: validApiCall.recipient,
+      from: 'Hello <invalid@agency.gov.sg>',
+      status: TransactionalEmailMessageStatus.Unsent,
+      errorCode: `Error 400: ${INVALID_FROM_ADDRESS_ERROR_MESSAGE}`,
+    })
   })
 
   test('Should throw an error with invalid custom from address (user email not added into EmailFromAddress table)', async () => {
@@ -254,6 +268,16 @@ describe(`${emailTransactionalRoute}/send`, () => {
 
     expect(res.status).toBe(400)
     expect(mockSendEmail).not.toBeCalled()
+    const transactionalEmail = await EmailMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalEmail).not.toBeNull()
+    expect(transactionalEmail).toMatchObject({
+      recipient: validApiCall.recipient,
+      from: `Hello <${user.email}>`,
+      status: TransactionalEmailMessageStatus.Unsent,
+      errorCode: `Error 400: ${UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE}`,
+    })
   })
 
   test('Should throw an error if email subject or body is empty after removing invalid HTML tags and correct error is saved in db', async () => {
