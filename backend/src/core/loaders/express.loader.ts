@@ -8,6 +8,7 @@ import config from '@core/config'
 import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
+import helmet from 'helmet'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
@@ -160,6 +161,13 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     })
   )
 
+  app.use(
+    helmet({
+      hsts: {
+        maxAge: 31622400, // 366 days
+      },
+    })
+  )
   app.get('/', async (_req: Request, res: Response) => {
     return res.sendStatus(200)
   })
