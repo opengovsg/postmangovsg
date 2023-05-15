@@ -1,21 +1,22 @@
 import { Sequelize } from 'sequelize-typescript'
 import {
-  Credential,
-  JobQueue,
+  Agency,
+  ApiKey,
   Campaign,
-  Worker,
+  Credential,
+  Domain,
+  DomainCredential,
+  JobQueue,
+  List,
+  ProtectedMessage,
+  Statistic,
+  Unsubscriber,
   User,
-  UserFeature,
   UserCredential,
   UserDemo,
-  Statistic,
-  ProtectedMessage,
-  Unsubscriber,
-  Agency,
-  Domain,
-  List,
+  UserFeature,
   UserList,
-  ApiKey,
+  Worker,
 } from '@core/models'
 import {
   EmailBlacklist,
@@ -28,8 +29,8 @@ import {
 import {
   SmsMessage,
   SmsMessageTransactional,
-  SmsTemplate,
   SmsOp,
+  SmsTemplate,
 } from '@sms/models'
 import {
   BotSubscriber,
@@ -38,6 +39,10 @@ import {
   TelegramSubscriber,
   TelegramTemplate,
 } from '@telegram/models'
+import { CampaignWhatsappTemplate } from '@whatsapp/models/campaign-whatsapp-template'
+import { WhatsappMessage } from '@whatsapp/models/whatsapp-message'
+import { WhatsappOp } from '@whatsapp/models/whatsapp-op'
+import { WhatsappTemplate } from '@whatsapp/models/whatsapp-template'
 
 export const initializeModels = (sequelize: Sequelize): void => {
   const coreModels = [
@@ -53,6 +58,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
     Unsubscriber,
     Agency,
     Domain,
+    DomainCredential,
     List,
     UserList,
     ApiKey,
@@ -74,11 +80,18 @@ export const initializeModels = (sequelize: Sequelize): void => {
     TelegramTemplate,
     TelegramSubscriber,
   ]
+  const whatsappModels = [
+    CampaignWhatsappTemplate,
+    WhatsappMessage,
+    WhatsappOp,
+    WhatsappTemplate,
+  ]
   sequelize.addModels([
     ...coreModels,
     ...emailModels,
     ...smsModels,
     ...telegramModels,
+    ...whatsappModels,
   ])
 }
 
