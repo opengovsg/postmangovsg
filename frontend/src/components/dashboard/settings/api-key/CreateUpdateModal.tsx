@@ -118,7 +118,7 @@ export const CreateUpdateModal = ({
         </h2>
         <h4>Key Label</h4>
         <p>
-          The label you choose for your API key is be permanent and cannot be
+          The label you choose for your API key is permanent and cannot be
           changed once it has been created.
         </p>
         <TextInput
