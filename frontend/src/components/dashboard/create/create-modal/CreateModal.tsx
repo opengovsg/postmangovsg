@@ -69,9 +69,9 @@ const CreateModal = ({
             Choose the channel you want to send in
           </h2>
           <h5 className={styles.subtitle}>
-            Choosing a channel is irreversible. If you would like to change
-            channels halfway, you will have to restart. You may only edit your
-            message or re-upload recipients list. Please proceed with caution.
+            Choosing a channel is irreversible for a given campaign. If you
+            would like to change channels, you will have to create a new
+            campaign.
           </h5>
 
           <div className={styles.channelTypes}>
