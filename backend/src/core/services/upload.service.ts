@@ -394,7 +394,7 @@ const handleFailedUpload = async (
     })
   } catch (err) {
     logger.error({
-      message: 'Error occured while handling upload failure',
+      message: 'Error occurred while handling upload failure',
       error: err,
     })
   } finally {
