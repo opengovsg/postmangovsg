@@ -1,23 +1,15 @@
 import { i18n } from '@lingui/core'
-
 import cx from 'classnames'
 
-import { useState, useContext, useEffect } from 'react'
+import { useContext, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
-
 import { useNavigate } from 'react-router-dom'
 
 import styles from './CreateModal.module.scss'
 
-import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
-import {
-  TextInput,
-  PrimaryButton,
-  Checkbox,
-  ErrorBlock,
-} from 'components/common'
-import AddCredentialModal from 'components/dashboard/settings/add-credential-modal'
+import { Campaign, ChannelType } from 'classes/Campaign'
+import { ErrorBlock, PrimaryButton, TextInput } from 'components/common'
 import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
 
@@ -25,7 +17,7 @@ import { createCampaign } from 'services/campaign.service'
 
 const CreateModal = ({
   name = '',
-  channelType = ChannelType.SMS,
+  channelType = ChannelType.Email,
 }: {
   name?: string
   channelType?: ChannelType
@@ -37,16 +29,13 @@ const CreateModal = ({
   const [selectedName, setSelectedName] = useState(name)
   const [protect, setProtected] = useState(false)
 
-  useEffect(() => {
-    setProtected(false)
-  }, [selectedChannel])
-
   async function handleCreateCampaign() {
     try {
       const campaign: Campaign = await createCampaign({
         name: selectedName,
         type: selectedChannel,
-        protect,
+        // pass in protect=true only if channel type is email and protect is true
+        protect: protect && selectedChannel === ChannelType.Email,
       })
       // close modal and go to create view
       modalContext.close()
@@ -55,18 +44,6 @@ const CreateModal = ({
       console.error(err)
       setErrorMessage((err as Error).message)
     }
-  }
-
-  function handleAddCredentials(channelType: ChannelType) {
-    const saved = (
-      <CreateModal name={selectedName} channelType={selectedChannel} />
-    )
-    modalContext.setModalContent(
-      <AddCredentialModal
-        credType={channelType}
-        onSuccess={() => modalContext.setModalContent(saved)}
-      ></AddCredentialModal>
-    )
   }
 
   return (
@@ -92,119 +69,124 @@ const CreateModal = ({
             Choose the channel you want to send in
           </h2>
           <h5 className={styles.subtitle}>
-            Choosing a channel is irreversible. If you would like to change
-            channels halfway, you will have to restart. You may only edit your
-            message or re-upload recipients list. Please proceed with caution.
+            Choosing a channel is irreversible for a given campaign. If you
+            would like to change channels, you will have to create a new
+            campaign.
           </h5>
 
           <div className={styles.channelTypes}>
             <div className={styles.channelContainer}>
-              <PrimaryButton
-                className={cx(styles.button, {
-                  [styles.active]: selectedChannel === ChannelType.SMS,
-                })}
-                onClick={
-                  selectedChannel === ChannelType.SMS
-                    ? undefined
-                    : () => setSelectedChannel(ChannelType.SMS)
-                }
+              <input
+                type="radio"
+                aria-label={ChannelType.Email}
+                id={ChannelType.Email}
+                value={ChannelType.Email}
+                checked={selectedChannel === ChannelType.Email && !protect}
+                onChange={() => {
+                  setSelectedChannel(ChannelType.Email)
+                  setProtected(false)
+                }}
+              />
+              <label htmlFor={ChannelType.Email} className={styles.subtext}>
+                Email
+              </label>
+              {selectedChannel === ChannelType.Email && !protect && (
+                <p className={styles.infotext}>
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel="https://go.gov.sg/postman-email"
+                    to="https://go.gov.sg/postman-email"
+                    target="_blank"
+                  >
+                    Learn more
+                  </OutboundLink>
+                  &nbsp; about sending emails on Postman.
+                </p>
+              )}
+            </div>
+            <div className={styles.channelContainer}>
+              <input
+                type="radio"
+                aria-label={`protect-${ChannelType.Email}`}
+                id={`protect-${ChannelType.Email}`}
+                value={ChannelType.Email}
+                checked={selectedChannel === ChannelType.Email && protect}
+                onChange={() => {
+                  setSelectedChannel(ChannelType.Email)
+                  setProtected(true)
+                }}
+              />
+              <label
+                htmlFor={`protect-${ChannelType.Email}`}
+                className={styles.subtext}
               >
+                Password Protected Email
+              </label>
+              {selectedChannel === ChannelType.Email && protect && (
+                <p className={styles.infotext}>
+                  Send sensitive content using Postman. &nbsp;
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    target="_blank"
+                  >
+                    Learn more.
+                  </OutboundLink>
+                </p>
+              )}
+            </div>
+            <div className={styles.channelContainer}>
+              <input
+                type="radio"
+                aria-label={ChannelType.SMS}
+                id={ChannelType.SMS}
+                value={ChannelType.SMS}
+                checked={selectedChannel === ChannelType.SMS}
+                onChange={() => setSelectedChannel(ChannelType.SMS)}
+              />
+              <label htmlFor={ChannelType.SMS} className={styles.subtext}>
                 SMS
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    channelIcons[ChannelType.SMS]
-                  )}
-                ></i>
-              </PrimaryButton>
-
+              </label>
               {selectedChannel === ChannelType.SMS && (
-                <p className={styles.subtext}>
-                  Get your credentials ready.&nbsp;
+                <p className={styles.infotext}>
+                  Set up your Twilio credentials. &nbsp;
                   <OutboundLink
                     className={styles.link}
                     eventLabel={i18n._(LINKS.guideSmsUrl)}
                     to={i18n._(LINKS.guideSmsUrl)}
                     target="_blank"
                   >
-                    What is this?
+                    Learn more.
                   </OutboundLink>
                 </p>
               )}
             </div>
+
             <div className={styles.channelContainer}>
-              <PrimaryButton
-                className={cx(styles.button, {
-                  [styles.active]: selectedChannel === ChannelType.Telegram,
-                })}
-                onClick={
-                  selectedChannel === ChannelType.Telegram
-                    ? undefined
-                    : () => setSelectedChannel(ChannelType.Telegram)
-                }
-              >
+              <input
+                type="radio"
+                aria-label={ChannelType.Telegram}
+                id={ChannelType.Telegram}
+                value={ChannelType.Telegram}
+                checked={selectedChannel === ChannelType.Telegram}
+                onChange={() => setSelectedChannel(ChannelType.Telegram)}
+              />
+              <label htmlFor={ChannelType.Telegram} className={styles.subtext}>
                 Telegram
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    channelIcons[ChannelType.Telegram]
-                  )}
-                ></i>
-              </PrimaryButton>
+              </label>
               {selectedChannel === ChannelType.Telegram && (
-                <p className={styles.subtext}>
-                  It is best to
-                  <span
+                <p className={styles.infotext}>
+                  Set up your Telegram Bot. &nbsp;
+                  <OutboundLink
                     className={styles.link}
-                    onClick={() => handleAddCredentials(ChannelType.Telegram)}
+                    eventLabel="https://go.gov.sg/postman-telegram"
+                    to="https://go.gov.sg/postman-telegram"
+                    target="_blank"
                   >
-                    store and validate your credentials
-                  </span>
-                  &nbsp;before you start.
+                    Learn more.
+                  </OutboundLink>
                 </p>
-              )}
-            </div>
-            <div className={styles.channelContainer}>
-              <PrimaryButton
-                className={cx(styles.button, {
-                  [styles.active]: selectedChannel === ChannelType.Email,
-                })}
-                onClick={
-                  selectedChannel === ChannelType.Email
-                    ? undefined
-                    : () => setSelectedChannel(ChannelType.Email)
-                }
-              >
-                Email
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    channelIcons[ChannelType.Email]
-                  )}
-                ></i>
-              </PrimaryButton>
-              {selectedChannel === ChannelType.Email && (
-                <Checkbox
-                  className={styles.protectedOption}
-                  checked={protect}
-                  onChange={setProtected}
-                >
-                  <p className={styles.subtext}>
-                    Password protected.
-                    {/* TODO: change url to passsword protected section in guide */}
-                    <OutboundLink
-                      className={styles.link}
-                      eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
-                      to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
-                      target="_blank"
-                    >
-                      Learn more
-                    </OutboundLink>
-                  </p>
-                </Checkbox>
               )}
             </div>
           </div>

@@ -33,7 +33,7 @@ test.describe.serial('SMS campaign', () => {
     await page.goto('/');
     await page.getByRole('button', { name: 'Create', exact: true }).click();
     await page.locator('input[id="nameCampaign"]').fill(campaignName);
-    await page.getByRole('button', { name: /sms/i }).click();
+    await page.getByRole('radio', { name: /sms/i }).click();
     await page.getByRole('button', { name: 'Create campaign' }).click();
     await expect(page.getByText(/Step 1/)).toBeVisible();
   });

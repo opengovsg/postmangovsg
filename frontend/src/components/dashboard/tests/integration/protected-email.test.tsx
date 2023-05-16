@@ -1,24 +1,24 @@
 import userEvent from '@testing-library/user-event'
 
 import {
+  CAMPAIGN_NAME,
+  MESSAGE_TEXT,
   mockApis,
   renderDashboard,
-  CAMPAIGN_NAME,
-  SUBJECT_TEXT,
-  MESSAGE_TEXT,
   REPLY_TO,
+  SUBJECT_TEXT,
   UNPROTECTED_MESSAGE_TEXT,
 } from '../util'
 
 import {
-  server,
-  screen,
-  fireEvent,
   DEFAULT_FROM,
   DEFAULT_FROM_ADDRESS,
+  fireEvent,
+  RECIPIENT_EMAIL,
+  screen,
+  server,
   VALID_CSV_FILENAME,
   VALID_EMAIL_CSV_FILE,
-  RECIPIENT_EMAIL,
 } from 'test-utils'
 
 test('successfully creates and sends a new protected email campaign', async () => {
@@ -44,21 +44,15 @@ test('successfully creates and sends a new protected email campaign', async () =
   await userEvent.type(campaignNameTextbox, CAMPAIGN_NAME, { delay: null })
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
-  // Click on the email channel button
-  const emailChannelButton = screen.getByRole('button', {
-    name: /^email$/i,
+  // Click on the email channel radio
+  const passwordProtectedEmailChannelButton = screen.getByRole('radio', {
+    name: /^protect-email$/i,
   })
-  await userEvent.click(emailChannelButton, { delay: null })
-  await userEvent.click(screen.getByText(/password protected/i), {
-    delay: null,
-  })
-  expect(emailChannelButton).toHaveClass('active')
-  expect(screen.getByRole('button', { name: /^telegram$/i })).not.toHaveClass(
-    'active'
-  )
-  expect(screen.getByRole('button', { name: /^sms/i })).not.toHaveClass(
-    'active'
-  )
+  await userEvent.click(passwordProtectedEmailChannelButton, { delay: null })
+  expect(passwordProtectedEmailChannelButton).toBeChecked()
+  expect(screen.getByRole('radio', { name: /^telegram$/i })).not.toBeChecked()
+  expect(screen.getByRole('radio', { name: /^email$/i })).not.toBeChecked()
+  expect(screen.getByRole('radio', { name: /^sms/i })).not.toBeChecked()
 
   // Click on the "Create campaign" button
   await userEvent.click(
