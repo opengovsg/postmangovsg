@@ -395,7 +395,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         ...validApiCall,
         body,
       })
-    // note: in practice, the response given to the user is a 500 error (with PayloadTooLargeError logged on our backend)
+    // note: in practice, size of payload is limited by size specified in backend/.platform/nginx/conf.d/client_max_body_size.conf
     expect(res.status).toBe(413)
     expect(mockSendEmail).not.toBeCalled()
   })
@@ -425,7 +425,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         ...validApiCall,
         body,
       })
-    // note: in practice, the response given to the user is a 500 error (with PayloadTooLargeError logged on our backend)
+    // note: in practice, size of payload is limited by size specified in backend/.platform/nginx/conf.d/client_max_body_size.conf
     expect(res.status).toBe(413)
   })
 
@@ -456,6 +456,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .field('reply_to', validApiCall.reply_to)
       .field('body', body)
     expect(res.status).toBe(400)
+    // note: in practice, size of payload is limited by size specified in backend/.platform/nginx/conf.d/client_max_body_size.conf
     expect(mockSendEmail).not.toBeCalled()
   })
 

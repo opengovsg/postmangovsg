@@ -269,7 +269,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
       return false
     } catch (e) {
       logger.error({
-        message: 'Error occured while verifying otp',
+        message: 'Error occurred while verifying otp',
         error: e,
         ...logMeta,
       })
