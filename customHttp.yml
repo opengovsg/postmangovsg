@@ -2,7 +2,7 @@ customHeaders:
   - pattern: "**/*"
     headers:
       - key: "Strict-Transport-Security"
-        value: "max-age=5184000; includeSubDomains"
+        value: "max-age=31622400; includeSubDomains"
       - key: "X-Frame-Options"
         value: "DENY"
       - key: "X-XSS-Protection"
