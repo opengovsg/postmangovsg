@@ -1,13 +1,13 @@
 import userEvent from '@testing-library/user-event'
 
-import { mockApis, renderDashboard, CAMPAIGN_NAME, MESSAGE_TEXT } from '../util'
+import { CAMPAIGN_NAME, MESSAGE_TEXT, mockApis, renderDashboard } from '../util'
 
 import {
-  server,
+  RECIPIENT_NUMBER,
   screen,
+  server,
   TWILIO_CREDENTIAL,
   VALID_CSV_FILENAME,
-  RECIPIENT_NUMBER,
   VALID_MOBILE_CSV_FILE,
 } from 'test-utils'
 
@@ -35,17 +35,16 @@ test('successfully creates and sends a new SMS campaign', async () => {
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
   // Click on the SMS channel button
-  const smsChannelButton = screen.getByRole('button', {
+  const smsChannelButton = screen.getByRole('radio', {
     name: /^sms$/i,
   })
   await userEvent.click(smsChannelButton, { delay: null })
-  expect(smsChannelButton).toHaveClass('active')
-  expect(screen.getByRole('button', { name: /^telegram$/i })).not.toHaveClass(
-    'active'
-  )
-  expect(screen.getByRole('button', { name: /^email$/i })).not.toHaveClass(
-    'active'
-  )
+  expect(smsChannelButton).toBeChecked()
+  expect(
+    screen.getByRole('radio', { name: /^protect-email$/i })
+  ).not.toBeChecked()
+  expect(screen.getByRole('radio', { name: /^telegram$/i })).not.toBeChecked()
+  expect(screen.getByRole('radio', { name: /^email$/i })).not.toBeChecked()
 
   // Click on the "Create campaign" button
   await userEvent.click(
