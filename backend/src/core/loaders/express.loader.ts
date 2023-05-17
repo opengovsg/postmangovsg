@@ -140,9 +140,14 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       responseWhitelist: ['body', 'statusCode'],
       requestFilter: (req: Request, propName: string) => {
         if (propName === 'headers' && req.headers.authorization) {
-          // we do this instead of adding it to `headerBlacklist` so we can view
-          // if this `authorization` header was present
+          // we do this instead of adding it to `headerBlacklist`
+          // so we can distinguish if an API call is made via API key
           req.headers.authorization = '[REDACTED]'
+        }
+        if (propName === 'headers' && req.headers.cookie) {
+          // redact cookies from logs
+          // keep header to distinguish if API call is made via cookie
+          req.headers.cookie = '[REDACTED]'
         }
         if (propName === 'body' && req.body.attachments) {
           const { attachments } = req.body
