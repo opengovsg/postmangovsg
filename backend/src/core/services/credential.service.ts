@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk'
+import { SecretsManager } from '@aws-sdk/client-secrets-manager'
 import { get } from 'lodash'
 
 import config from '@core/config'
@@ -72,7 +72,7 @@ export interface CredentialService {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const InitCredentialService = (redisService: RedisService) => {
-  const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
+  const secretsManager = new SecretsManager(configureEndpoint(config))
   const logger = loggerWithLabel(module)
 
   /**
@@ -90,27 +90,23 @@ export const InitCredentialService = (redisService: RedisService) => {
     const logMeta = { name, action: 'upsertCredential' }
     // If credential doesn't exist, upload credential to secret manager
     try {
-      await secretsManager
-        .createSecret({
-          Name: name,
-          SecretString: secret,
-          ...(restrictEnvironment
-            ? { Tags: [{ Key: 'environment', Value: config.get('env') }] }
-            : {}),
-        })
-        .promise()
+      await secretsManager.createSecret({
+        Name: name,
+        SecretString: secret,
+        ...(restrictEnvironment
+          ? { Tags: [{ Key: 'environment', Value: config.get('env') }] }
+          : {}),
+      })
       logger.info({
         message: 'Successfully stored credential in AWS secrets manager',
         ...logMeta,
       })
     } catch (err) {
       if ((err as Error).name === 'ResourceExistsException') {
-        await secretsManager
-          .putSecretValue({
-            SecretId: name,
-            SecretString: secret,
-          })
-          .promise()
+        await secretsManager.putSecretValue({
+          SecretId: name,
+          SecretString: secret,
+        })
         logger.info({
           message: 'Successfully updated credential in AWS secrets manager',
           error: err,
@@ -160,9 +156,7 @@ export const InitCredentialService = (redisService: RedisService) => {
     return new Promise((resolve, reject) => {
       redisService.credentialClient.get(name, async (error, value) => {
         if (error || value === null) {
-          const data = await secretsManager
-            .getSecretValue({ SecretId: name })
-            .promise()
+          const data = await secretsManager.getSecretValue({ SecretId: name })
           logger.info({
             message: 'Retrieved secret from AWS secrets manager.',
             ...logMeta,
@@ -201,9 +195,7 @@ export const InitCredentialService = (redisService: RedisService) => {
    */
   const getTelegramCredential = async (name: string): Promise<string> => {
     const logMeta = { name, action: 'getTelegramCredential' }
-    const data = await secretsManager
-      .getSecretValue({ SecretId: name })
-      .promise()
+    const data = await secretsManager.getSecretValue({ SecretId: name })
     logger.info({
       message: 'Retrieved secret from AWS secrets manager.',
       ...logMeta,

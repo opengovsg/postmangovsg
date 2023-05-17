@@ -8,7 +8,7 @@ import { formatDefaultCredentialName } from '@core/utils'
 import { UploadService } from '@core/services'
 import { TelegramMessage } from '@telegram/models'
 import { ChannelType } from '@core/constants'
-import { mockSecretsManager } from '@mocks/aws-sdk'
+import { mockSecretsManager } from '@mocks/@aws-sdk/client-secrets-manager'
 import { mockTelegram, Telegram } from '@mocks/telegraf'
 
 const app = initialiseServer(true)
@@ -106,7 +106,7 @@ describe('POST /campaign/{campaignId}/telegram/credentials', () => {
     const demoCampaign = await createCampaign({ isDemo: true })
 
     const DEFAULT_TELEGRAM_CREDENTIAL = '12345'
-    mockSecretsManager.getSecretValue().promise.mockResolvedValue({
+    mockSecretsManager.getSecretValue.mockResolvedValue({
       SecretString: DEFAULT_TELEGRAM_CREDENTIAL,
     })
 
@@ -123,7 +123,7 @@ describe('POST /campaign/{campaignId}/telegram/credentials', () => {
     })
     expect(Telegram).toHaveBeenCalledWith(DEFAULT_TELEGRAM_CREDENTIAL)
 
-    mockSecretsManager.getSecretValue().promise.mockReset()
+    mockSecretsManager.getSecretValue.mockReset()
   })
 })
 

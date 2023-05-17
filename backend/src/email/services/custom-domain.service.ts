@@ -1,5 +1,5 @@
 import dns from 'dns'
-import AWS from 'aws-sdk'
+import { SES } from '@aws-sdk/client-ses'
 import escapeHTML from 'escape-html'
 import config from '@core/config'
 
@@ -13,9 +13,9 @@ import {
 
 const logger = loggerWithLabel(module)
 const backendSesRegion = config.get('mailOptions.host').split('.')[1]
-const backendSes = new AWS.SES({ region: backendSesRegion })
+const backendSes = new SES({ region: backendSesRegion })
 const workerSesRegion = config.get('mailOptions.workerHost').split('.')[1]
-const workerSes = new AWS.SES({ region: workerSesRegion })
+const workerSes = new SES({ region: workerSesRegion })
 /**
  * Verifies if the cname records are in the email's domain dns
  * @throws Error if verification fails
@@ -56,7 +56,7 @@ const verifyCnames = async (
  */
 const verifyEmailWithAWS = async (
   email: string,
-  ses: AWS.SES,
+  ses: SES,
   region: string
 ): Promise<Array<string>> => {
   // Get the dkim attributes for the email address and domain
@@ -64,9 +64,7 @@ const verifyEmailWithAWS = async (
   const params = {
     Identities: [email, emailDomain],
   }
-  const { DkimAttributes } = await ses
-    .getIdentityDkimAttributes(params)
-    .promise()
+  const { DkimAttributes } = await ses.getIdentityDkimAttributes(params)
 
   if (
     !DkimAttributes ||

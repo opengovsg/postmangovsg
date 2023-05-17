@@ -1,15 +1,13 @@
 import { v4 as uuid } from 'uuid'
-import S3 from 'aws-sdk/clients/s3'
+import { S3, UploadPartCommand } from '@aws-sdk/client-s3'
 import config from '@core/config'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
 import { UploadService } from '@core/services'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
-const s3 = new S3({
-  signatureVersion: 'v4',
-  ...configureEndpoint(config),
-})
+const s3 = new S3({ ...configureEndpoint(config) })
 
 /**
  * Get a presigned url to upload a part for multipart upload.
@@ -29,7 +27,7 @@ const getPresignedPartUrl = async ({
     PartNumber: partNumber,
     UploadId: uploadId,
   }
-  return await s3.getSignedUrlPromise('uploadPart', params)
+  return getSignedUrl(s3, new UploadPartCommand(params))
 }
 
 /**
@@ -47,7 +45,7 @@ const startMultipartUpload = async (
     ContentType: mimeType,
   }
 
-  const { UploadId } = await s3.createMultipartUpload(params).promise()
+  const { UploadId } = await s3.createMultipartUpload(params)
 
   if (!UploadId) {
     throw new Error('No upload id')
@@ -108,7 +106,7 @@ const completeMultipartUpload = async ({
     UploadId: uploadId,
   }
 
-  const { ETag: etag } = await s3.completeMultipartUpload(params).promise()
+  const { ETag: etag } = await s3.completeMultipartUpload(params)
   return { s3Key, etag }
 }
 

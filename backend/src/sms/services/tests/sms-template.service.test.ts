@@ -14,7 +14,7 @@ import { createDownloadStream } from '@test-utils/create-download-stream'
 let sequelize: Sequelize
 let campaign: Campaign
 
-jest.mock('aws-sdk/clients/s3')
+jest.mock('@aws-sdk/client-s3')
 jest.mock('@core/services/s3-client.class')
 
 const MockS3Client = S3Client as jest.MockedClass<typeof S3Client>
