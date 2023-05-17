@@ -5,7 +5,7 @@ import { Credential, UserCredential, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { ChannelType } from '@core/constants'
 import { mockTelegram } from '@mocks/telegraf'
-import { mockSecretsManager } from '@mocks/aws-sdk'
+import { mockSecretsManager } from '@mocks/@aws-sdk/client-secrets-manager'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize

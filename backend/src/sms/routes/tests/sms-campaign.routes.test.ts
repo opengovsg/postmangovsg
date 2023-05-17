@@ -8,7 +8,7 @@ import { DefaultCredentialName } from '@core/constants'
 import { formatDefaultCredentialName } from '@core/utils'
 import { SmsMessage, SmsTemplate } from '@sms/models'
 import { ChannelType } from '@core/constants'
-import { mockSecretsManager } from '@mocks/aws-sdk'
+import { mockSecretsManager } from '@mocks/@aws-sdk/client-secrets-manager'
 import { SmsService } from '@sms/services'
 
 const app = initialiseServer(true)
@@ -35,6 +35,7 @@ beforeAll(async () => {
   await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   const campaign = await createCampaign({ isDemo: false })
   campaignId = campaign.id
+  jest.mock('@aws-sdk/client-secrets-manager')
 })
 
 afterEach(async () => {
@@ -72,7 +73,7 @@ describe('GET /campaign/{id}/sms', () => {
       .mockResolvedValue(0.0395) // exact value unimportant for test to pass
     // needed because demo credentials are extracted from secrets manager to get
     // credentials to call Twilio API for SMS price
-    mockSecretsManager.getSecretValue().promise.mockResolvedValue({
+    mockSecretsManager.getSecretValue.mockResolvedValue({
       SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
     })
     const res = await request(app).get(`/campaign/${campaign.id}/sms`)
@@ -133,7 +134,7 @@ describe('POST /campaign/{campaignId}/sms/credentials', () => {
       apiSecret: '',
       messagingServiceSid: '',
     }
-    mockSecretsManager.getSecretValue().promise.mockResolvedValue({
+    mockSecretsManager.getSecretValue.mockResolvedValue({
       SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
     })
 
@@ -154,7 +155,7 @@ describe('POST /campaign/{campaignId}/sms/credentials', () => {
       SecretId: formatDefaultCredentialName(DefaultCredentialName.SMS),
     })
 
-    mockSecretsManager.getSecretValue().promise.mockReset()
+    mockSecretsManager.getSecretValue.mockReset()
     mockSendCampaignMessage.mockRestore()
   })
 })
