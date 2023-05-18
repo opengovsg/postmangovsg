@@ -44,5 +44,4 @@ export const confirmCancelScheduledCampaign = async ({
   return
 }
 
-export const campaignFeedbackUrl =
-  'https://form.gov.sg/6344cf65bb320400137b59dc?6357af36c23cd700125f9d7c='
+export const campaignFeedbackUrl = 'https://go.gov.sg/postman-feedback-zap'
