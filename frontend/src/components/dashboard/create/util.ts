@@ -44,4 +44,5 @@ export const confirmCancelScheduledCampaign = async ({
   return
 }
 
-export const campaignFeedbackUrl = 'https://form.gov.sg/6465cefc1e7d8b0012576d6a'
+export const campaignFeedbackUrl =
+  'https://form.gov.sg/6465cefc1e7d8b0012576d6a'
