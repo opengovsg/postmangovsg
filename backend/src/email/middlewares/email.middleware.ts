@@ -27,7 +27,7 @@ export const INVALID_FROM_ADDRESS_ERROR_MESSAGE =
   "Invalid 'from' email address, which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more."
 
 export const UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE =
-  'From Address has not been verified.'
+  'From Address has not been verified. Contact us to learn more.'
 
 export const InitEmailMiddleware = (
   authService: AuthService
@@ -233,7 +233,7 @@ export const InitEmailMiddleware = (
       if (req.body.emailMessageTransactionalId) {
         void EmailMessageTransactional.update(
           {
-            errorCode: 'Error 400: Invalid from address',
+            errorCode: `Error 400: ${INVALID_FROM_ADDRESS_ERROR_MESSAGE}`,
           },
           {
             where: { id: req.body.emailMessageTransactionalId },
@@ -272,7 +272,7 @@ export const InitEmailMiddleware = (
       if (!exists) throw new Error(UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE)
     } catch (err) {
       logger.error({
-        message: "Invalid 'from' email address",
+        message: UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE,
         from,
         defaultEmail: config.get('mailFrom'),
         fromName,
@@ -280,6 +280,16 @@ export const InitEmailMiddleware = (
         error: err,
         action: 'existsFromAddress',
       })
+      if (req.body.emailMessageTransactionalId) {
+        void EmailMessageTransactional.update(
+          {
+            errorCode: `Error 400: ${UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE}`,
+          },
+          {
+            where: { id: req.body.emailMessageTransactionalId },
+          }
+        )
+      }
       return res.status(400).json({ message: (err as Error).message })
     }
     return next()

@@ -3,7 +3,7 @@ import { v4 as uuid } from 'uuid'
 import { difference, keys } from 'lodash'
 import retry from 'async-retry'
 
-import S3 from 'aws-sdk/clients/s3'
+import { PutObjectCommand, S3 } from '@aws-sdk/client-s3'
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
@@ -22,6 +22,7 @@ import {
 import { CSVParams } from '@core/types'
 import S3Client from '@core/services/s3-client.class'
 import { StatsService, CampaignService, ParseCsvService } from '.'
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 const logger = loggerWithLabel(module)
 
@@ -32,10 +33,7 @@ const RETRY_CONFIG = {
   factor: 1,
 }
 const FILE_STORAGE_BUCKET_NAME = config.get('aws.uploadBucket')
-const s3 = new S3({
-  signatureVersion: 'v4',
-  ...configureEndpoint(config),
-})
+const s3 = new S3({ ...configureEndpoint(config) })
 
 let uploadQueue: Queue<Upload> | undefined
 
@@ -53,13 +51,14 @@ const getUploadParameters = async (
     Bucket: FILE_STORAGE_BUCKET_NAME,
     Key: s3Key,
     ContentType: contentType,
-    Expires: 180, // seconds
     ...(md5 ? { ContentMD5: md5 } : {}),
   }
 
   const signedKey = jwtUtils.sign(s3Key)
 
-  const presignedUrl = await s3.getSignedUrlPromise('putObject', params)
+  const presignedUrl = await getSignedUrl(s3, new PutObjectCommand(params), {
+    expiresIn: 180, // seconds
+  })
 
   return { presignedUrl, signedKey }
 }
@@ -333,7 +332,7 @@ const processUpload = <Template extends AllowedTemplateTypes>(
           return
         }
 
-        const downloadStream = s3Client.download(s3Key, etag)
+        const downloadStream = await s3Client.download(s3Key, etag)
         const params = {
           transaction,
           template,
@@ -394,7 +393,7 @@ const handleFailedUpload = async (
     })
   } catch (err) {
     logger.error({
-      message: 'Error occured while handling upload failure',
+      message: 'Error occurred while handling upload failure',
       error: err,
     })
   } finally {

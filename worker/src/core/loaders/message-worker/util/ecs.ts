@@ -1,11 +1,10 @@
 import config from '@core/config'
-import ECS from 'aws-sdk/clients/ecs'
-import { AWSError } from 'aws-sdk/lib/error'
+import { ECS } from '@aws-sdk/client-ecs'
 import axios from 'axios'
 import { loggerWithLabel } from '@core/logger'
 
 const logger = loggerWithLabel(module)
-const ECSClient = new ECS({ region: config.get('aws.awsRegion') })
+const ecsClient = new ECS({ region: config.get('aws.awsRegion') })
 const taskKeyword = ':task/'
 const clusterKeyword = ':cluster/'
 const getLabel = (v: string, keyword: string): string =>
@@ -19,26 +18,18 @@ class ECSUtil {
     if (!this.hasLoaded) throw new Error('ECSUtil has not been loaded')
     return this.taskARN || index
   }
-  static getWorkersInService(): Promise<string[]> {
+  static async getWorkersInService(): Promise<string[]> {
     if (!this.hasLoaded) throw new Error('ECSUtil has not been loaded')
-    return new Promise((resolve, reject) => {
-      ECSClient.listTasks(
-        {
-          serviceName: config.get('aws.serviceName'),
-          cluster: this.clusterName,
-          desiredStatus: 'RUNNING',
-        },
-        (err: AWSError, data: ECS.ListTasksResponse) => {
-          if (err) reject(err)
-          resolve(
-            data.taskArns?.map((taskArn) =>
-              getLabel(taskArn, taskKeyword)
-            ) as string[]
-          )
-        }
-      )
+    const data = await ecsClient.listTasks({
+      serviceName: config.get('aws.serviceName'),
+      cluster: this.clusterName,
+      desiredStatus: 'RUNNING',
     })
+    return data.taskArns?.map((taskArn) =>
+      getLabel(taskArn, taskKeyword)
+    ) as string[]
   }
+
   static load(): Promise<void> {
     logger.info({
       message: 'Loading ECSUtil',

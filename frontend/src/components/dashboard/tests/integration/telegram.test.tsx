@@ -1,14 +1,14 @@
 import userEvent from '@testing-library/user-event'
 
-import { mockApis, renderDashboard, CAMPAIGN_NAME, MESSAGE_TEXT } from '../util'
+import { CAMPAIGN_NAME, MESSAGE_TEXT, mockApis, renderDashboard } from '../util'
 
 import {
-  server,
+  RECIPIENT_NUMBER,
   screen,
+  server,
   TELEGRAM_CREDENTIAL,
   VALID_CSV_FILENAME,
   VALID_MOBILE_CSV_FILE,
-  RECIPIENT_NUMBER,
 } from 'test-utils'
 
 test('successfully creates and sends a new Telegram campaign', async () => {
@@ -35,18 +35,17 @@ test('successfully creates and sends a new Telegram campaign', async () => {
   expect(campaignNameTextbox).toHaveValue(CAMPAIGN_NAME)
 
   // Click on the Telegram channel button
-  const telegramChannelButton = await screen.findByRole('button', {
+  const telegramChannelButton = await screen.findByRole('radio', {
     name: /^telegram$/i,
   })
 
   await userEvent.click(telegramChannelButton, { delay: null })
-  expect(telegramChannelButton).toHaveClass('active')
-  expect(screen.getByRole('button', { name: /^sms/i })).not.toHaveClass(
-    'active'
-  )
-  expect(screen.getByRole('button', { name: /^email$/i })).not.toHaveClass(
-    'active'
-  )
+  expect(telegramChannelButton).toBeChecked()
+  expect(screen.getByRole('radio', { name: /^sms/i })).not.toBeChecked()
+  expect(
+    screen.getByRole('radio', { name: /^protect-email/i })
+  ).not.toBeChecked()
+  expect(screen.getByRole('radio', { name: /^email$/i })).not.toBeChecked()
 
   // Click on the "Create campaign" button
   await userEvent.click(

@@ -3,14 +3,15 @@ import { Sequelize } from 'sequelize-typescript'
 
 import { Credential, User, UserCredential } from '@core/models'
 import { ChannelType } from '@core/constants'
-import { InvalidRecipientError, RateLimitError } from '@core/errors'
+import { InvalidRecipientError } from '@core/errors'
 import { SmsService } from '@sms/services'
 
-import { mockSecretsManager } from '@mocks/aws-sdk'
+import { mockSecretsManager } from '@mocks/@aws-sdk/client-secrets-manager'
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { SmsMessageTransactional } from '@sms/models'
 import { CredentialService } from '@core/services'
+import { RateLimitError } from '@shared/clients/twilio-client.class/errors'
 
 const TEST_TWILIO_CREDENTIALS = {
   accountSid: '',
@@ -34,7 +35,7 @@ beforeEach(async () => {
   const userId = user.id
   const { plainTextKey } = await (
     app as any as { credentialService: CredentialService }
-  ).credentialService.generateApiKey(user.id, 'test api key')
+  ).credentialService.generateApiKey(user.id, 'test api key', [user.email])
   apiKey = plainTextKey
 
   credential = await Credential.create({ name: 'twilio' } as Credential)
@@ -93,7 +94,7 @@ describe('POST /transactional/sms/send', () => {
     const mockSendMessage = jest
       .spyOn(SmsService, 'sendMessage')
       .mockResolvedValue(mockSendMessageResolvedValue)
-    mockSecretsManager.getSecretValue().promise.mockResolvedValueOnce({
+    mockSecretsManager.getSecretValue.mockResolvedValueOnce({
       SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
     })
 
@@ -132,7 +133,7 @@ describe('POST /transactional/sms/send', () => {
     const mockSendMessage = jest
       .spyOn(SmsService, 'sendMessage')
       .mockRejectedValueOnce(new InvalidRecipientError())
-    mockSecretsManager.getSecretValue().promise.mockResolvedValueOnce({
+    mockSecretsManager.getSecretValue.mockResolvedValueOnce({
       SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
     })
 
@@ -149,7 +150,7 @@ describe('POST /transactional/sms/send', () => {
     const mockSendMessage = jest
       .spyOn(SmsService, 'sendMessage')
       .mockRejectedValueOnce(new RateLimitError())
-    mockSecretsManager.getSecretValue().promise.mockResolvedValueOnce({
+    mockSecretsManager.getSecretValue.mockResolvedValueOnce({
       SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
     })
 

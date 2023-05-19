@@ -193,7 +193,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   }
 
   /**
-   * Checks that a valid cookie has been sent with  the request
+   * Checks that a valid cookie has been sent with the request
    * @param req
    */
   const checkCookie = (req: Request): boolean => {
@@ -269,7 +269,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
       return false
     } catch (e) {
       logger.error({
-        message: 'Error occured while verifying otp',
+        message: 'Error occurred while verifying otp',
         error: e,
         ...logMeta,
       })

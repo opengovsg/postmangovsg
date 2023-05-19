@@ -1,4 +1,4 @@
-import AWS from 'aws-sdk'
+import { SecretsManager } from '@aws-sdk/client-secrets-manager'
 import { get } from 'lodash'
 
 import config from '@core/config'
@@ -17,6 +17,7 @@ import { RedisService } from './redis.service'
 import { TwilioCredentials } from '@shared/clients/twilio-client.class'
 import { ApiKeyService } from './api-key.service'
 import { ApiKey } from '@core/models/user/api-key'
+import moment from 'moment'
 
 export interface CredentialService {
   // Credentials (cred_name)
@@ -64,13 +65,14 @@ export interface CredentialService {
 
   generateApiKey(
     userId: number,
-    label: string
+    label: string,
+    notificationContacts: string[]
   ): Promise<ApiKey & { plainTextKey: string }>
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const InitCredentialService = (redisService: RedisService) => {
-  const secretsManager = new AWS.SecretsManager(configureEndpoint(config))
+  const secretsManager = new SecretsManager(configureEndpoint(config))
   const logger = loggerWithLabel(module)
 
   /**
@@ -88,27 +90,23 @@ export const InitCredentialService = (redisService: RedisService) => {
     const logMeta = { name, action: 'upsertCredential' }
     // If credential doesn't exist, upload credential to secret manager
     try {
-      await secretsManager
-        .createSecret({
-          Name: name,
-          SecretString: secret,
-          ...(restrictEnvironment
-            ? { Tags: [{ Key: 'environment', Value: config.get('env') }] }
-            : {}),
-        })
-        .promise()
+      await secretsManager.createSecret({
+        Name: name,
+        SecretString: secret,
+        ...(restrictEnvironment
+          ? { Tags: [{ Key: 'environment', Value: config.get('env') }] }
+          : {}),
+      })
       logger.info({
         message: 'Successfully stored credential in AWS secrets manager',
         ...logMeta,
       })
     } catch (err) {
       if ((err as Error).name === 'ResourceExistsException') {
-        await secretsManager
-          .putSecretValue({
-            SecretId: name,
-            SecretString: secret,
-          })
-          .promise()
+        await secretsManager.putSecretValue({
+          SecretId: name,
+          SecretString: secret,
+        })
         logger.info({
           message: 'Successfully updated credential in AWS secrets manager',
           error: err,
@@ -158,9 +156,7 @@ export const InitCredentialService = (redisService: RedisService) => {
     return new Promise((resolve, reject) => {
       redisService.credentialClient.get(name, async (error, value) => {
         if (error || value === null) {
-          const data = await secretsManager
-            .getSecretValue({ SecretId: name })
-            .promise()
+          const data = await secretsManager.getSecretValue({ SecretId: name })
           logger.info({
             message: 'Retrieved secret from AWS secrets manager.',
             ...logMeta,
@@ -199,9 +195,7 @@ export const InitCredentialService = (redisService: RedisService) => {
    */
   const getTelegramCredential = async (name: string): Promise<string> => {
     const logMeta = { name, action: 'getTelegramCredential' }
-    const data = await secretsManager
-      .getSecretValue({ SecretId: name })
-      .promise()
+    const data = await secretsManager.getSecretValue({ SecretId: name })
     logger.info({
       message: 'Retrieved secret from AWS secrets manager.',
       ...logMeta,
@@ -349,7 +343,8 @@ export const InitCredentialService = (redisService: RedisService) => {
 
   const generateApiKey = async (
     userId: number,
-    label: string
+    label: string,
+    notificationContacts: string[]
   ): Promise<ApiKey & { plainTextKey: string }> => {
     const user = await User.findByPk(userId)
     if (!user) {
@@ -363,6 +358,8 @@ export const InitCredentialService = (redisService: RedisService) => {
       hash: apiKeyHash,
       lastFive: plainTextKey.slice(-5),
       label,
+      validUntil: moment().add(6, 'month').toDate(),
+      notificationContacts,
     } as ApiKey)
     return Object.assign({}, apiKey.toJSON(), { plainTextKey })
   }

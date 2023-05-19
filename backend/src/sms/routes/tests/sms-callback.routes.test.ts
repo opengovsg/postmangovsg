@@ -9,7 +9,7 @@ import {
 } from '@sms/models'
 import request from 'supertest'
 import { SmsCallbackService, SmsService } from '@sms/services'
-import { mockSecretsManager } from '@mocks/aws-sdk'
+import { mockSecretsManager } from '@mocks/@aws-sdk/client-secrets-manager'
 import { CredentialService } from '@core/services'
 
 const TEST_TWILIO_CREDENTIALS = {
@@ -33,7 +33,7 @@ beforeEach(async () => {
   const userId = user.id
   const { plainTextKey } = await (
     app as any as { credentialService: CredentialService }
-  ).credentialService.generateApiKey(user.id, 'test api key')
+  ).credentialService.generateApiKey(user.id, 'test api key', [user.email])
   apiKey = plainTextKey
   credential = await Credential.create({ name: 'twilio' } as Credential)
   await UserCredential.create({
@@ -72,7 +72,7 @@ describe('On successful message send, status should update according to Twilio r
     const mockSendMessage = jest
       .spyOn(SmsService, 'sendMessage')
       .mockResolvedValue(mockSendMessageResolvedValue)
-    mockSecretsManager.getSecretValue().promise.mockResolvedValueOnce({
+    mockSecretsManager.getSecretValue.mockResolvedValueOnce({
       SecretString: JSON.stringify(TEST_TWILIO_CREDENTIALS),
     })
     const res = await request(app)

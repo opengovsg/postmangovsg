@@ -2,7 +2,7 @@ import { i18n } from '@lingui/core'
 
 import cx from 'classnames'
 
-import { useState, useContext } from 'react'
+import { useContext, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
@@ -10,13 +10,8 @@ import { useNavigate } from 'react-router-dom'
 
 import styles from './DuplicateCampaignModal.module.scss'
 
-import { ChannelType, channelIcons, Campaign } from 'classes/Campaign'
-import {
-  TextInput,
-  PrimaryButton,
-  Checkbox,
-  ErrorBlock,
-} from 'components/common'
+import { Campaign, ChannelType } from 'classes/Campaign'
+import { ErrorBlock, PrimaryButton, TextInput } from 'components/common'
 import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
 
@@ -73,81 +68,121 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
             Choose the channel you want to send in
           </h2>
           <h5 className={styles.subtitle}>
-            Choosing a channel is irreversible. If you would like to change
-            channels halfway, you will have to restart. You may only edit your
-            message or re-upload recipients list. Please proceed with caution.
+            Choosing a channel is irreversible for a given campaign. If you
+            would like to change channels, you will have to create a new
+            campaign.
           </h5>
 
           <div className={styles.channelTypes}>
             <div className={styles.channelContainer}>
-              <PrimaryButton
-                className={cx(styles.button, {
-                  [styles.active]: campaign.type === ChannelType.SMS,
-                })}
+              <input
+                type="radio"
+                aria-label={ChannelType.Email}
+                id={ChannelType.Email}
+                value={ChannelType.Email}
+                checked={
+                  campaign.type === ChannelType.Email && !campaign.protect
+                }
                 disabled={true}
-              >
-                SMS
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    channelIcons[ChannelType.SMS]
-                  )}
-                ></i>
-              </PrimaryButton>
-            </div>
-            <div className={styles.channelContainer}>
-              <PrimaryButton
-                className={cx(styles.button, {
-                  [styles.active]: campaign.type === ChannelType.Telegram,
-                })}
-                disabled={true}
-              >
-                Telegram
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    channelIcons[ChannelType.Telegram]
-                  )}
-                ></i>
-              </PrimaryButton>
-            </div>
-            <div className={styles.channelContainer}>
-              <PrimaryButton
-                className={cx(styles.button, {
-                  [styles.active]: campaign.type === ChannelType.Email,
-                })}
-                disabled={true}
-              >
+              />
+              <label htmlFor={ChannelType.Email} className={styles.subtext}>
                 Email
-                <i
-                  className={cx(
-                    'bx',
-                    styles.icon,
-                    channelIcons[ChannelType.Email]
-                  )}
-                ></i>
-              </PrimaryButton>
-              {campaign.type === ChannelType.Email && (
-                <Checkbox
-                  className={cx(styles.protectedOption, styles.disabled)}
-                  checked={campaign.protect}
-                  // eslint-disable-next-line @typescript-eslint/no-empty-function
-                  onChange={() => {}}
-                >
-                  <p className={cx(styles.subtext, styles.disabled)}>
-                    Password protected.
-                    <OutboundLink
-                      className={cx(styles.link, styles.disabled)}
-                      eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
-                      to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
-                      target="_blank"
-                    >
-                      Learn more
-                    </OutboundLink>
-                  </p>
-                </Checkbox>
+              </label>
+              {campaign.type === ChannelType.Email && !campaign.protect && (
+                <p className={styles.infotext}>
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel="https://go.gov.sg/postman-email"
+                    to="https://go.gov.sg/postman-email"
+                    target="_blank"
+                  >
+                    Learn more
+                  </OutboundLink>
+                  &nbsp; about sending emails on Postman.
+                </p>
+              )}
+            </div>
+            <div className={styles.channelContainer}>
+              <input
+                type="radio"
+                aria-label={`protect-${ChannelType.Email}`}
+                id={`protect-${ChannelType.Email}`}
+                value={ChannelType.Email}
+                checked={
+                  campaign.type === ChannelType.Email && campaign.protect
+                }
+                disabled={true}
+              />
+              <label
+                htmlFor={`protect-${ChannelType.Email}`}
+                className={styles.subtext}
+              >
+                Password Protected Email
+              </label>
+              {campaign.type === ChannelType.Email && campaign.protect && (
+                <p className={styles.infotext}>
+                  Send sensitive content using Postman. &nbsp;
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    target="_blank"
+                  >
+                    Learn more.
+                  </OutboundLink>
+                </p>
+              )}
+            </div>
+            <div className={styles.channelContainer}>
+              <input
+                type="radio"
+                aria-label={ChannelType.SMS}
+                id={ChannelType.SMS}
+                value={ChannelType.SMS}
+                checked={campaign.type === ChannelType.SMS}
+                disabled={true}
+              />
+              <label htmlFor={ChannelType.SMS} className={styles.subtext}>
+                SMS
+              </label>
+              {campaign.type === ChannelType.SMS && (
+                <p className={styles.infotext}>
+                  Set up your Twilio credentials. &nbsp;
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel={i18n._(LINKS.guideSmsUrl)}
+                    to={i18n._(LINKS.guideSmsUrl)}
+                    target="_blank"
+                  >
+                    Learn more.
+                  </OutboundLink>
+                </p>
+              )}
+            </div>
+            <div className={styles.channelContainer}>
+              <input
+                type="radio"
+                aria-label={ChannelType.Telegram}
+                id={ChannelType.Telegram}
+                value={ChannelType.Telegram}
+                checked={campaign.type === ChannelType.Telegram}
+                disabled={true}
+              />
+              <label htmlFor={ChannelType.Telegram} className={styles.subtext}>
+                Telegram
+              </label>
+              {campaign.type === ChannelType.Telegram && (
+                <p className={styles.infotext}>
+                  Set up your Telegram Bot. &nbsp;
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel="https://go.gov.sg/postman-telegram"
+                    to="https://go.gov.sg/postman-telegram"
+                    target="_blank"
+                  >
+                    Learn more.
+                  </OutboundLink>
+                </p>
               )}
             </div>
           </div>

@@ -8,6 +8,7 @@ import config from '@core/config'
 import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
+import helmet from 'helmet'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
@@ -92,16 +93,18 @@ const expressApp = ({ app }: { app: express.Application }): void => {
 
   app.use(
     express.json({
-      // this must be significantly bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
-      // will get 400 error informing them of the size of the limit, instead of 500 error
+      // this must be significantly bigger than transactionalEmail.bodySizeLimit
+      // so that users who exceed limit will trigger Joi validation rather than body-parser error
+      // see https://github.com/opengovsg/postmangovsg/pull/2025
       limit: config.get('transactionalEmail.bodySizeLimit') * 10,
     })
   )
   app.use(
     express.urlencoded({
       extended: false,
-      // this must be significantly bigger than transactionalEmail.bodySizeLimit so that users who exceed limit
-      // will get 400 error informing them of the size of the limit, instead of 500 error
+      // this must be significantly bigger than transactionalEmail.bodySizeLimit
+      // so that users who exceed limit will trigger Joi validation rather than body-parser error
+      // see https://github.com/opengovsg/postmangovsg/pull/2025
       limit: config.get('transactionalEmail.bodySizeLimit') * 10,
     })
   )
@@ -137,9 +140,14 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       responseWhitelist: ['body', 'statusCode'],
       requestFilter: (req: Request, propName: string) => {
         if (propName === 'headers' && req.headers.authorization) {
-          // we do this instead of adding it to `headerBlacklist` so we can view
-          // if this `authorization` header was present
+          // we do this instead of adding it to `headerBlacklist`
+          // so we can distinguish if an API call is made via API key
           req.headers.authorization = '[REDACTED]'
+        }
+        if (propName === 'headers' && req.headers.cookie) {
+          // redact cookies from logs
+          // keep header to distinguish if API call is made via cookie
+          req.headers.cookie = '[REDACTED]'
         }
         if (propName === 'body' && req.body.attachments) {
           const { attachments } = req.body
@@ -158,6 +166,13 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     })
   )
 
+  app.use(
+    helmet({
+      hsts: {
+        maxAge: 31622400, // 366 days
+      },
+    })
+  )
   app.get('/', async (_req: Request, res: Response) => {
     return res.sendStatus(200)
   })
