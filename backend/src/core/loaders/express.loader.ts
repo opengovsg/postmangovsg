@@ -3,12 +3,18 @@ import { isCelebrate } from 'celebrate'
 import express, { Request, Response, NextFunction } from 'express'
 import expressWinston from 'express-winston'
 import * as Sentry from '@sentry/node'
+import tracer from 'dd-trace'
 
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 import helmet from 'helmet'
+import {
+  ApiMalformError,
+  ApiValidationError,
+  RestApiError,
+} from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 const FRONTEND_URL = config.get('frontendUrl')
@@ -184,26 +190,24 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     (
       err: Error,
       _req: express.Request,
-      res: express.Response,
+      _res: express.Response,
       next: express.NextFunction
-    ): express.Response | void => {
+    ) => {
       if (isCelebrate(err)) {
-        return res.status(400).json({
-          code: 'api_validation',
-          message: err.message,
-        })
+        throw new ApiValidationError(err.message)
+      } else if (err) {
+        return next(err)
       }
       next()
     }
   )
-  app.use(Sentry.Handlers.errorHandler())
 
   app.use(
     (
       err: Error,
       _req: express.Request,
-      res: express.Response,
-      _next: express.NextFunction
+      _res: express.Response,
+      next: express.NextFunction
     ) => {
       if (isBodyParserError(err as ErrorWithType)) {
         logger.info({
@@ -213,7 +217,46 @@ const expressApp = ({ app }: { app: express.Application }): void => {
             type: (err as ErrorWithType).type,
           },
         })
-        return res.status(400).json({ message: 'Malformed request body' })
+        throw new ApiMalformError('Malformed request body')
+      } else if (err) {
+        return next(err)
+      }
+      next()
+    }
+  )
+
+  app.use(
+    (
+      err: Error,
+      _req: express.Request,
+      res: express.Response,
+      next: express.NextFunction
+    ): express.Response | void => {
+      if (err instanceof RestApiError) {
+        return res.status(err.httpStatusCode).json({
+          code: err.errorCode,
+          message: err.message,
+        })
+      } else if (err) {
+        return next(err)
+      }
+      next()
+    }
+  )
+
+  app.use(Sentry.Handlers.errorHandler())
+
+  app.use(
+    (
+      err: Error,
+      _req: express.Request,
+      res: express.Response,
+      _next: express.NextFunction
+    ) => {
+      const traceId = tracer.scope().active()?.context().toTraceId()
+      let message = 'Internal Server Error.'
+      if (traceId) {
+        message = `Internal Server Error. Please reach out to us with tracking ID ${traceId} for more info.`
       }
       logger.error({
         message: 'Unexpected error occured',
@@ -223,7 +266,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
           original: (err as any).original,
         },
       })
-      return res.sendStatus(500)
+      return res.status(500).json({ code: 'internal_server', message })
     }
   )
 

@@ -8,6 +8,13 @@ import {
 } from '@core/constants'
 import { CampaignService, JobService, UploadService } from '@core/services'
 import { Campaign } from '@core/models'
+import {
+  ApiAlreadySentError,
+  ApiAuthorizationError,
+  ApiCampaignRedactedError,
+  ApiInvalidParametersError,
+  ApiNotFoundError,
+} from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -19,46 +26,43 @@ const logger = loggerWithLabel(module)
  */
 const canEditCampaign = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    const [hasJob, csvStatus] = await Promise.all([
-      CampaignService.hasJobInProgress(+campaignId),
-      UploadService.getCsvStatus(+campaignId),
-    ])
-    if (!hasJob && !csvStatus?.isCsvProcessing) {
-      return next()
-    }
-    return res.sendStatus(403)
-  } catch (err) {
-    return next(err)
+): Promise<void> => {
+  const { campaignId } = req.params
+  const [hasJob, csvStatus] = await Promise.all([
+    CampaignService.hasJobInProgress(+campaignId),
+    UploadService.getCsvStatus(+campaignId),
+  ])
+  if (!hasJob && !csvStatus?.isCsvProcessing) {
+    return next()
   }
+
+  throw new ApiAuthorizationError(
+    "Campaign can't be edited at the moment as there're ongoing uploads or jobs"
+  )
 }
 
 const canSendCampaign = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    const [sentJobs] = await Promise.all([
-      CampaignService.hasAlreadyBeenSent(+campaignId),
-    ])
-    logger.info({
-      message: 'Checking can send campaign',
-      sentJobs,
-      action: 'canSendCampaign',
-    })
-    if (sentJobs <= 0) {
-      return next()
-    }
-    return res.sendStatus(403)
-  } catch (err) {
-    return next(err)
+): Promise<void> => {
+  const { campaignId } = req.params
+  const [sentJobs] = await Promise.all([
+    CampaignService.hasAlreadyBeenSent(+campaignId),
+  ])
+  logger.info({
+    message: 'Checking can send campaign',
+    sentJobs,
+    action: 'canSendCampaign',
+  })
+  if (sentJobs <= 0) {
+    return next()
   }
+  throw new ApiAlreadySentError(
+    "Campaign has been sent before and can't be resent"
+  )
 }
 
 /**
@@ -98,9 +102,9 @@ const createCampaign = async (
       demoMessageLimit,
     })
     if (!campaign) {
-      return res.status(400).json({
-        message: `Unable to create campaign with these parameters`,
-      })
+      throw new ApiInvalidParametersError(
+        'Unable to create campaign with these parameters'
+      )
     }
     logger.info({
       message: 'Successfully created new campaign',
@@ -158,89 +162,70 @@ const listCampaigns = async (
  */
 const isCampaignRedacted = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-): Promise<Response | void> => {
+): Promise<void> => {
   const { campaignId } = req.params
-  try {
-    const campaign = await CampaignService.getCampaignDetails(+campaignId, [])
-    if (campaign.redacted) {
-      logger.error({
-        message: 'Campaign has been redacted',
-        campaignId: campaign.id,
-        action: 'isCampaignRedacted',
-      })
+  const campaign = await CampaignService.getCampaignDetails(+campaignId, [])
+  if (campaign.redacted) {
+    logger.error({
+      message: 'Campaign has been redacted',
+      campaignId: campaign.id,
+      action: 'isCampaignRedacted',
+    })
 
-      return res.status(410).json({
-        message: 'Campaign has been redacted',
-      })
-    }
-    next()
-  } catch (err) {
-    return next(err)
+    throw new ApiCampaignRedactedError(
+      `Campaign ${campaignId} has been redacted`
+    )
   }
+  next()
 }
 
 const deleteCampaign = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
-  try {
-    const campaignId = +req.params.campaignId
-    const deletedRows = await CampaignService.deleteCampaign(campaignId)
-    if (deletedRows < 1) {
-      logger.error({
-        message: 'Campaign not found',
-        campaignId: campaignId,
-        action: 'deleteCampaign',
-      })
+  const campaignId = +req.params.campaignId
+  const deletedRows = await CampaignService.deleteCampaign(campaignId)
+  if (deletedRows < 1) {
+    logger.error({
+      message: 'Campaign not found',
+      campaignId: campaignId,
+      action: 'deleteCampaign',
+    })
 
-      return res
-        .status(404)
-        .json({ message: `Campaign ${campaignId} not found` })
-    }
-    // also delete any related job_queues, possible cases include
-    // scheduled campaigns, and campaigns that queue up due to high load.
-    await JobService.cancelJobQueues(campaignId)
-
-    res.json({})
-  } catch (e) {
-    console.error(e)
-    return next(e)
+    throw new ApiNotFoundError(`Campaign ${campaignId} not found`)
   }
+  // also delete any related job_queues, possible cases include
+  // scheduled campaigns, and campaigns that queue up due to high load.
+  await JobService.cancelJobQueues(campaignId)
+
+  res.status(200).json({ id: campaignId })
 }
 
 const updateCampaign = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    const { name, should_save_list, should_bcc_to_me } = req.body
-    const [count, rows] = await CampaignService.updateCampaign({
-      id: +campaignId,
-      name,
-      shouldSaveList: should_save_list,
-      shouldBccToMe: should_bcc_to_me,
-    } as Campaign)
-    if (count < 1) {
-      logger.error({
-        message: 'Campaign not found',
-        campaignId: campaignId,
-        action: 'updateCampaign',
-      })
+  const { campaignId } = req.params
+  const { name, should_save_list, should_bcc_to_me } = req.body
+  const [count, rows] = await CampaignService.updateCampaign({
+    id: +campaignId,
+    name,
+    shouldSaveList: should_save_list,
+    shouldBccToMe: should_bcc_to_me,
+  } as Campaign)
+  if (count < 1) {
+    logger.error({
+      message: 'Campaign not found',
+      campaignId: campaignId,
+      action: 'updateCampaign',
+    })
 
-      return res
-        .status(404)
-        .json({ message: `Campaign ${campaignId} not found` })
-    }
-
-    res.json(rows[0])
-  } catch (err) {
-    return next(err)
+    throw new ApiNotFoundError(`Campaign ${campaignId} not found`)
   }
+
+  res.json(rows[0])
 }
 
 export const CampaignMiddleware = {

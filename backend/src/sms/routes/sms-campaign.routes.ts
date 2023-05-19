@@ -148,8 +148,6 @@ export const InitSmsCampaignRoute = (
     JobMiddleware.sendCampaign
   )
 
-  router.post('/stop', JobMiddleware.stopCampaign)
-
   router.post(
     '/retry',
     CampaignMiddleware.canEditCampaign,

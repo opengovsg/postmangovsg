@@ -16,6 +16,12 @@ import {
   InvalidPhoneNumberError,
   RateLimitError,
 } from '@shared/clients/twilio-client.class/errors'
+import {
+  ApiInvalidRecipientError,
+  ApiInvalidCredentialsError,
+  ApiRateLimitError,
+  ApiNotFoundError,
+} from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -98,19 +104,13 @@ async function sendMessage(
       err instanceof InvalidPhoneNumberError ||
       err instanceof InvalidRecipientError
     ) {
-      res.status(400).json({
-        code: 'invalid_recipient',
-        message: `Phone number ${req.body.recipient} is invalid`,
-      })
-      return
+      throw new ApiInvalidRecipientError(
+        `Phone number ${req.body.recipient} is invalid`
+      )
     }
 
     if (err instanceof AuthenticationError) {
-      res.status(400).json({
-        code: 'invalid_sms_credentials',
-        message: 'Invalid Twilio credentials',
-      })
-      return
+      throw new ApiInvalidCredentialsError('Invalid Twilio credentials')
     }
 
     if (err instanceof RateLimitError) {
@@ -119,8 +119,7 @@ async function sendMessage(
         userId: req?.session?.user.id,
         label: credentials.label,
       })
-      res.sendStatus(429)
-      return
+      throw new ApiRateLimitError('Too many requests. Please try again later.')
     }
 
     next(err)
@@ -152,7 +151,7 @@ async function listMessages(req: Request, res: Response): Promise<void> {
   })
 }
 
-async function getById(req: Request, res: Response): Promise<void> {
+async function getById(req: Request, res: Response): Promise<Response> {
   const { smsId } = req.params
   const message = await SmsMessageTransactional.findOne({
     where: {
@@ -161,10 +160,9 @@ async function getById(req: Request, res: Response): Promise<void> {
     },
   })
   if (!message) {
-    res.status(404).json({ message: `Sms message with ID ${smsId} not found.` })
-    return
+    throw new ApiNotFoundError(`Sms message with ID ${smsId} not found.`)
   }
-  res.status(200).json(convertMessageModelToResponse(message))
+  return res.status(200).json(convertMessageModelToResponse(message))
 }
 
 export const SmsTransactionalMiddleware = {

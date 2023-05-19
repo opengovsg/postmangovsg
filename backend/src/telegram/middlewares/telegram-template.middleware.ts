@@ -10,6 +10,7 @@ import { TemplateError } from '@shared/templating'
 import { UploadService, StatsService } from '@core/services'
 import { TelegramService, TelegramTemplateService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
+import { ApiInvalidTemplateError } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -67,7 +68,7 @@ const storeTemplate = async (
     }
   } catch (err) {
     if (err instanceof HydrationError || err instanceof TemplateError) {
-      return res.status(400).json({ message: err.message })
+      throw new ApiInvalidTemplateError(err.message)
     }
     return next(err)
   }
@@ -116,7 +117,7 @@ const uploadCompleteHandler = async (
     })
 
     // Return early because bulk insert is slow
-    res.sendStatus(202)
+    res.status(202).json({ id: campaignId })
   } catch (err) {
     logger.error({
       message: 'Failed to complete upload to s3',
@@ -131,7 +132,7 @@ const uploadCompleteHandler = async (
     ]
 
     if (userErrors.some((errType) => err instanceof errType)) {
-      return res.status(400).json({ message: (err as Error).message })
+      throw new ApiInvalidTemplateError((err as Error).message)
     }
     return next(err)
   }
@@ -142,34 +143,29 @@ const uploadCompleteHandler = async (
  */
 const pollCsvStatusHandler = async (
   req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    const { isCsvProcessing, filename, tempFilename, error } =
-      await UploadService.getCsvStatus(+campaignId)
+  res: Response
+): Promise<Response> => {
+  const { campaignId } = req.params
+  const { isCsvProcessing, filename, tempFilename, error } =
+    await UploadService.getCsvStatus(+campaignId)
 
-    // If done processing, returns num recipients and preview msg
-    let numRecipients, preview
-    if (!isCsvProcessing) {
-      ;[numRecipients, preview] = await Promise.all([
-        StatsService.getNumRecipients(+campaignId),
-        TelegramService.getHydratedMessage(+campaignId),
-      ])
-    }
-
-    res.json({
-      is_csv_processing: isCsvProcessing,
-      csv_filename: filename,
-      temp_csv_filename: tempFilename,
-      csv_error: error,
-      num_recipients: numRecipients,
-      preview,
-    })
-  } catch (err) {
-    next(err)
+  // If done processing, returns num recipients and preview msg
+  let numRecipients, preview
+  if (!isCsvProcessing) {
+    ;[numRecipients, preview] = await Promise.all([
+      StatsService.getNumRecipients(+campaignId),
+      TelegramService.getHydratedMessage(+campaignId),
+    ])
   }
+
+  return res.json({
+    is_csv_processing: isCsvProcessing,
+    csv_filename: filename,
+    temp_csv_filename: tempFilename,
+    csv_error: error,
+    num_recipients: numRecipients,
+    preview,
+  })
 }
 
 /*
@@ -177,16 +173,11 @@ const pollCsvStatusHandler = async (
  */
 const deleteCsvErrorHandler = async (
   req: Request,
-  res: Response,
-  next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    await UploadService.deleteS3TempKeys(+campaignId)
-    res.sendStatus(200)
-  } catch (e) {
-    next(e)
-  }
+  res: Response
+): Promise<Response> => {
+  const { campaignId } = req.params
+  await UploadService.deleteS3TempKeys(+campaignId)
+  return res.status(200).json({ id: campaignId })
 }
 
 export const TelegramTemplateMiddleware = {

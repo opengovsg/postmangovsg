@@ -188,10 +188,6 @@ export async function sendCampaign(
   await axios.post(`/campaign/${campaignId}/send`, body)
 }
 
-export async function stopCampaign(campaignId: number): Promise<void> {
-  await axios.post(`/campaign/${campaignId}/stop`)
-}
-
 export async function retryCampaign(campaignId: number): Promise<void> {
   await axios.post(`/campaign/${campaignId}/retry`)
 }

@@ -4,6 +4,13 @@ import { CredentialService } from '@core/services'
 import { TelegramService } from '@telegram/services'
 import { loggerWithLabel } from '@core/logger'
 import { formatDefaultCredentialName } from '@core/utils'
+import {
+  ApiAuthorizationError,
+  ApiInvalidCredentialLabelError,
+  ApiInvalidCredentialsError,
+  ApiInvalidTemplateError,
+  ApiNotFoundError,
+} from '@core/errors/rest-api.errors'
 
 export interface TelegramMiddleware {
   getCredentialsFromBody: Handler
@@ -35,24 +42,18 @@ export const InitTelegramMiddleware = (
    */
   const disabledForDemoCampaign = async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
-  ): Promise<Response | void> => {
-    try {
-      const userId = req.session?.user?.id
-      const campaign = await TelegramService.findCampaign(
-        +req.params.campaignId,
-        userId
-      )
-      if (campaign.demoMessageLimit) {
-        return res.status(400).json({
-          message: `Action disabled for demo campaign`,
-        })
-      }
-      return next()
-    } catch (err) {
-      return next(err)
+  ): Promise<void> => {
+    const userId = req.session?.user?.id
+    const campaign = await TelegramService.findCampaign(
+      +req.params.campaignId,
+      userId
+    )
+    if (campaign.demoMessageLimit) {
+      throw new ApiAuthorizationError('Action not allowed for demo campaign')
     }
+    return next()
   }
   /**
    * Parse telegram credentials from request body, setting it to res.locals.credentials to be passed downstream
@@ -116,7 +117,7 @@ export const InitTelegramMiddleware = (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response | void> => {
+  ): Promise<void> => {
     const { campaignId } = req.params // May be undefined if invoked from settings page
     const { label } = req.body
     const userId = req.session?.user?.id
@@ -146,7 +147,7 @@ export const InitTelegramMiddleware = (
         ...logMeta,
         message: `${errAsError.stack}`,
       })
-      return res.status(400).json({ message: `${errAsError.message}` })
+      throw new ApiInvalidCredentialLabelError(errAsError.message)
     }
   }
 
@@ -160,7 +161,7 @@ export const InitTelegramMiddleware = (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void | Response> => {
+  ): Promise<void> => {
     const { campaignId } = req.params
     const userId = req.session?.user?.id
     const campaign = await TelegramService.findCampaign(+campaignId, userId)
@@ -173,9 +174,7 @@ export const InitTelegramMiddleware = (
         credName,
         action: 'getCampaignCredential',
       })
-      return res
-        .status(400)
-        .json({ message: 'No credentials found for this campaign.' })
+      throw new ApiNotFoundError('No credentials found for this campaign.')
     }
 
     const telegramBotToken = await credentialService.getTelegramCredential(
@@ -214,7 +213,7 @@ export const InitTelegramMiddleware = (
         error: err,
         ...logMeta,
       })
-      return res.status(400).json({ message: `${err}` })
+      throw new ApiInvalidCredentialsError((err as Error).message)
     }
 
     try {
@@ -275,7 +274,7 @@ export const InitTelegramMiddleware = (
         error: err,
         ...logMeta,
       })
-      return res.status(400).json({ message: `${(err as Error).message}` })
+      throw new ApiInvalidTemplateError((err as Error).message)
     }
   }
 
@@ -287,21 +286,19 @@ export const InitTelegramMiddleware = (
    */
   const isTelegramCampaignOwnedByUser = async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
   ): Promise<Response | void> => {
-    try {
-      const { campaignId } = req.params
-      const userId = req.session?.user?.id
-      const campaign = await TelegramService.findCampaign(+campaignId, userId)
-      if (campaign) {
-        return next()
-      } else {
-        return res.sendStatus(403)
-      }
-    } catch (err) {
-      return next(err)
+    const { campaignId } = req.params
+    const userId = req.session?.user?.id
+    const campaign = await TelegramService.findCampaign(+campaignId, userId)
+    if (campaign) {
+      return next()
     }
+
+    throw new ApiAuthorizationError(
+      "User doesn't have access to this campaign."
+    )
   }
 
   /**
@@ -332,17 +329,12 @@ export const InitTelegramMiddleware = (
    */
   const previewFirstMessage = async (
     req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> => {
-    try {
-      const { campaignId } = req.params
-      return res.json({
-        preview: await TelegramService.getHydratedMessage(+campaignId),
-      })
-    } catch (err) {
-      return next(err)
-    }
+    res: Response
+  ): Promise<Response> => {
+    const { campaignId } = req.params
+    return res.json({
+      preview: await TelegramService.getHydratedMessage(+campaignId),
+    })
   }
 
   /**
@@ -353,21 +345,16 @@ export const InitTelegramMiddleware = (
    */
   const setCampaignCredential = async (
     req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> => {
-    try {
-      const { campaignId } = req.params
-      const { credentialName } = res.locals
-      if (!credentialName) {
-        throw new Error('Credential does not exist')
-      }
-
-      await TelegramService.setCampaignCredential(+campaignId, credentialName)
-      return res.json({ message: 'OK' })
-    } catch (err) {
-      next(err)
+    res: Response
+  ): Promise<Response> => {
+    const { campaignId } = req.params
+    const { credentialName } = res.locals
+    if (!credentialName) {
+      throw new Error('Credential does not exist')
     }
+
+    await TelegramService.setCampaignCredential(+campaignId, credentialName)
+    return res.json({ message: 'OK' })
   }
 
   /**
@@ -389,9 +376,9 @@ export const InitTelegramMiddleware = (
         name,
       })
       if (!campaign) {
-        return res.status(400).json({
-          message: `Unable to duplicate campaign with these parameters`,
-        })
+        throw new ApiNotFoundError(
+          `Cannot duplicate. Campaign ${campaignId} was not found`
+        )
       }
       logger.info({
         message: 'Successfully copied campaign',

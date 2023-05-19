@@ -5,6 +5,11 @@ import { SmsService } from '@sms/services'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { formatDefaultCredentialName } from '@core/utils'
+import {
+  ApiAuthorizationError,
+  ApiInvalidCredentialsError,
+  ApiNotFoundError,
+} from '@core/errors/rest-api.errors'
 
 export interface SmsMiddleware {
   getCredentialsFromBody: Handler
@@ -33,21 +38,19 @@ export const InitSmsMiddleware = (
    */
   const isSmsCampaignOwnedByUser = async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
   ): Promise<Response | void> => {
-    try {
-      const { campaignId } = req.params
-      const userId = req.session?.user?.id
-      const campaign = await SmsService.findCampaign(+campaignId, +userId)
-      if (campaign) {
-        return next()
-      } else {
-        return res.sendStatus(403)
-      }
-    } catch (err) {
-      return next(err)
+    const { campaignId } = req.params
+    const userId = req.session?.user?.id
+    const campaign = await SmsService.findCampaign(+campaignId, +userId)
+    if (campaign) {
+      return next()
     }
+
+    throw new ApiAuthorizationError(
+      "User doesn't have access to this campaign."
+    )
   }
 
   /**
@@ -58,24 +61,18 @@ export const InitSmsMiddleware = (
    */
   const disabledForDemoCampaign = async (
     req: Request,
-    res: Response,
+    _res: Response,
     next: NextFunction
-  ): Promise<Response | void> => {
-    try {
-      const userId = req.session?.user?.id
-      const campaign = await SmsService.findCampaign(
-        +req.params.campaignId,
-        userId
-      )
-      if (campaign.demoMessageLimit) {
-        return res.status(400).json({
-          message: `Action not allowed for demo campaign`,
-        })
-      }
-      return next()
-    } catch (err) {
-      return next(err)
+  ): Promise<void> => {
+    const userId = req.session?.user?.id
+    const campaign = await SmsService.findCampaign(
+      +req.params.campaignId,
+      userId
+    )
+    if (campaign.demoMessageLimit) {
+      throw new ApiAuthorizationError('Action not allowed for demo campaign')
     }
+    return next()
   }
 
   /**
@@ -138,45 +135,31 @@ export const InitSmsMiddleware = (
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<void | Response> => {
+  ): Promise<void> => {
     const { campaignId } = req.params // May be undefined if invoked from settings page
     const { label } = req.body
     const userId = req.session?.user?.id
-    const logMeta = {
-      campaignId,
-      label,
-      action: 'getCredentialsFromLabelCampaign',
-    }
-    try {
-      /* Determine if credential name can be used */
-      const campaign = campaignId
-        ? await SmsService.findCampaign(+campaignId, userId)
-        : null
-      const canUseDemoCredentials =
-        campaign?.demoMessageLimit && campaign?.demoMessageLimit > 0
-      if (!canUseDemoCredentials && label === DefaultCredentialName.SMS) {
-        throw new Error(
-          `Campaign cannot use demo credentials. ${label} is not allowed.`
-        )
-      }
-      const credentialName = canUseDemoCredentials
-        ? getDemoCredentialName(label)
-        : await getCredentialName(label, +userId)
-
-      /* Get credential from the name */
-      res.locals.credentials = await credentialService.getTwilioCredentials(
-        credentialName
+    /* Determine if credential name can be used */
+    const campaign = campaignId
+      ? await SmsService.findCampaign(+campaignId, userId)
+      : null
+    const canUseDemoCredentials =
+      campaign?.demoMessageLimit && campaign?.demoMessageLimit > 0
+    if (!canUseDemoCredentials && label === DefaultCredentialName.SMS) {
+      throw new ApiAuthorizationError(
+        `Campaign cannot use demo credentials. ${label} is not allowed.`
       )
-      res.locals.credentialName = credentialName
-      return next()
-    } catch (err) {
-      const errAsError = err as Error
-      logger.error({
-        ...logMeta,
-        message: `${errAsError.stack}`,
-      })
-      return res.status(400).json({ message: `${errAsError.message}` })
     }
+    const credentialName = canUseDemoCredentials
+      ? getDemoCredentialName(label)
+      : await getCredentialName(label, +userId)
+
+    /* Get credential from the name */
+    res.locals.credentials = await credentialService.getTwilioCredentials(
+      credentialName
+    )
+    res.locals.credentialName = credentialName
+    return next()
   }
 
   const getCredentialsFromLabelTransactional = async (
@@ -206,7 +189,7 @@ export const InitSmsMiddleware = (
         ...logMeta,
         message: `${errAsError.stack}`,
       })
-      return res.status(400).json({ message: `${errAsError.message}` })
+      throw new ApiInvalidCredentialsError(errAsError.message)
     }
   }
 
@@ -253,7 +236,7 @@ export const InitSmsMiddleware = (
         error: err,
         ...logMeta,
       })
-      return res.status(400).json({ message: `${err}` })
+      throw new ApiInvalidCredentialsError((err as Error).message)
     }
     try {
       // Store credentials in AWS secrets manager
@@ -374,9 +357,9 @@ export const InitSmsMiddleware = (
         name,
       })
       if (!campaign) {
-        return res.status(400).json({
-          message: `Unable to duplicate campaign with these parameters`,
-        })
+        throw new ApiNotFoundError(
+          `Cannot duplicate. Campaign ${campaignId} was  not found.`
+        )
       }
       logger.info({
         message: 'Successfully copied campaign',
