@@ -302,10 +302,10 @@ export const InitEmailTemplateMiddleware = (
   const deleteCsvErrorHandler = async (
     req: Request,
     res: Response
-  ): Promise<Response | void> => {
+  ): Promise<Response> => {
     const { campaignId } = req.params
     await UploadService.deleteS3TempKeys(+campaignId)
-    res.status(200).json({ id: campaignId })
+    return res.status(200).json({ id: campaignId })
   }
 
   // TODO: refactor this handler with uploadCompleteHandler to share the same function

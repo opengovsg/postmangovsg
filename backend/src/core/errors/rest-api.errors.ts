@@ -97,3 +97,9 @@ export class ApiAttachmentLimitError extends RestApiError {
     super(413, 'attachment_limit', message)
   }
 }
+
+export class ApiInvalidCredentialLabelError extends RestApiError {
+  constructor(message: string) {
+    super(400, 'invalid_credential_label', message)
+  }
+}
