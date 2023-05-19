@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import { ProtectedService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
+import {
+  ApiAuthorizationError,
+  ApiInvalidTemplateError,
+} from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -12,18 +16,15 @@ const logger = loggerWithLabel(module)
  */
 const isProtectedCampaign = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
-): Promise<Response | void> => {
-  try {
-    const { campaignId } = req.params
-    if (await ProtectedService.isProtectedCampaign(+campaignId)) {
-      return next()
-    }
-    return res.sendStatus(403)
-  } catch (err) {
-    return next(err)
+): Promise<void> => {
+  const { campaignId } = req.params
+  if (await ProtectedService.isProtectedCampaign(+campaignId)) {
+    return next()
   }
+
+  throw new ApiAuthorizationError('Campaign is not a protected campaign.')
 }
 
 /**
@@ -35,7 +36,7 @@ const isProtectedCampaign = async (
  */
 const verifyTemplate = async (
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<Response | void> => {
   try {
@@ -65,7 +66,7 @@ const verifyTemplate = async (
       error: err,
       action: 'verifyTemplate',
     })
-    return res.status(400).json({ message: (err as Error).message })
+    throw new ApiInvalidTemplateError((err as Error).message)
   }
 }
 

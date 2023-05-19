@@ -10,7 +10,7 @@ import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 
-import { retryCampaign, stopCampaign } from 'services/campaign.service'
+import { retryCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const SMSDetail = () => {
@@ -19,16 +19,6 @@ const SMSDetail = () => {
   const { id, demoMessageLimit } = campaign
   const isDemo = !!demoMessageLimit
   const { stats, refreshCampaignStats } = usePollCampaignStats()
-
-  async function handlePause() {
-    try {
-      sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.SMS)
-      await stopCampaign(id)
-      await refreshCampaignStats()
-    } catch (err) {
-      console.error(err)
-    }
-  }
 
   async function handleRetry() {
     try {
@@ -109,7 +99,6 @@ const SMSDetail = () => {
           <ProgressDetails
             stats={stats}
             redacted={campaign.redacted}
-            handlePause={handlePause}
             handleRetry={handleRetry}
           />
         )}

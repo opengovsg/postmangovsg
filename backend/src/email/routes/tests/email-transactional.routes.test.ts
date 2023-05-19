@@ -167,7 +167,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.body.from).toBe(from)
     expect(mockSendEmail).toBeCalledTimes(1)
     const transactionalEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
+      where: { id: res.body.id },
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
@@ -210,7 +210,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.body.from).toBe(from)
     expect(mockSendEmail).toBeCalledTimes(1)
     const transactionalEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
+      where: { id: res.body.id },
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
@@ -387,7 +387,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
 
   test('Should throw a 413 error if body size is wayyy too large (JSON payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
-    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    const body = 'a'.repeat(1024 * 1024 * 2) // 2MB
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -396,7 +396,12 @@ describe(`${emailTransactionalRoute}/send`, () => {
         body,
       })
     // note: in practice, size of payload is limited by size specified in backend/.platform/nginx/conf.d/client_max_body_size.conf
-    expect(res.status).toBe(413)
+    expect(res.status).toBe(400)
+    expect(res.body).toStrictEqual({
+      code: 'api_validation',
+      message:
+        'body is a required string whose size must be less than or equal to 1MB in UTF-8 encoding',
+    })
     expect(mockSendEmail).not.toBeCalled()
   })
 
@@ -416,7 +421,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
 
   test('Should throw 413 error if body size is wayy too large (URL encoded payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
-    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    const body = 'a'.repeat(1024 * 1024 * 2) // 15MB
     const res = await request(app)
       .post(endpoint)
       .type('form')
@@ -426,7 +431,13 @@ describe(`${emailTransactionalRoute}/send`, () => {
         body,
       })
     // note: in practice, size of payload is limited by size specified in backend/.platform/nginx/conf.d/client_max_body_size.conf
-    expect(res.status).toBe(413)
+    expect(res.status).toBe(400)
+    expect(res.body).toStrictEqual({
+      code: 'api_validation',
+      message:
+        'body is a required string whose size must be less than or equal to 1MB in UTF-8 encoding',
+    })
+    expect(mockSendEmail).not.toBeCalled()
   })
 
   test('Should throw a 400 error if the body size is too large (multipart payload)', async () => {

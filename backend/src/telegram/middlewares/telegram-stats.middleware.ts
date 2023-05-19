@@ -12,21 +12,16 @@ const logger = loggerWithLabel(module)
  */
 const getStats = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  res: Response
 ): Promise<Response | void> => {
   const { campaignId } = req.params
-  try {
-    const stats = await TelegramStatsService.getStats(+campaignId)
-    logger.info({
-      message: 'Retreived telegram stats',
-      campaignId,
-      action: 'getStats',
-    })
-    return res.json(stats)
-  } catch (err) {
-    next(err)
-  }
+  const stats = await TelegramStatsService.getStats(+campaignId)
+  logger.info({
+    message: 'Retreived telegram stats',
+    campaignId,
+    action: 'getStats',
+  })
+  return res.json(stats)
 }
 
 /**

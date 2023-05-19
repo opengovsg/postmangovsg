@@ -3,6 +3,10 @@ import fileUpload from 'express-fileupload'
 import config from '@core/config'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
+import {
+  ApiAttachmentLimitError,
+  ApiAuthorizationError,
+} from '@core/errors/rest-api.errors'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')
@@ -23,10 +27,12 @@ const fileUploadHandler = fileUpload({
     fieldSize: BODY_SIZE_LIMIT + 1,
   },
   abortOnLimit: true,
-  limitHandler: function (_: Request, res: Response) {
-    res
-      .status(413)
-      .json({ message: 'Size of one or more attachments exceeds limit' })
+  limitHandler: function (_: Request, _res: Response, next: NextFunction) {
+    next(
+      new ApiAttachmentLimitError(
+        'Size of one or more attachments exceeds limit'
+      )
+    )
   },
 })
 
@@ -36,7 +42,7 @@ const fileUploadHandler = fileUpload({
  */
 function preprocessPotentialIncomingFile(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): void {
   if (req.files?.attachments) {
@@ -48,10 +54,9 @@ function preprocessPotentialIncomingFile(
      * exceeded, instead truncates array to specified num
      */
     if (req.body.attachments.length > FILE_ATTACHMENT_MAX_NUM) {
-      res.status(413).json({
-        message: `Number of attachments exceeds limit of ${FILE_ATTACHMENT_MAX_NUM}`,
-      })
-      return
+      throw new ApiAttachmentLimitError(
+        `Number of attachments exceeds limit of ${FILE_ATTACHMENT_MAX_NUM}`
+      )
     }
   }
   next()
@@ -60,7 +65,7 @@ function preprocessPotentialIncomingFile(
 // two checks: (1) must use custom domain for attachment; (2) global attachment size limit respected
 async function checkAttachmentValidity(
   req: Request,
-  res: Response,
+  _res: Response,
   next: NextFunction
 ): Promise<void> {
   // return early if no attachments
@@ -71,11 +76,9 @@ async function checkAttachmentValidity(
   // forbid user from sending attachments from default @mail.postman.gov.sg
   const { from } = req.body
   if (isDefaultFromAddress(from)) {
-    res.status(403).json({
-      message:
-        'Attachments cannot be sent from the default @mail.postman.gov.sg domain',
-    })
-    return
+    throw new ApiAuthorizationError(
+      'Attachments are not allowed for Postman default from email address'
+    )
   }
   // ensuring global attachment size limit is not exceeded
   const attachments = ensureAttachmentsFieldIsArray(req.files.attachments)
@@ -84,10 +87,9 @@ async function checkAttachmentValidity(
     0
   )
   if (totalAttachmentsSize > TOTAL_ATTACHMENT_SIZE_LIMIT) {
-    res.status(413).json({
-      message: 'Cumulative attachment size exceeds limit',
-    })
-    return
+    throw new ApiAttachmentLimitError(
+      'Cumulative attachment size exceeds limit'
+    )
   }
   next()
 }

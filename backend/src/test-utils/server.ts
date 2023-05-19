@@ -1,5 +1,7 @@
+// Patching for express v4 lacking https://stackoverflow.com/questions/68923821/testing-default-error-handler-in-an-express-application-results-in-a-timeout
+import 'express-async-errors'
+
 import express, { Request, Response, NextFunction } from 'express'
-import { errors as celebrateErrorMiddleware } from 'celebrate'
 import sessionLoader from '@core/loaders/session.loader'
 import { InitV1Route } from '@core/routes'
 import {
@@ -8,6 +10,11 @@ import {
   RedisService,
 } from '@core/services'
 import config from '@core/config'
+import {
+  bodyParserErrorMiddleware,
+  celebrateErrorMiddleware,
+  restApiErrorMiddleware,
+} from '@core/loaders/express.loader'
 
 const initialiseServer = (session?: boolean): express.Application => {
   const app: express.Application = express()
@@ -44,7 +51,9 @@ const initialiseServer = (session?: boolean): express.Application => {
 
   const routes = InitV1Route(app)
   app.use(routes)
-  app.use(celebrateErrorMiddleware())
+  app.use(celebrateErrorMiddleware)
+  app.use(bodyParserErrorMiddleware)
+  app.use(restApiErrorMiddleware)
   ;(app as any).cleanup = async function (): Promise<void> {
     await (app as any).redisService.shutdown()
   }

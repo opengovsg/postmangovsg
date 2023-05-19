@@ -63,7 +63,10 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         reply_to: 'user@agency.gov.sg',
       })
     expect(res.status).toBe(400)
-    expect(res.body).toEqual({ message: INVALID_FROM_ADDRESS_ERROR_MESSAGE })
+    expect(res.body).toEqual({
+      code: 'invalid_from_address',
+      message: INVALID_FROM_ADDRESS_ERROR_MESSAGE,
+    })
   })
 
   test('Invalid values for email is not accepted', async () => {
@@ -151,7 +154,10 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         reply_to: 'user@agency.gov.sg',
       })
     expect(res.status).toBe(400)
-    expect(res.body).toEqual({ message: UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE })
+    expect(res.body).toEqual({
+      code: 'invalid_from_address',
+      message: UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE,
+    })
   })
 
   test("Verified user's email as from address is accepted", async () => {
@@ -249,7 +255,10 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       })
 
     expect(res.status).toBe(400)
-    expect(res.body).toEqual({ message: UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE })
+    expect(res.body).toEqual({
+      code: 'invalid_from_address',
+      message: UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE,
+    })
   })
 
   test('Mail via should only be appended once', async () => {
@@ -285,6 +294,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       })
     expect(res.status).toBe(400)
     expect(res.body).toEqual({
+      code: 'invalid_template',
       message:
         'Error: There are missing keywords in the message template: protectedlink. Please return to the previous step to add in the keywords.',
     })
@@ -300,6 +310,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       })
     expect(testSubject.status).toBe(400)
     expect(testSubject.body).toEqual({
+      code: 'invalid_template',
       message:
         'Error: Only these keywords are allowed in the template: protectedlink,recipient.\nRemove the other keywords from the template: name.',
     })
@@ -316,6 +327,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
 
     expect(testBody.status).toBe(400)
     expect(testBody.body).toEqual({
+      code: 'invalid_template',
       message:
         'Error: Only these keywords are allowed in the template: protectedlink,recipient.\nRemove the other keywords from the template: name.',
     })
@@ -353,6 +365,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
 
     expect(testBody.status).toBe(400)
     expect(testBody.body).toEqual({
+      code: 'invalid_template',
       message:
         'Message template is invalid as it only contains invalid HTML tags!',
     })
