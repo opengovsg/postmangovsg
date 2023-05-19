@@ -63,6 +63,58 @@ function isBodyParserError(error: ErrorWithType) {
   return bodyParserCommonErrorsTypes.includes(error.type)
 }
 
+export function celebrateErrorMiddleware(
+  err: Error,
+  _req: express.Request,
+  _res: express.Response,
+  next: express.NextFunction
+) {
+  if (isCelebrate(err)) {
+    throw new ApiValidationError(err.message)
+  } else if (err) {
+    return next(err)
+  }
+  next()
+}
+
+export function bodyParserErrorMiddleware(
+  err: Error,
+  _req: express.Request,
+  _res: express.Response,
+  next: express.NextFunction
+) {
+  if (isBodyParserError(err as ErrorWithType)) {
+    logger.info({
+      message: 'Malformed request',
+      error: {
+        message: err.message,
+        type: (err as ErrorWithType).type,
+      },
+    })
+    throw new ApiMalformError('Malformed request body')
+  } else if (err) {
+    return next(err)
+  }
+  next()
+}
+
+export function restApiErrorMiddleware(
+  err: Error,
+  _req: express.Request,
+  res: express.Response,
+  next: express.NextFunction
+): express.Response | void {
+  if (err instanceof RestApiError) {
+    return res.status(err.httpStatusCode).json({
+      code: err.errorCode,
+      message: err.message,
+    })
+  } else if (err) {
+    return next(err)
+  }
+  next()
+}
+
 Sentry.init({
   dsn: config.get('sentryDsn'),
   environment: config.get('env'),
@@ -186,63 +238,9 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   app.use(sentrySessionMiddleware)
 
   app.use('/v1', InitV1Route(app))
-  app.use(
-    (
-      err: Error,
-      _req: express.Request,
-      _res: express.Response,
-      next: express.NextFunction
-    ) => {
-      if (isCelebrate(err)) {
-        throw new ApiValidationError(err.message)
-      } else if (err) {
-        return next(err)
-      }
-      next()
-    }
-  )
-
-  app.use(
-    (
-      err: Error,
-      _req: express.Request,
-      _res: express.Response,
-      next: express.NextFunction
-    ) => {
-      if (isBodyParserError(err as ErrorWithType)) {
-        logger.info({
-          message: 'Malformed request',
-          error: {
-            message: err.message,
-            type: (err as ErrorWithType).type,
-          },
-        })
-        throw new ApiMalformError('Malformed request body')
-      } else if (err) {
-        return next(err)
-      }
-      next()
-    }
-  )
-
-  app.use(
-    (
-      err: Error,
-      _req: express.Request,
-      res: express.Response,
-      next: express.NextFunction
-    ): express.Response | void => {
-      if (err instanceof RestApiError) {
-        return res.status(err.httpStatusCode).json({
-          code: err.errorCode,
-          message: err.message,
-        })
-      } else if (err) {
-        return next(err)
-      }
-      next()
-    }
-  )
+  app.use(celebrateErrorMiddleware)
+  app.use(bodyParserErrorMiddleware)
+  app.use(restApiErrorMiddleware)
 
   app.use(Sentry.Handlers.errorHandler())
 
