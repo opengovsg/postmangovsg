@@ -14,7 +14,7 @@ import ScheduleDetails from 'components/common/schedule-details'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import { CampaignContext } from 'contexts/campaign.context'
 
-import { retryCampaign, stopCampaign } from 'services/campaign.service'
+import { retryCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const EmailDetail = () => {
@@ -23,16 +23,6 @@ const EmailDetail = () => {
   const { stats, refreshCampaignStats } = usePollCampaignStats()
 
   const emailCampaign = campaign as EmailCampaign
-
-  async function handlePause() {
-    try {
-      sendUserEvent(GA_USER_EVENTS.PAUSE_SENDING, ChannelType.Email)
-      await stopCampaign(id)
-      await refreshCampaignStats()
-    } catch (err) {
-      console.error(err)
-    }
-  }
 
   async function handleRetry() {
     try {
@@ -107,7 +97,6 @@ const EmailDetail = () => {
           <ProgressDetails
             stats={stats}
             redacted={campaign.redacted}
-            handlePause={handlePause}
             handleRetry={handleRetry}
           />
         )}

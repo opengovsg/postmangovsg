@@ -120,17 +120,6 @@ const sendCampaign = async ({
 }
 
 /**
- * @see ../backend/src/database/migrations/20210501121338-create-stop-jobs-function.js
- * @param campaignId
- */
-const stopCampaign = (campaignId: number): Promise<any> | undefined => {
-  return Campaign.sequelize?.query('SELECT stop_jobs(:campaignId);', {
-    replacements: { campaignId },
-    type: QueryTypes.SELECT,
-  })
-}
-
-/**
  * @see ../backend/src/database/migrations/20210501120857-create-retry-jobs-function.js
  * @param campaignId
  */
@@ -169,7 +158,6 @@ const cancelJobQueues = async (campaignId: number) => {
 export const JobService = {
   canSendCampaign,
   sendCampaign,
-  stopCampaign,
   retryCampaign,
   updateScheduledCampaign,
   cancelJobQueues,
