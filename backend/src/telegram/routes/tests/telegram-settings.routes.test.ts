@@ -53,7 +53,8 @@ describe('POST /settings/telegram/credentials', () => {
 
     expect(res.status).toBe(400)
     expect(res.body).toEqual({
-      message: `Error: Invalid token. ${TELEGRAM_ERROR_STRING}`,
+      code: 'invalid_credentials',
+      message: `Invalid token. ${TELEGRAM_ERROR_STRING}`,
     })
 
     expect(mockSecretsManager.createSecret).not.toHaveBeenCalled()

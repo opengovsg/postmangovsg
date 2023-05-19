@@ -114,7 +114,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.status).toBe(400)
   })
 
-  test.skip('Should send email successfully and metadata is saved correctly in db', async () => {
+  test('Should send email successfully and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue(true)
@@ -145,7 +145,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
   })
 
-  test.skip('Should send a message with valid custom from name', async () => {
+  test('Should send a message with valid custom from name', async () => {
     const mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue(true)
@@ -167,7 +167,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.body.from).toBe(from)
     expect(mockSendEmail).toBeCalledTimes(1)
     const transactionalEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
+      where: { id: res.body.id },
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
@@ -184,7 +184,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
   })
 
-  test.skip('Should send a message with valid custom from address', async () => {
+  test('Should send a message with valid custom from address', async () => {
     const mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue(true)
@@ -210,7 +210,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.body.from).toBe(from)
     expect(mockSendEmail).toBeCalledTimes(1)
     const transactionalEmail = await EmailMessageTransactional.findOne({
-      where: { userId: user.id.toString() },
+      where: { id: res.body.id },
     })
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
@@ -227,7 +227,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
   })
 
-  test.skip('Should throw an error with invalid custom from address (not user email)', async () => {
+  test('Should throw an error with invalid custom from address (not user email)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const res = await request(app)
       .post(endpoint)
@@ -252,7 +252,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
   })
 
-  test.skip('Should throw an error with invalid custom from address (user email not added into EmailFromAddress table)', async () => {
+  test('Should throw an error with invalid custom from address (user email not added into EmailFromAddress table)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const from = `Hello <${user.email}>`
     const res = await request(app)
@@ -280,7 +280,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     })
   })
 
-  test.skip('Should throw an error if email subject or body is empty after removing invalid HTML tags and correct error is saved in db', async () => {
+  test('Should throw an error if email subject or body is empty after removing invalid HTML tags and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const invalidHtmlTagsSubjectAndBody = {
       subject: '\n\n\n',
@@ -317,7 +317,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(transactionalEmail?.errorCode).toBe(EMPTY_MESSAGE_ERROR_CODE)
   })
 
-  test.skip('Should send email if subject and body are not empty after removing invalid HTML tags and metadata is saved correctly in db', async () => {
+  test('Should send email if subject and body are not empty after removing invalid HTML tags and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue(true)
@@ -371,7 +371,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       { extraSmtpHeaders: { isTransactional: true } }
     )
   })
-  test.skip('Should throw a 400 error if the body size is too large (JSON payload)', async () => {
+  test('Should throw a 400 error if the body size is too large (JSON payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
     const res = await request(app)
@@ -385,9 +385,9 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
-  test.skip('Should throw a 413 error if body size is wayyy too large (JSON payload)', async () => {
+  test('Should throw a 413 error if body size is wayyy too large (JSON payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
-    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    const body = 'a'.repeat(1024 * 1024 * 2) // 2MB
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -396,11 +396,16 @@ describe(`${emailTransactionalRoute}/send`, () => {
         body,
       })
     // note: in practice, size of payload is limited by size specified in backend/.platform/nginx/conf.d/client_max_body_size.conf
-    expect(res.status).toBe(413)
+    expect(res.status).toBe(400)
+    expect(res.body).toStrictEqual({
+      code: 'api_validation',
+      message:
+        'body is a required string whose size must be less than or equal to 1MB in UTF-8 encoding',
+    })
     expect(mockSendEmail).not.toBeCalled()
   })
 
-  test.skip('Should throw 400 error if body size is too large (URL encoded payload)', async () => {
+  test('Should throw 400 error if body size is too large (URL encoded payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
     const res = await request(app)
@@ -414,9 +419,9 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(res.status).toBe(400)
   })
 
-  test.skip('Should throw 413 error if body size is wayy too large (URL encoded payload)', async () => {
+  test('Should throw 413 error if body size is wayy too large (URL encoded payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
-    const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
+    const body = 'a'.repeat(1024 * 1024 * 2) // 15MB
     const res = await request(app)
       .post(endpoint)
       .type('form')
@@ -426,10 +431,16 @@ describe(`${emailTransactionalRoute}/send`, () => {
         body,
       })
     // note: in practice, size of payload is limited by size specified in backend/.platform/nginx/conf.d/client_max_body_size.conf
-    expect(res.status).toBe(413)
+    expect(res.status).toBe(400)
+    expect(res.body).toStrictEqual({
+      code: 'api_validation',
+      message:
+        'body is a required string whose size must be less than or equal to 1MB in UTF-8 encoding',
+    })
+    expect(mockSendEmail).not.toBeCalled()
   })
 
-  test.skip('Should throw a 400 error if the body size is too large (multipart payload)', async () => {
+  test('Should throw a 400 error if the body size is too large (multipart payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const body = 'a'.repeat(1024 * 1024 * 5) // 5MB
     const res = await request(app)
@@ -444,7 +455,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
-  test.skip('Should throw a 400 error even if body size is wayyy too large because of truncation (multipart payload)', async () => {
+  test('Should throw a 400 error even if body size is wayyy too large because of truncation (multipart payload)', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const body = 'a'.repeat(1024 * 1024 * 15) // 15MB
     const res = await request(app)
@@ -460,7 +471,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
-  test.skip('Show throw 403 error is user is sending attachment from default email address', async () => {
+  test('Show throw 403 error is user is sending attachment from default email address', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const res = await request(app)
       .post(endpoint)
@@ -475,7 +486,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(mockSendEmail).not.toBeCalled()
   })
 
-  test.skip('Should throw an error if file type of attachment is not supported and correct error is saved in db', async () => {
+  test('Should throw an error if file type of attachment is not supported and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually an invalid file type; FileExtensionService checks magic number
     const invalidFileTypeAttachment = generateRandomFileSizeInMb(1)
@@ -525,7 +536,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(transactionalEmail?.errorCode).toBe(UNSUPPORTED_FILE_TYPE_ERROR_CODE)
   })
 
-  test.skip('Should throw an error if recipient is blacklisted and correct error is saved in db', async () => {
+  test('Should throw an error if recipient is blacklisted and correct error is saved in db', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     // not actually a blacklisted recipient
     const blacklistedRecipient = 'blacklisted@baddomain.com'
@@ -562,7 +573,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(transactionalEmail?.errorCode).toBe(BLACKLISTED_RECIPIENT_ERROR_CODE)
   })
 
-  test.skip('Should send email with a valid attachment and attachment metadata is saved correctly in db', async () => {
+  test('Should send email with a valid attachment and attachment metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue(true)
@@ -636,7 +647,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     ])
   })
 
-  test.skip('Email with attachment that exceeds size limit should fail', async () => {
+  test('Email with attachment that exceeds size limit should fail', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     const invalidAttachmentTooBig = generateRandomFileSizeInMb(10)
     const invalidAttachmentTooBigName = 'too big.txt'
@@ -664,7 +675,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(mockSendEmail).not.toBeCalled()
     // no need to check EmailMessageTransactional since this is rejected before db record is saved
   })
-  test.skip('Email with more than 10MB cumulative attachments should fail', async () => {
+  test('Email with more than 10MB cumulative attachments should fail', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     await EmailFromAddress.create({
       email: user.email,
@@ -692,7 +703,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     // no need to check EmailMessageTransactional since this is rejected before db record is saved
   })
 
-  test.skip('Should send email with two valid attachments and metadata is saved correctly in db', async () => {
+  test('Should send email with two valid attachments and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue(true)
@@ -776,7 +787,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     ])
   })
 
-  test.skip('Email with more than ten attachments should fail', async () => {
+  test('Email with more than ten attachments should fail', async () => {
     mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
     await EmailFromAddress.create({
       email: user.email,
@@ -808,7 +819,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     // no need to check EmailMessageTransactional since this is rejected before db record is saved
   })
 
-  test.skip('Requests should be rate limited and metadata and error code is saved correctly in db', async () => {
+  test('Requests should be rate limited and metadata and error code is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue(true)
@@ -848,7 +859,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     mockSendEmail.mockClear()
   })
 
-  test.skip('Requests should not be rate limited after window elasped and metadata is saved correctly in db', async () => {
+  test('Requests should not be rate limited after window elasped and metadata is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue(true)
@@ -944,7 +955,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
     },
     status: TransactionalEmailMessageStatus.Delivered,
   }
-  test.skip('Should return 200 with empty array when no messages are found', async () => {
+  test('Should return 200 with empty array when no messages are found', async () => {
     const res = await request(app)
       .get(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -953,7 +964,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
     expect(res.body.data).toEqual([])
   })
 
-  test.skip('Should return 200 with descending array of messages when messages are found', async () => {
+  test('Should return 200 with descending array of messages when messages are found', async () => {
     const message = await EmailMessageTransactional.create({
       ...deliveredMessage,
       userId: user.id,
@@ -985,7 +996,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
       },
     ])
   })
-  test.skip('Should return 400 when invalid query params are provided', async () => {
+  test('Should return 400 when invalid query params are provided', async () => {
     const resInvalidLimit = await request(app)
       .get(`${endpoint}?limit=invalid`)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -1030,7 +1041,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
       .set('Authorization', `Bearer ${apiKey}`)
     expect(resInvalidSortByPrefix.status).toBe(400)
   })
-  test.skip('default values of limit and offset should be 10 and 0 respectively', async () => {
+  test('default values of limit and offset should be 10 and 0 respectively', async () => {
     for (let i = 0; i < 15; i++) {
       await EmailMessageTransactional.create({
         ...deliveredMessage,
@@ -1073,7 +1084,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
     expect(res5.body.data.length).toBe(15)
   })
 
-  test.skip('status filter should work', async () => {
+  test('status filter should work', async () => {
     for (let i = 0; i < 5; i++) {
       await EmailMessageTransactional.create({
         ...deliveredMessage,
@@ -1125,7 +1136,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
       .set('Authorization', `Bearer ${apiKey}`)
     expect(res4.status).toBe(400)
   })
-  test.skip('created_at filter range should work', async () => {
+  test('created_at filter range should work', async () => {
     const messages = []
     const now = new Date()
     for (let i = 0; i < 10; i++) {
@@ -1171,7 +1182,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
     expect(res4.body.has_more).toBe(false)
     expect(res4.body.data.length).toBe(3)
   })
-  test.skip('sort_by should work', async () => {
+  test('sort_by should work', async () => {
     const messages = []
     const now = new Date()
     for (let i = 0; i < 10; i++) {
@@ -1222,7 +1233,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
       .set('Authorization', `Bearer ${apiKey}`)
     expect(res4.status).toBe(400)
   })
-  test.skip('combination of query params should work', async () => {
+  test('combination of query params should work', async () => {
     const messages = []
     const now = new Date()
     for (let i = 0; i < 15; i++) {
@@ -1271,7 +1282,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
 
 describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
   const endpoint = emailTransactionalRoute
-  test.skip('should return a transactional email message with corresponding ID', async () => {
+  test('should return a transactional email message with corresponding ID', async () => {
     const message = await EmailMessageTransactional.create({
       userId: user.id,
       recipient: 'recipient@agency.gov.sg',
@@ -1291,7 +1302,7 @@ describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
     expect(res.body.id).toBe(message.id)
   })
 
-  test.skip('should return 404 if the transactional email message ID not found', async () => {
+  test('should return 404 if the transactional email message ID not found', async () => {
     const id = 69
     const res = await request(app)
       .get(`${endpoint}/${id}`)
@@ -1300,7 +1311,7 @@ describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
     expect(res.body.message).toBe(`Email message with ID ${id} not found.`)
   })
 
-  test.skip('should return 404 if the transactional email message belongs to another user', async () => {
+  test('should return 404 if the transactional email message belongs to another user', async () => {
     const anotherUser = await User.create({
       id: 2,
       email: 'user_2@agency.gov.sg',

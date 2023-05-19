@@ -284,6 +284,16 @@ export const InitEmailMiddleware = (
         fromAddress,
         action: 'existsFromAddress',
       })
+      if (req.body.emailMessageTransactionalId) {
+        void EmailMessageTransactional.update(
+          {
+            errorCode: `Error 400: ${UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE}`,
+          },
+          {
+            where: { id: req.body.emailMessageTransactionalId },
+          }
+        )
+      }
       throw new ApiInvalidFromAddressError(
         UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE
       )

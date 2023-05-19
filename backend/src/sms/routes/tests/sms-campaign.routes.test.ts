@@ -99,8 +99,9 @@ describe('POST /campaign/{campaignId}/sms/credentials', () => {
         recipient: '98765432',
       })
 
-    expect(res.status).toBe(400)
+    expect(res.status).toBe(403)
     expect(res.body).toEqual({
+      code: 'unauthorized',
       message: `Campaign cannot use demo credentials. ${DefaultCredentialName.SMS} is not allowed.`,
     })
   })
@@ -117,8 +118,9 @@ describe('POST /campaign/{campaignId}/sms/credentials', () => {
         recipient: '98765432',
       })
 
-    expect(res.status).toBe(400)
+    expect(res.status).toBe(403)
     expect(res.body).toEqual({
+      code: 'unauthorized',
       message: `Demo campaign must use demo credentials. ${NON_DEMO_CREDENTIAL_LABEL} is not allowed.`,
     })
 
@@ -179,8 +181,9 @@ describe('POST /campaign/{campaignId}/sms/new-credentials', () => {
         twilio_messaging_service_sid: 'twilio_messaging_service_sid',
       })
 
-    expect(res.status).toBe(400)
+    expect(res.status).toBe(403)
     expect(res.body).toEqual({
+      code: 'unauthorized',
       message: `Action not allowed for demo campaign`,
     })
 
@@ -208,7 +211,8 @@ describe('POST /campaign/{campaignId}/sms/new-credentials', () => {
 
     expect(res.status).toBe(400)
     expect(res.body).toEqual({
-      message: `Error: ${ERROR_MESSAGE}`,
+      code: 'invalid_credentials',
+      message: 'Some Error',
     })
 
     expect(mockSecretsManager.createSecret).not.toHaveBeenCalled()
@@ -329,6 +333,7 @@ describe('PUT /campaign/{id}/sms/template', () => {
       })
     expect(res.status).toBe(400)
     expect(res.body).toEqual({
+      code: 'invalid_template',
       message:
         'Message template is invalid as it only contains invalid HTML tags!',
     })
@@ -343,6 +348,7 @@ describe('PUT /campaign/{id}/sms/template', () => {
 
     expect(testBody.status).toBe(400)
     expect(testBody.body).toEqual({
+      code: 'invalid_template',
       message:
         'Message template is invalid as it only contains invalid HTML tags!',
     })
@@ -409,6 +415,7 @@ describe('GET /campaign/{id}/sms/upload/start', () => {
 
     expect(res.status).toBe(500)
     expect(res.body).toEqual({
+      code: 'internal_server',
       message: 'Unable to generate presigned URL',
     })
     mockGetUploadParameters.mockRestore()

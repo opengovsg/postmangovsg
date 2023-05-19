@@ -6,6 +6,7 @@ import { InitCredentialService, RedisService } from '@core/services'
 import { ChannelType } from '@core/constants'
 import { TelegramMiddleware } from '@telegram/middlewares/telegram.middleware'
 import { InitTelegramMiddleware } from '..'
+import { ApiAuthorizationError } from '@core/errors/rest-api.errors'
 
 let sequelize: Sequelize
 let campaignId: number
@@ -46,18 +47,19 @@ afterAll(async () => {
 })
 
 describe('isTelegramCampaignOwnedByUser middleware', () => {
-  test('Returns 403 campaign does not belong to user', async () => {
+  test('Throw ApiAuthorizationError if campaign does not belong to user', async () => {
     mockRequest = {
       params: { campaignId: String(campaignId) },
       session: { user: { id: 2 } } as any,
     }
 
-    await telegramMiddleware.isTelegramCampaignOwnedByUser(
-      mockRequest as Request,
-      mockResponse as Response,
-      nextFunction
-    )
-    expect(mockResponse.sendStatus).toBeCalledWith(403)
+    await expect(
+      telegramMiddleware.isTelegramCampaignOwnedByUser(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction
+      )
+    ).rejects.toBeInstanceOf(ApiAuthorizationError)
   })
 
   test('Returns next middleware when campaign belongs to user', async () => {

@@ -4,6 +4,7 @@ import { Campaign, JobQueue, User } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { ChannelType, JobStatus } from '@core/constants'
 import { CampaignMiddleware } from '@core/middlewares/campaign.middleware'
+import { ApiAuthorizationError } from '@core/errors/rest-api.errors'
 
 let sequelize: Sequelize
 let mockRequest: Partial<Request>
@@ -33,7 +34,7 @@ afterAll(async () => {
 })
 
 describe('canEditCampaign middleware', () => {
-  test('Should respond with 403 if campaign has a job in progress', async () => {
+  test('Should throw ApiAuthorizationError if campaign has a job in progress', async () => {
     const campaign = await Campaign.create({
       name: 'campaign-1',
       userId: 1,
@@ -50,12 +51,13 @@ describe('canEditCampaign middleware', () => {
       params: { campaignId: String(campaign.id) },
     }
 
-    await CampaignMiddleware.canEditCampaign(
-      mockRequest as Request,
-      mockResponse as Response,
-      nextFunction
-    )
-    expect(mockResponse.sendStatus).toBeCalledWith(403)
+    await expect(
+      CampaignMiddleware.canEditCampaign(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction
+      )
+    ).rejects.toBeInstanceOf(ApiAuthorizationError)
   })
 
   test('Should respond with 403 if campaign has an upload in progress', async () => {
@@ -71,12 +73,13 @@ describe('canEditCampaign middleware', () => {
       params: { campaignId: String(campaign.id) },
     }
 
-    await CampaignMiddleware.canEditCampaign(
-      mockRequest as Request,
-      mockResponse as Response,
-      nextFunction
-    )
-    expect(mockResponse.sendStatus).toBeCalledWith(403)
+    await expect(
+      CampaignMiddleware.canEditCampaign(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction
+      )
+    ).rejects.toBeInstanceOf(ApiAuthorizationError)
   })
 
   test('Returns next middleware if campaign has no job or upload in progress', async () => {

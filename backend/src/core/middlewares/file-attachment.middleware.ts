@@ -27,9 +27,11 @@ const fileUploadHandler = fileUpload({
     fieldSize: BODY_SIZE_LIMIT + 1,
   },
   abortOnLimit: true,
-  limitHandler: function (_: Request, _res: Response, _next: NextFunction) {
-    throw new ApiAttachmentLimitError(
-      'Size of one or more attachments exceeds limit'
+  limitHandler: function (_: Request, _res: Response, next: NextFunction) {
+    next(
+      new ApiAttachmentLimitError(
+        'Size of one or more attachments exceeds limit'
+      )
     )
   },
 })

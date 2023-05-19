@@ -75,8 +75,9 @@ describe('POST /campaign/{campaignId}/telegram/credentials', () => {
         label: DefaultCredentialName.Telegram,
       })
 
-    expect(res.status).toBe(400)
+    expect(res.status).toBe(403)
     expect(res.body).toEqual({
+      code: 'unauthorized',
       message: `Campaign cannot use demo credentials. ${DefaultCredentialName.Telegram} is not allowed.`,
     })
 
@@ -94,8 +95,9 @@ describe('POST /campaign/{campaignId}/telegram/credentials', () => {
         label: NON_DEMO_CREDENTIAL_LABEL,
       })
 
-    expect(res.status).toBe(400)
+    expect(res.status).toBe(403)
     expect(res.body).toEqual({
+      code: 'unauthorized',
       message: `Demo campaign must use demo credentials. ${NON_DEMO_CREDENTIAL_LABEL} is not allowed.`,
     })
 
@@ -155,9 +157,10 @@ describe('POST /campaign/{campaignId}/telegram/new-credentials', () => {
         telegram_bot_token: FAKE_API_TOKEN,
       })
 
-    expect(res.status).toBe(400)
+    expect(res.status).toBe(403)
     expect(res.body).toEqual({
-      message: `Action disabled for demo campaign`,
+      code: 'unauthorized',
+      message: 'Action not allowed for demo campaign',
     })
 
     expect(mockSecretsManager.createSecret).not.toHaveBeenCalled()
@@ -180,7 +183,8 @@ describe('POST /campaign/{campaignId}/telegram/new-credentials', () => {
 
     expect(res.status).toBe(400)
     expect(res.body).toEqual({
-      message: `Error: Invalid token. ${TELEGRAM_ERROR_STRING}`,
+      code: 'invalid_credentials',
+      message: `Invalid token. ${TELEGRAM_ERROR_STRING}`,
     })
 
     expect(mockSecretsManager.createSecret).not.toHaveBeenCalled()
@@ -232,6 +236,7 @@ describe('PUT /campaign/{campaignId}/telegram/template', () => {
 
     expect(testBody.status).toBe(400)
     expect(testBody.body).toEqual({
+      code: 'invalid_template',
       message:
         'Message template is invalid as it only contains invalid HTML tags!',
     })

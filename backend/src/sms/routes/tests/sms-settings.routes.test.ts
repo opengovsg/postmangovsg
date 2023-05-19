@@ -46,7 +46,8 @@ describe('POST /settings/sms/credentials', () => {
     })
     expect(res.status).toBe(400)
     expect(res.body).toEqual({
-      message: `Error: ${ERROR_MESSAGE}`,
+      code: 'invalid_credentials',
+      message: ERROR_MESSAGE,
     })
 
     expect(mockSecretsManager.createSecret).not.toHaveBeenCalled()

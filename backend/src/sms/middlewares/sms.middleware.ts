@@ -107,7 +107,7 @@ export const InitSmsMiddleware = (
     if (label === DefaultCredentialName.SMS) {
       return formatDefaultCredentialName(label)
     } else {
-      throw new Error(
+      throw new ApiAuthorizationError(
         `Demo campaign must use demo credentials. ${label} is not allowed.`
       )
     }

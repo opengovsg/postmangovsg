@@ -80,7 +80,7 @@ export const InitTelegramMiddleware = (
     if (label === DefaultCredentialName.Telegram) {
       return formatDefaultCredentialName(label)
     } else {
-      throw new Error(
+      throw new ApiAuthorizationError(
         `Demo campaign must use demo credentials. ${label} is not allowed.`
       )
     }
@@ -91,7 +91,7 @@ export const InitTelegramMiddleware = (
   ): Promise<string> => {
     // Non-demo campaigns cannot use default credentials
     if (label === DefaultCredentialName.Telegram) {
-      throw new Error(
+      throw new ApiAuthorizationError(
         `Campaign cannot use demo credentials. ${label} is not allowed.`
       )
     } else {
@@ -126,15 +126,16 @@ export const InitTelegramMiddleware = (
       label,
       action: 'getCredentialsFromLabel',
     }
-    try {
-      /* Determine if credential name can be used */
-      const campaign = campaignId
-        ? await TelegramService.findCampaign(+campaignId, userId)
-        : null
-      const credentialName = campaign?.demoMessageLimit
-        ? getDemoCredentialName(label)
-        : await getCredentialName(label, +userId)
 
+    /* Determine if credential name can be used */
+    const campaign = campaignId
+      ? await TelegramService.findCampaign(+campaignId, userId)
+      : null
+    const credentialName = campaign?.demoMessageLimit
+      ? getDemoCredentialName(label)
+      : await getCredentialName(label, +userId)
+
+    try {
       const telegramBotToken = await credentialService.getTelegramCredential(
         credentialName
       )

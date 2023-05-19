@@ -6,6 +6,7 @@ import { InitCredentialService, RedisService } from '@core/services'
 import { ChannelType } from '@core/constants'
 import { SmsMiddleware } from '@sms/middlewares/sms.middleware'
 import { InitSmsMiddleware } from '..'
+import { ApiAuthorizationError } from '@core/errors/rest-api.errors'
 
 let sequelize: Sequelize
 let campaignId: number
@@ -44,18 +45,19 @@ afterAll(async () => {
 })
 
 describe('isSmsCampaignOwnedByUser middleware', () => {
-  test('Returns 403 campaign does not belong to user', async () => {
+  test('Throws ApiAuthorizationError if campaign does not belong to user', async () => {
     mockRequest = {
       params: { campaignId: String(campaignId) },
       session: { user: { id: 2 } } as any,
     }
 
-    await smsMiddleware.isSmsCampaignOwnedByUser(
-      mockRequest as Request,
-      mockResponse as Response,
-      nextFunction
-    )
-    expect(mockResponse.sendStatus).toBeCalledWith(403)
+    await expect(
+      smsMiddleware.isSmsCampaignOwnedByUser(
+        mockRequest as Request,
+        mockResponse as Response,
+        nextFunction
+      )
+    ).rejects.toBeInstanceOf(ApiAuthorizationError)
   })
 
   test('Returns next middleware when campaign belongs to user', async () => {
