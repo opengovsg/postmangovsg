@@ -13,6 +13,7 @@ on:
 
 env:
   SLACK_CHANNEL_ID: C04H0FTGS5P # postman-deploys
+  ENVIRONMENT: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
 
 concurrency: deploy-non-serverless-${{ github.ref }}
 
@@ -81,9 +82,15 @@ jobs:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
   deploy-backend:
-    name: Deploy backend to AWS Elastic Beanstalk
-    uses: ./.github/workflows/deploy-eb.yml
-    secrets: inherit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Deploy backend to AWS Elastic Container Service (production)
+        uses: ./.github/workflows/deploy-backend-production.yml
+        if: env.ENVIRONMENT == 'production'
+      - name: Deploy backend to AWS Elastic Container Service (staging)
+        uses: ./.github/workflows/deploy-backend-staging.yml
+        if: env.ENVIRONMENT == 'staging'
   deploy-worker:
     name: Deploy worker to AWS Elastic Container Service
     uses: ./.github/workflows/deploy-worker.yml
@@ -122,8 +129,6 @@ jobs:
             ${{ needs.deploy-worker.outputs.sending_revert_command }}
             ${{ needs.deploy-worker.outputs.logging_revert_command }}
             ${{ needs.deploy-frontend.outputs.revert_command }}
-            ${{ needs.deploy-backend.outputs.revert_command_backend }}
-            ${{ needs.deploy-backend.outputs.revert_command_callback }}
           fi
 
   slack-success:

@@ -1,0 +1,27 @@
+name: Deploy to staging
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+on:
+  push:
+    branches:
+      - staging
+
+jobs:
+  deploy:
+    name: Deploy
+    uses: ./.github/workflows/deploy-backend.yml
+    with:
+      # eventually to switch over to a staging AWS account
+      environment: "stg"
+      aws-account-id: "454894717801"
+      cicd-role: "arn:aws:iam::454894717801:role/postmangovsg-github-cicd"
+      ecr-repository: "postman"
+      ecs-cluster-name: "postman-ecs"
+      ecs-service-name: "postman-ecs-service"
+      ecs-container-name: "backend"
+      codedeploy-application: "postman-ecs-app"
+      codedeploy-deployment-group: "postman-ecs-dg"
+      release-version: ${{ github.sha }}
