@@ -1,0 +1,9 @@
+version: 1
+Resources:
+  - TargetService:
+      Type: 'AWS::ECS::Service'
+      Properties:
+        TaskDefinition: 'arn:aws:ecs:ap-southeast-1:<AWS_ACCOUNT_ID>:task-definition/postman:1'
+        LoadBalancerInfo:
+          ContainerName: backend
+          ContainerPort: 8080
