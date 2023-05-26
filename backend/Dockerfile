@@ -4,11 +4,14 @@ WORKDIR /usr/home/postmangovsg
 COPY shared ../shared
 RUN cd ../shared && npm ci
 
-COPY tsconfig.* ./
-COPY ./package* ./
+COPY backend/tsconfig.* ./
+COPY backend/package* ./
+# required for node-gyp
+RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \
+  g++ make python3 python3-dev py3-pip tini
 RUN npm ci
 
-COPY src ./src
+COPY backend/src ./src
 
 RUN npm run build
 RUN cd ../shared && npm run postbuild
@@ -33,7 +36,7 @@ ENV NODE_ENV=production
 
 # expose port and copy these files first as they're unlikely to change
 EXPOSE 4000
-COPY ./docker-entrypoint.sh ./
+COPY backend/docker-entrypoint.sh ./
 RUN ["chmod", "+x", "docker-entrypoint.sh"]
 
 COPY --from=builder /usr/home/shared/package* ../shared/
@@ -44,7 +47,7 @@ RUN npm install
 
 COPY --from=builder /usr/home/shared/build ../shared/build
 
-COPY openapi.yaml ./
+COPY backend/openapi.yaml ./
 COPY --from=builder /usr/home/postmangovsg/build ./build
 
 ENTRYPOINT [ "tini", "--" ]

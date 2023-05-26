@@ -82,7 +82,7 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          docker build backend -t ${{ steps.ecr-image-uri.outputs.image }}
+          docker build . -t ${{ steps.ecr-image-uri.outputs.image }} -f backend/Dockerfile
           docker push ${{ steps.ecr-image-uri.outputs.image }}
 
   deploy:
