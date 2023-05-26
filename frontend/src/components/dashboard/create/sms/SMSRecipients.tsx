@@ -1,8 +1,7 @@
 import { i18n } from '@lingui/core'
 
-import { useState, useEffect, useContext } from 'react'
-
 import type { Dispatch, SetStateAction } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
@@ -13,38 +12,34 @@ import styles from '../Create.module.scss'
 import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
 import { ChannelType, List } from 'classes'
 import {
-  FileInput,
+  ButtonGroup,
+  Checkbox,
   CsvUpload,
   ErrorBlock,
-  PreviewBlock,
-  NextButton,
-  SampleCsv,
-  ButtonGroup,
-  TextButton,
-  StepSection,
-  StepHeader,
+  FileInput,
   InfoBlock,
+  NextButton,
+  PreviewBlock,
+  SampleCsv,
+  StepHeader,
+  StepSection,
+  TextButton,
   WarningBlock,
-  Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import {
-  ManagedListInfoBlock,
-  ManagedListSection,
-} from 'components/experimental'
+import { ManagedListSection } from 'components/experimental'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { updateCampaign as apiUpdateCampaign } from 'services/campaign.service'
 import { sendTiming } from 'services/ga.service'
-import { selectList, getListsByChannel } from 'services/list.service'
+import { getListsByChannel, selectList } from 'services/list.service'
+import type { CsvStatusResponse } from 'services/upload.service'
 import {
-  uploadFileToS3,
   deleteCsvStatus,
   getCsvStatus,
+  uploadFileToS3,
 } from 'services/upload.service'
-
-import type { CsvStatusResponse } from 'services/upload.service'
 
 const SMSRecipients = ({
   setActiveStep,
@@ -166,8 +161,8 @@ const SMSRecipients = ({
 
   // If shouldSaveList is modified, send info to backend
   useEffect(() => {
-    void apiUpdateCampaign(campaignId as string, { shouldSaveList })
-  }, [campaignId, shouldSaveList])
+    void apiUpdateCampaign(campaignId as string, {})
+  }, [campaignId])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -214,7 +209,6 @@ const SMSRecipients = ({
           title="Upload recipient list in CSV format"
           subtitle="Step 2"
         >
-          <ManagedListInfoBlock />
           <p>
             Only CSV format files are allowed. If you have an Excel file, please
             convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
