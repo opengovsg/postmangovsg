@@ -82,7 +82,7 @@ jobs:
         env:
           DOCKER_BUILDKIT: 1
         run: |
-          docker build . -t ${{ steps.ecr-image-uri.outputs.image }}
+          docker build backend -t ${{ steps.ecr-image-uri.outputs.image }}
           docker push ${{ steps.ecr-image-uri.outputs.image }}
 
   deploy:
@@ -113,10 +113,10 @@ jobs:
 
       - name: Replace variables in task definition file
         run: |
-          sed -i 's/<AWS_ACCOUNT_ID>/${{ inputs.aws-account-id }}/g' ecs-task-definition.json
-          sed -i 's/<ENVIRONMENT>/${{ inputs.environment }}/g' ecs-task-definition.json
-          sed -i 's/<AWS_ACCOUNT_ID>/${{ inputs.aws-account-id }}/g' appspec.json
-          sed -i 's/<ENVIRONMENT>/${{ inputs.environment }}/g' appspec.json
+          sed -i 's/<AWS_ACCOUNT_ID>/${{ inputs.aws-account-id }}/g' backend/ecs-task-definition.json
+          sed -i 's/<ENVIRONMENT>/${{ inputs.environment }}/g' backend/ecs-task-definition.json
+          sed -i 's/<AWS_ACCOUNT_ID>/${{ inputs.aws-account-id }}/g' backend/appspec.yml
+          sed -i 's/<ENVIRONMENT>/${{ inputs.environment }}/g' backend/appspec.yml
 
       - name: Fill in the new image ID in the Amazon ECS task definition
         id: server-task-def
