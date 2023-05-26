@@ -1,4 +1,4 @@
-name: Deploy to staging
+name: Deploy to production
 
 concurrency:
   group: ${{ github.ref }}
@@ -7,14 +7,14 @@ concurrency:
 on:
   push:
     branches:
-      - staging
+      - master
 
 jobs:
   deploy:
     name: Deploy
     uses: ./.github/workflows/deploy-backend.yml
     with:
-      environment: "stg"
+      environment: "prod"
       aws-account-id: "454894717801"
       cicd-role: "arn:aws:iam::454894717801:role/postmangovsg-github-cicd"
       ecr-repository: "postman"
