@@ -122,7 +122,7 @@ jobs:
         id: server-task-def
         uses: aws-actions/amazon-ecs-render-task-definition@v1
         with:
-          task-definition: ecs-task-definition.json
+          task-definition: backend/ecs-task-definition.json
           container-name: ${{ inputs.ecs-container-name }}
           image: ${{ steps.ecr-image-uri.outputs.image }}
 
@@ -132,7 +132,7 @@ jobs:
           task-definition: ${{ steps.server-task-def.outputs.task-definition }}
           cluster: ${{ inputs.ecs-cluster-name }}
           service: ${{ inputs.ecs-service-name }}
-          codedeploy-appspec: appspec.json
+          codedeploy-appspec: backend/appspec.yml
           codedeploy-application: ${{ inputs.codedeploy-application }}
           codedeploy-deployment-group: ${{ inputs.codedeploy-deployment-group }}
           wait-for-service-stability: true

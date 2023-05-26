@@ -81,16 +81,6 @@ jobs:
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
 
-  deploy-backend:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - name: Deploy backend to AWS Elastic Container Service (production)
-        uses: ./.github/workflows/deploy-backend-production.yml
-        if: env.ENVIRONMENT == 'production'
-      - name: Deploy backend to AWS Elastic Container Service (staging)
-        uses: ./.github/workflows/deploy-backend-staging.yml
-        if: env.ENVIRONMENT == 'staging'
   deploy-worker:
     name: Deploy worker to AWS Elastic Container Service
     uses: ./.github/workflows/deploy-worker.yml
@@ -102,7 +92,6 @@ jobs:
 
   e2e-test:
     needs:
-      - deploy-backend
       - deploy-frontend
       - deploy-worker
     name: End-to-end Test
@@ -112,7 +101,6 @@ jobs:
   revert-on-e2e-failure:
     runs-on: ubuntu-latest
     needs:
-      - deploy-backend
       - deploy-frontend
       - deploy-worker
       - e2e-test
@@ -185,7 +173,6 @@ jobs:
       # we include the deploy jobs here as we want to update the message to FAILED
       # as well when the deploy jobs fail. We didn't need to include for succes
       # because e2e-test has a pre-requisite of deploy jobs to have succeeded
-      - deploy-backend
       - deploy-frontend
       - deploy-worker
       - e2e-test
