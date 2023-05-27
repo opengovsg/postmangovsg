@@ -101,8 +101,8 @@
   "requiresCompatibilities": [
     "FARGATE"
   ],
-  "taskRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/postman-backend-ecs-task-role",
-  "executionRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/postman-backend-ecs-task-exec-role",
+  "taskRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/postman-ecs-task-role",
+  "executionRoleArn": "arn:aws:iam::<AWS_ACCOUNT_ID>:role/postman-ecs-task-exec-role",
   "cpu": "1024",
   "memory": "8192"
 }

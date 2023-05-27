@@ -6,10 +6,11 @@
 # Side note: we need to follow .github/workflows convention https://docs.github.com/en/actions/using-workflows/reusing-workflows
 name: Deploy and E2E test non-serverless stuffs
 on:
-  push:
-    branches:
-      - staging
-      - master
+  workflow_dispatch:
+  # push:
+  #   branches:
+  #     - staging
+  #     - master
 
 env:
   SLACK_CHANNEL_ID: C04H0FTGS5P # postman-deploys
