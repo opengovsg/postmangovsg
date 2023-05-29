@@ -15,7 +15,7 @@ jobs:
     uses: ./.github/workflows/deploy-backend.yml
     with:
       # eventually to switch over to a staging AWS account
-      environment: "stg"
+      environment: "staging"
       aws-account-id: "454894717801"
       cicd-role: "arn:aws:iam::454894717801:role/postmangovsg-github-cicd"
       ecr-repository: "postman"

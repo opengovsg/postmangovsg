@@ -14,7 +14,7 @@ jobs:
     name: Deploy
     uses: ./.github/workflows/deploy-backend.yml
     with:
-      environment: "prod"
+      environment: "production"
       aws-account-id: "454894717801"
       cicd-role: "arn:aws:iam::454894717801:role/postmangovsg-github-cicd"
       ecr-repository: "postman"

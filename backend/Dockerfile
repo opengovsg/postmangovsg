@@ -1,14 +1,15 @@
 FROM public.ecr.aws/docker/library/node:18-alpine as builder
 WORKDIR /usr/home/postmangovsg
 
-COPY shared ../shared
-RUN cd ../shared && npm ci
-
 COPY backend/tsconfig.* ./
-COPY backend/package* ./
 # required for node-gyp
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \
   g++ make python3 python3-dev py3-pip tini
+
+COPY shared ../shared
+RUN cd ../shared && npm ci
+
+COPY backend/package* ./
 RUN npm ci
 
 COPY backend/src ./src
@@ -22,6 +23,7 @@ FROM public.ecr.aws/docker/library/node:18-alpine
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \
   g++ make python3 python3-dev py3-pip tini
 
+# required to convert .json from Secrets Manager into .env file in docker-entrypoint.sh
 RUN apk add jq
 
 RUN python3 -m pip install awscli
