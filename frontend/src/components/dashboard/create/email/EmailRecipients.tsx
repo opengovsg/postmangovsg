@@ -14,7 +14,7 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import { EmailPreview, EmailProgress } from 'classes'
+import { AgencyList, EmailPreview, EmailProgress } from 'classes'
 import {
   ButtonGroup,
   CsvUpload,
@@ -33,9 +33,8 @@ import {
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
-
-import { updateCampaign as apiUpdateCampaign } from 'services/campaign.service'
 import { sendTiming } from 'services/ga.service'
+import { getPhonebookListsByChannel } from 'services/phonebook.service'
 import {
   CsvStatusResponse,
   deleteCsvStatus,
@@ -75,6 +74,9 @@ const EmailRecipients = ({
   const { id: campaignId } = useParams<{ id: string }>()
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
+  const [phonebookLists, setPhonebookLists] = useState<
+    { label: string; value: string }[]
+  >([])
 
   // Poll csv status
   useEffect(() => {
@@ -123,10 +125,18 @@ const EmailRecipients = ({
     })
   }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
-  // If shouldSaveList is modified, send info to backend
+  // On load, retrieve the list of phonebook lists
   useEffect(() => {
-    void apiUpdateCampaign(campaignId as string, {})
-  }, [campaignId])
+    void retrieveAndPopulatePhonebookLists()
+  }, [])
+  async function retrieveAndPopulatePhonebookLists() {
+    const lists = await getPhonebookListsByChannel({ channel: campaign.type })
+    setPhonebookLists(
+      lists.map((l: AgencyList) => {
+        return { label: l.name, value: l.id.toString() }
+      })
+    )
+  }
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -183,14 +193,15 @@ const EmailRecipients = ({
           onSelect={() => {
             return
           }}
-          options={[{ label: 'test', value: 'test' }]}
-          defaultLabel={'test'}
+          options={phonebookLists}
+          // this or the saved contact list
+          defaultLabel={phonebookLists[0]?.label}
           aria-label="Phonebook list"
         ></Dropdown>
         <InfoBlock>
           <p>
             If your Phonebook contact list is not listed,{' '}
-            <TextButton onClick={() => console.log('clicked')}>
+            <TextButton onClick={retrieveAndPopulatePhonebookLists}>
               click here to refresh.
             </TextButton>
           </p>
