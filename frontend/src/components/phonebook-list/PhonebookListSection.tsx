@@ -28,32 +28,30 @@ export const PhonebookListSection = ({
         </p>
       </StepHeader>
       <Dropdown
-        onSelect={(selected) => {
-          setSelectedPhonebookListId(+selected)
-        }}
+        onSelect={(selected) => setSelectedPhonebookListId(+selected)}
+        disabled={!phonebookLists.length}
         options={phonebookLists}
-        // this or the saved contact list
-        defaultLabel={phonebookLists[0]?.label}
-        aria-label="Phonebook list"
+        aria-label="Phonebook list selector"
       ></Dropdown>
       <InfoBlock>
         <p>
-          If your Phonebook contact list is not listed,{' '}
+          If your Phonebook contact list is not listed, &nbsp;
           <TextButton onClick={retrieveAndPopulatePhonebookLists}>
             click here to refresh.
           </TextButton>
         </p>
         <p>
-          New to Phonebook? Log in{' '}
+          New to Phonebook? Log in &nbsp;
           <OutboundLink
             eventLabel={'https://phonebook.gov.sg'}
             to={'https://phonebook.gov.sg'}
             target="_blank"
           >
             here
-          </OutboundLink>{' '}
-          to start managing your contacts and allow your recipients to update
-          their contact details through Postman’s Public Phonebook Portal.
+          </OutboundLink>
+          &nbsp; to start managing your contacts and allow your recipients to
+          update their contact details through Postman’s Public Phonebook
+          Portal.
         </p>
       </InfoBlock>
     </StepSection>

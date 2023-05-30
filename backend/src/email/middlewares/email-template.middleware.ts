@@ -283,9 +283,7 @@ export const InitEmailTemplateMiddleware = (
       filename,
     })
 
-    res.status(202).json({ list_id: listId })
-
-    return
+    return res.status(202).json({ list_id: listId })
   }
 
   /*

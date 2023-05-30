@@ -3,6 +3,7 @@ import { i18n } from '@lingui/core'
 import {
   Dispatch,
   SetStateAction,
+  useCallback,
   useContext,
   useEffect,
   useState,
@@ -18,9 +19,11 @@ import { AgencyList, EmailPreview, EmailProgress } from 'classes'
 import {
   ButtonGroup,
   CsvUpload,
+  Dropdown,
   EmailPreviewBlock,
   ErrorBlock,
   FileInput,
+  InfoBlock,
   NextButton,
   SampleCsv,
   StepHeader,
@@ -29,7 +32,6 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import { PhonebookListSection } from 'components/phonebook-list/PhonebookListSection'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
@@ -76,7 +78,7 @@ const EmailRecipients = ({
   const { id: campaignId } = useParams<{ id: string }>()
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
-  const [phonebookLists, setPhonebookLists] = useState<
+  const [phonebookList, setPhonebookList] = useState<
     { label: string; value: string }[]
   >([])
   const [selectedPhonebookListId, setSelectedPhonebookListId] =
@@ -148,18 +150,18 @@ const EmailRecipients = ({
     })
   }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
-  // On load, retrieve the list of phonebook lists
-  useEffect(() => {
-    void retrieveAndPopulatePhonebookLists()
-  })
-  async function retrieveAndPopulatePhonebookLists() {
+  const retrieveAndPopulatePhonebookLists = useCallback(async () => {
     const lists = await getPhonebookListsByChannel({ channel: campaign.type })
-    setPhonebookLists(
+    setPhonebookList(
       lists.map((l: AgencyList) => {
         return { label: l.name, value: l.id.toString() }
       })
     )
-  }
+  }, [campaign.type])
+  // On load, retrieve the list of phonebook lists
+  useEffect(() => {
+    void retrieveAndPopulatePhonebookLists()
+  }, [campaignId])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -202,11 +204,41 @@ const EmailRecipients = ({
 
   return (
     <>
-      <PhonebookListSection
-        phonebookLists={phonebookLists}
-        setSelectedPhonebookListId={setSelectedPhonebookListId}
-        retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
-      />
+      <StepSection>
+        <StepHeader title="Select Phonebook contact list" subtitle="Step 2">
+          <p>
+            All your saved contact lists in Phonebook will automatically appear
+            here.
+          </p>
+        </StepHeader>
+        <Dropdown
+          onSelect={(selected) => setSelectedPhonebookListId(+selected)}
+          disabled={!phonebookList.length}
+          options={phonebookList}
+          aria-label="Phonebook list selector"
+        ></Dropdown>
+        <InfoBlock>
+          <p>
+            If your Phonebook contact list is not listed, &nbsp;
+            <TextButton onClick={retrieveAndPopulatePhonebookLists}>
+              click here to refresh.
+            </TextButton>
+          </p>
+          <p>
+            New to Phonebook? Log in &nbsp;
+            <OutboundLink
+              eventLabel={'https://phonebook.gov.sg'}
+              to={'https://phonebook.gov.sg'}
+              target="_blank"
+            >
+              here
+            </OutboundLink>
+            &nbsp; to start managing your contacts and allow your recipients to
+            update their contact details through Postman’s Public Phonebook
+            Portal.
+          </p>
+        </InfoBlock>
+      </StepSection>
       <StepSection>
         <StepHeader title="Upload CSV File">
           <p>

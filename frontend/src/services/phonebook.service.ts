@@ -23,7 +23,7 @@ export async function selectPhonebookList({
   listId: number
 }): Promise<void> {
   try {
-    return await axios.post(`/campaign/${campaignId}/select-phonebook-list`, {
+    return await axios.post(`/campaign/${campaignId}/select-phonebook-lists`, {
       list_id: listId,
     })
   } catch (e) {
