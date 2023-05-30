@@ -32,6 +32,7 @@ import {
   TextAlignControl,
   InlineControl,
   FontColorControl,
+  InlineAttachmentControl,
 } from './controls'
 import {
   VariableDecorator,
@@ -123,7 +124,10 @@ const TOOLBAR_OPTIONS = {
   },
 }
 
-const TOOLBAR_CUSTOM_BUTTONS = [<TableControl key="tableOption" />]
+const TOOLBAR_CUSTOM_BUTTONS = [
+  <TableControl key="tableOption" />,
+  <InlineAttachmentControl key="attachmentOption" />,
+]
 
 const defaultValue = {
   editorState: EditorState.createEmpty(),
