@@ -47,4 +47,16 @@ export default class PhonebookClient {
       throw new Error(err as any)
     }
   }
+
+  public async getManagedListById(listId: number) {
+    try {
+      const res = await this.request({
+        method: 'get',
+        url: `managed-list/${listId}/members/s3`,
+      })
+      return res.data
+    } catch (err) {
+      throw new Error(err as any)
+    }
+  }
 }

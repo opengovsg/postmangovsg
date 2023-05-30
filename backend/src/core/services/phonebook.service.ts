@@ -12,7 +12,7 @@ const phonebookClient: PhonebookClient = new PhonebookClient(
   config.get('phonebook.version')
 )
 
-const getManagedLists = async ({
+const getPhonebookLists = async ({
   userId,
   channel,
 }: {
@@ -32,6 +32,15 @@ const getManagedLists = async ({
   return res
 }
 
+const getPhonebookListById = async ({
+  listId,
+}: {
+  listId: number
+}): Promise<any> => {
+  return await phonebookClient.getManagedListById(listId)
+}
+
 export const PhonebookService = {
-  getManagedLists,
+  getPhonebookLists,
+  getPhonebookListById,
 }

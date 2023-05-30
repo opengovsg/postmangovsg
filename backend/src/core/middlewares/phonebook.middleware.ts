@@ -17,7 +17,7 @@ const getListsByChannel = async (
   const userId = req.session?.user?.id
   const { channel } = req.params
 
-  const lists = await PhonebookService.getManagedLists({
+  const lists = await PhonebookService.getPhonebookLists({
     userId,
     channel: channel as ChannelType,
   })

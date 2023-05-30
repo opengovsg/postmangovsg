@@ -18,11 +18,9 @@ import { AgencyList, EmailPreview, EmailProgress } from 'classes'
 import {
   ButtonGroup,
   CsvUpload,
-  Dropdown,
   EmailPreviewBlock,
   ErrorBlock,
   FileInput,
-  InfoBlock,
   NextButton,
   SampleCsv,
   StepHeader,
@@ -31,10 +29,14 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import { PhonebookListSection } from 'components/phonebook-list/PhonebookListSection'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
-import { getPhonebookListsByChannel } from 'services/phonebook.service'
+import {
+  getPhonebookListsByChannel,
+  selectPhonebookList,
+} from 'services/phonebook.service'
 import {
   CsvStatusResponse,
   deleteCsvStatus,
@@ -77,6 +79,8 @@ const EmailRecipients = ({
   const [phonebookLists, setPhonebookLists] = useState<
     { label: string; value: string }[]
   >([])
+  const [selectedPhonebookListId, setSelectedPhonebookListId] =
+    useState<number>()
 
   // Poll csv status
   useEffect(() => {
@@ -116,6 +120,25 @@ const EmailRecipients = ({
     return () => clearTimeout(timeoutId)
   }, [campaignId, csvFilename, forceReset, isCsvProcessing, isMounted])
 
+  // Select managed list
+  useEffect(() => {
+    const setSelectedList = async () => {
+      try {
+        if (selectedPhonebookListId) {
+          await selectPhonebookList({
+            campaignId: +(campaignId as string),
+            listId: selectedPhonebookListId,
+          })
+          setIsCsvProcessing(true)
+        }
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void setSelectedList()
+  }, [campaignId, selectedPhonebookListId])
+
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
     updateCampaign({
@@ -128,7 +151,7 @@ const EmailRecipients = ({
   // On load, retrieve the list of phonebook lists
   useEffect(() => {
     void retrieveAndPopulatePhonebookLists()
-  }, [])
+  })
   async function retrieveAndPopulatePhonebookLists() {
     const lists = await getPhonebookListsByChannel({ channel: campaign.type })
     setPhonebookLists(
@@ -179,46 +202,11 @@ const EmailRecipients = ({
 
   return (
     <>
-      <StepSection>
-        <StepHeader
-          title="Select Phonebook contact list"
-          subtitle={protect ? '' : 'Step 2'}
-        >
-          <p>
-            All your saved contact lists in Phonebook will automatically appear
-            here.
-          </p>
-        </StepHeader>
-        <Dropdown
-          onSelect={() => {
-            return
-          }}
-          options={phonebookLists}
-          // this or the saved contact list
-          defaultLabel={phonebookLists[0]?.label}
-          aria-label="Phonebook list"
-        ></Dropdown>
-        <InfoBlock>
-          <p>
-            If your Phonebook contact list is not listed,{' '}
-            <TextButton onClick={retrieveAndPopulatePhonebookLists}>
-              click here to refresh.
-            </TextButton>
-          </p>
-          <p>
-            New to Phonebook? Log in{' '}
-            <OutboundLink
-              eventLabel={'https://phonebook.gov.sg'}
-              to={'https://phonebook.gov.sg'}
-              target="_blank"
-            >
-              here
-            </OutboundLink>{' '}
-            to start managing your contacts and allow your recipients to update
-            their contact details through Postman’s Public Phonebook Portal.
-          </p>
-        </InfoBlock>
-      </StepSection>
+      <PhonebookListSection
+        phonebookLists={phonebookLists}
+        setSelectedPhonebookListId={setSelectedPhonebookListId}
+        retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
+      />
       <StepSection>
         <StepHeader title="Upload CSV File">
           <p>

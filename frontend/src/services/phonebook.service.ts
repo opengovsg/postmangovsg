@@ -8,11 +8,26 @@ export async function getPhonebookListsByChannel({
   channel: ChannelType
 }): Promise<AgencyList[]> {
   try {
-    const lists = (await axios.get(`/phonebook/lists/${channel}`)).data
+    return (await axios.get(`/phonebook/lists/${channel}`)).data
       .lists as AgencyList[]
-    return lists
   } catch (e) {
     errorHandler(e, 'Error getting phonebook lists')
+  }
+}
+
+export async function selectPhonebookList({
+  campaignId,
+  listId,
+}: {
+  campaignId: number
+  listId: number
+}): Promise<void> {
+  try {
+    return await axios.post(`/campaign/${campaignId}/select-phonebook-list`, {
+      list_id: listId,
+    })
+  } catch (e) {
+    errorHandler(e, 'Error selecting list')
   }
 }
 

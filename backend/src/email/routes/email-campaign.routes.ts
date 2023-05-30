@@ -186,6 +186,12 @@ export const InitEmailCampaignRoute = (
   )
 
   router.post(
+    '/select-phonebook-list',
+    celebrate(selectListValidator),
+    emailTemplateMiddleware.selectPhonebookListHandler
+  )
+
+  router.post(
     '/select-list',
     celebrate(selectListValidator),
     emailTemplateMiddleware.selectListHandler
