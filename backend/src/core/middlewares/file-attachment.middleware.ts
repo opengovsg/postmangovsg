@@ -1,40 +1,42 @@
 import { Request, Response, NextFunction } from 'express'
 import fileUpload from 'express-fileupload'
 import config from '@core/config'
-import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
+import {
+  Attachment,
+  ensureAttachmentsFieldIsArray,
+} from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
 import {
   ApiAttachmentLimitError,
   ApiAuthorizationError,
 } from '@core/errors/rest-api.errors'
+import { S3 } from '@aws-sdk/client-s3'
+import { configureEndpoint } from '@core/utils/aws-endpoint'
+import { CommonAttachment } from '@email/models/common-attachment'
+import { v4 as uuidv4 } from 'uuid'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
-const FILE_ATTACHMENT_MAX_SIZE = config.get('file.maxAttachmentSize')
 const TOTAL_ATTACHMENT_SIZE_LIMIT = config.get(
   'file.maxCumulativeAttachmentsSize'
 )
-const BODY_SIZE_LIMIT = config.get('transactionalEmail.bodySizeLimit')
 
-const fileUploadHandler = fileUpload({
-  limits: {
-    // this limit is on a per-file basis, that's why subsequent check is required
-    fileSize: FILE_ATTACHMENT_MAX_SIZE,
-    // this is necessary as express-fileupload relies on busboy, which has a
-    // default field size limit of 1MB and does not throw any error
-    // by setting the limit to be 1 byte above the max, any request with
-    // a field size exceeding the limit will be truncated to just above the limit
-    // which will be caught by Joi validation
-    fieldSize: BODY_SIZE_LIMIT + 1,
-  },
-  abortOnLimit: true,
-  limitHandler: function (_: Request, _res: Response, next: NextFunction) {
-    next(
-      new ApiAttachmentLimitError(
-        'Size of one or more attachments exceeds limit'
+const s3 = new S3({ ...configureEndpoint(config) })
+
+const getFileUploadHandler = (fileSize: number, fieldSize: number) =>
+  fileUpload({
+    limits: {
+      fileSize,
+      fieldSize,
+    },
+    abortOnLimit: true,
+    limitHandler: function (_req: Request, _res: Response, next: NextFunction) {
+      next(
+        new ApiAttachmentLimitError(
+          'Size of one or more attachments exceeds limit'
+        )
       )
-    )
-  },
-})
+    },
+  })
 
 /**
  * Place incoming files into the request body so that it can be
@@ -94,8 +96,50 @@ async function checkAttachmentValidity(
   next()
 }
 
+function transformAttachmentsFieldToArray(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+) {
+  if (req.files?.attachments) {
+    req.body.attachments = ensureAttachmentsFieldIsArray(req.files.attachments)
+  }
+  next()
+}
+
+async function storeCampaignEmbed(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const a = req.body.attachments[0] as Attachment
+  const hash = a.md5
+  const type = a.mimetype
+  const commonAttachment = await CommonAttachment.create({
+    id: uuidv4(),
+    originalFileName: a.name,
+    metadata: {
+      size: a.size,
+      hash,
+      type,
+    },
+  } as CommonAttachment)
+  await s3.putObject({
+    Bucket: config.get('commonAttachments.bucketName'),
+    Key: commonAttachment.id,
+    ContentType: type,
+    Body: a.data,
+  })
+  return res.status(200).json({
+    id: commonAttachment.id,
+    original_file_name: commonAttachment.originalFileName,
+    metadata: commonAttachment.metadata,
+  })
+}
+
 export const FileAttachmentMiddleware = {
   checkAttachmentValidity,
-  fileUploadHandler,
+  getFileUploadHandler,
   preprocessPotentialIncomingFile,
+  transformAttachmentsFieldToArray,
+  storeCampaignEmbed,
 }

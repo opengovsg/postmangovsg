@@ -16,7 +16,6 @@ import {
   TransactionalEmailMessageStatus,
 } from '@email/models'
 
-import crypto from 'crypto'
 import {
   Ordering,
   TimestampFilter,
@@ -26,6 +25,7 @@ import {
   ApiInvalidTemplateError,
   ApiRateLimitError,
 } from '@core/errors/rest-api.errors'
+import { Attachment, getAttachmentHash } from '@core/utils/attachment'
 
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler
@@ -40,11 +40,6 @@ export const RATE_LIMIT_ERROR_MESSAGE =
 
 export const TRANSACTIONAL_EMAIL_WINDOW = 1 // in seconds
 
-const getAttachmentHash = (content: Buffer): string => {
-  const hash = crypto.createHash('md5')
-  return hash.update(content).digest('hex')
-}
-
 export const InitEmailTransactionalMiddleware = (
   redisService: RedisService,
   authService: AuthService
@@ -57,7 +52,7 @@ export const InitEmailTransactionalMiddleware = (
     from: string
     recipient: string
     reply_to: string
-    attachments?: { data: Buffer; name: string; size: number }[]
+    attachments?: Attachment[]
     classification: TransactionalEmailClassification
     tag: string
   }

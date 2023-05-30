@@ -89,7 +89,16 @@ export const InitEmailTransactionalRoute = (
   router.post(
     '/send',
     emailTransactionalMiddleware.rateLimit,
-    FileAttachmentMiddleware.fileUploadHandler,
+    FileAttachmentMiddleware.getFileUploadHandler(
+      // this limit is on a per-file basis, that's why subsequent check is required
+      config.get('file.maxAttachmentSize') as number,
+      // this is necessary as express-fileupload relies on busboy, which has a
+      // default field size limit of 1MB and does not throw any error
+      // by setting the limit to be 1 byte above the max, any request with
+      // a field size exceeding the limit will be truncated to just above the limit
+      // which will be caught by Joi validation
+      (config.get('transactionalEmail.bodySizeLimit') as number) + 1
+    ),
     FileAttachmentMiddleware.preprocessPotentialIncomingFile,
     celebrate(sendValidator),
     FileAttachmentMiddleware.checkAttachmentValidity,

@@ -1,6 +1,15 @@
+import crypto from 'crypto'
 import { UploadedFile } from 'express-fileupload'
 
-const ensureAttachmentsFieldIsArray = (
+export interface Attachment {
+  data: Buffer
+  name: string
+  size: number
+  mimetype: string
+  md5: string
+}
+
+export const ensureAttachmentsFieldIsArray = (
   attachments: UploadedFile | UploadedFile[]
 ) => {
   if (!Array.isArray(attachments)) {
@@ -9,4 +18,7 @@ const ensureAttachmentsFieldIsArray = (
   return attachments
 }
 
-export { ensureAttachmentsFieldIsArray }
+export const getAttachmentHash = (content: Buffer): string => {
+  const hash = crypto.createHash('md5')
+  return hash.update(content).digest('hex')
+}
