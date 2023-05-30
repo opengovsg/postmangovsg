@@ -261,7 +261,7 @@ export const InitEmailTemplateMiddleware = (
     })
     if (!list) throw new Error('Error: List not found')
 
-    const { s3key: s3Key, etag, filename } = list
+    const { s3Key, etag, filename } = list
 
     // check if template exists
     const template = await EmailTemplateService.getFilledTemplate(+campaignId)
