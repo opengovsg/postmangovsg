@@ -92,6 +92,7 @@ const TOOLBAR_OPTIONS = {
   },
   image: {
     uploadEnabled: false,
+    urlEnabled: false,
     component: ImageControl,
   },
   link: {
@@ -138,6 +139,7 @@ const RichTextEditor = ({
   placeholder?: string
 }) => {
   const { editorState, setEditorState } = useContext(EditorContext)
+  const [editorReadonlyMode, setEditorReadonlyMode] = useState(false)
   const blockRenderMap = Immutable.Map({
     'table-cell': {
       element: 'td',
@@ -184,6 +186,9 @@ const RichTextEditor = ({
           return {
             component: ImageBlock,
             editable: false,
+            props: {
+              setEditorReadonlyMode,
+            },
           }
         }
       }
@@ -420,6 +425,7 @@ const RichTextEditor = ({
       keyBindingFn={keyBindingFn}
       handleReturn={handleReturn}
       handlePastedText={handlePastedText}
+      readOnly={editorReadonlyMode}
     />
   )
 }

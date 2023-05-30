@@ -283,8 +283,8 @@ const EmailTemplate = ({
           </p>
           <TextArea
             id="subject"
-            highlight={true}
-            singleRow={true}
+            highlight
+            singleRow
             placeholder={t`e.g. Appointment Confirmation`}
             value={subject}
             onChange={setSubject}

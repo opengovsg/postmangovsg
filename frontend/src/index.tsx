@@ -6,7 +6,6 @@ import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import * as Sentry from '@sentry/browser'
 
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 
@@ -29,12 +28,10 @@ const container = document.getElementById('root') as HTMLElement
 const root = createRoot(container)
 root.render(
   <BrowserRouter>
-    <StrictMode>
-      <I18nProvider i18n={i18n}>
-        <AuthContextProvider>
-          <App />
-        </AuthContextProvider>
-      </I18nProvider>
-    </StrictMode>
+    <I18nProvider i18n={i18n}>
+      <AuthContextProvider>
+        <App />
+      </AuthContextProvider>
+    </I18nProvider>
   </BrowserRouter>
 )
