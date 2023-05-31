@@ -227,7 +227,9 @@ const SMSRecipients = ({
 
         {!csvFilename && (
           <WarningBlock title={'We do not remove duplicate recipients'}>
-            Learn how to remove duplicates in your excel{' '}
+            This is because some use cases intend for multiple emails to be sent
+            to the same recipient. If this is not intended, please remove the
+            duplicates. Learn how{' '}
             <OutboundLink
               className={styles.warningHelpLink}
               eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
