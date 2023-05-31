@@ -142,7 +142,7 @@ class Email {
     agencyName,
     agencyLogoURI,
     showMasthead,
-    contactPrefLink,
+    userUniqueLink,
   }: Message): Promise<void> {
     try {
       if (!validator.isEmail(recipient)) {
@@ -163,7 +163,7 @@ class Email {
         agencyName,
         agencyLogoURI,
         showMasthead,
-        contactPrefLink,
+        userUniqueLink,
       })
 
       await this.mailService.sendMail({

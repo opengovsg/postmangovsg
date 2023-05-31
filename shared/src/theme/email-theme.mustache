@@ -2,7 +2,7 @@
   Email template built with reference to https://www.goodemailcode.com/
 --}}
 <!DOCTYPE html>
-<html lang="en" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<html lang="en">
 
 <head>
   <meta charset="utf-8">
@@ -208,18 +208,18 @@
         <div>
           {{{body}}}
         </div>
-        {{#contactPrefLink}}
+        {{#userUniqueLink}}
           <div class="contact-pref-cta-mobile" style="display: none;">
-            <a href={{{contactPrefLink}}} target="_blank" style="text-decoration: none; cursor: pointer;">
+            <a href={{{userUniqueLink}}} target="_blank" style="text-decoration: none; cursor: pointer;">
               <img src="https://file.go.gov.sg/phonebook-email-cta-mobile.png" width="332" height="156" alt="Set channel">
             </a>
           </div>  
           <div class="contact-pref-cta-desktop" style="display: none;">
-            <a href={{{contactPrefLink}}} target="_blank" style="text-decoration: none; cursor: pointer;">
+            <a href={{{userUniqueLink}}} target="_blank" style="text-decoration: none; cursor: pointer;">
               <img src="https://file.go.gov.sg/phonebook-email-cta-desktop.png" width="600" height="112" alt="Set channel">
             </a>
           </div>
-        {{/contactPrefLink}}
+        {{/userUniqueLink}}
         <div class="body-vertical-spacer-bottom" style="line-height: 0px; height: 0px; margin-top: 48px;">&#8202;</div>
     
     <!--[if false]><!-->
