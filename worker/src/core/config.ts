@@ -82,6 +82,7 @@ export interface ConfigSchema {
   }
 
   phonebook: {
+    enabled: boolean
     endpointUrl: string
     apiKey: string
     version: string
@@ -341,6 +342,11 @@ const config: Config<ConfigSchema> = convict({
     },
   },
   phonebook: {
+    enabled: {
+      doc: 'Kill switch of phonebook related features',
+      default: false,
+      env: 'PHONEBOOK_FEATURE_ENABLE',
+    },
     endpointUrl: {
       doc: 'Endpoint url of phonebook server',
       default: 'http://localhost:8080',
