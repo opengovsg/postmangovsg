@@ -1,5 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
-import { PhonebookChannelDto } from './interfaces'
+import { PhonebookChannelDto, UserChannel } from './interfaces'
 
 export default class PhonebookClient {
   private client: AxiosInstance
@@ -61,7 +61,9 @@ export default class PhonebookClient {
     }
   }
 
-  public async getUniqueLinksForUsers(body: PhonebookChannelDto) {
+  public async getUniqueLinksForUsers(
+    body: PhonebookChannelDto
+  ): Promise<UserChannel[]> {
     try {
       const res = await this.request(
         {

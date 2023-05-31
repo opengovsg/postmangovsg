@@ -6,4 +6,5 @@ export type PhonebookChannelDto = {
 export type UserChannel = {
   channel: string
   channelId: string
+  userUniqueLink?: string
 }
