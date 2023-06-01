@@ -1,4 +1,5 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+import { PhonebookChannelDto, UserChannel } from './interfaces'
 
 export default class PhonebookClient {
   private client: AxiosInstance
@@ -54,6 +55,23 @@ export default class PhonebookClient {
         method: 'get',
         url: `managed-list/${listId}/members/s3`,
       })
+      return res.data
+    } catch (err) {
+      throw new Error(err as any)
+    }
+  }
+
+  public async getUniqueLinksForUsers(
+    body: PhonebookChannelDto
+  ): Promise<UserChannel[]> {
+    try {
+      const res = await this.request(
+        {
+          method: 'post',
+          url: 'public-user/unique_links',
+        },
+        body
+      )
       return res.data
     } catch (err) {
       throw new Error(err as any)
