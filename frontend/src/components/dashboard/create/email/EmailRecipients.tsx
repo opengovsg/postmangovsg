@@ -19,11 +19,9 @@ import { AgencyList, EmailPreview, EmailProgress } from 'classes'
 import {
   ButtonGroup,
   CsvUpload,
-  Dropdown,
   EmailPreviewBlock,
   ErrorBlock,
   FileInput,
-  InfoBlock,
   NextButton,
   SampleCsv,
   StepHeader,
@@ -32,6 +30,7 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import { PhonebookListSection } from 'components/phonebook-list'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
@@ -126,7 +125,16 @@ const EmailRecipients = ({
   useEffect(() => {
     const setSelectedList = async () => {
       try {
-        if (selectedPhonebookListId) {
+        // trigger change only if it isn't already the current one
+        const currentValue = phonebookList.filter(
+          (l) => l.label === csvInfo.csvFilename?.replace('.csv', '')
+        )[0]?.value
+        console.log(currentValue)
+        console.log(selectedPhonebookListId)
+        if (
+          selectedPhonebookListId &&
+          selectedPhonebookListId !== +currentValue
+        ) {
           await selectPhonebookList({
             campaignId: +(campaignId as string),
             listId: selectedPhonebookListId,
@@ -154,7 +162,8 @@ const EmailRecipients = ({
     const lists = await getPhonebookListsByChannel({ channel: campaign.type })
     setPhonebookList(
       lists.map((l: AgencyList) => {
-        return { label: l.name, value: l.id.toString() }
+        // replace all space with dash
+        return { label: l.name.replaceAll(' ', '-'), value: l.id.toString() }
       })
     )
   }, [campaign.type])
@@ -204,41 +213,18 @@ const EmailRecipients = ({
 
   return (
     <>
-      <StepSection>
-        <StepHeader title="Select Phonebook contact list" subtitle="Step 2">
-          <p>
-            All your saved contact lists in Phonebook will automatically appear
-            here.
-          </p>
-        </StepHeader>
-        <Dropdown
-          onSelect={(selected) => setSelectedPhonebookListId(+selected)}
-          disabled={!phonebookList.length}
-          options={phonebookList}
-          aria-label="Phonebook list selector"
-        ></Dropdown>
-        <InfoBlock>
-          <p>
-            If your Phonebook contact list is not listed, &nbsp;
-            <TextButton onClick={retrieveAndPopulatePhonebookLists}>
-              click here to refresh.
-            </TextButton>
-          </p>
-          <p>
-            New to Phonebook? Log in &nbsp;
-            <OutboundLink
-              eventLabel={'https://phonebook.gov.sg'}
-              to={'https://phonebook.gov.sg'}
-              target="_blank"
-            >
-              here
-            </OutboundLink>
-            &nbsp; to start managing your contacts and allow your recipients to
-            update their contact details through Postman’s Public Phonebook
-            Portal.
-          </p>
-        </InfoBlock>
-      </StepSection>
+      <PhonebookListSection
+        phonebookLists={phonebookList}
+        setSelectedPhonebookListId={setSelectedPhonebookListId}
+        retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
+        isProcessing={isCsvProcessing}
+        // have to strip additional appended .csv label
+        defaultLabel={
+          phonebookList.filter(
+            (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
+          )[0]?.label
+        }
+      />
       <StepSection>
         <StepHeader title="Upload CSV File">
           <p>

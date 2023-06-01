@@ -14,10 +14,14 @@ export const PhonebookListSection = ({
   phonebookLists,
   setSelectedPhonebookListId,
   retrieveAndPopulatePhonebookLists,
+  isProcessing,
+  defaultLabel,
 }: {
   phonebookLists: { label: string; value: string }[]
   setSelectedPhonebookListId: Dispatch<SetStateAction<number | undefined>>
   retrieveAndPopulatePhonebookLists: () => void
+  isProcessing: boolean
+  defaultLabel: string
 }) => {
   return (
     <StepSection>
@@ -29,9 +33,10 @@ export const PhonebookListSection = ({
       </StepHeader>
       <Dropdown
         onSelect={(selected) => setSelectedPhonebookListId(+selected)}
-        disabled={!phonebookLists.length}
+        disabled={!phonebookLists.length || isProcessing}
         options={phonebookLists}
         aria-label="Phonebook list selector"
+        defaultLabel={defaultLabel}
       ></Dropdown>
       <InfoBlock>
         <p>
@@ -43,8 +48,8 @@ export const PhonebookListSection = ({
         <p>
           New to Phonebook? Log in &nbsp;
           <OutboundLink
-            eventLabel={'https://phonebook.gov.sg'}
-            to={'https://phonebook.gov.sg'}
+            eventLabel={'https://phonebook.postman.gov.sg/agency'}
+            to={'https://phonebook.postman.gov.sg/agency'}
             target="_blank"
           >
             here
