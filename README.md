@@ -145,8 +145,8 @@ npm run dev
 You should find the
 
 - React frontend at [localhost:3000](http://localhost:3000)
-- Express backend at [localhost:4000](http://localhost:4000)
-- Swagger docs at [localhost:4000/docs](http://localhost:4000/docs)
+- Express backend at [localhost:8080](http://localhost:8080)
+- Swagger docs at [localhost:8080/docs](http://localhost:8080/docs)
 
 Alternatively, if you would like to develop locally against staging database and workers, ensure that you have set up the necessary variables in `./backend/.env` and run either:
 
@@ -161,10 +161,10 @@ As we're relying on external service provider like AWS, Twilio to delivery our m
 
 #### Exposing the local server to the internet
 
-We will be using [ngrok](https://ngrok.com/). Run this command to create a tunnel to port 4000 of your machine (i.e. where the Postman backend server is listening)
+We will be using [ngrok](https://ngrok.com/). Run this command to create a tunnel to port 8080 of your machine (i.e. where the Postman backend server is listening)
 
 ```bash
-ngrok http 4000
+ngrok http 8080
 ```
 
 You will get a public URL that looks something like ` https://d564-101-78-115-134.ap.ngrok.io`. Keep this as we will be using it for later sections.

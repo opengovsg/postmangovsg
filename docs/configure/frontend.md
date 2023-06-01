@@ -1,8 +1,9 @@
 # Forking and configuring this product
 
-- [Frontend](#frontend)
-  - [Minimal set of environment variables](#minimal-set-of-environment-variables)
-  - [Images and brands](#images-and-brands)
+- [Forking and configuring this product](#forking-and-configuring-this-product)
+  - [Frontend](#frontend)
+    - [Minimal set of environment variables](#minimal-set-of-environment-variables)
+    - [Images and brands](#images-and-brands)
 
 ## Frontend
 
@@ -14,7 +15,7 @@ Further reference: [Create-react-app documentation](https://create-react-app.dev
 
 | Name                    | Description                                                                                                       |
 | ----------------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `REACT_APP_BACKEND_URL` | URL of the API server. Example: `http://localhost:4000/v1`                                                        |
+| `REACT_APP_BACKEND_URL` | URL of the API server. Example: `http://localhost:8080/v1`                                                        |
 | `REACT_APP_TITLE`       | Title of the app. Example: `Postman.gov.sg`                                                                       |
 | `REACT_APP_DESCRIPTION` | Meta description. Example: `Postman.gov.sg enables public officers to send templated messages to many recipients` |
 

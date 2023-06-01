@@ -5,7 +5,7 @@ import 'source-map-support/register'
 import express from 'express'
 import { loaders } from '@core/loaders'
 import throng from 'throng'
-const port = Number(process.env.PORT) || 4000
+const port = Number(process.env.PORT) || 8080
 const app: express.Application = express()
 
 const start = async (): Promise<void> => {

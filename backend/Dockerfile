@@ -37,7 +37,7 @@ WORKDIR /usr/home/postmangovsg
 ENV NODE_ENV=production
 
 # expose port and copy these files first as they're unlikely to change
-EXPOSE 4000
+EXPOSE 8080
 COPY backend/docker-entrypoint.sh ./
 RUN ["chmod", "+x", "docker-entrypoint.sh"]
 

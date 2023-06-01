@@ -10,6 +10,8 @@ containerDefinitions:
         value: production
       - name: APP_ENV
         value: <ENVIRONMENT>
+      - name: PORT
+        value: '8080'
     mountPoints: []
     volumesFrom: []
     secrets: []
