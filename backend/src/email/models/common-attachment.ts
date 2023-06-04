@@ -8,7 +8,7 @@ import { Column, DataType, Model, Table } from 'sequelize-typescript'
 })
 export class CommonAttachment extends Model<CommonAttachment> {
   @Column({
-    type: DataType.UUIDV4,
+    type: DataType.UUID,
     primaryKey: true,
   })
   id!: string
