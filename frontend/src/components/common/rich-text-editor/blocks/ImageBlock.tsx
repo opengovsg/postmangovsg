@@ -13,6 +13,8 @@ import {
   useEffect,
   useMemo,
   forwardRef,
+  MouseEvent,
+  KeyboardEvent,
 } from 'react'
 
 import { EditorContext } from '../RichTextEditor'
@@ -118,11 +120,33 @@ export const ImageBlock = ({
   blockProps: any
 }) => {
   const { editorState, setEditorState } = useContext(EditorContext)
-  const readOnly = blockProps?.readOnly
+  const { readOnly, setEditorReadonlyMode } = blockProps
   const imageRef = useRef<HTMLImageElement>(null)
   const [showPopover, setShowPopover] = useState(false)
   const entity = contentState.getEntity(block.getEntityAt(0))
   const { src, width, height, link } = entity.getData()
+  const [widthPercent, setWidthPercent] = useState<string>(() => {
+    const widthPercentInString = width.replace('%', '')
+    try {
+      if (parseFloat(widthPercentInString)) {
+        return widthPercentInString
+      }
+      return ''
+    } catch (e) {
+      // if width value is not a percentage number
+      return ''
+    }
+  })
+
+  useEffect(() => {
+    setEditorReadonlyMode(showPopover)
+    // arbitrarily generate a new state (with the cursor at the end of content)
+    // to trigger a new update to editorState, otherwise Editor won't be re-rendered
+    // with new readOnly value somehow.
+    const newState = EditorState.moveSelectionToEnd(editorState)
+    setEditorState(newState)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [showPopover, setEditorReadonlyMode])
 
   function hidePopover() {
     // Do not setState if link is already removed
@@ -181,21 +205,24 @@ export const ImageBlock = ({
     setEditorState(updated)
   }
 
-  function getUpdateWidth(width: number) {
-    return () => {
-      // Preserve selection to prevent jumping to start of editor after setting width
-      const currentSelection = editorState.getSelection()
-      const entityKey = block.getEntityAt(0)
-      contentState.mergeEntityData(entityKey, {
-        width: `${width}%`,
-      })
-      const updated = EditorState.push(
-        EditorState.forceSelection(editorState, currentSelection),
-        contentState,
-        'change-block-data'
-      )
-      setEditorState(updated)
-    }
+  function updateWidth() {
+    if (!widthPercent) return
+    const currentSelection = editorState.getSelection()
+    const entityKey = block.getEntityAt(0)
+    contentState.mergeEntityData(entityKey, {
+      width: `${widthPercent}%`,
+    })
+    const updated = EditorState.push(
+      EditorState.forceSelection(editorState, currentSelection),
+      contentState,
+      'change-block-data'
+    )
+    setEditorState(updated)
+  }
+
+  function stopPropagation(e: KeyboardEvent | MouseEvent) {
+    e.stopPropagation()
+    return false
   }
 
   function renderPreviewImage() {
@@ -221,14 +248,18 @@ export const ImageBlock = ({
       />
       {showPopover && (
         <div contentEditable={false} className={cx('popover', styles.popover)}>
-          <button onClick={getUpdateWidth(50)} className={styles.sizeButton}>
-            50%
-          </button>
-          <button onClick={getUpdateWidth(75)} className={styles.sizeButton}>
-            75%
-          </button>
-          <button onClick={getUpdateWidth(100)} className={styles.sizeButton}>
-            100%
+          <input
+            placeholder="Enter width percentage for the image"
+            value={widthPercent}
+            type="number"
+            min="1"
+            max="100"
+            step="1"
+            onChange={(e) => setWidthPercent(e.target.value)}
+            onClick={stopPropagation}
+          />
+          <button className={styles.textButton} onClick={updateWidth}>
+            Set Width Percentage
           </button>
           <span className="divider"></span>
           {link && (
