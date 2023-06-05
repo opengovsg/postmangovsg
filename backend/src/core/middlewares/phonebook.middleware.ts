@@ -17,11 +17,16 @@ const getListsByChannel = async (
   const userId = req.session?.user?.id
   const { channel } = req.params
 
-  const lists = await PhonebookService.getPhonebookLists({
-    userId,
-    channel: channel as ChannelType,
-  })
-  return res.status(200).json({ lists })
+  try {
+    const lists = await PhonebookService.getPhonebookLists({
+      userId,
+      channel: channel as ChannelType,
+    })
+    return res.status(200).json({ lists })
+  } catch (e) {
+    // explicitly return 200 if something goes wrong with phonebook API and not an error
+    return res.status(200).json({ message: 'Could not retrieve lists.' })
+  }
 }
 
 export const PhonebookMiddleware = {

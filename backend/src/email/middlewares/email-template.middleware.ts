@@ -252,38 +252,46 @@ export const InitEmailTemplateMiddleware = (
     req: Request,
     res: Response
   ): Promise<Response | void> => {
-    const { campaignId } = req.params
+    try {
+      const { campaignId } = req.params
 
-    const { list_id: listId } = req.body
+      const { list_id: listId } = req.body
 
-    const list = await PhonebookService.getPhonebookListById({
-      listId,
-    })
-    if (!list) throw new Error('Error: List not found')
+      // check if template exists
+      const template = await EmailTemplateService.getFilledTemplate(+campaignId)
+      if (template === null) {
+        throw new Error(
+          'Error: No message template found. Please create a message template before uploading a recipient file.'
+        )
+      }
 
-    const { s3Key, etag, filename } = list
+      const list = await PhonebookService.getPhonebookListById({
+        listId,
+      })
+      if (!list) throw new Error('Error: List not found')
 
-    // check if template exists
-    const template = await EmailTemplateService.getFilledTemplate(+campaignId)
-    if (template === null) {
-      throw new Error(
-        'Error: No message template found. Please create a message template before uploading a recipient file.'
-      )
+      const { s3Key, etag, filename } = list
+
+      // Store temp filename
+      await UploadService.storeS3TempFilename(+campaignId, filename)
+
+      // Enqueue upload job to be processed
+      await EmailTemplateService.enqueueUpload({
+        campaignId: +campaignId,
+        template,
+        s3Key,
+        etag,
+        filename,
+      })
+
+      return res.status(202).json({ list_id: listId })
+    } catch (e) {
+      // explicitly return a 500 to not block user flow but prompt them to upload an alternative csv
+      return res.status(500).json({
+        message:
+          'Error selecting phonebook list. Please try uploading the list directly.',
+      })
     }
-
-    // Store temp filename
-    await UploadService.storeS3TempFilename(+campaignId, filename)
-
-    // Enqueue upload job to be processed
-    await EmailTemplateService.enqueueUpload({
-      campaignId: +campaignId,
-      template,
-      s3Key,
-      etag,
-      filename,
-    })
-
-    return res.status(202).json({ list_id: listId })
   }
 
   /*
