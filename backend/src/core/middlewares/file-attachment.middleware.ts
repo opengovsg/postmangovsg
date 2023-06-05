@@ -6,11 +6,13 @@ import { isDefaultFromAddress } from '@core/utils/from-address'
 import {
   ApiAttachmentLimitError,
   ApiAuthorizationError,
+  ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
 import { S3 } from '@aws-sdk/client-s3'
 import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { CommonAttachment } from '@email/models/common-attachment'
 import { v4 as uuidv4 } from 'uuid'
+import { Readable } from 'stream'
 
 const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const TOTAL_ATTACHMENT_SIZE_LIMIT = config.get(
@@ -133,10 +135,36 @@ async function storeCampaignEmbed(
   })
 }
 
+async function streamCampaignEmbed(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  const id = req.params.attachmentId
+  const attachment = await CommonAttachment.findOne({
+    where: { id },
+  })
+  if (!attachment) {
+    throw new ApiNotFoundError(`Attachment with ID ${id} doesn't exist`)
+  }
+
+  const obj = await s3.getObject({
+    Bucket: config.get('commonAttachments.bucketName'),
+    Key: id,
+  })
+  res.setHeader('Content-Type', attachment.metadata.type)
+  res.setHeader(
+    'Content-Disposition',
+    `inline; filename=${attachment.originalFileName}`
+  )
+  ;(obj.Body as Readable).pipe(res)
+  return res
+}
+
 export const FileAttachmentMiddleware = {
   checkAttachmentValidity,
   getFileUploadHandler,
   preprocessPotentialIncomingFile,
   transformAttachmentsFieldToArray,
   storeCampaignEmbed,
+  streamCampaignEmbed,
 }

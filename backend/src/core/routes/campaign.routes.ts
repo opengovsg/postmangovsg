@@ -102,4 +102,15 @@ router.post(
   FileAttachmentMiddleware.storeCampaignEmbed
 )
 
+router.get(
+  '/attachments/:attachmentId/:fileName',
+  celebrate({
+    [Segments.PARAMS]: Joi.object({
+      attachmentId: Joi.string().guid({ version: 'uuidv4' }).required(),
+      fileName: Joi.string().required(),
+    }),
+  }),
+  FileAttachmentMiddleware.streamCampaignEmbed
+)
+
 export default router
