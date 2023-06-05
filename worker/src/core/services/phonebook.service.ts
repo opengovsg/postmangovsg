@@ -6,6 +6,7 @@ import {
 } from '@shared/clients/phonebook-client.class/interfaces'
 import { map } from 'lodash'
 import { EmailResultRow, Message } from '@core/loaders/message-worker/interface'
+import CircuitBreaker from 'opossum'
 
 const phonebookClient: PhonebookClient = new PhonebookClient(
   config.get('phonebook.endpointUrl'),
@@ -13,9 +14,19 @@ const phonebookClient: PhonebookClient = new PhonebookClient(
   config.get('phonebook.version')
 )
 
+const options = {
+  timeout: 5000, // Trigger failure if phonebook takes longer than 5sec to respond
+  errorThresholdPercentage: 20, // When 20% of requests fail, open the circuit
+  resetTimeout: 30000, // After 30 seconds, half open the circuit and try again.
+}
+
+const breaker = new CircuitBreaker(
+  phonebookClient.getUniqueLinksForUsers,
+  options
+)
+
 const appendLinkForEmail = async (
   result: EmailResultRow[],
-  campaignOwnerEmail: string,
   channel = 'Email'
 ) => {
   const showMastheadDomain = config.get('showMastheadDomain')
@@ -28,7 +39,6 @@ const appendLinkForEmail = async (
   })
   const payload: PhonebookChannelDto = {
     userChannels: channels,
-    postmanCampaignOwner: campaignOwnerEmail,
   }
 
   const userChannelMap = await getUniqueLinksForUsers(payload)
@@ -45,11 +55,7 @@ const appendLinkForEmail = async (
   })
 }
 
-const appendLinkForSms = async (
-  result: Message[],
-  campaignOwnerEmail: string,
-  channel = 'Sms'
-) => {
+const appendLinkForSms = async (result: Message[], channel = 'Sms') => {
   const channels: UserChannel[] = result.map((message) => {
     return {
       channel,
@@ -58,7 +64,6 @@ const appendLinkForSms = async (
   })
   const payload: PhonebookChannelDto = {
     userChannels: channels,
-    postmanCampaignOwner: campaignOwnerEmail,
   }
 
   const userChannelMap = await getUniqueLinksForUsers(payload)
@@ -81,14 +86,21 @@ const appendLinkForSms = async (
 const getUniqueLinksForUsers = async (
   body: PhonebookChannelDto
 ): Promise<Map<string, UserChannel>> => {
-  const userChannelsRes = await phonebookClient.getUniqueLinksForUsers(body)
-  return userChannelsRes.reduce(
-    (map: Map<string, UserChannel>, userChannel: UserChannel) => {
-      map.set(userChannel.channelId, userChannel)
-      return map
-    },
-    new Map<string, UserChannel>()
-  )
+  return breaker
+    .fire(body)
+    .then((resp) => {
+      const userChannelsRes = resp as UserChannel[]
+      return userChannelsRes.reduce(
+        (map: Map<string, UserChannel>, userChannel: UserChannel) => {
+          map.set(userChannel.channelId, userChannel)
+          return map
+        },
+        new Map<string, UserChannel>()
+      )
+    })
+    .catch((error) => {
+      throw error
+    })
 }
 export const PhonebookService = {
   appendLinkForEmail,
