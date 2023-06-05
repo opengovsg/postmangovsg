@@ -59,7 +59,7 @@ const SMSRecipients = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
-  const [phonebookList, setPhonebookList] = useState<
+  const [phonebookLists, setPhonebookLists] = useState<
     { label: string; value: string }[]
   >([])
   const [selectedPhonebookListId, setSelectedPhonebookListId] =
@@ -139,7 +139,7 @@ const SMSRecipients = ({
 
   const retrieveAndPopulatePhonebookLists = useCallback(async () => {
     const lists = await getPhonebookListsByChannel({ channel: campaign.type })
-    setPhonebookList(
+    setPhonebookLists(
       lists.map((l: AgencyList) => {
         return { label: l.name, value: l.id.toString() }
       })
@@ -191,12 +191,12 @@ const SMSRecipients = ({
   return (
     <>
       <PhonebookListSection
-        phonebookLists={phonebookList}
+        phonebookLists={phonebookLists}
         setSelectedPhonebookListId={setSelectedPhonebookListId}
         retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
         isProcessing={isCsvProcessing}
         defaultLabel={
-          phonebookList.filter(
+          phonebookLists.filter(
             (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
           )[0]?.label
         }

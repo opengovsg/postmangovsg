@@ -19,17 +19,25 @@ const getPhonebookLists = async ({
   userId: number
   channel: ChannelType
 }): Promise<{ id: number; name: string }[]> => {
-  const user = await User.findOne({
-    where: { id: userId },
-    attributes: ['email'],
-  })
-  if (!user) {
-    logger.error('invalid user making request!')
-    return []
-  }
-  const res = await phonebookClient.getManagedLists(user.email, channel)
+  try {
+    const user = await User.findOne({
+      where: { id: userId },
+      attributes: ['email'],
+    })
+    if (!user) {
+      logger.error('invalid user making request!')
+      return []
+    }
+    const res = await phonebookClient.getManagedLists(user.email, channel)
 
-  return res
+    return res
+  } catch (err) {
+    logger.error({
+      action: 'getPhonebookLists',
+      message: err,
+    })
+    throw err
+  }
 }
 
 const getPhonebookListById = async ({
@@ -37,7 +45,15 @@ const getPhonebookListById = async ({
 }: {
   listId: number
 }): Promise<any> => {
-  return await phonebookClient.getManagedListById(listId)
+  try {
+    return await phonebookClient.getManagedListById(listId)
+  } catch (err) {
+    logger.error({
+      action: 'getPhonebookListById',
+      message: err,
+    })
+    throw err
+  }
 }
 
 export const PhonebookService = {

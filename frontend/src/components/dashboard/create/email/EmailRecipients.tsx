@@ -77,7 +77,7 @@ const EmailRecipients = ({
   const { id: campaignId } = useParams<{ id: string }>()
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
-  const [phonebookList, setPhonebookList] = useState<
+  const [phonebookLists, setPhonebookLists] = useState<
     { label: string; value: string }[]
   >([])
   const [selectedPhonebookListId, setSelectedPhonebookListId] =
@@ -126,11 +126,9 @@ const EmailRecipients = ({
     const setSelectedList = async () => {
       try {
         // trigger change only if it isn't already the current one
-        const currentValue = phonebookList.filter(
+        const currentValue = phonebookLists.filter(
           (l) => l.label === csvInfo.csvFilename?.replace('.csv', '')
         )[0]?.value
-        console.log(currentValue)
-        console.log(selectedPhonebookListId)
         if (
           selectedPhonebookListId &&
           selectedPhonebookListId !== +currentValue
@@ -160,10 +158,10 @@ const EmailRecipients = ({
 
   const retrieveAndPopulatePhonebookLists = useCallback(async () => {
     const lists = await getPhonebookListsByChannel({ channel: campaign.type })
-    setPhonebookList(
+    setPhonebookLists(
       lists.map((l: AgencyList) => {
         // replace all space with dash
-        return { label: l.name.replaceAll(' ', '-'), value: l.id.toString() }
+        return { label: l.name, value: l.id.toString() }
       })
     )
   }, [campaign.type])
@@ -214,13 +212,13 @@ const EmailRecipients = ({
   return (
     <>
       <PhonebookListSection
-        phonebookLists={phonebookList}
+        phonebookLists={phonebookLists}
         setSelectedPhonebookListId={setSelectedPhonebookListId}
         retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
         isProcessing={isCsvProcessing}
         // have to strip additional appended .csv label
         defaultLabel={
-          phonebookList.filter(
+          phonebookLists.filter(
             (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
           )[0]?.label
         }
