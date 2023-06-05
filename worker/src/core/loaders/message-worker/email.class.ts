@@ -85,12 +85,11 @@ class Email {
             'Unable to fetch user email from campaign for phonebook contact preference api'
           )
         }
-        const userEmail = emailResult[0].email
-        return await PhonebookService.appendLinkForEmail(result, userEmail)
+        return await PhonebookService.appendLinkForEmail(result)
       } catch (error) {
         logger.error({
           message: 'Unable to fetch contact preferences',
-          error,
+          error: (error as any).message,
           workerId: this.workerId,
         })
         // If phonebook is down, we still want to continue sending the messages

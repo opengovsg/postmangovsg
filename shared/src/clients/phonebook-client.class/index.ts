@@ -68,7 +68,7 @@ export default class PhonebookClient {
       const res = await this.request(
         {
           method: 'post',
-          url: 'public-user/unique_links',
+          url: 'public-user/unique-links',
         },
         body
       )
