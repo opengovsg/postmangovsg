@@ -25,7 +25,7 @@ import {
   ApiInvalidTemplateError,
   ApiRateLimitError,
 } from '@core/errors/rest-api.errors'
-import { Attachment, getAttachmentHash } from '@core/utils/attachment'
+import { UploadedFile } from 'express-fileupload'
 
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler
@@ -52,7 +52,7 @@ export const InitEmailTransactionalMiddleware = (
     from: string
     recipient: string
     reply_to: string
-    attachments?: Attachment[]
+    attachments?: UploadedFile[]
     classification: TransactionalEmailClassification
     tag: string
   }
@@ -100,7 +100,7 @@ export const InitEmailTransactionalMiddleware = (
       ? attachments.map((a) => ({
           fileName: a.name,
           fileSize: a.size,
-          hash: getAttachmentHash(a.data),
+          hash: a.md5,
         }))
       : null
 

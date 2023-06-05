@@ -1,10 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
-import fileUpload from 'express-fileupload'
+import fileUpload, { UploadedFile } from 'express-fileupload'
 import config from '@core/config'
-import {
-  Attachment,
-  ensureAttachmentsFieldIsArray,
-} from '@core/utils/attachment'
+import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
 import {
   ApiAttachmentLimitError,
@@ -111,7 +108,7 @@ async function storeCampaignEmbed(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const a = req.body.attachments[0] as Attachment
+  const a = req.body.attachments[0] as UploadedFile
   const hash = a.md5
   const type = a.mimetype
   const commonAttachment = await CommonAttachment.create({
