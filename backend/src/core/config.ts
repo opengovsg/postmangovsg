@@ -154,6 +154,10 @@ interface ConfigSchema {
     maxAttachmentNum: number
     maxCumulativeAttachmentsSize: number
   }
+  commonAttachments: {
+    maxFileSize: number
+    bucketName: string
+  }
 }
 
 convict.addFormats({
@@ -695,6 +699,19 @@ const config: Config<ConfigSchema> = convict({
       default: 10 * 1024 * 1024,
       env: 'FILE_ATTACHMENT_MAX_CUMULATIVE_SIZE',
       format: Number,
+    },
+  },
+  commonAttachments: {
+    maxFileSize: {
+      doc: 'Maximum file size of a common attachment',
+      default: 50 * 1024 * 1024, // 50 MB
+      env: 'COMMON_ATTACHMENT_MAX_SIZE',
+      format: Number,
+    },
+    bucketName: {
+      doc: 'S3 bucket to store common attachments',
+      default: 'development.common-attachments',
+      env: 'COMMON_ATTACHMENT_BUCKET_NAME',
     },
   },
 })
