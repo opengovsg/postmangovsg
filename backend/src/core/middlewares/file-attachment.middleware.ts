@@ -113,6 +113,7 @@ async function storeCampaignEmbed(
   const a = req.body.attachments[0] as UploadedFile
   const hash = a.md5
   const type = a.mimetype
+  const userId = req.session?.user?.id
   const commonAttachment = await CommonAttachment.create({
     id: uuidv4(),
     originalFileName: a.name,
@@ -121,6 +122,7 @@ async function storeCampaignEmbed(
       hash,
       type,
     },
+    userId,
   } as CommonAttachment)
   await s3.putObject({
     Bucket: config.get('commonAttachments.bucketName'),

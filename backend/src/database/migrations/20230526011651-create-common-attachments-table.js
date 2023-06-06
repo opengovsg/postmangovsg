@@ -15,6 +15,15 @@ module.exports = {
       metadata: {
         type: Sequelize.DataTypes.JSONB,
       },
+      user_id: {
+        type: Sequelize.DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+        onUpdate: 'CASCADE',
+      },
       created_at: {
         type: Sequelize.DataTypes.DATE,
         allowNull: false,

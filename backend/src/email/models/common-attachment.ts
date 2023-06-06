@@ -1,4 +1,11 @@
-import { Column, DataType, Model, Table } from 'sequelize-typescript'
+import { User } from '@core/models'
+import {
+  Column,
+  DataType,
+  ForeignKey,
+  Model,
+  Table,
+} from 'sequelize-typescript'
 
 @Table({
   tableName: 'common_attachments',
@@ -25,4 +32,8 @@ export class CommonAttachment extends Model<CommonAttachment> {
     type: string
     hash: string
   }
+
+  @ForeignKey(() => User)
+  @Column(DataType.INTEGER)
+  userId!: number
 }
