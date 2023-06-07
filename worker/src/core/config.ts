@@ -85,7 +85,6 @@ export interface ConfigSchema {
     enabled: boolean
     endpointUrl: string
     apiKey: string
-    version: string
   }
 }
 
@@ -357,12 +356,6 @@ const config: Config<ConfigSchema> = convict({
       doc: 'API key to make requests to Phonebook',
       default: 'API_KEY',
       env: 'PHONEBOOK_API_KEY',
-      format: 'required-string',
-    },
-    version: {
-      doc: 'Version number of Phonebook',
-      default: '1',
-      env: 'PHONEBOOK_VERSION',
       format: 'required-string',
     },
   },
