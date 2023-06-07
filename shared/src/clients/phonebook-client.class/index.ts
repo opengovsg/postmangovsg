@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import * as http from 'http'
 
 export default class PhonebookClient {
@@ -20,7 +20,10 @@ export default class PhonebookClient {
     })
   }
 
-  private request(options: AxiosRequestConfig, body?: any): Promise<any> {
+  private request<TBody>(
+    options: AxiosRequestConfig<TBody>,
+    body?: TBody
+  ): Promise<AxiosResponse> {
     const defaultOptions: AxiosRequestConfig = {
       method: 'post', // default method will be post
     }
