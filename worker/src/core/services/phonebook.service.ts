@@ -10,20 +10,30 @@ import CircuitBreaker from 'opossum'
 
 const phonebookClient: PhonebookClient = new PhonebookClient(
   config.get('phonebook.endpointUrl'),
-  config.get('phonebook.apiKey'),
-  config.get('phonebook.version')
+  config.get('phonebook.apiKey')
 )
 
 const options = {
   timeout: 5000, // Trigger failure if phonebook takes longer than 5sec to respond
   errorThresholdPercentage: 20, // When 20% of requests fail, open the circuit
   resetTimeout: 30000, // After 30 seconds, half open the circuit and try again.
+  enabled: true,
 }
 
-const breaker = new CircuitBreaker(
-  phonebookClient.getUniqueLinksForUsers,
-  options
-)
+const getUniqueLinksForUsers = async (
+  body: PhonebookChannelDto
+): Promise<Map<string, UserChannel>> => {
+  const userChannelsRes = await phonebookClient.getUniqueLinksForUsers(body)
+  return userChannelsRes.reduce(
+    (map: Map<string, UserChannel>, userChannel: UserChannel) => {
+      map.set(userChannel.channelId, userChannel)
+      return map
+    },
+    new Map<string, UserChannel>()
+  )
+}
+
+const breaker = new CircuitBreaker(getUniqueLinksForUsers, options)
 
 const appendLinkForEmail = async (
   result: EmailResultRow[],
@@ -41,18 +51,24 @@ const appendLinkForEmail = async (
     userChannels: channels,
   }
 
-  const userChannelMap = await getUniqueLinksForUsers(payload)
-
-  return map(result, (row) => {
-    const { senderEmail } = row.message
-    const showMasthead = senderEmail.endsWith(showMastheadDomain)
-    const userChannel = userChannelMap.get(row.message.recipient)
-    return {
-      ...row.message,
-      showMasthead,
-      userUniqueLink: userChannel?.userUniqueLink || '',
-    }
-  })
+  return breaker
+    .fire(payload)
+    .then((res) => {
+      const userChannelMap = res
+      return map(result, (row) => {
+        const { senderEmail } = row.message
+        const showMasthead = senderEmail.endsWith(showMastheadDomain)
+        const userChannel = userChannelMap.get(row.message.recipient)
+        return {
+          ...row.message,
+          showMasthead,
+          userUniqueLink: userChannel?.userUniqueLink || '',
+        }
+      })
+    })
+    .catch((err) => {
+      throw err
+    })
 }
 
 const appendLinkForSms = async (result: Message[], channel = 'Sms') => {
@@ -83,25 +99,6 @@ const appendLinkForSms = async (result: Message[], channel = 'Sms') => {
   })
 }
 
-const getUniqueLinksForUsers = async (
-  body: PhonebookChannelDto
-): Promise<Map<string, UserChannel>> => {
-  return breaker
-    .fire(body)
-    .then((resp) => {
-      const userChannelsRes = resp as UserChannel[]
-      return userChannelsRes.reduce(
-        (map: Map<string, UserChannel>, userChannel: UserChannel) => {
-          map.set(userChannel.channelId, userChannel)
-          return map
-        },
-        new Map<string, UserChannel>()
-      )
-    })
-    .catch((error) => {
-      throw error
-    })
-}
 export const PhonebookService = {
   appendLinkForEmail,
   appendLinkForSms,
