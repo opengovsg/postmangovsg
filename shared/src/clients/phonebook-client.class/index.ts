@@ -34,7 +34,10 @@ export default class PhonebookClient {
     })
   }
 
-  public async getManagedLists(email: string, channel: string) {
+  public async getManagedLists(
+    email: string,
+    channel: string
+  ): Promise<{ id: number; name: string }[]> {
     try {
       const res = await this.request({
         method: 'get',
@@ -50,7 +53,9 @@ export default class PhonebookClient {
     }
   }
 
-  public async getManagedListById(listId: number) {
+  public async getManagedListById(
+    listId: number
+  ): Promise<{ s3Key: string; etag: string; filename: string }> {
     try {
       const res = await this.request({
         method: 'get',
