@@ -21,26 +21,24 @@ export default class PhonebookClient {
     })
   }
 
-  private request<TBody>(
+  request<TData, TBody = any>(
     options: AxiosRequestConfig<TBody>,
     body?: TBody
-  ): Promise<AxiosResponse> {
+  ) {
     const defaultOptions: AxiosRequestConfig = {
       method: 'post', // default method will be post
     }
-    return this.client.request({
-      ...defaultOptions,
-      ...options,
-      data: { ...body },
-    })
+    const requestConfig = body
+      ? { ...defaultOptions, ...options, data: { ...body } }
+      : { ...defaultOptions, ...options }
+    return this.client.request<TData, AxiosResponse<TData>, TBody>(
+      requestConfig
+    )
   }
 
-  public async getManagedLists(
-    email: string,
-    channel: string
-  ): Promise<{ id: number; name: string }[]> {
+  public async getManagedLists(email: string, channel: string) {
     try {
-      const res = await this.request({
+      const res = await this.request<{ id: number; name: string }[]>({
         method: 'get',
         url: `/managed-list`,
         params: {
@@ -54,11 +52,13 @@ export default class PhonebookClient {
     }
   }
 
-  public async getManagedListById(
-    listId: number
-  ): Promise<{ s3Key: string; etag: string; filename: string }> {
+  public async getManagedListById(listId: number) {
     try {
-      const res = await this.request({
+      const res = await this.request<{
+        s3Key: string
+        etag: string
+        filename: string
+      }>({
         method: 'get',
         url: `/managed-list/${listId}/members/s3`,
       })
