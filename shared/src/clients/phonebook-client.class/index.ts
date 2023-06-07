@@ -1,4 +1,4 @@
-import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import * as http from 'http'
 
 export default class PhonebookClient {
@@ -20,7 +20,10 @@ export default class PhonebookClient {
     })
   }
 
-  private request(options: AxiosRequestConfig, body?: any): Promise<any> {
+  private request<TBody>(
+    options: AxiosRequestConfig<TBody>,
+    body?: TBody
+  ): Promise<AxiosResponse> {
     const defaultOptions: AxiosRequestConfig = {
       method: 'post', // default method will be post
     }
@@ -31,7 +34,10 @@ export default class PhonebookClient {
     })
   }
 
-  public async getManagedLists(email: string, channel: string) {
+  public async getManagedLists(
+    email: string,
+    channel: string
+  ): Promise<{ id: number; name: string }[]> {
     try {
       const res = await this.request({
         method: 'get',
@@ -43,11 +49,13 @@ export default class PhonebookClient {
       })
       return res.data
     } catch (err) {
-      throw new Error(err as any)
+      throw new Error('Could not get managed lists')
     }
   }
 
-  public async getManagedListById(listId: number) {
+  public async getManagedListById(
+    listId: number
+  ): Promise<{ s3Key: string; etag: string; filename: string }> {
     try {
       const res = await this.request({
         method: 'get',
@@ -55,7 +63,7 @@ export default class PhonebookClient {
       })
       return res.data
     } catch (err) {
-      throw new Error(err as any)
+      throw new Error('Could not get managed list by id')
     }
   }
 }
