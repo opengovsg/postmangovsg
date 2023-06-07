@@ -43,7 +43,7 @@ export default class PhonebookClient {
       })
       return res.data
     } catch (err) {
-      throw new Error(err as any)
+      throw new Error('Could not get managed lists')
     }
   }
 
@@ -55,7 +55,7 @@ export default class PhonebookClient {
       })
       return res.data
     } catch (err) {
-      throw new Error(err as any)
+      throw new Error('Could not get managed list by id')
     }
   }
 }
