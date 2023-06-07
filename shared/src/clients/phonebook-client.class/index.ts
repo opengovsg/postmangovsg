@@ -1,15 +1,14 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios'
+import * as http from 'http'
 
 export default class PhonebookClient {
   private client: AxiosInstance
   private baseUrl: string
   private apiKey: string
-  private version: string
 
-  constructor(baseUrl: string, apiKey: string, version: string) {
+  constructor(baseUrl: string, apiKey: string) {
     this.baseUrl = baseUrl
     this.apiKey = apiKey
-    this.version = version
     this.client = axios.create({
       baseURL: this.baseUrl,
       timeout: 5000,
@@ -17,11 +16,11 @@ export default class PhonebookClient {
         'Content-Type': 'application/json',
         'x-api-key': this.apiKey,
       },
+      httpAgent: new http.Agent({ keepAlive: true }),
     })
   }
 
   private request(options: AxiosRequestConfig, body?: any): Promise<any> {
-    options.url = `/api/v${this.version}/${options.url}`
     const defaultOptions: AxiosRequestConfig = {
       method: 'post', // default method will be post
     }
@@ -36,7 +35,7 @@ export default class PhonebookClient {
     try {
       const res = await this.request({
         method: 'get',
-        url: `managed-list`,
+        url: `/managed-list`,
         params: {
           owner: email,
           channel,
@@ -52,7 +51,7 @@ export default class PhonebookClient {
     try {
       const res = await this.request({
         method: 'get',
-        url: `managed-list/${listId}/members/s3`,
+        url: `/managed-list/${listId}/members/s3`,
       })
       return res.data
     } catch (err) {
