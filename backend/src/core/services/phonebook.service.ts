@@ -8,8 +8,7 @@ const logger = loggerWithLabel(module)
 
 const phonebookClient: PhonebookClient = new PhonebookClient(
   config.get('phonebook.endpointUrl'),
-  config.get('phonebook.apiKey'),
-  config.get('phonebook.version')
+  config.get('phonebook.apiKey')
 )
 
 const getPhonebookLists = async ({
