@@ -76,8 +76,8 @@ class SMS {
         return await PhonebookService.appendLinkForSms(result)
       } catch (error) {
         logger.error({
-          message: 'Unable to fetch contact preferences',
-          error: (error as any).message,
+          message: 'Unable to append links',
+          error,
           workerId: this.workerId,
         })
         // If phonebook is down, we still want to continue sending the messages

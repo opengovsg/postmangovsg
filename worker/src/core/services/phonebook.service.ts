@@ -5,7 +5,7 @@ import {
   UserChannel,
 } from '@shared/clients/phonebook-client.class/interfaces'
 import { map } from 'lodash'
-import { EmailResultRow } from '@core/loaders/message-worker/interface'
+import { EmailResultRow, Message } from '@core/loaders/message-worker/interface'
 import CircuitBreaker from 'opossum'
 
 const phonebookClient: PhonebookClient = new PhonebookClient(
@@ -38,7 +38,7 @@ const breaker = new CircuitBreaker(getUniqueLinksForUsers, options)
 const appendLinkForEmail = async (
   result: EmailResultRow[],
   channel = 'Email'
-) => {
+): Promise<Message[]> => {
   const showMastheadDomain = config.get('showMastheadDomain')
 
   const channels: UserChannel[] = result.map((row) => {
@@ -80,7 +80,15 @@ const appendLinkForSms = async (
     campaignId: number
   }[],
   channel = 'SMS'
-) => {
+): Promise<
+  {
+    id: number
+    recipient: string
+    params: { [key: string]: string }
+    body: string
+    campaignId: number
+  }[]
+> => {
   const channels: UserChannel[] = result.map((message) => {
     return {
       channel,
