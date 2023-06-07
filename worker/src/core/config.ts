@@ -93,6 +93,12 @@ export interface ConfigSchema {
     authTokenTwo: string
     authTokenTwoExpiry: string
   }
+
+  phonebook: {
+    enabled: boolean
+    endpointUrl: string
+    apiKey: string
+  }
 }
 
 const config: Config<ConfigSchema> = convict({
@@ -410,6 +416,25 @@ const config: Config<ConfigSchema> = convict({
       doc: 'WhatsApp Auth Token expiry for client 2, for local dev only',
       env: 'WA_AUTH_TOKEN_2_EXPIRY',
       default: '',
+    },
+  },
+  phonebook: {
+    enabled: {
+      doc: 'Kill switch of phonebook related features',
+      default: false,
+      env: 'PHONEBOOK_FEATURE_ENABLE',
+    },
+    endpointUrl: {
+      doc: 'Endpoint url of phonebook server',
+      default: 'http://localhost:8080',
+      env: 'PHONEBOOK_URL',
+      format: 'required-string',
+    },
+    apiKey: {
+      doc: 'API key to make requests to Phonebook',
+      default: 'API_KEY',
+      env: 'PHONEBOOK_API_KEY',
+      format: 'required-string',
     },
   },
 })
