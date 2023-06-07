@@ -160,7 +160,6 @@ const EmailRecipients = ({
     const lists = await getPhonebookListsByChannel({ channel: campaign.type })
     setPhonebookLists(
       lists.map((l: AgencyList) => {
-        // replace all space with dash
         return { label: l.name, value: l.id.toString() }
       })
     )
