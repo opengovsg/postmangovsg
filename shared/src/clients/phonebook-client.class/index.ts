@@ -68,11 +68,9 @@ export default class PhonebookClient {
     }
   }
 
-  public async getUniqueLinksForUsers(
-    body: PhonebookChannelDto
-  ): Promise<UserChannel[]> {
+  public async getUniqueLinksForUsers(body: PhonebookChannelDto) {
     try {
-      const res = await this.request(
+      const res = await this.request<UserChannel[]>(
         {
           method: 'post',
           url: '/public-user/unique-links',
