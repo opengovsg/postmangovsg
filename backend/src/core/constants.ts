@@ -2,6 +2,7 @@ export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
   Telegram = 'TELEGRAM',
+  Govsg = 'GOVSG',
 }
 
 export enum CampaignStatus {
@@ -26,6 +27,15 @@ export enum MessageStatus {
   Success = 'SUCCESS',
   Read = 'READ',
   InvalidRecipient = 'INVALID_RECIPIENT',
+}
+
+export enum GovsgMessageStatus {
+  Unsent = 'UNSENT',
+  Accepted = 'ACCEPTED',
+  Sent = 'SENT',
+  Delivered = 'DELIVERED',
+  Read = 'READ',
+  Error = 'ERROR',
 }
 
 export enum DefaultCredentialName {
