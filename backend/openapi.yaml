@@ -1583,6 +1583,57 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/templates:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Choose a template for a govsg campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                template_id:
+                  type: number
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GovSGCampaign'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
   /campaign/{campaignId}/govsg/upload/start:
     get:
       security:
