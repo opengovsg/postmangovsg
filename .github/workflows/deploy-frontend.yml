@@ -5,6 +5,9 @@ on:
       revert_command:
         description: "Command to revert frontend deployment"
         value: ${{ jobs.deploy-frontend.outputs.revert_cmd }}
+  push:
+    branches:
+      - staging2
 env:
   APP_ID: d3k3b7zs07zjio
 jobs:

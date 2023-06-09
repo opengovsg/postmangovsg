@@ -2,6 +2,7 @@ name: Lint and test
 on:
   push:
     branches:
+      - staging2
       - staging
       - master
   pull_request:

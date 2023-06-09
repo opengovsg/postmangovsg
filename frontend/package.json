@@ -1,7 +1,7 @@
 {
   "name": "frontend",
   "private": true,
-  "proxy": "https://api-staging.postman.gov.sg",
+  "proxy": "https://api-staging2.postman.gov.sg",
   "scripts": {
     "start": "react-app-rewired start",
     "dev": "npm start",

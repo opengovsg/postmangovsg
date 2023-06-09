@@ -1,5 +1,4 @@
-export const API_URL =
-  process.env.API_URL || 'https://api-staging.postman.gov.sg';
+export const API_URL = process.env.API_URL || "https://api-staging2.postman.gov.sg";
 export const API_KEY = process.env.API_KEY as string;
 export const MAILBOX = process.env.MAIL_BOX || 'internal-testing@open.gov.sg';
 
