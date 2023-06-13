@@ -1,7 +1,10 @@
+import { UploadData } from '@core/interfaces'
+import { UploadService } from '@core/services'
 import { CampaignGovsgTemplate } from '@govsg/models/campaign-govsg-template'
 import { GovsgMessage } from '@govsg/models/govsg-message'
 import { GovsgTemplate } from '@govsg/models/govsg-template'
 import { TemplateClient } from '@shared/templating'
+import { GovsgService } from '.'
 
 const templateCli = new TemplateClient({
   xssOptions: { whiteList: { br: [] }, stripIgnoreTag: true },
@@ -42,4 +45,20 @@ export async function getHydratedMessage(
   }
 
   return { body: templateCli.template(template?.body as string, params) }
+}
+
+export function testHydration(
+  records: Array<{ params: { [key: string]: string } }>,
+  templateBody: string
+): void {
+  templateCli.template(templateBody, records[0].params)
+}
+
+export function processUpload(
+  uploadData: UploadData<GovsgTemplate>
+): Promise<void> {
+  return UploadService.processUpload<GovsgTemplate>(
+    GovsgService.uploadCompleteOnPreview,
+    GovsgService.uploadCompleteOnChunk
+  )(uploadData)
 }

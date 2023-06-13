@@ -1,9 +1,17 @@
 import { ChannelType } from '@core/constants'
 import { CampaignDetails } from '@core/interfaces'
 import { Campaign } from '@core/models'
-import { CampaignService } from '@core/services'
+import { CampaignService, UploadService } from '@core/services'
+import { CSVParams } from '@core/types'
 import { CampaignGovsgTemplate } from '@govsg/models/campaign-govsg-template'
 import { GovsgTemplate } from '@govsg/models/govsg-template'
+import { Transaction } from 'sequelize'
+import { GovsgTemplateService } from '.'
+import { GovsgMessage } from '@govsg/models/govsg-message'
+import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 
 export async function getCampaignDetails(
   campaignId: number
@@ -56,4 +64,59 @@ export async function duplicateCampaign({
     }
     return duplicate
   })
+}
+
+export function uploadCompleteOnPreview({
+  transaction,
+  template,
+  campaignId,
+}: {
+  transaction: Transaction
+  template: GovsgTemplate
+  campaignId: number
+}): (data: CSVParams[]) => Promise<void> {
+  return async function (data: CSVParams[]): Promise<void> {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    UploadService.checkTemplateKeysMatch(data, template.params!)
+
+    GovsgTemplateService.testHydration(
+      [{ params: data[0] }],
+      template.body as string
+    )
+    await GovsgMessage.destroy({
+      where: { campaignId },
+      transaction,
+    })
+  }
+}
+
+export function uploadCompleteOnChunk({
+  transaction,
+  campaignId,
+}: {
+  transaction: Transaction
+  campaignId: number
+}): (data: CSVParams[]) => Promise<void> {
+  return async function (data: CSVParams[]): Promise<void> {
+    const records: Array<MessageBulkInsertInterface> = data.map((entry) => ({
+      campaignId,
+      recipient: entry.recipient.trim(),
+      params: entry,
+    }))
+
+    await GovsgMessage.bulkCreate(records as Array<GovsgMessage>, {
+      transaction,
+      logging: (_message, benchmark) => {
+        if (benchmark) {
+          logger.info({
+            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+            benchmark,
+            campaignId,
+            action: 'uploadCompleteOnChunk',
+          })
+        }
+      },
+      benchmark: true,
+    })
+  }
 }
