@@ -5,7 +5,7 @@ const { GovsgMessageStatus } = require('@core/constants')
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.sequelize.query(
-      "ALTER TYPE enum_campaigns_type ADD VALUE 'WHATSAPP';"
+      "ALTER TYPE enum_campaigns_type ADD VALUE 'GOVSG';"
     )
     await queryInterface.createTable('govsg_messages', {
       id: {
@@ -277,7 +277,7 @@ module.exports = {
     await queryInterface.dropTable('govsg_templates')
     await queryInterface.dropTable('govsg_messages')
     await queryInterface.sequelize.query(`
-      DELETE FROM campaigns WHERE type = 'WHATSAPP';
+      DELETE FROM campaigns WHERE type = 'GOVSG';
       ALTER TYPE enum_campaigns_type RENAME TO _enum_campaigns_type;
       CREATE TYPE enum_campaigns_type AS ENUM('SMS', 'EMAIL', 'TELEGRAM');
       ALTER TABLE campaigns ALTER COLUMN type TYPE enum_campaigns_type USING type::text::enum_campaigns_type;
