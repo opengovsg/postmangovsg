@@ -72,24 +72,11 @@ class Email {
     const phonebookFeatureFlag = config.get('phonebook.enabled')
     if (phonebookFeatureFlag && result.length > 0) {
       try {
-        const campaignId = result[0].message.campaignId as number
-        const emailResult = await this.connection.query<{ email: string }>(
-          'select u.email as email from users u where u.id = (select c.user_id from campaigns c where c.id = :campaignId);',
-          {
-            replacements: { campaignId },
-            type: QueryTypes.SELECT,
-          }
-        )
-        if (!emailResult || emailResult.length === 0) {
-          throw new Error(
-            'Unable to fetch user email from campaign for phonebook contact preference api'
-          )
-        }
         return await PhonebookService.appendLinkForEmail(result)
       } catch (error) {
         logger.error({
-          message: 'Unable to fetch contact preferences',
-          error: (error as any).message,
+          message: 'Unable to append links',
+          error,
           workerId: this.workerId,
         })
         // If phonebook is down, we still want to continue sending the messages

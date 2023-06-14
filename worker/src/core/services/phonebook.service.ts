@@ -38,7 +38,7 @@ const breaker = new CircuitBreaker(getUniqueLinksForUsers, options)
 const appendLinkForEmail = async (
   result: EmailResultRow[],
   channel = 'Email'
-) => {
+): Promise<Message[]> => {
   const showMastheadDomain = config.get('showMastheadDomain')
 
   const channels: UserChannel[] = result.map((row) => {
@@ -71,7 +71,24 @@ const appendLinkForEmail = async (
     })
 }
 
-const appendLinkForSms = async (result: Message[], channel = 'Sms') => {
+const appendLinkForSms = async (
+  result: {
+    id: number
+    recipient: string
+    params: { [key: string]: string }
+    body: string
+    campaignId: number
+  }[],
+  channel = 'SMS'
+): Promise<
+  {
+    id: number
+    recipient: string
+    params: { [key: string]: string }
+    body: string
+    campaignId: number
+  }[]
+> => {
   const channels: UserChannel[] = result.map((message) => {
     return {
       channel,
@@ -82,21 +99,27 @@ const appendLinkForSms = async (result: Message[], channel = 'Sms') => {
     userChannels: channels,
   }
 
-  const userChannelMap = await getUniqueLinksForUsers(payload)
-
-  return map(result, (message) => {
-    const userChannel = userChannelMap.get(message.recipient)
-    let body: string
-    if (userChannel?.userUniqueLink) {
-      body = `${message.body}\n\nKeep your contact details up to date at: ${userChannel?.userUniqueLink}`
-    } else {
-      body = message.body
-    }
-    return {
-      ...message,
-      body,
-    }
-  })
+  return breaker
+    .fire(payload)
+    .then((res) => {
+      const userChannelMap = res
+      return map(result, (message) => {
+        const userChannel = userChannelMap.get(message.recipient)
+        let body: string
+        if (userChannel?.userUniqueLink) {
+          body = `${message.body}\n\nKeep your contact details up to date at: ${userChannel?.userUniqueLink}`
+        } else {
+          body = message.body
+        }
+        return {
+          ...message,
+          body,
+        }
+      })
+    })
+    .catch((err) => {
+      throw err
+    })
 }
 
 export const PhonebookService = {

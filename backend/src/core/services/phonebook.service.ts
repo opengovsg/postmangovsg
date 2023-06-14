@@ -43,7 +43,7 @@ const getPhonebookListById = async ({
   listId,
 }: {
   listId: number
-}): Promise<any> => {
+}): Promise<{ s3Key: string; etag: string; filename: string }> => {
   try {
     return await phonebookClient.getManagedListById(listId)
   } catch (err) {
