@@ -5,24 +5,24 @@ import {
   XSS_TELEGRAM_OPTION,
 } from '@shared/templating'
 
-import { union, difference } from 'lodash'
+import { difference, union } from 'lodash'
 import { rest } from 'msw'
 
 import {
-  USER_EMAIL,
-  TWILIO_CREDENTIAL,
-  TELEGRAM_CREDENTIAL,
   DEFAULT_FROM,
-  PRESIGNED_URL,
+  INVALID_CSV_FILENAME,
   INVALID_TELEGRAM_CREDENTIAL,
   INVALID_TWILIO_CREDENTIAL,
-  INVALID_CSV_FILENAME,
+  PRESIGNED_URL,
+  TELEGRAM_CREDENTIAL,
+  TWILIO_CREDENTIAL,
+  USER_EMAIL,
 } from './constants'
 
 import type {
-  State,
   EmailTemplate,
   SMSTemplate,
+  State,
   TelegramTemplate,
 } from './interfaces'
 
@@ -90,6 +90,7 @@ function mockCommonApis(initialState?: Partial<State>) {
       ...mockUnsubscribeApis(state),
       ...mockProtectApis(state),
       ...mockListApis(state),
+      ...mockPhonebookApis(state),
     ],
   }
 }
@@ -797,6 +798,21 @@ function mockListApis(state: State) {
     rest.get('/lists/:channel', (req, res, ctx) => {
       const { channel } = req.params
 
+      if (
+        !Object.values(ChannelType).includes(channel as unknown as ChannelType)
+      ) {
+        return res(ctx.status(400))
+      }
+
+      return res(ctx.status(200), ctx.json({ lists: state.lists }))
+    }),
+  ]
+}
+
+function mockPhonebookApis(state: State) {
+  return [
+    rest.get('/phonebook/lists/:channel', (req, res, ctx) => {
+      const { channel } = req.params
       if (
         !Object.values(ChannelType).includes(channel as unknown as ChannelType)
       ) {
