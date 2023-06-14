@@ -95,6 +95,10 @@ module.exports = {
         type: Sequelize.DataTypes.STRING(255),
         allowNull: false,
       },
+      name: {
+        type: Sequelize.DataTypes.TEXT,
+        allowNull: false,
+      },
       created_at: {
         type: Sequelize.DataTypes.DATE,
         allowNull: false,

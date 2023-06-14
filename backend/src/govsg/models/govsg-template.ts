@@ -39,4 +39,9 @@ export class GovsgTemplate extends Model<GovsgTemplate> {
     allowNull: true,
   })
   whatsappTemplateLabel?: string | null
+
+  @Column({
+    type: DataType.TEXT,
+  })
+  name: string
 }
