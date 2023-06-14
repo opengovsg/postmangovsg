@@ -171,6 +171,12 @@ export const InitSmsCampaignRoute = (
   )
 
   router.post(
+    '/phonebook-list',
+    celebrate(selectListValidator),
+    SmsTemplateMiddleware.selectPhonebookListHandler
+  )
+
+  router.post(
     '/select-list',
     celebrate(selectListValidator),
     SmsTemplateMiddleware.selectListHandler
