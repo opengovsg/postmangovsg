@@ -251,7 +251,7 @@ export const InitEmailTemplateMiddleware = (
   const selectPhonebookListHandler = async (
     req: Request,
     res: Response
-  ): Promise<Response | void> => {
+  ): Promise<Response> => {
     try {
       const { campaignId } = req.params
 
