@@ -21,9 +21,11 @@ export async function selectPhonebookList({
 }: {
   campaignId: number
   listId: number
-}): Promise<void> {
+}): Promise<{
+  list_id: number
+}> {
   try {
-    return await axios.post(`/campaign/${campaignId}/phonebook-list`, {
+    return axios.post(`/campaign/${campaignId}/phonebook-list`, {
       list_id: listId,
     })
   } catch (e) {

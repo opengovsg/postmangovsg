@@ -139,11 +139,13 @@ const SMSRecipients = ({
 
   const retrieveAndPopulatePhonebookLists = useCallback(async () => {
     const lists = await getPhonebookListsByChannel({ channel: campaign.type })
-    setPhonebookLists(
-      lists.map((l: AgencyList) => {
-        return { label: l.name, value: l.id.toString() }
-      })
-    )
+    if (lists) {
+      setPhonebookLists(
+        lists.map((l: AgencyList) => {
+          return { label: l.name, value: l.id.toString() }
+        })
+      )
+    }
   }, [campaign.type])
   // On load, retrieve the list of phonebook lists
   useEffect(() => {
