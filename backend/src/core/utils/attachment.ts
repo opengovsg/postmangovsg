@@ -1,6 +1,6 @@
 import { UploadedFile } from 'express-fileupload'
 
-const ensureAttachmentsFieldIsArray = (
+export const ensureAttachmentsFieldIsArray = (
   attachments: UploadedFile | UploadedFile[]
 ) => {
   if (!Array.isArray(attachments)) {
@@ -8,5 +8,3 @@ const ensureAttachmentsFieldIsArray = (
   }
   return attachments
 }
-
-export { ensureAttachmentsFieldIsArray }

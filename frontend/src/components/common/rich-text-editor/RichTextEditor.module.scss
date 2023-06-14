@@ -157,7 +157,7 @@
 
       label {
         @extend %caption;
-        width: $label-width;
+        margin-right: $spacing-1;
       }
 
       .control {
@@ -187,6 +187,17 @@
 
         &::placeholder {
           color: $neutral;
+        }
+      }
+
+      .dropzone {
+        padding: 0.5rem;
+        border: 2px dashed $primary-light;
+        border-radius: 0.25rem;
+        text-align: center;
+        p {
+          margin-bottom: 0;
+          color: $primary-light;
         }
       }
     }

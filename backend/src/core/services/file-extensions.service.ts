@@ -43,13 +43,22 @@ const hasAllowedExtensions = async (
   },
   allowedFileExtensions = DEFAULT_ALLOWED_EXTENSIONS
 ): Promise<boolean> => {
-  const { data, name } = file
-
-  const fileType = await FileType.fromBuffer(data)
-  const extension = fileType?.ext || `${`${name}`.split('.').pop()}`
+  const extension = await extractFileExtension(file)
   return allowedFileExtensions.includes(extension)
+}
+
+const extractFileExtension = async ({
+  data,
+  name,
+}: {
+  data: Buffer
+  name: string
+}): Promise<string> => {
+  const fileType = await FileType.fromBuffer(data)
+  return fileType?.ext || `${`${name}`.split('.').pop()}`
 }
 
 export const FileExtensionService = {
   hasAllowedExtensions,
+  extractFileExtension,
 }

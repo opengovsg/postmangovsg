@@ -47,6 +47,7 @@
     "react-app-polyfill": "3.0.0",
     "react-dom": "18.1.0",
     "react-draft-wysiwyg": "1.15.0",
+    "react-dropzone": "14.2.3",
     "react-ga": "3.3.1",
     "react-moment": "1.1.2",
     "react-paginate": "8.1.3",
