@@ -210,18 +210,20 @@ const EmailRecipients = ({
 
   return (
     <>
-      <PhonebookListSection
-        phonebookLists={phonebookLists}
-        setSelectedPhonebookListId={setSelectedPhonebookListId}
-        retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
-        isProcessing={isCsvProcessing}
-        // have to strip additional appended .csv label
-        defaultLabel={
-          phonebookLists.filter(
-            (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
-          )[0]?.label
-        }
-      />
+      {!campaign.protect && (
+        <PhonebookListSection
+          phonebookLists={phonebookLists}
+          setSelectedPhonebookListId={setSelectedPhonebookListId}
+          retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
+          isProcessing={isCsvProcessing}
+          // have to strip additional appended .csv label
+          defaultLabel={
+            phonebookLists.filter(
+              (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
+            )[0]?.label
+          }
+        />
+      )}
       <StepSection>
         <StepHeader title="Upload CSV File">
           <p>
