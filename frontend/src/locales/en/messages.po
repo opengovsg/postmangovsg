@@ -87,7 +87,7 @@ msgstr "Verifying OTP..."
 
 #: config.ts:89
 msgid "allowedImageSources"
-msgstr "file.go.gov.sg;file.for.sg;file.for.edu.sg"
+msgstr "file.go.gov.sg;file.for.sg;file.for.edu.sg;api.postman.gov.sg;api-staging.postman.gov.sg;localhost:4000"
 
 #: config.ts:108
 msgid "announcement.mediaUrl"
