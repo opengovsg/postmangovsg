@@ -39,4 +39,8 @@ Set the credentials for Gmail API call
 ## To run locally
 
 - From the `e2e` folder, run `npm i`.
-- From the root folder, run `npm run test:e2e`.
+- From the root folder
+  - To run the end-to-end tests directly: `npm run test`
+  - To run in debug mode: `npm run test -- --debug` (for variants like running subset of tests or specifying browsers, [see here](https://playwright.dev/docs/debug#run-in-debug-mode-1))
+
+Tip: If you're using VS Code, you can download the [Playwright Test for VSCode](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright) and [write](https://www.youtube.com/watch?v=LM4yqrOzmFE) and [debug](https://playwright.dev/docs/debug#vs-code-debugger) your tests directly in VS Code.
