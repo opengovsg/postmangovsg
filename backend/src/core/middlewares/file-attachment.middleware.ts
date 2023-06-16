@@ -14,7 +14,6 @@ import { CommonAttachment } from '@email/models/common-attachment'
 import { v4 as uuidv4 } from 'uuid'
 import { Readable } from 'stream'
 
-const FILE_ATTACHMENT_MAX_NUM = config.get('file.maxAttachmentNum')
 const TOTAL_ATTACHMENT_SIZE_LIMIT = config.get(
   'file.maxCumulativeAttachmentsSize'
 )
@@ -49,16 +48,6 @@ function preprocessPotentialIncomingFile(
   if (req.files?.attachments) {
     const { attachments } = req.files
     req.body.attachments = ensureAttachmentsFieldIsArray(attachments)
-    /**
-     * Throw explicit error for exceeding num files.
-     * express-fileupload does not throw error if num files
-     * exceeded, instead truncates array to specified num
-     */
-    if (req.body.attachments.length > FILE_ATTACHMENT_MAX_NUM) {
-      throw new ApiAttachmentLimitError(
-        `Number of attachments exceeds limit of ${FILE_ATTACHMENT_MAX_NUM}`
-      )
-    }
   }
   next()
 }

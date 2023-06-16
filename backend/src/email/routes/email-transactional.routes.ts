@@ -90,8 +90,9 @@ export const InitEmailTransactionalRoute = (
     '/send',
     emailTransactionalMiddleware.rateLimit,
     FileAttachmentMiddleware.getFileUploadHandler(
-      // this limit is on a per-file basis, that's why subsequent check is required
-      config.get('file.maxAttachmentSize') as number,
+      // this limit applies on a per-file basis, not a cumulative basis
+      // but we apply maxCumulativeAttachmentsSize since each file size cannot exceed this limit
+      config.get('file.maxCumulativeAttachmentsSize') as number,
       // this is necessary as express-fileupload relies on busboy, which has a
       // default field size limit of 1MB and does not throw any error
       // by setting the limit to be 1 byte above the max, any request with
