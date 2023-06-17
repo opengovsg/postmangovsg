@@ -5,7 +5,7 @@ const router = Router()
 
 /**
  * paths:
- * /callbacks/whatsapp:
+ * /callback/whatsapp:
  *  post:
  *   summary: Update status of WhatsApp message
  * responses:
@@ -15,6 +15,7 @@ const router = Router()
  *     description: Bad Request
  *
  */
-router.post('/', WhatsappCallbackMiddleware.testHandler)
+
+router.get('/', WhatsappCallbackMiddleware.verifyWebhookChallenge)
 
 export default router

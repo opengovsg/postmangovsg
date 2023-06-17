@@ -158,6 +158,9 @@ interface ConfigSchema {
     maxFileSize: number
     bucketName: string
   }
+  whatsapp: {
+    callbackVerifyToken: string
+  }
 }
 
 convict.addFormats({
@@ -712,6 +715,13 @@ const config: Config<ConfigSchema> = convict({
       doc: 'S3 bucket to store common attachments',
       default: 'development.common-attachments',
       env: 'COMMON_ATTACHMENT_BUCKET_NAME',
+    },
+  },
+  whatsapp: {
+    callbackVerifyToken: {
+      doc: 'Token used to verify callback from WhatsApp during webhook setup',
+      default: '',
+      env: 'WHATSAPP_CALLBACK_VERIFY_TOKEN',
     },
   },
 })
