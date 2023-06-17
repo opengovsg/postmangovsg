@@ -46,6 +46,7 @@ import { InitTelegramMiddleware } from '@telegram/middlewares'
 import { InitApiKeyRoute } from '@core/routes/api-key.routes'
 import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 import { InitCommonAttachmentRoute } from './common-attachment.routes'
+import whatsappCallbackRoutes from '@whatsapp/routes/whatsapp-callback.routes'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -252,6 +253,8 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/callback/sms', smsCallbackRoutes)
 
   router.use('/callback/telegram', telegramCallbackRoutes)
+
+  router.use('/callback/whatsapp', whatsappCallbackRoutes)
 
   router.use(
     '/lists',
