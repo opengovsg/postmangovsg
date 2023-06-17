@@ -10,6 +10,7 @@ module.exports = {
     '@sms/(.*)': '<rootDir>/src/sms/$1',
     '@email/(.*)': '<rootDir>/src/email/$1',
     '@telegram/(.*)': '<rootDir>/src/telegram/$1',
+    '@whatsapp/(.*)': '<rootDir>/src/whatsapp/$1',
     '@test-utils/(.*)': '<rootDir>/src/test-utils/$1',
     '@shared/(.*)': '<rootDir>/../shared/src/$1',
     '@mocks/(.*)': '<rootDir>/src/__mocks__/$1',
