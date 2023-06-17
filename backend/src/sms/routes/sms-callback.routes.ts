@@ -8,8 +8,6 @@ const router = Router()
  *  /callback/sms/{campaignId}/{messageId}:
  *    post:
  *      summary: Update status of sms message
- *      tags:
- *        - Settings
  *      parameters:
  *        - c: campaignId
  *          in: path
@@ -38,8 +36,6 @@ router.post(
  *  /callback/sms:
  *    post:
  *      summary: Update status of transactional sms message
- *      tags:
- *        - Settings
  *      responses:
  *        200:
  *          description: OK
