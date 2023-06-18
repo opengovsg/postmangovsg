@@ -39,9 +39,7 @@
       "@sms/*": ["sms/*"],
       "@email/*": ["email/*"],
       "@telegram/*": ["telegram/*"],
-      "@whatsapp/*": [
-        "whatsapp/*"
-      ],
+      "@whatsapp/*": ["whatsapp/*"],
       "@shared/*": ["../../shared/src/*"],
       "@test-utils/*": ["test-utils/*"],
       "@database/*": ["database/*"],
