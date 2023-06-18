@@ -12,8 +12,6 @@
   - [Development](#development)
     - [Install and run required services](#install-and-run-required-services)
       - [Starting all services using Docker](#starting-all-services-using-docker)
-      - [Starting postgresql and redis natively](#starting-postgresql-and-redis-natively)
-      - [Optionally, run the following to install and use `cw` to tail Cloudwatch logs](#optionally-run-the-following-to-install-and-use-cw-to-tail-cloudwatch-logs)
     - [Secrets detection](#secrets-detection)
     - [Set environment variables](#set-environment-variables)
     - [Install dependencies](#install-dependencies)
@@ -26,6 +24,7 @@
       - [Email](#email)
       - [SMS](#sms)
       - [Telegram](#telegram)
+      - [WhatsApp](#whatsapp)
   - [Deployment](#deployment)
   - [Releasing](#releasing)
   - [Serverless](#serverless)
@@ -167,7 +166,7 @@ We will be using [ngrok](https://ngrok.com/). Run this command to create a tunne
 ngrok http 4000
 ```
 
-You will get a public URL that looks something like ` https://d564-101-78-115-134.ap.ngrok.io`. Keep this as we will be using it for later sections.
+You will get a public URL that looks something like `https://d564-101-78-115-134.ap.ngrok.io`. Keep this as we will be using it for later sections. Depending on the route you are testing, you might need to serve HTML content, in which case you must sign up for a free ngrok account and install your authtoken.
 
 #### Email
 
@@ -207,6 +206,12 @@ Telegram webhook URL will be set when a credential added to the Postman platform
 
 **Note**: Because this URL is only set to the bot when the credentials are added, we will need to re-add the credentials when the ngrok URL changes between development sessions.
 
+#### WhatsApp
+
+- Start your backend server and run ngrok locally per [this step](#exposing-the-local-server-to-the-internet). Copy the ngrok URL (e.g. `https://3d7f-2a09-bac5-55fa-18c8-00-278-b6.ngrok-free.app`).
+- Go to [Meta's developer console](https://developers.facebook.com/apps/), select your application, select Webhooks (under the Products tab), click "Edit Subscription", paste the URL from the previous step under "Callback URL" and copy the `WHATSAPP_CALLBACK_VERIFY_TOKEN` from your `.env` file into the "Verify Token" field. Click "Verify and Save".
+- You can now click the "Test" button for a given event type to send a test webhook to your local server.
+
 ## Deployment
 
 We use Github Actions to simplify our deployment process:
@@ -232,7 +237,7 @@ See [downtime-procedure](docs/downtime-procedure/index.md) for steps on how to b
 
 ## Infrastructure customizations
 
-#### Amplify rewrite rule
+### Amplify rewrite rule
 
 ```
 [
@@ -245,7 +250,7 @@ See [downtime-procedure](docs/downtime-procedure/index.md) for steps on how to b
 ]
 ```
 
-#### Elastic Container Service
+### Elastic Container Service
 
 Create a cluster with four services. These names are currently hardcoded for deployment in .travis.yml
 
