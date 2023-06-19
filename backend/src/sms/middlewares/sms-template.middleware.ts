@@ -164,7 +164,7 @@ const selectPhonebookListHandler = async (
         'Error: No message template found. Please create a message template before uploading a recipient file.'
       )
     }
-    const { presignedUrl } = await UploadService.getPresignedUrl()
+    const { s3Key, presignedUrl } = await UploadService.getPresignedUrl()
 
     const list = await PhonebookService.getPhonebookListById({
       listId,
@@ -172,7 +172,7 @@ const selectPhonebookListHandler = async (
     })
     if (!list) throw new Error('Error: List not found')
 
-    const { s3Key, etag, filename } = list
+    const { etag, filename } = list
 
     // Store temp filename
     await UploadService.storeS3TempFilename(+campaignId, filename)

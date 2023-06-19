@@ -70,6 +70,7 @@ const getUploadParameters = async (
  * to upload the managed list
  */
 const getPresignedUrl = async (): Promise<{
+  s3Key: string
   presignedUrl: string
 }> => {
   const s3Key = uuid()
@@ -81,7 +82,7 @@ const getPresignedUrl = async (): Promise<{
   const presignedUrl = await getSignedUrl(s3, new PutObjectCommand(params), {
     expiresIn: 180, // seconds
   })
-  return { presignedUrl }
+  return { s3Key, presignedUrl }
 }
 
 /**

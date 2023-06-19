@@ -265,7 +265,7 @@ export const InitEmailTemplateMiddleware = (
         )
       }
 
-      const { presignedUrl } = await UploadService.getPresignedUrl()
+      const { s3Key, presignedUrl } = await UploadService.getPresignedUrl()
 
       const list = await PhonebookService.getPhonebookListById({
         listId,
@@ -273,7 +273,7 @@ export const InitEmailTemplateMiddleware = (
       })
       if (!list) throw new Error('Error: List not found')
 
-      const { s3Key, etag, filename } = list
+      const { etag, filename } = list
 
       // Store temp filename
       await UploadService.storeS3TempFilename(+campaignId, filename)
