@@ -20,7 +20,7 @@ export class GovsgTemplate extends Model<GovsgTemplate> {
   @BelongsToMany(() => Campaign, {
     through: { model: () => CampaignGovsgTemplate },
   })
-  campaign: Array<Campaign>
+  campaigns: Array<Campaign>
 
   @Column({
     type: DataType.TEXT,
