@@ -265,8 +265,11 @@ export const InitEmailTemplateMiddleware = (
         )
       }
 
+      const { presignedUrl } = await UploadService.getPresignedUrl()
+
       const list = await PhonebookService.getPhonebookListById({
         listId,
+        presignedUrl,
       })
       if (!list) throw new Error('Error: List not found')
 

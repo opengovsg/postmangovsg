@@ -41,11 +41,13 @@ const getPhonebookLists = async ({
 
 const getPhonebookListById = async ({
   listId,
+  presignedUrl,
 }: {
   listId: number
+  presignedUrl: string
 }): Promise<{ s3Key: string; etag: string; filename: string }> => {
   try {
-    return await phonebookClient.getManagedListById(listId)
+    return await phonebookClient.getManagedListById(listId, presignedUrl)
   } catch (err) {
     logger.error({
       action: 'getPhonebookListById',

@@ -164,9 +164,11 @@ const selectPhonebookListHandler = async (
         'Error: No message template found. Please create a message template before uploading a recipient file.'
       )
     }
+    const { presignedUrl } = await UploadService.getPresignedUrl()
 
     const list = await PhonebookService.getPhonebookListById({
       listId,
+      presignedUrl,
     })
     if (!list) throw new Error('Error: List not found')
 

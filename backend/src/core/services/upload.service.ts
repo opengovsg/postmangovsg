@@ -14,14 +14,14 @@ import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { jwtUtils } from '@core/utils/jwt'
 import { Campaign } from '@core/models'
 import {
-  CsvStatusInterface,
-  UploadData,
-  Upload,
   AllowedTemplateTypes,
+  CsvStatusInterface,
+  Upload,
+  UploadData,
 } from '@core/interfaces'
 import { CSVParams } from '@core/types'
 import S3Client from '@core/services/s3-client.class'
-import { StatsService, CampaignService, ParseCsvService } from '.'
+import { CampaignService, ParseCsvService, StatsService } from '.'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
 const logger = loggerWithLabel(module)
@@ -61,6 +61,27 @@ const getUploadParameters = async (
   })
 
   return { presignedUrl, signedKey }
+}
+
+/**
+ * Returns a presigned url for uploading file to s3 bucket
+ * Used as a passthrough function as we just need to generate the url
+ * to gain access to postman bucket, for other services , e.g. phonebook
+ * to upload the managed list
+ */
+const getPresignedUrl = async (): Promise<{
+  presignedUrl: string
+}> => {
+  const s3Key = uuid()
+
+  const params = {
+    Bucket: FILE_STORAGE_BUCKET_NAME,
+    Key: s3Key,
+  }
+  const presignedUrl = await getSignedUrl(s3, new PutObjectCommand(params), {
+    expiresIn: 180, // seconds
+  })
+  return { presignedUrl }
 }
 
 /**
@@ -428,6 +449,7 @@ const destroyUploadQueue = async (): Promise<void> => {
 export const UploadService = {
   /*** S3 API Calls ****/
   getUploadParameters,
+  getPresignedUrl,
   extractParamsFromJwt,
   /**** Handle S3Key in DB *****/
   storeS3TempFilename,
