@@ -37,6 +37,11 @@ export interface CampaignDetails {
   sms_templates?: {
     body: string
   }
+  govsg_templates?: {
+    id: number
+    body: string
+    params: Array<string>
+  }
   job_queue?: {
     status: string
     visible_at?: Date

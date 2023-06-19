@@ -39,6 +39,11 @@ import {
   TelegramSubscriber,
   TelegramTemplate,
 } from '@telegram/models'
+import { GovsgMessage } from '@govsg/models/govsg-message'
+import { GovsgMessageTransactional } from '@govsg/models/govsg-message-transactional'
+import { GovsgOp } from '@govsg/models/govsg-op'
+import { GovsgTemplate } from '@govsg/models/govsg-template'
+import { CampaignGovsgTemplate } from '@govsg/models/campaign-govsg-template'
 
 export const initializeModels = (sequelize: Sequelize): void => {
   const coreModels = [
@@ -76,11 +81,19 @@ export const initializeModels = (sequelize: Sequelize): void => {
     TelegramTemplate,
     TelegramSubscriber,
   ]
+  const govsgModels = [
+    GovsgMessage,
+    GovsgMessageTransactional,
+    GovsgOp,
+    GovsgTemplate,
+    CampaignGovsgTemplate,
+  ]
   sequelize.addModels([
     ...coreModels,
     ...emailModels,
     ...smsModels,
     ...telegramModels,
+    ...govsgModels,
   ])
 }
 

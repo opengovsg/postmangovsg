@@ -15,10 +15,15 @@ const logger = loggerWithLabel(module)
 
 export async function getCampaignDetails(
   campaignId: number
-): Promise<CampaignDetails> {
-  return CampaignService.getCampaignDetails(campaignId, [
-    { model: GovsgTemplate, attributes: ['body', 'params'] },
+): Promise<CampaignDetails | null> {
+  const [campaign, pivot] = await Promise.all([
+    CampaignService.getCampaignDetails(campaignId, []),
+    CampaignGovsgTemplate.findOne({
+      where: { campaignId },
+      include: { model: GovsgTemplate, attributes: ['id', 'body', 'params'] },
+    }),
   ])
+  return { ...campaign, govsg_templates: pivot?.govsgTemplate }
 }
 
 export const findCampaign = (

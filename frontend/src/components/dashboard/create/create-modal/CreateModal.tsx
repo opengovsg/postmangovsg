@@ -189,6 +189,32 @@ const CreateModal = ({
                 </p>
               )}
             </div>
+            <div className={styles.channelContainer}>
+              <input
+                type="radio"
+                aria-label={ChannelType.Govsg}
+                id={ChannelType.Govsg}
+                value={ChannelType.Govsg}
+                checked={selectedChannel === ChannelType.Govsg}
+                onChange={() => setSelectedChannel(ChannelType.Govsg)}
+              />
+              <label htmlFor={ChannelType.Govsg} className={styles.subtext}>
+                Gov.sg - WhatsApp
+              </label>
+              {selectedChannel === ChannelType.Govsg && (
+                <p className={styles.infotext}>
+                  Read more about this secure government communication channel
+                  <OutboundLink
+                    className={styles.link}
+                    eventLabel="https://google.com"
+                    to="https://google.com"
+                    target="_blank"
+                  >
+                    here.
+                  </OutboundLink>
+                </p>
+              )}
+            </div>
           </div>
         </div>
 

@@ -4,6 +4,7 @@ export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
   Telegram = 'TELEGRAM',
+  Govsg = 'GOVSG',
 }
 
 export enum Status {
@@ -34,6 +35,7 @@ export const channelIcons = {
   [ChannelType.SMS]: 'bx-message-detail',
   [ChannelType.Email]: 'bx-envelope-open',
   [ChannelType.Telegram]: 'bx-paper-plane',
+  [ChannelType.Govsg]: 'bx-govsg',
 }
 
 export class Campaign {
