@@ -10,7 +10,7 @@ export interface Message {
   agencyName?: string
   agencyLogoURI?: string
   showMasthead?: boolean
-  contactPrefLink?: string
+  userUniqueLink?: string
 }
 
 export interface ContactChannel {
