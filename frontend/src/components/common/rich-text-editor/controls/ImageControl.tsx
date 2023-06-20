@@ -1,18 +1,32 @@
+import { i18n } from '@lingui/core'
+import { t } from '@lingui/macro'
+
 import cx from 'classnames'
 import { AtomicBlockUtils } from 'draft-js'
-import { useContext, useState } from 'react'
+import { debounce } from 'lodash'
+import { useContext, useState, useMemo, useCallback } from 'react'
 
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
-import Dropzone from 'react-dropzone'
+import { OutboundLink } from 'react-ga'
 
 import { EditorContext } from '../RichTextEditor'
 import styles from '../RichTextEditor.module.scss'
+import { isImgSrcValid, isExternalImage } from '../utils/image'
 
 import CloseButton from 'components/common/close-button'
-import { uploadCommonCampaignAttachment } from 'services/attachment.service'
+import Tooltip from 'components/common/tooltip'
+import { LINKS } from 'config'
 
 const VARIABLE_REGEX = new RegExp(/^{{\s*?\w+\s*?}}$/)
+
+enum ImagePreviewState {
+  Blank,
+  Error,
+  Loading,
+  Success,
+  External,
+}
 
 interface ImageControlProps {
   currentState: any
@@ -32,28 +46,51 @@ const ImageForm = ({
 }) => {
   const [imgSrc, setImgSrc] = useState('')
   const [link, setLink] = useState('')
+  const [previewState, setPreviewState] = useState(ImagePreviewState.Blank)
   const [error, setError] = useState('')
-  const [isLoading, setIsLoading] = useState(false)
+
+  const isValidUrl = (url: string): boolean => {
+    try {
+      const { protocol } = new URL(url)
+      return protocol === 'http:' || protocol === 'https:'
+    } catch (err) {
+      return false
+    }
+  }
+
+  const updatePreviewState = useCallback(async (imgSrc: string) => {
+    setError('')
+
+    try {
+      if (!isValidUrl(imgSrc)) {
+        setPreviewState(ImagePreviewState.Error)
+        setError(t`errors.insertImage.notImage`)
+      } else if (isExternalImage(imgSrc)) {
+        setPreviewState(ImagePreviewState.External)
+      } else if (await isImgSrcValid(imgSrc)) {
+        setPreviewState(ImagePreviewState.Success)
+      } else {
+        setPreviewState(ImagePreviewState.Error)
+        setError(t`errors.insertImage.invalidUrl`)
+      }
+    } catch (err) {
+      setPreviewState(ImagePreviewState.Error)
+      setError(t`errors.insertImage.notImage`)
+    }
+  }, [])
+
+  const debouncedUpdatePreviewState = useMemo(
+    () => debounce(updatePreviewState, 900),
+    [updatePreviewState]
+  )
 
   function stopPropagation(e: ReactMouseEvent<HTMLElement>) {
     e.stopPropagation()
   }
 
-  async function handleDrop(files: Array<File>) {
-    setIsLoading(true)
-    if (!files || files.length === 0) return
-    try {
-      setImgSrc(await uploadCommonCampaignAttachment(files[0]))
-    } catch (e) {
-      setError('Failed to upload image. Please check file size to be < 50MB')
-    } finally {
-      setIsLoading(false)
-    }
-  }
-
   function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    onChange(imgSrc, 'auto', '50%', link)
+    onChange(imgSrc, 'auto', '100%', link)
   }
 
   return (
@@ -64,37 +101,49 @@ const ImageForm = ({
     >
       <div className={styles.top}>
         <div>
-          <p className={styles.header}>Embed image</p>
+          <p className={styles.header}>
+            Insert image
+            <Tooltip
+              containerClassName={styles.infoIcon}
+              text="Upload your image to go.gov.sg and copy the file.go.gov.sg link"
+            >
+              <i className="bx bxs-help-circle"></i>
+            </Tooltip>
+          </p>
         </div>
         <CloseButton onClick={doCollapse} className={styles.closeButton} />
       </div>
-      {!isLoading && !imgSrc && (
-        <div className={styles.item}>
-          <Dropzone
-            accept={{ 'image/*': [] }}
-            maxFiles={1}
-            maxSize={50 * 1024 * 1024}
-            onError={(e: Error) => setError(e.message)}
-            onDropAccepted={handleDrop}
-          >
-            {({ getRootProps, getInputProps }) => (
-              <div {...getRootProps({ className: styles.dropzone })}>
-                <input {...getInputProps()} />
-                <p>Drag and drop an image here, or click to select</p>
-              </div>
-            )}
-          </Dropzone>
+      <div className={styles.item}>
+        <label>Source</label>
+        <div
+          className={
+            previewState === ImagePreviewState.Error
+              ? cx(styles.control, styles.errorControl)
+              : styles.control
+          }
+        >
+          <input
+            value={imgSrc}
+            type="text"
+            placeholder="https://file.go.gov.sg/image"
+            onChange={(e) => {
+              setImgSrc(e.target.value)
+              setPreviewState(ImagePreviewState.Loading)
+              void debouncedUpdatePreviewState(e.target.value)
+            }}
+            onBlur={async (e) => {
+              // If updatePreviewState is queued (due to debounce), cancel and immediately run validation
+              if (previewState === ImagePreviewState.Loading) {
+                debouncedUpdatePreviewState.cancel()
+                await updatePreviewState(e.target.value)
+              }
+            }}
+          />
         </div>
-      )}
-      {isLoading && (
-        <div className={styles.loadingIcon}>
-          <i className="bx bx-loader-alt bx-spin"></i>
-        </div>
-      )}
-      {imgSrc && (
-        <div className={styles.imagePreview}>
-          <img src={imgSrc} alt="Image embed preview" />
-        </div>
+      </div>
+
+      {previewState === ImagePreviewState.Error && (
+        <div className={styles.controlErrorMsg}>{error}</div>
       )}
 
       <div className={styles.item}>
@@ -109,10 +158,44 @@ const ImageForm = ({
         </div>
       </div>
 
-      {error && <div className={styles.controlErrorMsg}>{error}</div>}
+      {previewState === ImagePreviewState.Loading && (
+        <div className={styles.loadingIcon}>
+          <i className="bx bx-loader-alt bx-spin"></i>
+        </div>
+      )}
+
+      {previewState === ImagePreviewState.Success && (
+        <div className={styles.imagePreview}>
+          <img src={imgSrc}></img>
+        </div>
+      )}
+
+      {previewState === ImagePreviewState.External && (
+        <div className={styles.externalImagePreview}>
+          <p>
+            <i className="bx bx-image"></i>
+            <i className="bx bx-x"></i>
+          </p>
+          <p>Preview not available for external images</p>
+        </div>
+      )}
 
       <div className={styles.submit}>
-        <button type="submit" disabled={isLoading || !imgSrc}>
+        <OutboundLink
+          className={styles.guideLink}
+          eventLabel={i18n._(LINKS.guideEmailImageUrl)}
+          to={i18n._(LINKS.guideEmailImageUrl)}
+          target="_blank"
+        >
+          View guide <i className="bx bx-link-external"></i>
+        </OutboundLink>
+        <button
+          type="submit"
+          disabled={
+            previewState !== ImagePreviewState.Success &&
+            previewState !== ImagePreviewState.External
+          }
+        >
           Insert
         </button>
       </div>
