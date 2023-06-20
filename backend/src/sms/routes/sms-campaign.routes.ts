@@ -75,6 +75,12 @@ export const InitSmsCampaignRoute = (
     }),
   }
 
+  const selectPhonebookListValidator = {
+    [Segments.BODY]: Joi.object({
+      list_id: Joi.number().required(),
+    }),
+  }
+
   // Routes
 
   // Check if campaign belongs to user for this router
@@ -162,6 +168,12 @@ export const InitSmsCampaignRoute = (
     '/duplicate',
     celebrate(duplicateCampaignValidator),
     smsMiddleware.duplicateCampaign
+  )
+
+  router.post(
+    '/phonebook-list',
+    celebrate(selectPhonebookListValidator),
+    SmsTemplateMiddleware.selectPhonebookListHandler
   )
 
   return router

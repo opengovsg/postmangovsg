@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 
 import type { Dispatch, SetStateAction } from 'react'
-import { useContext, useEffect, useState } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
@@ -10,6 +10,7 @@ import { useParams } from 'react-router-dom'
 import styles from '../Create.module.scss'
 
 import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
+import { AgencyList } from 'classes'
 import {
   ButtonGroup,
   CsvUpload,
@@ -25,9 +26,14 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import { PhonebookListSection } from 'components/phonebook-list'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
+import {
+  getPhonebookListsByChannel,
+  selectPhonebookList,
+} from 'services/phonebook.service'
 import type { CsvStatusResponse } from 'services/upload.service'
 import {
   deleteCsvStatus,
@@ -53,6 +59,11 @@ const SMSRecipients = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
+  const [phonebookLists, setPhonebookLists] = useState<
+    { label: string; value: string }[]
+  >([])
+  const [selectedPhonebookListId, setSelectedPhonebookListId] =
+    useState<number>()
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({
@@ -64,6 +75,25 @@ const SMSRecipients = ({
 
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
+
+  // Select managed list
+  useEffect(() => {
+    const setSelectedList = async () => {
+      try {
+        if (selectedPhonebookListId) {
+          await selectPhonebookList({
+            campaignId: +(campaignId as string),
+            listId: selectedPhonebookListId,
+          })
+          setIsCsvProcessing(true)
+        }
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void setSelectedList()
+  }, [campaignId, selectedPhonebookListId])
 
   // Poll csv status
   useEffect(() => {
@@ -107,6 +137,21 @@ const SMSRecipients = ({
     })
   }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
+  const retrieveAndPopulatePhonebookLists = useCallback(async () => {
+    const lists = await getPhonebookListsByChannel({ channel: campaign.type })
+    if (lists) {
+      setPhonebookLists(
+        lists.map((l: AgencyList) => {
+          return { label: l.name, value: l.id.toString() }
+        })
+      )
+    }
+  }, [campaign.type])
+  // On load, retrieve the list of phonebook lists
+  useEffect(() => {
+    void retrieveAndPopulatePhonebookLists()
+  }, [campaignId])
+
   // Handle file upload
   async function uploadFile(files: FileList) {
     setIsUploading(true)
@@ -147,11 +192,19 @@ const SMSRecipients = ({
 
   return (
     <>
+      <PhonebookListSection
+        phonebookLists={phonebookLists}
+        setSelectedPhonebookListId={setSelectedPhonebookListId}
+        retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
+        isProcessing={isCsvProcessing}
+        defaultLabel={
+          phonebookLists.filter(
+            (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
+          )[0]?.label
+        }
+      />
       <StepSection>
-        <StepHeader
-          title="Upload recipient list in CSV format"
-          subtitle="Step 2"
-        >
+        <StepHeader title="Upload recipient list in CSV format">
           <p>
             Only CSV format files are allowed. If you have an Excel file, please
             convert it by going to File &gt; Save As &gt; CSV (Comma delimited).

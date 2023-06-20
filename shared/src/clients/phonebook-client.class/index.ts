@@ -52,16 +52,21 @@ export default class PhonebookClient {
     }
   }
 
-  public async getManagedListById(listId: number) {
+  public async getManagedListById(listId: number, presignedUrl: string) {
     try {
       const res = await this.request<{
         s3Key: string
         etag: string
         filename: string
-      }>({
-        method: 'get',
-        url: `/managed-list/${listId}/members/s3`,
-      })
+      }>(
+        {
+          method: 'post',
+          url: `/managed-list/${listId}/members/s3`,
+        },
+        {
+          presignedUrl,
+        }
+      )
       return res.data
     } catch (err) {
       throw new Error('Could not get managed list by id')
