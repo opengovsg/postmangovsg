@@ -32,6 +32,7 @@ import {
   TextAlignControl,
   InlineControl,
   FontColorControl,
+  // InlineAttachmentControl,
 } from './controls'
 import {
   VariableDecorator,
@@ -92,6 +93,7 @@ const TOOLBAR_OPTIONS = {
   },
   image: {
     uploadEnabled: false,
+    urlEnabled: false,
     component: ImageControl,
   },
   link: {
@@ -122,7 +124,10 @@ const TOOLBAR_OPTIONS = {
   },
 }
 
-const TOOLBAR_CUSTOM_BUTTONS = [<TableControl key="tableOption" />]
+const TOOLBAR_CUSTOM_BUTTONS = [
+  <TableControl key="tableOption" />,
+  // <InlineAttachmentControl key="attachmentOption" />,
+]
 
 const defaultValue = {
   editorState: EditorState.createEmpty(),
@@ -138,6 +143,7 @@ const RichTextEditor = ({
   placeholder?: string
 }) => {
   const { editorState, setEditorState } = useContext(EditorContext)
+  const [editorReadonlyMode, setEditorReadonlyMode] = useState(false)
   const blockRenderMap = Immutable.Map({
     'table-cell': {
       element: 'td',
@@ -184,6 +190,9 @@ const RichTextEditor = ({
           return {
             component: ImageBlock,
             editable: false,
+            props: {
+              setEditorReadonlyMode,
+            },
           }
         }
       }
@@ -420,6 +429,7 @@ const RichTextEditor = ({
       keyBindingFn={keyBindingFn}
       handleReturn={handleReturn}
       handlePastedText={handlePastedText}
+      readOnly={editorReadonlyMode}
     />
   )
 }

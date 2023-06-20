@@ -24,6 +24,7 @@ import {
   EmailMessageTransactional,
   EmailOp,
   EmailTemplate,
+  CommonAttachment,
 } from '@email/models'
 import {
   SmsMessage,
@@ -65,6 +66,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
     EmailOp,
     EmailTemplate,
     ProtectedMessage,
+    CommonAttachment,
   ]
   const smsModels = [SmsMessage, SmsMessageTransactional, SmsTemplate, SmsOp]
   const telegramModels = [

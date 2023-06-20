@@ -1,6 +1,5 @@
 import cx from 'classnames'
 import escapeHTML from 'escape-html'
-import { useRef, useEffect } from 'react'
 import TextareaAutosize from 'react-textarea-autosize'
 
 import styles from './TextArea.module.scss'
@@ -23,18 +22,6 @@ const TextArea = ({
   onChange: (text: string) => void
 }) => {
   const minRows = singleRow ? 1 : 7
-  const textAreaRef = useRef<HTMLTextAreaElement | null>(null)
-
-  useEffect(() => {
-    // ignores Enter key presses as it triggers a resize on textarea
-    if (singleRow && textAreaRef.current) {
-      textAreaRef.current.onkeydown = (e) => {
-        if (e.keyCode === 13) {
-          e.preventDefault()
-        }
-      }
-    }
-  }, [singleRow])
 
   // Remove line breaks for singleRow textarea
   function onTextChange(text: string) {
@@ -63,7 +50,6 @@ const TextArea = ({
         onChange={(e) => onTextChange(e.target.value)}
         minRows={minRows}
         className={cx(styles.textArea, { [styles.single]: singleRow })}
-        inputRef={(r) => (textAreaRef.current = r)}
       />
     </div>
   )

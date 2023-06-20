@@ -21,7 +21,7 @@ jobs:
           if [ "${{ github.ref }}" = "refs/heads/master" ]; then
             echo "current_env=production" >> $GITHUB_OUTPUT
           else
-             echo "current_env=staging" >> $GITHUB_OUTPUT
+            echo "current_env=staging" >> $GITHUB_OUTPUT
           fi
   playwright-run:
     runs-on: ubuntu-latest
