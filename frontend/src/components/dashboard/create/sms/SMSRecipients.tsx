@@ -1,8 +1,7 @@
 import { i18n } from '@lingui/core'
 
-import { useState, useEffect, useContext } from 'react'
-
 import type { Dispatch, SetStateAction } from 'react'
+import { useCallback, useContext, useEffect, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
@@ -11,40 +10,36 @@ import { useParams } from 'react-router-dom'
 import styles from '../Create.module.scss'
 
 import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
-import { ChannelType, List } from 'classes'
+import { AgencyList } from 'classes'
 import {
-  FileInput,
+  ButtonGroup,
   CsvUpload,
   ErrorBlock,
-  PreviewBlock,
-  NextButton,
-  SampleCsv,
-  ButtonGroup,
-  TextButton,
-  StepSection,
-  StepHeader,
+  FileInput,
   InfoBlock,
+  NextButton,
+  PreviewBlock,
+  SampleCsv,
+  StepHeader,
+  StepSection,
+  TextButton,
   WarningBlock,
-  Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import {
-  ManagedListInfoBlock,
-  ManagedListSection,
-} from 'components/experimental'
+import { PhonebookListSection } from 'components/phonebook-list'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
-
-import { updateCampaign as apiUpdateCampaign } from 'services/campaign.service'
 import { sendTiming } from 'services/ga.service'
-import { selectList, getListsByChannel } from 'services/list.service'
 import {
-  uploadFileToS3,
+  getPhonebookListsByChannel,
+  selectPhonebookList,
+} from 'services/phonebook.service'
+import type { CsvStatusResponse } from 'services/upload.service'
+import {
   deleteCsvStatus,
   getCsvStatus,
+  uploadFileToS3,
 } from 'services/upload.service'
-
-import type { CsvStatusResponse } from 'services/upload.service'
 
 const SMSRecipients = ({
   setActiveStep,
@@ -58,16 +53,17 @@ const SMSRecipients = ({
     csvFilename: initialCsvFilename,
     demoMessageLimit,
     params,
-    shouldSaveList: initialShouldSaveList,
   } = campaign as SMSCampaign
   const isDemo = !!demoMessageLimit
 
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
-  const [shouldSaveList, setShouldSaveList] = useState(initialShouldSaveList)
-  const [managedLists, setManagedLists] = useState<List[]>([])
-  const [selectedListId, setSelectedListId] = useState<number>()
+  const [phonebookLists, setPhonebookLists] = useState<
+    { label: string; value: string }[]
+  >([])
+  const [selectedPhonebookListId, setSelectedPhonebookListId] =
+    useState<number>()
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({
@@ -80,30 +76,14 @@ const SMSRecipients = ({
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
 
-  // Retrieve managed lists - just once on component load
-  useEffect(() => {
-    const getManagedLists = async () => {
-      try {
-        const managedLists = await getListsByChannel({
-          channel: ChannelType.SMS,
-        })
-        setManagedLists(managedLists)
-      } catch (e) {
-        setErrorMessage((e as Error).message)
-      }
-    }
-
-    void getManagedLists()
-  }, [])
-
   // Select managed list
   useEffect(() => {
     const setSelectedList = async () => {
       try {
-        if (selectedListId) {
-          await selectList({
+        if (selectedPhonebookListId) {
+          await selectPhonebookList({
             campaignId: +(campaignId as string),
-            listId: selectedListId,
+            listId: selectedPhonebookListId,
           })
           setIsCsvProcessing(true)
         }
@@ -113,7 +93,7 @@ const SMSRecipients = ({
     }
 
     void setSelectedList()
-  }, [campaignId, selectedListId])
+  }, [campaignId, selectedPhonebookListId])
 
   // Poll csv status
   useEffect(() => {
@@ -154,20 +134,23 @@ const SMSRecipients = ({
       isCsvProcessing,
       csvFilename,
       numRecipients,
-      shouldSaveList,
     })
-  }, [
-    isCsvProcessing,
-    csvFilename,
-    numRecipients,
-    updateCampaign,
-    shouldSaveList,
-  ])
+  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
-  // If shouldSaveList is modified, send info to backend
+  const retrieveAndPopulatePhonebookLists = useCallback(async () => {
+    const lists = await getPhonebookListsByChannel({ channel: campaign.type })
+    if (lists) {
+      setPhonebookLists(
+        lists.map((l: AgencyList) => {
+          return { label: l.name, value: l.id.toString() }
+        })
+      )
+    }
+  }, [campaign.type])
+  // On load, retrieve the list of phonebook lists
   useEffect(() => {
-    void apiUpdateCampaign(campaignId as string, { shouldSaveList })
-  }, [campaignId, shouldSaveList])
+    void retrieveAndPopulatePhonebookLists()
+  }, [campaignId])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -209,12 +192,19 @@ const SMSRecipients = ({
 
   return (
     <>
+      <PhonebookListSection
+        phonebookLists={phonebookLists}
+        setSelectedPhonebookListId={setSelectedPhonebookListId}
+        retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
+        isProcessing={isCsvProcessing}
+        defaultLabel={
+          phonebookLists.filter(
+            (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
+          )[0]?.label
+        }
+      />
       <StepSection>
-        <StepHeader
-          title="Upload recipient list in CSV format"
-          subtitle="Step 2"
-        >
-          <ManagedListInfoBlock />
+        <StepHeader title="Upload recipient list in CSV format">
           <p>
             Only CSV format files are allowed. If you have an Excel file, please
             convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
@@ -255,13 +245,6 @@ const SMSRecipients = ({
             setErrorMsg={setErrorMessage}
           />
         </CsvUpload>
-        <Checkbox checked={shouldSaveList} onChange={setShouldSaveList}>
-          Save this file as a managed list
-        </Checkbox>
-        <p>
-          Note: managed recipient list will only be saved after you have sent
-          the campaign
-        </p>
         {isDemo && (
           <InfoBlock title="Limited to 20 recipients">
             <span>
@@ -270,10 +253,6 @@ const SMSRecipients = ({
             </span>
           </InfoBlock>
         )}
-        <ManagedListSection
-          managedLists={managedLists}
-          setSelectedListId={setSelectedListId}
-        />
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>
 

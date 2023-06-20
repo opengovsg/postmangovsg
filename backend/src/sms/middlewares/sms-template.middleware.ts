@@ -1,18 +1,19 @@
-import { Request, Response, NextFunction } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import {
-  MissingTemplateKeysError,
   HydrationError,
-  RecipientColumnMissing,
   InvalidRecipientError,
+  MissingTemplateKeysError,
+  RecipientColumnMissing,
   UserError,
 } from '@core/errors'
 import { TemplateError } from '@shared/templating'
-import { UploadService, StatsService, ListService } from '@core/services'
-import { SmsTemplateService, SmsService } from '@sms/services'
+import { ListService, StatsService, UploadService } from '@core/services'
+import { SmsService, SmsTemplateService } from '@sms/services'
 import { StoreTemplateOutput } from '@sms/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
 import { ApiInvalidTemplateError } from '@core/errors/rest-api.errors'
+import { PhonebookService } from '@core/services/phonebook.service'
 
 const logger = loggerWithLabel(module)
 /**
@@ -147,6 +148,54 @@ const uploadCompleteHandler = async (
   }
 }
 
+const selectPhonebookListHandler = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  try {
+    const { campaignId } = req.params
+
+    const { list_id: listId } = req.body
+
+    // check if template exists
+    const template = await SmsTemplateService.getFilledTemplate(+campaignId)
+    if (template === null) {
+      throw new Error(
+        'Error: No message template found. Please create a message template before uploading a recipient file.'
+      )
+    }
+    const { s3Key, presignedUrl } = await UploadService.getPresignedUrl()
+
+    const list = await PhonebookService.getPhonebookListById({
+      listId,
+      presignedUrl,
+    })
+    if (!list) throw new Error('Error: List not found')
+
+    const { etag, filename } = list
+
+    // Store temp filename
+    await UploadService.storeS3TempFilename(+campaignId, filename)
+
+    // Enqueue upload job to be processed
+    await SmsTemplateService.enqueueUpload({
+      campaignId: +campaignId,
+      template,
+      s3Key,
+      etag,
+      filename,
+    })
+
+    return res.status(202).json({ list_id: listId })
+  } catch (e) {
+    // explicitly return a 500 to not block user flow but prompt them to upload an alternative csv
+    return res.status(500).json({
+      message:
+        'Error selecting phonebook list. Please try uploading the list directly.',
+    })
+  }
+}
+
 const selectListHandler = async (
   req: Request,
   res: Response,
@@ -265,5 +314,6 @@ export const SmsTemplateMiddleware = {
   uploadCompleteHandler,
   pollCsvStatusHandler,
   deleteCsvErrorHandler,
+  selectPhonebookListHandler,
   selectListHandler,
 }

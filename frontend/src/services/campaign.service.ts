@@ -242,16 +242,13 @@ export async function updateCampaign(
   {
     name,
     shouldBccToMe,
-    shouldSaveList,
   }: {
     name?: string
-    shouldSaveList?: boolean
     shouldBccToMe?: boolean
   }
 ): Promise<void> {
   return axios.put(`/campaigns/${campaignId}`, {
     name,
-    should_save_list: shouldSaveList,
     should_bcc_to_me: shouldBccToMe,
   })
 }

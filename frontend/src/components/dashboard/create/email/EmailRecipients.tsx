@@ -1,11 +1,12 @@
 import { i18n } from '@lingui/core'
 
 import {
-  useState,
-  useEffect,
-  useContext,
   Dispatch,
   SetStateAction,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
 } from 'react'
 
 import { OutboundLink } from 'react-ga'
@@ -14,37 +15,34 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import { EmailPreview, EmailProgress, List, ChannelType } from 'classes'
+import { AgencyList, EmailPreview, EmailProgress } from 'classes'
 import {
-  FileInput,
+  ButtonGroup,
   CsvUpload,
-  ErrorBlock,
   EmailPreviewBlock,
+  ErrorBlock,
+  FileInput,
   NextButton,
   SampleCsv,
-  ButtonGroup,
-  TextButton,
   StepHeader,
   StepSection,
+  TextButton,
   WarningBlock,
-  Checkbox,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import {
-  ManagedListInfoBlock,
-  ManagedListSection,
-} from 'components/experimental'
+import { PhonebookListSection } from 'components/phonebook-list'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
-
-import { updateCampaign as apiUpdateCampaign } from 'services/campaign.service'
 import { sendTiming } from 'services/ga.service'
-import { selectList, getListsByChannel } from 'services/list.service'
 import {
-  uploadFileToS3,
+  getPhonebookListsByChannel,
+  selectPhonebookList,
+} from 'services/phonebook.service'
+import {
+  CsvStatusResponse,
   deleteCsvStatus,
   getCsvStatus,
-  CsvStatusResponse,
+  uploadFileToS3,
 } from 'services/upload.service'
 
 const EmailRecipients = ({
@@ -63,14 +61,12 @@ const EmailRecipients = ({
     csvFilename: initialCsvFilename,
     isCsvProcessing: initialIsProcessing,
     numRecipients: initialNumRecipients,
-    shouldSaveList: initialShouldSaveList,
     params,
     protect,
   } = campaign
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
-  const [shouldSaveList, setShouldSaveList] = useState(initialShouldSaveList)
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({
@@ -78,46 +74,14 @@ const EmailRecipients = ({
     csvFilename: initialCsvFilename,
   })
   const [preview, setPreview] = useState({} as EmailPreview)
-  const [managedLists, setManagedLists] = useState<List[]>([])
-  const [selectedListId, setSelectedListId] = useState<number>()
   const { id: campaignId } = useParams<{ id: string }>()
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
-
-  // Retrieve managed lists - just once on component load
-  useEffect(() => {
-    const getManagedLists = async () => {
-      try {
-        const managedLists = await getListsByChannel({
-          channel: ChannelType.Email,
-        })
-        setManagedLists(managedLists)
-      } catch (e) {
-        setErrorMessage((e as Error).message)
-      }
-    }
-
-    void getManagedLists()
-  }, [])
-
-  // Select managed list
-  useEffect(() => {
-    const setSelectedList = async () => {
-      try {
-        if (selectedListId) {
-          await selectList({
-            campaignId: +(campaignId as string),
-            listId: selectedListId,
-          })
-          setIsCsvProcessing(true)
-        }
-      } catch (e) {
-        setErrorMessage((e as Error).message)
-      }
-    }
-
-    void setSelectedList()
-  }, [campaignId, selectedListId])
+  const [phonebookLists, setPhonebookLists] = useState<
+    { label: string; value: string }[]
+  >([])
+  const [selectedPhonebookListId, setSelectedPhonebookListId] =
+    useState<number>()
 
   // Poll csv status
   useEffect(() => {
@@ -157,26 +121,55 @@ const EmailRecipients = ({
     return () => clearTimeout(timeoutId)
   }, [campaignId, csvFilename, forceReset, isCsvProcessing, isMounted])
 
+  // Select managed list
+  useEffect(() => {
+    const setSelectedList = async () => {
+      try {
+        // trigger change only if it isn't already the current one
+        const currentValue = phonebookLists.filter(
+          (l) => l.label === csvInfo.csvFilename?.replace('.csv', '')
+        )[0]?.value
+        if (
+          selectedPhonebookListId &&
+          selectedPhonebookListId !== +currentValue
+        ) {
+          await selectPhonebookList({
+            campaignId: +(campaignId as string),
+            listId: selectedPhonebookListId,
+          })
+          setIsCsvProcessing(true)
+        }
+      } catch (e) {
+        setErrorMessage((e as Error).message)
+      }
+    }
+
+    void setSelectedList()
+  }, [campaignId, selectedPhonebookListId])
+
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
     updateCampaign({
       isCsvProcessing,
       csvFilename,
       numRecipients,
-      shouldSaveList,
     })
-  }, [
-    isCsvProcessing,
-    csvFilename,
-    numRecipients,
-    updateCampaign,
-    shouldSaveList,
-  ])
+  }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
-  // If shouldSaveList is modified, send info to backend
+  const retrieveAndPopulatePhonebookLists = useCallback(async () => {
+    const lists = await getPhonebookListsByChannel({ channel: campaign.type })
+    if (lists) {
+      setPhonebookLists(
+        lists.map((l: AgencyList) => {
+          return { label: l.name, value: l.id.toString() }
+        })
+      )
+    }
+  }, [campaign.type])
+  // On load, retrieve the list of phonebook lists
   useEffect(() => {
-    void apiUpdateCampaign(campaignId as string, { shouldSaveList })
-  }, [campaignId, shouldSaveList])
+    void retrieveAndPopulatePhonebookLists()
+  }, [campaignId])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -219,12 +212,22 @@ const EmailRecipients = ({
 
   return (
     <>
+      {!campaign.protect && (
+        <PhonebookListSection
+          phonebookLists={phonebookLists}
+          setSelectedPhonebookListId={setSelectedPhonebookListId}
+          retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
+          isProcessing={isCsvProcessing}
+          // have to strip additional appended .csv label
+          defaultLabel={
+            phonebookLists.filter(
+              (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
+            )[0]?.label
+          }
+        />
+      )}
       <StepSection>
-        <StepHeader
-          title="Upload or select existing recipient list"
-          subtitle={protect ? '' : 'Step 2'}
-        >
-          <ManagedListInfoBlock />
+        <StepHeader title="Upload CSV File">
           <p>
             Only CSV format files are allowed. If you have an Excel file, please
             convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
@@ -285,17 +288,6 @@ const EmailRecipients = ({
             </>
           )}
         </CsvUpload>
-        <Checkbox checked={shouldSaveList} onChange={setShouldSaveList}>
-          Save this file as a managed list
-        </Checkbox>
-        <p>
-          Note: managed recipient list will only be saved after you have sent
-          the campaign
-        </p>
-        <ManagedListSection
-          managedLists={managedLists}
-          setSelectedListId={setSelectedListId}
-        />
         <ErrorBlock>{errorMessage}</ErrorBlock>
       </StepSection>
 
@@ -328,5 +320,4 @@ const EmailRecipients = ({
     </>
   )
 }
-
 export default EmailRecipients

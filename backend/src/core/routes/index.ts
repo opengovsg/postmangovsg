@@ -46,6 +46,7 @@ import { InitTelegramMiddleware } from '@telegram/middlewares'
 import { InitApiKeyRoute } from '@core/routes/api-key.routes'
 import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 import { InitCommonAttachmentRoute } from './common-attachment.routes'
+import phonebookRoutes from '@core/routes/phonebook.routes'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -257,6 +258,12 @@ export const InitV1Route = (app: Application): Router => {
     '/lists',
     authMiddleware.getAuthMiddleware([AuthType.Cookie]),
     listRoutes
+  )
+
+  router.use(
+    '/phonebook',
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
+    phonebookRoutes
   )
 
   router.use(

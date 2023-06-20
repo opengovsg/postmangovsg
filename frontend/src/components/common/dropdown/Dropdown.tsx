@@ -1,5 +1,5 @@
 import cx from 'classnames'
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import styles from './Dropdown.module.scss'
 
@@ -53,7 +53,7 @@ const Dropdown = ({
     } else {
       setSelectedLabel('Select an option')
     }
-  }, [defaultLabel, onSelect, options])
+  }, [defaultLabel])
 
   return (
     <div
