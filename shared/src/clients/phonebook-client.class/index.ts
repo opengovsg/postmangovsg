@@ -1,5 +1,6 @@
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from 'axios'
 import * as http from 'http'
+import { PhonebookChannelDto, UserChannel } from './interfaces'
 
 export default class PhonebookClient {
   private client: AxiosInstance
@@ -69,6 +70,21 @@ export default class PhonebookClient {
       return res.data
     } catch (err) {
       throw new Error('Could not get managed list by id')
+    }
+  }
+
+  public async getUniqueLinksForUsers(body: PhonebookChannelDto) {
+    try {
+      const res = await this.request<UserChannel[]>(
+        {
+          method: 'post',
+          url: '/public-user/unique-links',
+        },
+        body
+      )
+      return res.data
+    } catch (err) {
+      throw new Error('Could not get unique links for users')
     }
   }
 }

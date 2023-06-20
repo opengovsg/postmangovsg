@@ -10,7 +10,7 @@ import MailClient from '@shared/clients/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import { ThemeClient } from '@shared/theme'
 import { EmailResultRow, Message } from './interface'
-import { getContactPrefLinksForEmail } from './util/contact-preference'
+import { PhonebookService } from '@core/services/phonebook.service'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 const logger = loggerWithLabel(module)
@@ -69,27 +69,13 @@ class Email {
         type: QueryTypes.SELECT,
       }
     )
-    const showContactPref = config.get('phonebookContactPref.enabled')
-    if (showContactPref && result.length > 0) {
+    const phonebookFeatureFlag = config.get('phonebook.enabled')
+    if (phonebookFeatureFlag && result.length > 0) {
       try {
-        const campaignId = result[0].message.campaignId as number
-        const emailResult = await this.connection.query<{ email: string }>(
-          'select u.email as email from users u where u.id = (select c.user_id from campaigns c where c.id = :campaignId);',
-          {
-            replacements: { campaignId },
-            type: QueryTypes.SELECT,
-          }
-        )
-        if (!emailResult || emailResult.length === 0) {
-          throw new Error(
-            'Unable to fetch user email from campaign for phonebook contact preference api'
-          )
-        }
-        const userEmail = emailResult[0].email
-        return await getContactPrefLinksForEmail(result, campaignId, userEmail)
+        return await PhonebookService.appendLinkForEmail(result)
       } catch (error) {
         logger.error({
-          message: 'Unable to fetch contact preferences',
+          message: 'Unable to append links',
           error,
           workerId: this.workerId,
         })
@@ -142,7 +128,7 @@ class Email {
     agencyName,
     agencyLogoURI,
     showMasthead,
-    contactPrefLink,
+    userUniqueLink,
   }: Message): Promise<void> {
     try {
       if (!validator.isEmail(recipient)) {
@@ -163,7 +149,7 @@ class Email {
         agencyName,
         agencyLogoURI,
         showMasthead,
-        contactPrefLink,
+        userUniqueLink,
       })
 
       await this.mailService.sendMail({
