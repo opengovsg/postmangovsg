@@ -52,6 +52,12 @@ export class GovsgMessage extends Model<GovsgMessage> {
   @Column({ type: DataType.DATE, allowNull: true })
   acceptedAt: Date | null
 
+  // Equivalent to `sentAt` per the previous convention
+  // Added this extra field so we can use deliveredAt for the actual delivery
+  // notification from service provider
+  @Column({ type: DataType.DATE, allowNull: true })
+  sendAttemptedAt: Date | null
+
   @Column({ type: DataType.DATE, allowNull: true })
   sentAt: Date | null
 

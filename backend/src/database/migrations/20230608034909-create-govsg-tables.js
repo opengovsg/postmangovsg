@@ -51,6 +51,10 @@ module.exports = {
         type: Sequelize.DataTypes.DATE,
         allowNull: true,
       },
+      send_attempted_at: {
+        type: Sequelize.DataTypes.DATE,
+        allowNull: true,
+      },
       sent_at: {
         type: Sequelize.DataTypes.DATE,
         allowNull: true,
@@ -171,10 +175,14 @@ module.exports = {
         allowNull: true,
       },
       status: {
-        type: Sequelize.DataTypes.ENUM(Object.values(GovsgMessageStatus)),
+        type: 'enum_govsg_messages_status',
         allowNull: true,
       },
       accepted_at: {
+        type: Sequelize.DataTypes.DATE,
+        allowNull: true,
+      },
+      send_attempted_at: {
         type: Sequelize.DataTypes.DATE,
         allowNull: true,
       },
@@ -240,7 +248,7 @@ module.exports = {
         allowNull: true,
       },
       status: {
-        type: Sequelize.DataTypes.ENUM(Object.values(GovsgMessageStatus)),
+        type: 'enum_govsg_messages_status',
         allowNull: true,
       },
       accepted_at: {
@@ -281,6 +289,7 @@ module.exports = {
     await queryInterface.dropTable('govsg_templates')
     await queryInterface.dropTable('govsg_messages')
     await queryInterface.sequelize.query(`
+      DELETE FROM job_queue WHERE campaign_id IN (SELECT id FROM campaigns WHERE type = 'GOVSG');
       DELETE FROM campaigns WHERE type = 'GOVSG';
       ALTER TYPE enum_campaigns_type RENAME TO _enum_campaigns_type;
       CREATE TYPE enum_campaigns_type AS ENUM('SMS', 'EMAIL', 'TELEGRAM');
