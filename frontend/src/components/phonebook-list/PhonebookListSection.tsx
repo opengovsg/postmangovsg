@@ -2,6 +2,8 @@ import { Dispatch, SetStateAction } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
+import styles from './PhonebookListSection.module.scss'
+
 import {
   Dropdown,
   InfoBlock,
@@ -38,10 +40,13 @@ export const PhonebookListSection = ({
         aria-label="Phonebook list selector"
         defaultLabel={defaultLabel}
       ></Dropdown>
-      <InfoBlock>
+      <InfoBlock className={styles.infoBlockContainer}>
         <p>
           If your Phonebook contact list is not listed, &nbsp;
-          <TextButton onClick={retrieveAndPopulatePhonebookLists}>
+          <TextButton
+            onClick={retrieveAndPopulatePhonebookLists}
+            className={styles.textButtonStyle}
+          >
             click here to refresh.
           </TextButton>
         </p>
@@ -51,6 +56,7 @@ export const PhonebookListSection = ({
             eventLabel={'https://phonebook.gov.sg/agency'}
             to={'https://phonebook.gov.sg/agency'}
             target="_blank"
+            className={styles.linkStyle}
           >
             here
           </OutboundLink>

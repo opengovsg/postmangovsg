@@ -1,0 +1,19 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.infoBlockContainer {
+  margin: 0;
+  p {
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+.textButtonStyle {
+  text-decoration: underline;
+}
+
+.linkStyle {
+  height: 1rem;
+}
