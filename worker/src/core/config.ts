@@ -329,7 +329,7 @@ const config: Config<ConfigSchema> = convict({
     },
     url: {
       doc: 'Phonebook uri to fetch contact preferences',
-      default: 'phonebook.postman.gov.sg',
+      default: 'phonebook.gov.sg',
       env: 'PHONEBOOK_URL',
       format: 'required-string',
     },

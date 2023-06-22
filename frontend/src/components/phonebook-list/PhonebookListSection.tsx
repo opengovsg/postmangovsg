@@ -48,8 +48,8 @@ export const PhonebookListSection = ({
         <p>
           New to Phonebook? Log in &nbsp;
           <OutboundLink
-            eventLabel={'https://phonebook.postman.gov.sg/agency'}
-            to={'https://phonebook.postman.gov.sg/agency'}
+            eventLabel={'https://phonebook.gov.sg/agency'}
+            to={'https://phonebook.gov.sg/agency'}
             target="_blank"
           >
             here
