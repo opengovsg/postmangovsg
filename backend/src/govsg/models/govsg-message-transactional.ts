@@ -1,5 +1,4 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -8,6 +7,7 @@ import {
 } from 'sequelize-typescript'
 import { GovsgTemplate } from './govsg-template'
 import { GovsgMessageStatus } from '@core/constants'
+import { User } from '@core/models'
 
 @Table({
   tableName: 'govsg_messages_transactional',
@@ -19,17 +19,18 @@ export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> 
   @Column(DataType.BIGINT)
   templateId: number
 
-  @BelongsTo(() => GovsgTemplate)
-  template: GovsgTemplate
+  @ForeignKey(() => User)
+  @Column({ type: DataType.STRING, allowNull: false })
+  userId: string
 
-  @Column(DataType.STRING)
+  @Column({ type: DataType.STRING, allowNull: false })
   recipient: string
 
-  @Column(DataType.JSONB)
-  params!: object
+  @Column({ type: DataType.JSONB, allowNull: false })
+  params: object
 
-  @Column(DataType.STRING)
-  serviceProviderMessageId?: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  serviceProviderMessageId: string | null
 
   @Column({ type: DataType.STRING, allowNull: true })
   errorCode: string | null
@@ -39,9 +40,8 @@ export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> 
 
   @Column({
     type: DataType.ENUM(...Object.values(GovsgMessageStatus)),
-    allowNull: true,
   })
-  status: GovsgMessageStatus | null
+  status: GovsgMessageStatus
 
   @Column({ type: DataType.DATE, allowNull: true })
   acceptedAt: Date | null
