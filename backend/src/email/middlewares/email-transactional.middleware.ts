@@ -25,6 +25,7 @@ import {
   ApiInvalidTemplateError,
   ApiNotFoundError,
   ApiRateLimitError,
+  ApiValidationError,
 } from '@core/errors/rest-api.errors'
 import { UploadedFile } from 'express-fileupload'
 
@@ -81,7 +82,7 @@ export const InitEmailTransactionalMiddleware = (
   }
 
   async function saveMessage(
-    req: Request,
+    req: Request<unknown, unknown, ReqBody>,
     _: Response,
     next: NextFunction
   ): Promise<void> {
@@ -147,6 +148,12 @@ export const InitEmailTransactionalMiddleware = (
       emailMessageTransactionalId, // added by saveMessage middleware
     } = req.body
 
+    if (typeof emailMessageTransactionalId !== 'string') {
+      throw new ApiValidationError(
+        `emailMessageTransactionalId ${emailMessageTransactionalId} is not a string`
+      )
+    }
+
     try {
       const emailMessageTransactional =
         await EmailMessageTransactional.findByPk(emailMessageTransactionalId)
@@ -164,7 +171,7 @@ export const InitEmailTransactionalMiddleware = (
         replyTo:
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
         attachments,
-        emailMessageTransactionalId,
+        emailMessageTransactionalId: +emailMessageTransactionalId,
       })
       emailMessageTransactional.set(
         'status',
