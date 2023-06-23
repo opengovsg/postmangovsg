@@ -150,8 +150,6 @@ interface ConfigSchema {
     checkStalledInterval: number
   }
   file: {
-    maxAttachmentSize: number
-    maxAttachmentNum: number
     maxCumulativeAttachmentsSize: number
   }
   commonAttachments: {
@@ -682,18 +680,6 @@ const config: Config<ConfigSchema> = convict({
     },
   },
   file: {
-    maxAttachmentSize: {
-      doc: 'Maximum accepted file attachment size in bytes',
-      default: 2 * 1024 * 1024,
-      env: 'FILE_ATTACHMENT_MAX_SIZE',
-      format: Number,
-    },
-    maxAttachmentNum: {
-      doc: 'Maximum number of file attachments',
-      default: 10,
-      env: 'FILE_ATTACHMENT_MAX_NUM',
-      format: Number,
-    },
     maxCumulativeAttachmentsSize: {
       doc: 'Maximum cumulative size of all file attachments in bytes',
       default: 10 * 1024 * 1024,

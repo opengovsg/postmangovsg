@@ -787,38 +787,6 @@ describe(`${emailTransactionalRoute}/send`, () => {
     ])
   })
 
-  test('Email with more than ten attachments should fail', async () => {
-    mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
-    await EmailFromAddress.create({
-      email: user.email,
-      name: 'Agency ABC',
-    } as EmailFromAddress)
-
-    const res = await request(app)
-      .post(endpoint)
-      .set('Authorization', `Bearer ${apiKey}`)
-      .field('recipient', validApiCallAttachment.recipient)
-      .field('subject', validApiCallAttachment.subject)
-      .field('body', validApiCallAttachment.body)
-      .field('from', validApiCallAttachment.from)
-      .field('reply_to', validApiCallAttachment.reply_to)
-      .attach('attachments', validAttachment, validAttachmentName)
-      .attach('attachments', generateRandomSmallFile(), 'attachment2')
-      .attach('attachments', generateRandomSmallFile(), 'attachment3')
-      .attach('attachments', generateRandomSmallFile(), 'attachment4')
-      .attach('attachments', generateRandomSmallFile(), 'attachment5')
-      .attach('attachments', generateRandomSmallFile(), 'attachment6')
-      .attach('attachments', generateRandomSmallFile(), 'attachment7')
-      .attach('attachments', generateRandomSmallFile(), 'attachment8')
-      .attach('attachments', generateRandomSmallFile(), 'attachment9')
-      .attach('attachments', generateRandomSmallFile(), 'attachment10')
-      .attach('attachments', generateRandomSmallFile(), 'attachment11')
-
-    expect(res.status).toBe(413)
-    expect(mockSendEmail).not.toBeCalled()
-    // no need to check EmailMessageTransactional since this is rejected before db record is saved
-  })
-
   test('Requests should be rate limited and metadata and error code is saved correctly in db', async () => {
     mockSendEmail = jest
       .spyOn(EmailService, 'sendEmail')
