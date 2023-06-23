@@ -2121,13 +2121,18 @@ paths:
           application/json:
             schema:
               required:
-                - body
                 - recipient
+                - whatsapp_template_label
+                - params
               properties:
-                body:
-                  type: string
                 recipient:
                   type: string
+                whatsapp_template_label:
+                  type: string
+                params:
+                  type: object
+                  additionalProperties:
+                    type: string
       responses:
         '201':
           description: Created. The message is being sent.
