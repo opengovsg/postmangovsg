@@ -26,7 +26,7 @@ export class GovsgTemplate extends Model<GovsgTemplate> {
     type: DataType.TEXT,
     allowNull: false,
   })
-  body: string
+  body?: string
 
   @Column({
     type: DataType.ARRAY(DataType.STRING),

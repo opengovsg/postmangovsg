@@ -63,11 +63,14 @@ router.post(
   '/send',
   celebrate({
     [Segments.BODY]: {
+      // fix rate to 100
+      rate: Joi.number().integer().min(100).max(100).default(100),
       scheduledTiming: Joi.date().optional(),
     },
   }),
   CampaignMiddleware.canEditCampaign,
   CampaignMiddleware.canSendCampaign,
+  GovsgMiddleware.setDefaultCredentials,
   JobMiddleware.sendCampaign
 )
 

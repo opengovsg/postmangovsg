@@ -53,3 +53,12 @@ export async function duplicateCampaign(req: Request, res: Response) {
     demo_message_limit: campaign.demoMessageLimit,
   })
 }
+
+export async function setDefaultCredentials(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): Promise<void> {
+  await GovsgService.setDefaultCredentials(+req.params.campaignId)
+  return next()
+}
