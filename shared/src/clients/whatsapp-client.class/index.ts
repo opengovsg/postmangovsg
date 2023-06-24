@@ -1,4 +1,5 @@
-import axios, { AxiosError } from 'axios'
+import axios, { AxiosError, AxiosInstance } from 'axios'
+import https from 'https'
 import {
   WhatsAppCredentials,
   WhatsAppTemplateMessageToSend,
@@ -15,9 +16,17 @@ const MESSAGE_ENDPOINT = 'v1/messages'
 
 export default class WhatsAppClient {
   private credentials: WhatsAppCredentials
+  private axiosInstance: AxiosInstance
 
   constructor(credentials: WhatsAppCredentials) {
     this.credentials = credentials
+    this.axiosInstance = axios.create({
+      responseType: 'json',
+      httpsAgent: new https.Agent({
+        // required for connecting to on-prem API client
+        rejectUnauthorized: false,
+      }),
+    })
   }
 
   private getCredentials(
@@ -49,7 +58,7 @@ export default class WhatsAppClient {
       return input.to
     }
     const { token, url } = this.getCredentials(input.apiClient)
-    const res = await axios
+    const res = await this.axiosInstance
       .request<ValidateContact200Response>({
         method: 'post',
         url: CONTACT_ENDPOINT,
@@ -104,7 +113,7 @@ export default class WhatsAppClient {
       : { headers: { Authorization: `Bearer ${token}` }, baseURL: url }
     const {
       data: { messages },
-    } = await axios
+    } = await this.axiosInstance
       .request<TemplateMessage200Response>({
         method: 'post',
         url: MESSAGE_ENDPOINT,
