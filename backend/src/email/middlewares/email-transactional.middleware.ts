@@ -23,9 +23,8 @@ import {
 } from '@core/constants'
 import {
   ApiInvalidTemplateError,
-  ApiNotFoundError,
   ApiRateLimitError,
-  ApiValidationError,
+  ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
 import { UploadedFile } from 'express-fileupload'
 
@@ -58,7 +57,6 @@ export const InitEmailTransactionalMiddleware = (
     classification?: TransactionalEmailClassification
     tag?: string
   }
-  type ReqBodyWithId = ReqBody & { emailMessageTransactionalId: string }
 
   function convertMessageModelToResponse(message: EmailMessageTransactional) {
     return {
@@ -126,13 +124,12 @@ export const InitEmailTransactionalMiddleware = (
       tag,
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
     } as unknown as EmailMessageTransactional)
-    // insert id into req.body so that subsequent middlewares can use it
-    req.body.emailMessageTransactionalId = emailMessageTransactional.id
+    req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
     next()
   }
 
   async function sendMessage(
-    req: Request<unknown, unknown, ReqBodyWithId>,
+    req: Request,
     res: Response,
     next: NextFunction
   ): Promise<void> {
@@ -147,12 +144,6 @@ export const InitEmailTransactionalMiddleware = (
       attachments,
       emailMessageTransactionalId, // added by saveMessage middleware
     } = req.body
-
-    if (typeof emailMessageTransactionalId !== 'string') {
-      throw new ApiValidationError(
-        `emailMessageTransactionalId ${emailMessageTransactionalId} is not a string`
-      )
-    }
 
     try {
       const emailMessageTransactional =
@@ -171,7 +162,7 @@ export const InitEmailTransactionalMiddleware = (
         replyTo:
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
         attachments,
-        emailMessageTransactionalId: +emailMessageTransactionalId,
+        emailMessageTransactionalId,
       })
       emailMessageTransactional.set(
         'status',
