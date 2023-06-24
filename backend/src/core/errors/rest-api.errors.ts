@@ -74,6 +74,12 @@ export class ApiInternalServerError extends RestApiError {
   }
 }
 
+export class ApiBadGatewayError extends RestApiError {
+  constructor(message: string) {
+    super(502, 'bad_gateway', message)
+  }
+}
+
 export class ApiAlreadySentError extends RestApiError {
   constructor(message: string) {
     super(403, 'already_sent', message)

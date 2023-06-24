@@ -11,7 +11,8 @@ export const InitGovsgMessageTransactionalRoute = (
     [Segments.BODY]: Joi.object({
       recipient: Joi.string().required(),
       whatsapp_template_label: Joi.string().required(),
-      params: Joi.object().required(),
+      // not sure whether it's possible to validate that params is a Record<string,string> using Joi
+      params: Joi.object().optional(), // optional because templates might not have params
     }),
   }
 
