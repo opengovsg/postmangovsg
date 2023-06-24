@@ -1,3 +1,4 @@
+import config from '@core/config'
 import {
   ApiBadGatewayError,
   ApiInvalidRecipientError,
@@ -36,8 +37,11 @@ async function sendMessage({
     apiClient: WhatsAppApiClient.clientOne, // to parameterize after adding flamingo db query
     language: WhatsAppLanguages.english,
   }
+  // differential treatment based on local vs staging/prod
+  // because WA API Client is inaccessible from local
+  const isLocal = config.get('env') === 'development'
   await WhatsAppService.whatsappClient
-    .validateSingleRecipient(messageToSend)
+    .validateSingleRecipient(messageToSend, isLocal)
     .catch((err) => {
       logger.error({
         message: 'Error validating recipient',
@@ -48,7 +52,7 @@ async function sendMessage({
     })
 
   const messageId = await WhatsAppService.whatsappClient
-    .sendMessage(messageToSend)
+    .sendMessage(messageToSend, isLocal)
     .catch((err) => {
       logger.error({
         message: 'Error sending message',
