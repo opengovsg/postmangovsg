@@ -27,7 +27,7 @@ export const UNSUPPORTED_FILE_TYPE_ERROR_CODE =
 
 const sanitizeFiles = async (
   files: { data: Buffer; name: string }[],
-  emailMessageTransactionalId: number
+  emailMessageTransactionalId: string
 ): Promise<MailAttachment[]> => {
   const isAcceptedType = await checkExtensions(files)
   if (!isAcceptedType) {

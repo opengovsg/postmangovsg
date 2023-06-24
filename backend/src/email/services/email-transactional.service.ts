@@ -49,7 +49,7 @@ async function sendMessage({
   recipient: string
   replyTo?: string
   attachments?: { data: Buffer; name: string }[]
-  emailMessageTransactionalId: number
+  emailMessageTransactionalId: string
 }): Promise<void> {
   // TODO: flagging this coupling for future refactoring:
   // currently, we are using EmailTemplateService to sanitize both tx emails and campaign emails
