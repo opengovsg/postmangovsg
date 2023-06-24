@@ -49,22 +49,31 @@ export default class WhatsAppClient {
       return input.to
     }
     const { token, url } = this.getCredentials(input.apiClient)
-    const res = await axios.request<ValidateContact200Response>({
-      method: 'post',
-      url: CONTACT_ENDPOINT,
-      baseURL: url,
-      headers: { Authorization: `Bearer ${token}` },
-      data: { blocking: 'wait', contacts: [input.to] },
-    })
+    const res = await axios
+      .request<ValidateContact200Response>({
+        method: 'post',
+        url: CONTACT_ENDPOINT,
+        baseURL: url,
+        headers: { Authorization: `Bearer ${token}` },
+        data: { blocking: 'wait', contacts: [input.to] },
+      })
+      .catch((err: Error | AxiosError) => {
+        if (axios.isAxiosError(err) && err.response) {
+          throw new Error(
+            `Error validating recipient ${input.to}: ${JSON.stringify(
+              err.response
+            )}`
+          )
+        }
+        throw new Error(
+          `Unexpected error validating recipient ${
+            input.to
+          }. Error: ${JSON.stringify(err)}`
+        )
+      })
     const {
-      status,
       data: { contacts },
     } = res
-    if (status !== 200) {
-      throw new Error(
-        `Error validating recipient ${input.to}, status code ${status}`
-      )
-    }
     return contacts[0].wa_id as WhatsAppId
   }
 
@@ -128,7 +137,9 @@ export default class WhatsAppClient {
           )
         }
         throw new Error(
-          `Unexpected error while sending message ${JSON.stringify(input)}`
+          `Unexpected error while sending message. Input: ${JSON.stringify(
+            input
+          )}, Error: ${JSON.stringify(err)}`
         )
       })
     return messages[0].id
