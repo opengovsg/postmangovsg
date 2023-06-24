@@ -26,6 +26,8 @@ export interface WhatsAppCredentials {
   authTokenTwo: string
   onPremClientOneUrl: string
   onPremClientTwoUrl: string
+  proxyToken: string
+  proxyUrl: string
 }
 
 export interface ValidateContact200Response {
