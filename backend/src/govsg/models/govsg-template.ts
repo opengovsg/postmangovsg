@@ -20,25 +20,27 @@ export class GovsgTemplate extends Model<GovsgTemplate> {
   @BelongsToMany(() => Campaign, {
     through: { model: () => CampaignGovsgTemplate },
   })
-  campaign!: Campaign
+  campaign: Campaign
 
   @Column({
     type: DataType.TEXT,
+    allowNull: false,
   })
-  body?: string
+  body: string
 
+  // not sure about this — should we not accept null and use empty array instead? I think null is more elegant
   @Column({
     type: DataType.ARRAY(DataType.STRING),
     allowNull: true,
   })
-  params?: Array<string>
+  params: Array<string> | null
 
   @Column({
     type: DataType.STRING,
     unique: true,
     allowNull: true,
   })
-  whatsappTemplateLabel?: string | null
+  whatsappTemplateLabel: string | null
 
   @Column({
     type: DataType.TEXT,

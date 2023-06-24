@@ -229,7 +229,7 @@ module.exports = {
       },
       recipient: {
         type: Sequelize.DataTypes.STRING(255),
-        allowNull: true,
+        allowNull: false,
       },
       params: {
         type: Sequelize.DataTypes.JSONB,

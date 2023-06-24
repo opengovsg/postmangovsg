@@ -15,6 +15,14 @@ import { User } from '@core/models'
   timestamps: true,
 })
 export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> {
+  @Column({
+    type: DataType.BIGINT,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  })
+  id: string
+
   @ForeignKey(() => GovsgTemplate)
   @Column(DataType.BIGINT)
   templateId: number
@@ -26,8 +34,8 @@ export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> 
   @Column({ type: DataType.STRING, allowNull: false })
   recipient: string
 
-  @Column({ type: DataType.JSONB, allowNull: false })
-  params: object
+  @Column({ type: DataType.JSONB, allowNull: true })
+  params: Record<string, string> | null
 
   @Column({ type: DataType.STRING, allowNull: true })
   serviceProviderMessageId: string | null

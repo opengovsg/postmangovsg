@@ -57,8 +57,8 @@ export const InitEmailTransactionalMiddleware = (
     attachments?: UploadedFile[]
     classification: TransactionalEmailClassification
     tag: string
-    [key: string]: unknown
   }
+  type ReqBodyWithId = ReqBody & { emailMessageTransactionalId: string }
 
   function convertMessageModelToResponse(message: EmailMessageTransactional) {
     return {
@@ -82,7 +82,7 @@ export const InitEmailTransactionalMiddleware = (
   }
 
   async function saveMessage(
-    req: Request<unknown, unknown, ReqBody>,
+    req: Request,
     _: Response,
     next: NextFunction
   ): Promise<void> {
@@ -97,7 +97,7 @@ export const InitEmailTransactionalMiddleware = (
       attachments,
       classification,
       tag,
-    } = req.body
+    } = req.body as ReqBody
 
     const attachmentsMetadata = attachments
       ? attachments.map((a) => ({
@@ -131,7 +131,7 @@ export const InitEmailTransactionalMiddleware = (
   }
 
   async function sendMessage(
-    req: Request<unknown, unknown, ReqBody>,
+    req: Request<unknown, unknown, ReqBodyWithId>,
     res: Response,
     next: NextFunction
   ): Promise<void> {
