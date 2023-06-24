@@ -43,6 +43,7 @@ export const InitGovsgTransactionalMiddleware =
         recipient,
         whatsapp_template_label: whatsappTemplateLabel,
         params,
+        // use of as is safe because of validation by Joi; see govsg-transactional.route.ts
       } = req.body as ReqBody
 
       const govsgTemplate = await GovsgTemplate.findOne({
@@ -63,6 +64,7 @@ export const InitGovsgTransactionalMiddleware =
         params: params ?? null,
         status: GovsgMessageStatus.Unsent,
       } as unknown as GovsgMessageTransactional)
+      // insert id into req.body so that subsequent middlewares can use it
       req.body.govsgTransactionalId = govsgTransactional.id
       next()
     }
@@ -113,18 +115,12 @@ export const InitGovsgTransactionalMiddleware =
         govsgTransactionalId,
         whatsapp_template_label: whatsappTemplateLabel,
       } = req.body
-      if (typeof govsgTransactionalId !== 'string') {
-        throw new ApiValidationError(
-          `govsgTransactionalId ${govsgTransactionalId} is not a string`
-        )
-      }
       try {
         const govsgTransactional = await GovsgMessageTransactional.findByPk(
           govsgTransactionalId
         )
         if (!govsgTransactional) {
-          // practically this will never happen but adding to fulfill TypeScript
-          // type-safety requirement
+          // practically this will never happen unless sendMessage is called before saveMessage
           throw new ApiNotFoundError(
             `Unable to find id ${govsgTransactionalId} in govsg_messages_transactional`
           )
