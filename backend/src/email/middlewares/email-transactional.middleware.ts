@@ -82,7 +82,7 @@ export const InitEmailTransactionalMiddleware = (
   }
 
   async function saveMessage(
-    req: Request<unknown, unknown, ReqBody>,
+    req: Request,
     _: Response,
     next: NextFunction
   ): Promise<void> {
