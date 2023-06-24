@@ -7,7 +7,6 @@ export const InitGovsgMessageTransactionalRoute = (
 ): Router => {
   const router = Router({ mergeParams: true })
   const sendValidator = {
-    // todo later
     [Segments.BODY]: Joi.object({
       recipient: Joi.string().required(),
       whatsapp_template_label: Joi.string().required(),
