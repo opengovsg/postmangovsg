@@ -96,8 +96,8 @@ export const InitEmailTransactionalMiddleware = (
       attachments,
       classification,
       tag,
-    }: // use of as is safe because of validation by Joi; see email-transactional.routes.ts
-    ReqBody = req.body as ReqBody
+      // use of as is safe because of validation by Joi; see email-transactional.routes.ts
+    } = req.body as ReqBody
 
     const attachmentsMetadata = attachments
       ? attachments.map((a) => ({
