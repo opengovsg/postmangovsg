@@ -162,6 +162,8 @@ interface ConfigSchema {
     authTokenTwo: string // todo: remove and substitute with extract from KMS
     onPremClientOneUrl: string
     onPremClientTwoUrl: string
+    proxyToken: string
+    proxyUrl: string
   }
 }
 
@@ -736,6 +738,16 @@ const config: Config<ConfigSchema> = convict({
       doc: 'Load balancer URL for WhatsApp On Prem Client 2',
       env: 'WHATSAPP_LB_URL_2',
       format: 'required-string',
+      default: '',
+    },
+    proxyToken: {
+      doc: 'Proxy token for accessing WhatsApp On Prem Client via proxy',
+      env: 'WHATSAPP_PROXY_TOKEN',
+      default: '',
+    },
+    proxyUrl: {
+      doc: 'Proxy URL for accessing WhatsApp On Prem Client via proxy',
+      env: 'WHATSAPP_PROXY_URL',
       default: '',
     },
   },

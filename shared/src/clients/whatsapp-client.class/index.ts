@@ -40,8 +40,14 @@ export default class WhatsAppClient {
     }
   }
   public async validateSingleRecipient(
-    input: WhatsAppTemplateMessageToSend
+    input: WhatsAppTemplateMessageToSend,
+    isLocal = false
   ): Promise<WhatsAppId> {
+    // bypass validation in local environment because no access to on-prem API
+    // proxy can only send message, no endpoint for validation
+    if (isLocal) {
+      return input.to
+    }
     const { token, url } = this.getCredentials(input.apiClient)
     const res = await axios.request<ValidateContact200Response>({
       method: 'post',
@@ -74,17 +80,27 @@ export default class WhatsAppClient {
   // }
 
   public async sendMessage(
-    input: WhatsAppTemplateMessageToSend
+    input: WhatsAppTemplateMessageToSend,
+    isLocal = false
   ): Promise<MessageId> {
     const { token, url } = this.getCredentials(input.apiClient)
+    // modify headers and baseURL if local environment to send to proxy
+    const { headers, baseURL } = isLocal
+      ? {
+          headers: {
+            Authorization: `Bearer proxy=${this.credentials['proxyToken']} client=${token}`,
+          },
+          baseURL: `${this.credentials['proxyUrl']}`,
+        }
+      : { headers: { Authorization: `Bearer ${token}` }, baseURL: url }
     const {
       data: { messages },
     } = await axios
       .request<TemplateMessage200Response>({
         method: 'post',
         url: MESSAGE_ENDPOINT,
-        baseURL: url,
-        headers: { Authorization: `Bearer ${token}` },
+        baseURL,
+        headers,
         data: {
           to: input.to,
           type: 'template',
