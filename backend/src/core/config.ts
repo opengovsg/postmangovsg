@@ -167,6 +167,9 @@ interface ConfigSchema {
     proxyToken: string
     proxyUrl: string
   }
+  flamingo: {
+    dbUri: string
+  }
 }
 
 convict.addFormats({
@@ -763,6 +766,14 @@ const config: Config<ConfigSchema> = convict({
       doc: 'Proxy URL for accessing WhatsApp On Prem Client via proxy',
       env: 'WHATSAPP_PROXY_URL',
       default: '',
+    },
+  },
+  flamingo: {
+    dbUri: {
+      doc: 'URI to the flamingo database',
+      default: '',
+      format: 'required-string',
+      env: 'FLAMINGO_DB_URI',
     },
   },
 })
