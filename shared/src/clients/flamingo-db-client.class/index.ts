@@ -13,6 +13,7 @@ export default class FlamingoDbClient {
     const client = new Client({
       connectionString: this.dbUri,
       ssl: {
+        // required to connect to flamingo db
         rejectUnauthorized: false,
       },
     })

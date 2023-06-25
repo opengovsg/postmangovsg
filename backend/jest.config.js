@@ -11,7 +11,9 @@ module.exports = {
     '@test-utils/(.*)': '<rootDir>/src/test-utils/$1',
     '@shared/(.*)': '<rootDir>/../shared/src/$1',
     '@mocks/(.*)': '<rootDir>/src/__mocks__/$1',
-    "axios": "axios/dist/node/axios.cjs" // https://stackoverflow.com/a/74297004
+    "axios": "axios/dist/node/axios.cjs", // https://stackoverflow.com/a/74297004
+    "drizzle-orm/node-postgres": "drizzle-orm/node-postgres/index.cjs",
+    "drizzle-orm/pg-core": "drizzle-orm/pg-core/index.cjs",
   },
   modulePathIgnorePatterns: ['<rootDir>/build'],
   transform: {
