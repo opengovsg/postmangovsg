@@ -5,11 +5,15 @@ import { eq } from 'drizzle-orm'
 
 export default class FlamingoDbClient {
   private dbUri: string
+  private db: NodePgDatabase | null = null
   constructor(dbUri: string) {
     this.dbUri = dbUri
   }
 
-  private async initializeDb(): Promise<NodePgDatabase> {
+  private async getDb(): Promise<NodePgDatabase> {
+    if (this.db) {
+      return this.db
+    }
     const client = new Client({
       connectionString: this.dbUri,
       ssl: {
@@ -18,12 +22,13 @@ export default class FlamingoDbClient {
       },
     })
     await client.connect()
-    return drizzle(client)
+    this.db = drizzle(client)
+    return this.db
   }
   public async getAssociatedApiClientId(
     phoneNumber: string
   ): Promise<number | null> {
-    const db = await this.initializeDb()
+    const db = await this.getDb()
     const result = await db
       .select({
         apiClientId: whatsappSubscribers.apiClientId,
