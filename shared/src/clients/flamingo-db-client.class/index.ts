@@ -12,6 +12,9 @@ export default class FlamingoDbClient {
   private async initializeDb(): Promise<NodePgDatabase> {
     const client = new Client({
       connectionString: this.dbUri,
+      ssl: {
+        rejectUnauthorized: false,
+      },
     })
     await client.connect()
     return drizzle(client)
@@ -26,6 +29,6 @@ export default class FlamingoDbClient {
       })
       .from(whatsappSubscribers)
       .where(eq(whatsappSubscribers.phoneNumber, phoneNumber))
-    return result[0].apiClientId
+    return result.length === 0 ? null : result[0].apiClientId
   }
 }
