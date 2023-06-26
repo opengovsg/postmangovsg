@@ -15,6 +15,14 @@ import { GovsgMessageStatus } from '@core/constants'
   timestamps: true,
 })
 export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> {
+  @Column({
+    type: DataType.BIGINT,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  })
+  id: string
+
   @ForeignKey(() => GovsgTemplate)
   @Column(DataType.BIGINT)
   templateId: number
@@ -22,14 +30,14 @@ export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> 
   @BelongsTo(() => GovsgTemplate)
   template: GovsgTemplate
 
-  @Column(DataType.STRING)
+  @Column({ type: DataType.STRING, allowNull: false })
   recipient: string
 
-  @Column(DataType.JSONB)
-  params!: object
+  @Column({ type: DataType.JSONB, allowNull: true })
+  params: Record<string, string> | null
 
-  @Column(DataType.STRING)
-  serviceProviderMessageId?: string
+  @Column({ type: DataType.STRING, allowNull: true })
+  serviceProviderMessageId: string | null
 
   @Column({ type: DataType.STRING, allowNull: true })
   errorCode: string | null
@@ -39,9 +47,10 @@ export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> 
 
   @Column({
     type: DataType.ENUM(...Object.values(GovsgMessageStatus)),
-    allowNull: true,
+    allowNull: false,
+    defaultValue: GovsgMessageStatus.Unsent,
   })
-  status: GovsgMessageStatus | null
+  status: GovsgMessageStatus
 
   @Column({ type: DataType.DATE, allowNull: true })
   acceptedAt: Date | null

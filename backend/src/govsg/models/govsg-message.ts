@@ -9,14 +9,6 @@ import {
   Table,
 } from 'sequelize-typescript'
 
-export enum ModelGovsgMessageStatus {
-  Unsent = 'UNSENT',
-  Accepted = 'ACCEPTED',
-  Sent = 'SENT',
-  Delivered = 'DELIVERED',
-  Read = 'READ',
-  Error = 'ERROR',
-}
 @Table({ tableName: 'govsg_messages', underscored: true, timestamps: true })
 export class GovsgMessage extends Model<GovsgMessage> {
   @ForeignKey(() => Campaign)
@@ -30,7 +22,7 @@ export class GovsgMessage extends Model<GovsgMessage> {
   recipient: string
 
   @Column(DataType.JSONB)
-  params!: object
+  params: object
 
   @Column(DataType.STRING)
   serviceProviderMessageId?: string
@@ -43,9 +35,10 @@ export class GovsgMessage extends Model<GovsgMessage> {
 
   @Column({
     type: DataType.ENUM(...Object.values(GovsgMessageStatus)),
-    allowNull: true,
+    allowNull: false,
+    defaultValue: GovsgMessageStatus.Unsent,
   })
-  status: GovsgMessageStatus | null
+  status: GovsgMessageStatus
 
   // Equivalent to dequeuedAt per the previous convention
   // Making this change to align between campaign vs txn messages for this channel

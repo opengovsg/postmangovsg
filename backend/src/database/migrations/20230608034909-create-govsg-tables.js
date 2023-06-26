@@ -44,8 +44,9 @@ module.exports = {
         allowNull: true,
       },
       status: {
-        allowNull: true,
+        allowNull: false,
         type: Sequelize.DataTypes.ENUM(Object.values(GovsgMessageStatus)),
+        defaultValue: GovsgMessageStatus.Unsent,
       },
       accepted_at: {
         type: Sequelize.DataTypes.DATE,
@@ -176,7 +177,8 @@ module.exports = {
       },
       status: {
         type: 'enum_govsg_messages_status',
-        allowNull: true,
+        allowNull: false,
+        defaultValue: GovsgMessageStatus.Unsent,
       },
       accepted_at: {
         type: Sequelize.DataTypes.DATE,
@@ -218,6 +220,14 @@ module.exports = {
         allowNull: false,
         primaryKey: true,
       },
+      user_id: {
+        type: Sequelize.DataTypes.INTEGER,
+        allowNull: false,
+        references: {
+          model: 'users',
+          key: 'id',
+        },
+      },
       template_id: {
         type: Sequelize.DataTypes.BIGINT,
         allowNull: true,
@@ -229,7 +239,7 @@ module.exports = {
       },
       recipient: {
         type: Sequelize.DataTypes.STRING(255),
-        allowNull: true,
+        allowNull: false,
       },
       params: {
         type: Sequelize.DataTypes.JSONB,
@@ -249,7 +259,8 @@ module.exports = {
       },
       status: {
         type: 'enum_govsg_messages_status',
-        allowNull: true,
+        allowNull: false,
+        defaultValue: GovsgMessageStatus.Unsent,
       },
       accepted_at: {
         type: Sequelize.DataTypes.DATE,
