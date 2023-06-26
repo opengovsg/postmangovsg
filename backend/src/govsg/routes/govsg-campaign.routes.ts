@@ -3,7 +3,11 @@ import {
   JobMiddleware,
   UploadMiddleware,
 } from '@core/middlewares'
-import { GovsgMiddleware, GovsgTemplateMiddleware } from '@govsg/middlewares'
+import {
+  GovsgMiddleware,
+  GovsgStatsMiddleware,
+  GovsgTemplateMiddleware,
+} from '@govsg/middlewares'
 import { Joi, Segments, celebrate } from 'celebrate'
 import { Router } from 'express'
 
@@ -88,6 +92,16 @@ router.post(
     }),
   }),
   GovsgMiddleware.duplicateCampaign
+)
+
+router.get('/stats', GovsgStatsMiddleware.getStats)
+
+router.post('/refresh-stats', GovsgStatsMiddleware.updateAndgetStats)
+
+router.get(
+  '/export',
+  CampaignMiddleware.isCampaignRedacted,
+  GovsgStatsMiddleware.getDeliveredRecipients
 )
 
 export default router

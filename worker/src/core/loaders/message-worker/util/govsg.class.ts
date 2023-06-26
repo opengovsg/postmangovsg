@@ -79,10 +79,18 @@ class Govsg {
     whatsappTemplateLabel?: string
   }): Promise<void> {
     try {
-      const normalisedRecipient = PhoneNumberService.normalisePhoneNumber(
-        recipient,
-        config.get('defaultCountry')
-      )
+      let normalisedRecipient
+      try {
+        normalisedRecipient = PhoneNumberService.normalisePhoneNumber(
+          recipient,
+          config.get('defaultCountry')
+        )
+      } catch (e: any) {
+        throw {
+          errorCode: 'invalid_recipient',
+          message: (e as Error).message,
+        }
+      }
       if (!whatsappTemplateLabel || !paramOrder) {
         throw new Error('Missing template label or param order')
       }
@@ -109,10 +117,16 @@ class Govsg {
     } catch (error: any) {
       await this.connection.query(
         `UPDATE govsg_ops SET status='ERROR', sent_at=clock_timestamp(),
-	error_code='failed_sending_attempt', error_description=:description, updated_at=clock_timestamp()
+	error_code=:errorCode, error_description=:description, updated_at=clock_timestamp()
 	where id=:id`,
         {
-          replacements: { id, description: (error as Error).message },
+          replacements: {
+            id,
+            description: (error as Error).message,
+            errorCode:
+              (error as { errorCode: string }).errorCode ||
+              'failed_sending_attempt',
+          },
           type: QueryTypes.UPDATE,
         }
       )

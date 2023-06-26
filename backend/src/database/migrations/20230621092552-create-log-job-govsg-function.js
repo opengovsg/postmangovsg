@@ -13,8 +13,12 @@ module.exports = {
         SET accepted_at = NULL,
           -- coalesced fields should prioritise message table over ops table
           -- because callbacks might arrive before logging
+          status = CASE
+              WHEN m.status = 'ACCEPTED' THEN COALESCE(p.status, m.status)
+              ELSE COALESCE(m.status, p.status)
+            END,
           error_code = COALESCE(m.error_code, p.error_code),
-            status = COALESCE(m.status, p.status),
+          error_description = COALESCE(m.error_description, p.error_description),
           service_provider_message_id = p.service_provider_message_id,
           send_attempted_at = p.send_attempted_at,
           sent_at = p.sent_at,

@@ -13,10 +13,11 @@ import {
   CampaignStats,
   CampaignStatsCount,
 } from '@core/interfaces'
-import { JobStatus, MessageStatus } from '@core/constants'
+import { GovsgMessageStatus, JobStatus, MessageStatus } from '@core/constants'
 import { Writable } from 'stream'
 import { waitForMs } from '@shared/utils/wait-for-ms'
 import { EmailMessage } from '@email/models'
+import { GovsgOp } from '@govsg/models/govsg-op'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
@@ -32,6 +33,7 @@ const getStatsFromArchive = async (
       sent: 0,
       unsent: 0,
       invalid: 0,
+      read: 0,
       updated_at: new Date(),
     }
   }
@@ -40,6 +42,7 @@ const getStatsFromArchive = async (
     sent: stats?.sent,
     unsent: stats?.unsent,
     invalid: stats?.invalid,
+    read: stats?.read,
     updated_at: stats?.updatedAt,
   }
 }
@@ -87,6 +90,49 @@ const getStatsFromTable = async (
   campaignId: number,
   model: any
 ): Promise<CampaignStatsCount> => {
+  if (model === GovsgOp) {
+    const [data] = await model.findAll({
+      raw: true,
+      where: { campaign_id: campaignId }, // not sure why it has to be `campaign_id` here
+      attributes: [
+        [
+          fn(
+            'sum',
+            cast(
+              {
+                [Op.and]: [
+                  { status: GovsgMessageStatus.Error },
+                  {
+                    [Op.not]: { error_code: 'invalid_recipient' },
+                  },
+                ],
+              },
+              'int'
+            )
+          ),
+          'error',
+        ],
+        [fn('sum', cast({ status: GovsgMessageStatus.Sent }, 'int')), 'sent'],
+        [
+          fn('sum', cast({ status: GovsgMessageStatus.Accepted }, 'int')),
+          'unsent',
+        ],
+        [
+          fn('sum', cast({ error_code: 'invalid_recipient' }, 'int')),
+          'invalid',
+        ],
+      ],
+    })
+
+    return {
+      error: +data.error,
+      sent: +data.sent,
+      unsent: +data.unsent,
+      invalid: +data.invalid,
+      updated_at: new Date(),
+    }
+  }
+
   // Retrieve stats from ops table
   const [data] = await model.findAll({
     raw: true,
@@ -152,6 +198,7 @@ const getCurrentStats = async (
       sent: opsStats.sent + archivedStats.sent,
       // this is needed when invalid might appear in ops table, e.g. telegram immediate bounce errors
       invalid: opsStats.invalid + archivedStats.invalid,
+      read: opsStats.read,
       status: job.status,
       updated_at: job.updatedAt,
       halted: job.campaign.halted,
