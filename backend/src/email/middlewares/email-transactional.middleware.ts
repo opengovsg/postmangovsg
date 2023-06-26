@@ -23,6 +23,7 @@ import {
 } from '@core/constants'
 import {
   ApiInvalidTemplateError,
+  ApiNotFoundError,
   ApiRateLimitError,
 } from '@core/errors/rest-api.errors'
 import { UploadedFile } from 'express-fileupload'
@@ -51,11 +52,12 @@ export const InitEmailTransactionalMiddleware = (
     body: string
     from: string
     recipient: string
-    reply_to: string
+    reply_to?: string
     attachments?: UploadedFile[]
-    classification: TransactionalEmailClassification
-    tag: string
+    classification?: TransactionalEmailClassification
+    tag?: string
   }
+  type ReqBodyWithId = ReqBody & { emailMessageTransactionalId: string }
 
   function convertMessageModelToResponse(message: EmailMessageTransactional) {
     return {
@@ -94,7 +96,8 @@ export const InitEmailTransactionalMiddleware = (
       attachments,
       classification,
       tag,
-    }: ReqBody = req.body
+      // use of as is safe because of validation by Joi; see email-transactional.routes.ts
+    } = req.body as ReqBody
 
     const attachmentsMetadata = attachments
       ? attachments.map((a) => ({
@@ -122,12 +125,13 @@ export const InitEmailTransactionalMiddleware = (
       tag,
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
     } as unknown as EmailMessageTransactional)
-    req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
+    // insert id into req.body so that subsequent middlewares can use it
+    req.body.emailMessageTransactionalId = emailMessageTransactional.id
     next()
   }
 
   async function sendMessage(
-    req: Request,
+    req: Request<unknown, unknown, ReqBodyWithId>,
     res: Response,
     next: NextFunction
   ): Promise<void> {
@@ -140,18 +144,17 @@ export const InitEmailTransactionalMiddleware = (
       recipient,
       reply_to: replyTo,
       attachments,
-      emailMessageTransactionalId, // added by saveMessage
-    }: ReqBody & {
-      emailMessageTransactionalId: number
+      emailMessageTransactionalId, // added by saveMessage middleware
     } = req.body
 
     try {
       const emailMessageTransactional =
         await EmailMessageTransactional.findByPk(emailMessageTransactionalId)
       if (!emailMessageTransactional) {
-        // practically this will never happen but adding to fulfill TypeScript
-        // type-safety requirement
-        throw new Error('Unable to find entry in email_messages_transactional')
+        // practically this will never happen unless sendMessage is called before saveMessage
+        throw new ApiNotFoundError(
+          'Unable to find entry in email_messages_transactional'
+        )
       }
       await EmailTransactionalService.sendMessage({
         subject,
