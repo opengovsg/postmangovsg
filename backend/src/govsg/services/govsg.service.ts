@@ -1,4 +1,4 @@
-import { ChannelType } from '@core/constants'
+import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { CampaignDetails } from '@core/interfaces'
 import { Campaign } from '@core/models'
 import { CampaignService, UploadService } from '@core/services'
@@ -15,10 +15,15 @@ const logger = loggerWithLabel(module)
 
 export async function getCampaignDetails(
   campaignId: number
-): Promise<CampaignDetails> {
-  return CampaignService.getCampaignDetails(campaignId, [
-    { model: GovsgTemplate, attributes: ['body', 'params'] },
+): Promise<CampaignDetails | null> {
+  const [campaign, pivot] = await Promise.all([
+    CampaignService.getCampaignDetails(campaignId, []),
+    CampaignGovsgTemplate.findOne({
+      where: { campaignId },
+      include: { model: GovsgTemplate, attributes: ['id', 'body', 'params'] },
+    }),
   ])
+  return { ...campaign, govsg_templates: pivot?.govsgTemplate }
 }
 
 export const findCampaign = (
@@ -129,4 +134,18 @@ export function uploadCompleteOnChunk({
       benchmark: true,
     })
   }
+}
+
+export async function setDefaultCredentials(
+  campaignId: number
+): Promise<number> {
+  const [updatedCount] = await Campaign.update(
+    { credName: DefaultCredentialName.Govsg },
+    {
+      where: {
+        id: campaignId,
+      },
+    }
+  )
+  return updatedCount
 }

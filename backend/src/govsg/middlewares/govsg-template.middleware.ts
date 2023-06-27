@@ -10,9 +10,10 @@ import {
   ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
 import { loggerWithLabel } from '@core/logger'
-import { Campaign } from '@core/models'
-import { StatsService, UploadService } from '@core/services'
+import { Campaign, Statistic } from '@core/models'
+import { CampaignService, StatsService, UploadService } from '@core/services'
 import { CampaignGovsgTemplate } from '@govsg/models/campaign-govsg-template'
+import { GovsgMessage } from '@govsg/models/govsg-message'
 import { GovsgTemplate } from '@govsg/models/govsg-template'
 import { GovsgTemplateService } from '@govsg/services'
 import { NextFunction, Request, Response } from 'express'
@@ -39,11 +40,7 @@ export async function pickTemplateForCampaign(
         id: templateId,
       },
     }),
-    Campaign.findOne({
-      where: {
-        id: campaignId,
-      },
-    }),
+    CampaignService.getCampaignDetails(campaignId, []),
   ])
   if (!template) {
     throw new ApiNotFoundError(`Template with ID ${templateId} not found`)
@@ -51,13 +48,51 @@ export async function pickTemplateForCampaign(
   if (!campaign) {
     throw new ApiNotFoundError(`Campaign with ID ${campaignId} not found`)
   }
-  await CampaignGovsgTemplate.create({
-    campaignId,
-    govsgTemplateId: templateId,
-  } as CampaignGovsgTemplate)
+
+  const pivot = await CampaignGovsgTemplate.findOne({
+    where: { campaignId, govsgTemplateId: templateId },
+  })
+
+  if (!pivot) {
+    await CampaignGovsgTemplate.sequelize?.transaction(async (t) => {
+      await GovsgMessage.destroy({
+        where: { campaignId },
+        transaction: t,
+      })
+      await Statistic.destroy({
+        where: { campaignId },
+        transaction: t,
+      })
+      await CampaignGovsgTemplate.destroy({
+        where: { campaignId },
+        transaction: t,
+      })
+      await CampaignGovsgTemplate.create(
+        {
+          campaignId,
+          govsgTemplateId: templateId,
+        } as CampaignGovsgTemplate,
+        { transaction: t }
+      )
+      await Campaign.update(
+        { valid: false },
+        { where: { id: campaignId }, transaction: t }
+      )
+    })
+  }
+
   return res.status(200).json({
-    ...campaign,
-    govsg_templates: template,
+    message: pivot
+      ? `Template ${templateId} picked for campaign`
+      : `Please re-upload your recipient list as template choice has changed`,
+    num_recipients: pivot ? campaign.num_recipients : 0,
+    valid: !!pivot,
+    template: {
+      id: template.id,
+      name: template.name,
+      body: template.body,
+      params: template.params,
+    },
   })
 }
 

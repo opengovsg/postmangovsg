@@ -208,8 +208,8 @@ export const InitV1Route = (app: Application): Router => {
     telegramCampaignRoutes
   )
   router.use(
-    '/campaign/govsg/templates',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
+    '/govsg/templates',
+    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     govsgTemplateRoutes
   )
   router.use(

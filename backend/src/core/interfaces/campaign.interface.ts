@@ -37,6 +37,11 @@ export interface CampaignDetails {
   sms_templates?: {
     body: string
   }
+  govsg_templates?: {
+    id: number
+    body: string
+    params: Array<string> | null
+  }
   job_queue?: {
     status: string
     visible_at?: Date
@@ -64,6 +69,7 @@ export interface CampaignStatsCount {
   unsent: number
   sent: number
   invalid: number
+  read?: number
   updated_at: Date
   unsubscribed?: number // only applicable for email stats
 }

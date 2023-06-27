@@ -3,7 +3,11 @@ import {
   JobMiddleware,
   UploadMiddleware,
 } from '@core/middlewares'
-import { GovsgMiddleware, GovsgTemplateMiddleware } from '@govsg/middlewares'
+import {
+  GovsgMiddleware,
+  GovsgStatsMiddleware,
+  GovsgTemplateMiddleware,
+} from '@govsg/middlewares'
 import { Joi, Segments, celebrate } from 'celebrate'
 import { Router } from 'express'
 
@@ -63,11 +67,14 @@ router.post(
   '/send',
   celebrate({
     [Segments.BODY]: {
+      // fix rate to 100
+      rate: Joi.number().integer().min(100).max(100).default(100),
       scheduledTiming: Joi.date().optional(),
     },
   }),
   CampaignMiddleware.canEditCampaign,
   CampaignMiddleware.canSendCampaign,
+  GovsgMiddleware.setDefaultCredentials,
   JobMiddleware.sendCampaign
 )
 
@@ -85,6 +92,16 @@ router.post(
     }),
   }),
   GovsgMiddleware.duplicateCampaign
+)
+
+router.get('/stats', GovsgStatsMiddleware.updateAndGetStats)
+
+router.post('/refresh-stats', GovsgStatsMiddleware.updateAndGetStats)
+
+router.get(
+  '/export',
+  CampaignMiddleware.isCampaignRedacted,
+  GovsgStatsMiddleware.getDeliveredRecipients
 )
 
 export default router

@@ -8,6 +8,7 @@ import styles from './Create.module.scss'
 
 import EmailCreate from './email/EmailCreate'
 
+import CreateGovsg from './govsg/GovsgCreate'
 import SMSCreate from './sms/SMSCreate'
 
 import TelegramCreate from './telegram/TelegramCreate'
@@ -68,6 +69,8 @@ const Create = () => {
         return <EmailCreate />
       case ChannelType.Telegram:
         return <TelegramCreate />
+      case ChannelType.Govsg:
+        return <CreateGovsg />
       default:
         return <p>Invalid Channel Type</p>
     }
