@@ -1,4 +1,4 @@
-import { ChannelType } from '@core/constants'
+import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { CampaignDetails } from '@core/interfaces'
 import { Campaign } from '@core/models'
 import { CampaignService, UploadService } from '@core/services'
@@ -134,4 +134,18 @@ export function uploadCompleteOnChunk({
       benchmark: true,
     })
   }
+}
+
+export async function setDefaultCredentials(
+  campaignId: number
+): Promise<number> {
+  const [updatedCount] = await Campaign.update(
+    { credName: DefaultCredentialName.Govsg },
+    {
+      where: {
+        id: campaignId,
+      },
+    }
+  )
+  return updatedCount
 }
