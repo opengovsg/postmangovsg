@@ -48,6 +48,10 @@ module.exports = {
         type: Sequelize.DataTypes.ENUM(Object.values(GovsgMessageStatus)),
         defaultValue: GovsgMessageStatus.Unsent,
       },
+      dequeued_at: {
+        type: Sequelize.DataTypes.DATE,
+        allowNull: true,
+      },
       accepted_at: {
         type: Sequelize.DataTypes.DATE,
         allowNull: true,
@@ -179,6 +183,10 @@ module.exports = {
         type: 'enum_govsg_messages_status',
         allowNull: false,
         defaultValue: GovsgMessageStatus.Unsent,
+      },
+      dequeued_at: {
+        type: Sequelize.DataTypes.DATE,
+        allowNull: true,
       },
       accepted_at: {
         type: Sequelize.DataTypes.DATE,

@@ -40,16 +40,19 @@ export class GovsgMessage extends Model<GovsgMessage> {
   })
   status: GovsgMessageStatus
 
-  // Equivalent to dequeuedAt per the previous convention
-  // Making this change to align between campaign vs txn messages for this channel
   @Column({ type: DataType.DATE, allowNull: true })
-  acceptedAt: Date | null
+  dequeuedAt: Date | null
 
   // Equivalent to `sentAt` per the previous convention
-  // Added this extra field so we can use deliveredAt for the actual delivery
+  // Added this extra field so we can use senAt for the actual delivery
   // notification from service provider
   @Column({ type: DataType.DATE, allowNull: true })
   sendAttemptedAt: Date | null
+
+  // Equivalent to deliveredAt per the previous convention
+  // Making this change to align between campaign vs txn messages for this channel
+  @Column({ type: DataType.DATE, allowNull: true })
+  acceptedAt: Date | null
 
   @Column({ type: DataType.DATE, allowNull: true })
   sentAt: Date | null
