@@ -40,7 +40,7 @@ export interface CampaignDetails {
   govsg_templates?: {
     id: number
     body: string
-    params: Array<string>
+    params: Array<string> | null
   }
   job_queue?: {
     status: string
