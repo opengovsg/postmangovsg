@@ -10,7 +10,7 @@ const SG_NUMBER_FORMAT = /^(\+?65)?(8|9)\d{7}$/
  */
 const normalisePhoneNumber = (
   phoneNumber: string,
-  defaultCountry: string
+  defaultCountry = 'SG'
 ): string => {
   let normalised = parsePhoneNumber(phoneNumber, defaultCountry as CountryCode)
 
