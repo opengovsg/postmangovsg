@@ -10,6 +10,7 @@ import {
   MessageId,
   TemplateMessageErrResponse,
 } from './interfaces'
+import { AuthenticationError, RateLimitError } from './errors'
 
 const CONTACT_ENDPOINT = 'v1/contacts'
 const MESSAGE_ENDPOINT = 'v1/messages'
@@ -25,6 +26,7 @@ export default class WhatsAppClient {
       httpsAgent: new https.Agent({
         // required for connecting to on-prem API client
         rejectUnauthorized: false,
+        keepAlive: true,
       }),
     })
   }
@@ -138,11 +140,19 @@ export default class WhatsAppClient {
           axios.isAxiosError<TemplateMessageErrResponse>(err) &&
           err.response
         ) {
+          const { status } = err.response
           const { errors } = err.response.data
+          const { code, title, detail } = errors[0]
+          if (status === 401) {
+            throw new AuthenticationError(`${code}: ${title} - ${detail}`)
+          }
+          if (status === 429) {
+            throw new RateLimitError(`${code}: ${title} - ${detail}`)
+          }
           throw new Error(
-            `Error sending message ${JSON.stringify(input)}: ${JSON.stringify(
-              errors
-            )}`
+            `Error sending message ${JSON.stringify(
+              input
+            )}.\n Errors countered: ${JSON.stringify(errors)}`
           )
         }
         throw new Error(

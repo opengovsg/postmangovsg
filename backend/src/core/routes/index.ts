@@ -270,7 +270,7 @@ export const InitV1Route = (app: Application): Router => {
 
   router.use(
     '/transactional/govsg',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    authMiddleware.getAuthMiddleware([AuthType.ApiKey]),
     govsgTransactionalRoutes
   )
 
