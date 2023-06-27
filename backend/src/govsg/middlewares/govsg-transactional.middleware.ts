@@ -8,6 +8,7 @@ import {
 } from '@core/errors/rest-api.errors'
 import { GovsgMessageStatus } from '@core/constants'
 import { GovsgTransactionalService } from '../services/govsg-transactional.service'
+import { PhoneNumberService } from '@core/services'
 
 export interface GovsgTransactionalMiddleware {
   saveMessage: Handler
@@ -56,11 +57,13 @@ export const InitGovsgTransactionalMiddleware =
           `Template with label ${whatsappTemplateLabel} not found`
         )
       }
+      const normalisedRecipient =
+        PhoneNumberService.normalisePhoneNumber(recipient)
       validateParams(govsgTemplate.params, params, whatsappTemplateLabel)
       const govsgTransactional = await GovsgMessageTransactional.create({
         templateId: govsgTemplate.id,
         userId: req.session?.user?.id,
-        recipient,
+        recipient: normalisedRecipient,
         params: params ?? null,
         status: GovsgMessageStatus.Unsent,
       } as unknown as GovsgMessageTransactional)

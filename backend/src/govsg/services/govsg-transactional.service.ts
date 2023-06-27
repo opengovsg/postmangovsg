@@ -28,13 +28,16 @@ async function sendMessage({
   1. DB models to query flamingo db to decide which API client to use
   2. Call WhatsApp contacts endpoint to validate user
   3. Send templated message to user
-  For now, will just do 2 and 3 to test workflow. Add 1 afterwards
   */
+  const map = await WhatsAppService.flamingoDbClient.getApiClientId([recipient])
+  // if recipient not in db, map.get(recipient) will return undefined
+  // default to clientTwo in this case
+  const apiClient = map.get(recipient) ?? WhatsAppApiClient.clientTwo
   const messageToSend = {
     to: recipient,
     templateName,
     components: params,
-    apiClient: WhatsAppApiClient.clientOne, // to parameterize after adding flamingo db query
+    apiClient,
     language: WhatsAppLanguages.english,
   }
   // differential treatment based on local vs staging/prod
