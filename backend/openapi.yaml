@@ -42,8 +42,7 @@ paths:
           description: mode of campaigns to filter for
           required: false
           schema:
-            type: string
-            enum: [EMAIL, SMS, TELEGRAM]
+            $ref: '#/components/schemas/ChannelType'
         - in: query
           name: status
           description: status of campaigns to filter for
@@ -1510,6 +1509,822 @@ paths:
               schema:
                 $ref: '#/components/schemas/Error500Response'
 
+  /campaign/{campaignId}/govsg:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Get GovSG campaign details
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: GovSG campaign details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovSGCampaign'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/govsg/templates:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Get available templates for GovSG channel
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                required:
+                  - data
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GovSGTemplate'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/templates:
+    put:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Choose a template for a govsg campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                template_id:
+                  type: number
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                required:
+                  - data
+                properties:
+                  data:
+                    $ref: '#/components/schemas/GovSGCampaign'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/upload/start:
+    get:
+      security:
+        - bearerAuth: []
+      summary: 'Get a presigned URL for upload with Content-MD5 header'
+      tags:
+        - GovSG
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: mime_type
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: md5
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - presigned_url
+                  - transaction_id
+                properties:
+                  presigned_url:
+                    type: string
+                  transaction_id:
+                    type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/upload/status:
+    get:
+      security:
+        - bearerAuth: []
+      summary: 'Get csv processing status'
+      tags:
+        - GovSG
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Success
+          content:
+            application/json:
+              schema:
+                properties:
+                  is_csv_processing:
+                    type: boolean
+                  csv_filename:
+                    type: string
+                  temp_csv_filename:
+                    type: string
+                  csv_error:
+                    type: string
+                  num_recipients:
+                    type: number
+                  preview:
+                    type: object
+                    required:
+                      - body
+                    properties:
+                      body:
+                        type: string
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+    delete:
+      security:
+        - bearerAuth: []
+      description: 'Deletes error status from previous failed upload'
+      tags:
+        - GovSG
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignIdObject'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/preview:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Preview templated message
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  preview:
+                    type: object
+                    properties:
+                      body:
+                        type: string
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/send:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Start sending campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+                  job_id:
+                    type: array
+                    items:
+                      type: number
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/retry:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Retry sending campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  campaign_id:
+                    type: integer
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/stats:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Get GovSG campaign stats
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStats'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/refresh-stats:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Forcibly refresh GovSG campaign stats, then retrieves them
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignStats'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/export:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Get invalid recipients in campaign
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CampaignRecipient'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '410':
+          description: Data No Longer Available
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error410Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /campaign/{campaignId}/govsg/duplicate:
+    post:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: Duplicate the campaign and its choice of template
+      parameters:
+        - name: campaignId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+      responses:
+        '201':
+          description: A duplicate of the campaign was created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignDuplicateMeta'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '403':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error403Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /transactional/govsg/send:
+    post:
+      security:
+        - bearerAuth: []
+      summary: 'Send a transactional GovSG message'
+      tags:
+        - GovSG
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - body
+                - recipient
+              properties:
+                body:
+                  type: string
+                recipient:
+                  type: string
+      responses:
+        '201':
+          description: Created. The message is being sent.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovSGMessageTransactional'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '429':
+          description: Rate limit exceeded. Too many requests.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error429Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /transactional/govsg:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: 'List transactional GovSG messages'
+      parameters:
+        - in: query
+          name: limit
+          description: max number of messages returned
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 10
+        - in: query
+          name: offset
+          description: offset to begin returning messages from
+          required: false
+          schema:
+            type: integer
+            minimum: 0
+            default: 0
+        - in: query
+          name: status
+          description: status of messages to filter for
+          required: false
+          schema:
+            type: array
+            items:
+              type: string
+              enum: [UNSENT, ACCEPTED, SENT, DELIVERED, READ, ERROR]
+          style: form
+          explode: true
+        - in: query
+          name: created_at
+          description: >
+            Filter for created_at timestamp of messages:
+              - gt: greater than
+              - gte: greater than or equal
+              - lt: less than
+              - lte: less than or equal
+          required: false
+          schema:
+            type: object
+            minProperties: 1
+            properties:
+              gt:
+                type: string
+                format: date-time
+              gte:
+                type: string
+                format: date-time
+              lt:
+                type: string
+                format: date-time
+              lte:
+                type: string
+                format: date-time
+        - in: query
+          name: sort_by
+          description: >
+            Array of fields to sort by, default order is desc, but can be configured by adding a prefix of:
+             - plus sign (+) for ascending order
+             - minus sign (-) for descending order
+          required: false
+          schema:
+            type: array
+            default: [created_at]
+            items:
+              type: string
+              enum:
+                [
+                  created_at,
+                  +created_at,
+                  -created_at,
+                  updated_at,
+                  -updated_at,
+                  +updated_at,
+                ]
+
+      responses:
+        200:
+          description: Successfully retrieved a list of messages
+          content:
+            application/json:
+              schema:
+                type: object
+                required:
+                  - has_more
+                  - data
+                properties:
+                  has_more:
+                    type: boolean
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GovSGMessageTransactional'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+  /transactional/govsg/{messageId}:
+    get:
+      security:
+        - bearerAuth: []
+      tags:
+        - GovSG
+      summary: 'Get transactional GovSG by ID'
+      parameters:
+        - in: path
+          name: messageId
+          required: true
+          schema:
+            type: string
+            example: 42
+      responses:
+        200:
+          description: Successfully retrieved transactional GovSG message with corresponding ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GovSGMessageTransactional'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error400Response'
+        '401':
+          description: Unauthenticated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error401Response'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error404Response'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error500Response'
+
   /campaign/{campaignId}/sms:
     get:
       security:
@@ -1989,7 +2804,7 @@ paths:
 
       responses:
         '200':
-          description: Successnm
+          description: Success
           content:
             application/json:
               schema:
@@ -3435,6 +4250,7 @@ components:
         - SMS
         - EMAIL
         - TELEGRAM
+        - GOVSG
 
     CampaignIdObject:
       type: object
@@ -3565,6 +4381,48 @@ components:
               type: array
               items:
                 type: string
+    GovSGCampaign:
+      type: object
+      properties:
+        id:
+          type: number
+        name:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        has_credential:
+          type: boolean
+        valid:
+          type: boolean
+        protect:
+          type: boolean
+        redacted:
+          type: boolean
+        csv_filename:
+          type: string
+        is_csv_processing:
+          type: boolean
+        num_recipients:
+          type: number
+        type:
+          $ref: '#/components/schemas/ChannelType'
+          default: 'GOVSG'
+        job_queue:
+          type: array
+          items:
+            $ref: '#/components/schemas/JobQueue'
+        govsg_templates:
+          $ref: '#/components/schemas/GovSGTemplate'
+    GovSGTemplate:
+      type: object
+      properties:
+        body:
+          type: string
+        params:
+          type: array
+          items:
+            type: string
     CampaignStats:
       type: object
       properties:
@@ -3785,6 +4643,62 @@ components:
             * `DELIVERED` - the SMS provider has successfully delivered the SMS to the recipient's phone number
 
             * `ERROR` - an error happened when the SMS provider is trying to deliver the message
+    GovSGMessageTransactional:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 42
+        recipient:
+          type: string
+          example: '98765432'
+        body:
+          type: string
+          example: 'Hello world'
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+        accepted_at:
+          type: string
+          format: date-time
+        sent_at:
+          type: string
+          format: date-time
+        delivered_at:
+          type: string
+          format: date-time
+        read_at:
+          type: string
+          format: date-time
+        errored_at:
+          type: string
+          format: date-time
+        error_code:
+          type: string
+          description: >
+            This error code corresponds with error codes from our service providers:
+              - [WhatsApp](https://developers.facebook.com/docs/whatsapp/cloud-api/support/error-codes/#error-codes)
+        error_description:
+          type: string
+          description: Human-readable details about the message error.
+        status:
+          type: string
+          enum: [UNSENT, ACCEPTED, SENT, DELIVERED, ERROR]
+          description: >
+            * `UNSENT` - initial state of a newly created transactional GovSG message (this status is not returned in the course of a successful request to send a GovSG message)
+
+            * `ACCEPTED` - Message has been accepted by our service provider (this status is returned in the course of a successful request to send a GovSG message)
+
+            * `SENT` - the send request was successfully forwarded to our service provider and our service provider will attempt to deliver the message to the recipient’s phone number (API user can check this and all subsequent statuses via the `/transactional/govSG/{messageId}` endpoint)
+
+            * `DELIVERED` - the service provider has successfully delivered the message to the recipient's phone number
+
+            * `READ` - the recipient has received the message and viewed it
+
+            * `ERROR` - an error happened when the service provider is trying to deliver the message
     TelegramCampaign:
       type: object
       properties:

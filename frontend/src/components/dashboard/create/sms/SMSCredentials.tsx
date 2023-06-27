@@ -14,7 +14,7 @@ import TwilioCredentialsInput from './TwilioCredentialsInput'
 
 import type { TwilioCredentials } from './TwilioCredentialsInput'
 
-import type { SMSProgress } from 'classes'
+import type { SMSCampaign, SMSProgress } from 'classes'
 import {
   PrimaryButton,
   NextButton,
@@ -43,7 +43,8 @@ const SMSCredentials = ({
 }) => {
   const DEMO_CREDENTIAL = 'Postman_SMS_Demo'
   const { campaign, updateCampaign } = useContext(CampaignContext)
-  const { hasCredential: initialHasCredential, demoMessageLimit } = campaign
+  const { hasCredential: initialHasCredential, demoMessageLimit } =
+    campaign as SMSCampaign
   const isDemo = !!demoMessageLimit
 
   const [hasCredential, setHasCredential] = useState(initialHasCredential)

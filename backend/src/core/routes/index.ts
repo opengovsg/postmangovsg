@@ -46,6 +46,7 @@ import { InitTelegramMiddleware } from '@telegram/middlewares'
 import { InitApiKeyRoute } from '@core/routes/api-key.routes'
 import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 import { InitCommonAttachmentRoute } from './common-attachment.routes'
+import { govsgCampaignRoutes, govsgTemplateRoutes } from '@govsg/routes'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -205,6 +206,17 @@ export const InitV1Route = (app: Application): Router => {
     authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     celebrate(campaignIdValidator),
     telegramCampaignRoutes
+  )
+  router.use(
+    '/govsg/templates',
+    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    govsgTemplateRoutes
+  )
+  router.use(
+    '/campaign/:campaignId/govsg',
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
+    celebrate(campaignIdValidator),
+    govsgCampaignRoutes
   )
   router.use(
     '/campaign/:campaignId',

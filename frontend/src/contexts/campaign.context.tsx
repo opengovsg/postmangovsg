@@ -3,9 +3,19 @@ import { createContext, useState, useCallback } from 'react'
 
 import type { ReactNode, Dispatch, SetStateAction } from 'react'
 
-import { SMSCampaign, EmailCampaign, TelegramCampaign, Campaign } from 'classes'
+import {
+  SMSCampaign,
+  EmailCampaign,
+  TelegramCampaign,
+  Campaign,
+  GovsgCampaign,
+} from 'classes'
 
-type PossibleCampaign = SMSCampaign | EmailCampaign | TelegramCampaign
+type PossibleCampaign =
+  | SMSCampaign
+  | EmailCampaign
+  | TelegramCampaign
+  | GovsgCampaign
 
 interface ContextProps {
   campaign: PossibleCampaign

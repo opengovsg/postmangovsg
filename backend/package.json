@@ -139,6 +139,7 @@
     "@email": "build/email",
     "@telegram": "build/telegram",
     "@database": "build/database",
+    "@govsg": "build/govsg",
     "@shared": "../shared/build/"
   },
   "repository": {
