@@ -36,6 +36,8 @@ export enum GovsgMessageStatus {
   Delivered = 'DELIVERED',
   Read = 'READ',
   Error = 'ERROR',
+  InvalidRecipient = 'INVALID_RECIPIENT',
+  Deleted = 'DELETED',
 }
 
 export enum DefaultCredentialName {
