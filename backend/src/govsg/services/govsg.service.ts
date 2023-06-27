@@ -98,11 +98,21 @@ export function uploadCompleteOnChunk({
   campaignId: number
 }): (data: CSVParams[]) => Promise<void> {
   return async function (data: CSVParams[]): Promise<void> {
-    const records: Array<MessageBulkInsertInterface> = data.map((entry) => ({
-      campaignId,
-      recipient: entry.recipient.trim(),
-      params: entry,
-    }))
+    const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
+      const keysWithMissingValues = Object.keys(entry).filter((k) => !entry[k])
+      if (keysWithMissingValues.length > 0) {
+        throw new Error(
+          `One or more rows have missing data for ${keysWithMissingValues.join(
+            ', '
+          )}`
+        )
+      }
+      return {
+        campaignId,
+        recipient: entry.recipient.trim(),
+        params: entry,
+      }
+    })
 
     await GovsgMessage.bulkCreate(records as Array<GovsgMessage>, {
       transaction,
