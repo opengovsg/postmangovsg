@@ -13,7 +13,11 @@ import { GovsgTemplate } from './govsg-template'
 //   but we're creating a pivot table to not have to modify campaign table,
 //   which, in tandem with the old set up of templates for other channels,
 //   will greatly confuse readers
-@Table({ tableName: 'campaign_govsg_template', underscored: true })
+@Table({
+  tableName: 'campaign_govsg_template',
+  underscored: true,
+  timestamps: false,
+})
 export class CampaignGovsgTemplate extends Model<CampaignGovsgTemplate> {
   @Column({
     type: DataType.BIGINT,

@@ -44,6 +44,7 @@ export enum DefaultCredentialName {
   Email = 'EMAIL_DEFAULT',
   SMS = 'Postman_SMS_Demo',
   Telegram = 'Postman_Telegram_Demo',
+  Govsg = 'GOVSG_DEFAULT',
 }
 
 export enum CampaignSortField {

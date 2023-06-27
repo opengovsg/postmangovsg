@@ -12,7 +12,7 @@ import styles from '../Create.module.scss'
 import TelegramCredentialsInput from './TelegramCredentialsInput'
 import TelegramValidationInput from './TelegramValidationInput'
 
-import type { TelegramProgress } from 'classes'
+import type { TelegramCampaign, TelegramProgress } from 'classes'
 import {
   PrimaryButton,
   NextButton,
@@ -43,7 +43,8 @@ const TelegramCredentials = ({
 }) => {
   const DEMO_CREDENTIAL = 'Postman_Telegram_Demo'
   const { campaign, updateCampaign } = useContext(CampaignContext)
-  const { hasCredential: initialHasCredential, demoMessageLimit } = campaign
+  const { hasCredential: initialHasCredential, demoMessageLimit } =
+    campaign as TelegramCampaign
   const isDemo = !!demoMessageLimit
 
   const [hasCredential, setHasCredential] = useState(initialHasCredential)

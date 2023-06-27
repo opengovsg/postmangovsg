@@ -26,5 +26,8 @@ export class Statistic extends Model<Statistic> {
   sent!: number
 
   @Column(DataType.INTEGER)
+  read: number
+
+  @Column(DataType.INTEGER)
   invalid!: number
 }
