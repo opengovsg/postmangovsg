@@ -95,30 +95,28 @@ const getStatsFromTable = async (
       raw: true,
       where: { campaign_id: campaignId }, // not sure why it has to be `campaign_id` here
       attributes: [
+        [fn('sum', cast({ status: GovsgMessageStatus.Error }, 'int')), 'error'],
+        [fn('sum', cast({ status: GovsgMessageStatus.Sent }, 'int')), 'sent'],
         [
           fn(
             'sum',
             cast(
               {
-                [Op.and]: [
-                  { status: GovsgMessageStatus.Error },
-                  {
-                    [Op.not]: { error_code: 'invalid_recipient' },
-                  },
+                [Op.or]: [
+                  { status: GovsgMessageStatus.Accepted },
+                  { status: GovsgMessageStatus.Unsent },
                 ],
               },
               'int'
             )
           ),
-          'error',
-        ],
-        [fn('sum', cast({ status: GovsgMessageStatus.Sent }, 'int')), 'sent'],
-        [
-          fn('sum', cast({ status: GovsgMessageStatus.Accepted }, 'int')),
           'unsent',
         ],
         [
-          fn('sum', cast({ error_code: 'invalid_recipient' }, 'int')),
+          fn(
+            'sum',
+            cast({ status: GovsgMessageStatus.InvalidRecipient }, 'int')
+          ),
           'invalid',
         ],
       ],

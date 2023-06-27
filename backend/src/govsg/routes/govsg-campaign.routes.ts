@@ -94,9 +94,9 @@ router.post(
   GovsgMiddleware.duplicateCampaign
 )
 
-router.get('/stats', GovsgStatsMiddleware.getStats)
+router.get('/stats', GovsgStatsMiddleware.updateAndGetStats)
 
-router.post('/refresh-stats', GovsgStatsMiddleware.updateAndgetStats)
+router.post('/refresh-stats', GovsgStatsMiddleware.updateAndGetStats)
 
 router.get(
   '/export',

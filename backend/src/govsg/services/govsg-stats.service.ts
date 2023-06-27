@@ -7,7 +7,6 @@ import { QueryTypes } from 'sequelize'
 import { Writable } from 'stream'
 
 export async function getStats(campaignId: number): Promise<CampaignStats> {
-  await refreshStats(campaignId)
   return StatsService.getCurrentStats(campaignId, GovsgOp)
 }
 

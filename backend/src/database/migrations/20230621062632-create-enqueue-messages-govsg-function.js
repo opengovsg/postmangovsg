@@ -20,7 +20,7 @@ module.exports = {
           -- enqueue only those that have not been enqueued - when logger writes the ops back to messages, it will set accepted_at to null so that messages can be retried.
           AND m.accepted_at IS NULL
           -- enqueue only unsent or errored messages
-          AND (m.status = 'ERROR' OR m.status IS NULL OR m.status = 'ACCEPTED')
+          AND (m.status = 'ERROR' OR m.status = 'UNSENT' OR m.status = 'ACCEPTED')
           RETURNING
           id,
           campaign_id,

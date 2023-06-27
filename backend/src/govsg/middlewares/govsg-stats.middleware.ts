@@ -6,7 +6,7 @@ export async function getStats(req: Request, res: Response): Promise<Response> {
   return res.json(stats)
 }
 
-export async function updateAndgetStats(
+export async function updateAndGetStats(
   req: Request,
   res: Response
 ): Promise<Response> {

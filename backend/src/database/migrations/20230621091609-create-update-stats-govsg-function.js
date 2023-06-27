@@ -17,11 +17,11 @@ module.exports = {
 -- Archive number of unsent, errored and sent govsg messages in statistics table
 WITH stats AS (
   SELECT
-    COUNT(*) FILTER (WHERE status IS NULL) AS unsent,
-    COUNT(*) FILTER (WHERE status = 'ERROR' AND error_code <> 'invalid_recipient') AS errored,
+    COUNT(*) FILTER (WHERE status = 'UNSENT') AS unsent,
+    COUNT(*) FILTER (WHERE status = 'ERROR') AS errored,
     COUNT(*) FILTER (WHERE status = 'ACCEPTED' OR status = 'SENT' or status = 'DELIVERED') AS sent,
-    COUNT(*) FILTER (WHERE error_code = 'invalid_recipient') AS invalid,
-    COUNT(*) FILTER (WHERE status = 'READ') AS read
+    COUNT(*) FILTER (WHERE status = 'INVALID_RECIPIENT') AS invalid,
+    COUNT(*) FILTER (WHERE status = 'READ' OR status = 'DELETED') AS read
   FROM govsg_messages
   WHERE campaign_id = selected_campaign_id
 )

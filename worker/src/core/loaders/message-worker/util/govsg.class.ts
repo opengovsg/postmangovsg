@@ -115,10 +115,25 @@ class Govsg {
         action: 'sendMessage',
       })
     } catch (error: any) {
+      if ((error as { errorCode: string }).errorCode === 'invalid_recipient') {
+        await this.connection.query(
+          `UPDATE govsg_ops SET status='INVALID_RECIPIENT', 
+            sent_at=clock_timestamp(), updated_at=clock_timestamp()
+            where id=:id`,
+          {
+            replacements: {
+              id,
+            },
+            type: QueryTypes.UPDATE,
+          }
+        )
+        return
+      }
+
       await this.connection.query(
         `UPDATE govsg_ops SET status='ERROR', sent_at=clock_timestamp(),
-	error_code=:errorCode, error_description=:description, updated_at=clock_timestamp()
-	where id=:id`,
+	        error_code=:errorCode, error_description=:description, updated_at=clock_timestamp()
+	        where id=:id`,
         {
           replacements: {
             id,

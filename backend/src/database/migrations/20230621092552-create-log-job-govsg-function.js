@@ -14,7 +14,7 @@ module.exports = {
           -- coalesced fields should prioritise message table over ops table
           -- because callbacks might arrive before logging
           status = CASE
-              WHEN m.status = 'ACCEPTED' THEN COALESCE(p.status, m.status)
+              WHEN m.status = 'ACCEPTED' OR m.status = 'UNSENT' THEN COALESCE(p.status, m.status)
               ELSE COALESCE(m.status, p.status)
             END,
           error_code = COALESCE(m.error_code, p.error_code),
