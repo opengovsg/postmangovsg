@@ -96,20 +96,24 @@ const getStatsFromTable = async (
       where: { campaign_id: campaignId }, // not sure why it has to be `campaign_id` here
       attributes: [
         [fn('sum', cast({ status: GovsgMessageStatus.Error }, 'int')), 'error'],
-        [fn('sum', cast({ status: GovsgMessageStatus.Sent }, 'int')), 'sent'],
         [
           fn(
             'sum',
             cast(
               {
                 [Op.or]: [
+                  { status: GovsgMessageStatus.Sent },
                   { status: GovsgMessageStatus.Accepted },
-                  { status: GovsgMessageStatus.Unsent },
+                  { status: GovsgMessageStatus.Delivered },
                 ],
               },
               'int'
             )
           ),
+          'sent',
+        ],
+        [
+          fn('sum', cast({ status: GovsgMessageStatus.Unsent }, 'int')),
           'unsent',
         ],
         [

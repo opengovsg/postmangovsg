@@ -15,18 +15,18 @@ module.exports = {
         WITH messages AS
         (
           UPDATE govsg_messages m
-          SET accepted_at = clock_timestamp(), updated_at = clock_timestamp(), error_code = NULL, sent_at = NULL, send_attempted_at = NULL, delivered_at = NULL, read_at = NULL, errored_at = NULL, status = 'ACCEPTED'
+          SET dequeued_at = clock_timestamp(), updated_at = clock_timestamp(), error_code = NULL, sent_at = NULL, send_attempted_at = NULL, delivered_at = NULL, read_at = NULL, errored_at = NULL, status = 'UNSENT'
           WHERE m.campaign_id = selected_campaign_id
-          -- enqueue only those that have not been enqueued - when logger writes the ops back to messages, it will set accepted_at to null so that messages can be retried.
-          AND m.accepted_at IS NULL
+          -- enqueue only those that have not been enqueued - when logger writes the ops back to messages, it will set dequeued_at to null so that messages can be retried.
+          AND m.dequeued_at IS NULL
           -- enqueue only unsent or errored messages
-          AND (m.status = 'ERROR' OR m.status = 'UNSENT' OR m.status = 'ACCEPTED')
+          AND (m.status = 'ERROR' OR m.status = 'UNSENT')
           RETURNING
           id,
           campaign_id,
           recipient,
           params,
-          accepted_at,
+          dequeued_at,
           created_at,
           updated_at
         )
@@ -36,7 +36,7 @@ module.exports = {
         campaign_id, 
         recipient, 
         params, 
-        accepted_at,
+        dequeued_at,
         -- note that send_attempted_at is not set. It remains as null so that the sending step will pick it up.
         -- note that sent_at is not set. It remains as null so we can set it when the sending client responds.
         created_at,

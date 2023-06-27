@@ -100,7 +100,7 @@ class Govsg {
         paramOrder.map((p) => params[p])
       )
       await this.connection.query(
-        `UPDATE govsg_ops SET status='SENT', sent_at=clock_timestamp(), 
+        `UPDATE govsg_ops SET status='ACCEPTED', accepted_at=clock_timestamp(), 
 	service_provider_message_id=:serviceProviderMessageId, updated_at=clock_timestamp() 
 	WHERE id=:id;`,
         {

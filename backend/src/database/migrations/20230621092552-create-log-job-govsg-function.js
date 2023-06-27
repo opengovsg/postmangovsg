@@ -9,12 +9,12 @@ module.exports = {
       'plpgsql',
       `
         UPDATE govsg_messages m 
-        -- setting accepted_at to null so it can be retried if needed
-        SET accepted_at = NULL,
+        -- setting dequeued_at to null so it can be retried if needed
+        SET dequeued_at = NULL,
           -- coalesced fields should prioritise message table over ops table
           -- because callbacks might arrive before logging
           status = CASE
-              WHEN m.status = 'ACCEPTED' OR m.status = 'UNSENT' THEN COALESCE(p.status, m.status)
+              WHEN m.status = 'UNSENT' THEN COALESCE(p.status, m.status)
               ELSE COALESCE(m.status, p.status)
             END,
           error_code = COALESCE(m.error_code, p.error_code),
