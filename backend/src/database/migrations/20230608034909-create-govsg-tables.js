@@ -299,6 +299,7 @@ module.exports = {
     await queryInterface.dropTable('campaign_govsg_template')
     await queryInterface.dropTable('govsg_templates')
     await queryInterface.dropTable('govsg_messages')
+    await queryInterface.sequelize.query('DROP TYPE enum_govsg_messages_status')
     await queryInterface.sequelize.query(`
       DELETE FROM job_queue WHERE campaign_id IN (SELECT id FROM campaigns WHERE type = 'GOVSG');
       DELETE FROM campaigns WHERE type = 'GOVSG';
