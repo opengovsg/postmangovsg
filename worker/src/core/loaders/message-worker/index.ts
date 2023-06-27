@@ -15,6 +15,7 @@ import { Message } from './interface'
 import { NotificationService } from '@core/services/notification.service'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import MailClient, { MailToSend } from '@shared/clients/mail-client.class'
+import Govsg from './util/govsg.class'
 
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 
@@ -26,14 +27,15 @@ let connection: Sequelize,
   currentCampaignType: string,
   email: Email,
   sms: SMS,
-  telegram: Telegram
+  telegram: Telegram,
+  govsg: Govsg
 let shouldRun = false
 
 /**
  *  Different channel types operate on their own channel type tables.
  *  Helper method to decide which queries to use, depending on channel type
  */
-const service = (): Email | SMS | Telegram => {
+const service = (): Email | SMS | Telegram | Govsg => {
   switch (currentCampaignType) {
     case 'EMAIL':
       return email
@@ -41,6 +43,8 @@ const service = (): Email | SMS | Telegram => {
       return sms
     case 'TELEGRAM':
       return telegram
+    case 'GOVSG':
+      return govsg
     default:
       throw new Error(`${currentCampaignType} not supported`)
   }
@@ -155,20 +159,34 @@ const finalize = tracer.wrap(
         })
       })
 
-    return Promise.all([logEmailJob, logSmsJob, logTelegramJob]).then(
-      (campaignIds) => {
-        campaignIds.filter(Boolean).forEach((campaignId) => {
-          logger.info({
-            message: 'Logging finalized',
-            workerId,
-            campaignId,
-            action: 'finalize',
-          })
-          // for each campaign id, send email confirmation
-          void sendFinalizedNotification(campaignId)
+    const logGovsgJob = connection
+      .query('SELECT log_next_job_govsg();')
+      .then(([result]) => get(result, '[0].log_next_job_govsg', ''))
+      .catch((err) => {
+        logger.error({
+          message: 'Log govsg job',
+          error: err,
+          action: 'finalize',
         })
-      }
-    )
+      })
+
+    return Promise.all([
+      logEmailJob,
+      logSmsJob,
+      logTelegramJob,
+      logGovsgJob,
+    ]).then((campaignIds) => {
+      campaignIds.filter(Boolean).forEach((campaignId) => {
+        logger.info({
+          message: 'Logging finalized',
+          workerId,
+          campaignId,
+          action: 'finalize',
+        })
+        // for each campaign id, send email confirmation
+        void sendFinalizedNotification(campaignId)
+      })
+    })
   }
 )
 
@@ -374,6 +392,7 @@ const start = async (index: string, isLogger = false): Promise<any> => {
   email = new Email(workerId, connection)
   sms = new SMS(workerId, connection)
   telegram = new Telegram(workerId, connection)
+  govsg = new Govsg(workerId, connection)
 
   try {
     shouldRun = true
