@@ -1564,7 +1564,9 @@ paths:
                   - data
                 properties:
                   data:
-                    $ref: '#/components/schemas/GovSGTemplate'
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/GovSGTemplate'
         '401':
           description: Unauthenticated
           content:

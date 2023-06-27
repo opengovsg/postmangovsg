@@ -1,0 +1,25 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.choice {
+  border: 1px solid $neutral;
+  border-radius: 1.5rem;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+
+  .head {
+    padding: 2rem;
+    label {
+      margin-left: 2rem;
+    }
+  }
+  .body {
+    padding: 2rem;
+    padding-top: 1rem;
+    background: $neutral-light;
+  }
+
+  &.selected {
+    border-color: $primary;
+  }
+}

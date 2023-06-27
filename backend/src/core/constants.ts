@@ -2,6 +2,7 @@ export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
   Telegram = 'TELEGRAM',
+  Govsg = 'GOVSG',
 }
 
 export enum CampaignStatus {
@@ -28,10 +29,22 @@ export enum MessageStatus {
   InvalidRecipient = 'INVALID_RECIPIENT',
 }
 
+export enum GovsgMessageStatus {
+  Unsent = 'UNSENT',
+  Accepted = 'ACCEPTED',
+  Sent = 'SENT',
+  Delivered = 'DELIVERED',
+  Read = 'READ',
+  Error = 'ERROR',
+  InvalidRecipient = 'INVALID_RECIPIENT',
+  Deleted = 'DELETED',
+}
+
 export enum DefaultCredentialName {
   Email = 'EMAIL_DEFAULT',
   SMS = 'Postman_SMS_Demo',
   Telegram = 'Postman_Telegram_Demo',
+  Govsg = 'GOVSG_DEFAULT',
 }
 
 export enum CampaignSortField {
