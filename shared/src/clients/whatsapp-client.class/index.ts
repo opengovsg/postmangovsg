@@ -88,16 +88,64 @@ export default class WhatsAppClient {
     return contacts[0].wa_id as WhatsAppId
   }
 
-  // public async validateMultipleRecipients(
-  //   input: WhatsAppTemplateMessageToSend[]
-  // ): Promise<WhatsAppId[]> {
-  //   const { tokenOne, urlOne } = this.getCredentials(
-  //     WhatsAppApiClient.clientOne
-  //   )
-  //   const { tokenTwo, urlTwo } = this.getCredentials(
-  //     WhatsAppApiClient.clientTwo
-  //   )
-  // }
+  public async validateMultipleRecipients(
+    inputs: WhatsAppTemplateMessageToSend[],
+    isLocal = false
+  ): Promise<WhatsAppId[]> {
+    // bypass validation in local environment because no access to on-prem API
+    // proxy can only send message, no endpoint for validation
+    if (isLocal) {
+      return inputs.map((i) => i.to)
+    }
+    const { token: tokenOne, url: urlOne } = this.getCredentials(
+      WhatsAppApiClient.clientOne
+    )
+    const { token: tokenTwo, url: urlTwo } = this.getCredentials(
+      WhatsAppApiClient.clientTwo
+    )
+    const clientOneRecipients = inputs
+      .filter((i) => i.apiClient === WhatsAppApiClient.clientOne)
+      .map((i) => i.to)
+    const clientTwoRecipients = inputs
+      .filter((i) => i.apiClient === WhatsAppApiClient.clientTwo)
+      .map((i) => i.to)
+    const [validatedClientOneData, validatedClientTwoData] = await Promise.all([
+      this.axiosInstance.request<ValidateContact200Response>({
+        method: 'post',
+        url: CONTACT_ENDPOINT,
+        baseURL: urlOne,
+        headers: { Authorization: `Bearer ${tokenOne}` },
+        data: { blocking: 'wait', contacts: clientOneRecipients },
+      }),
+      this.axiosInstance.request<ValidateContact200Response>({
+        method: 'post',
+        url: CONTACT_ENDPOINT,
+        baseURL: urlTwo,
+        headers: { Authorization: `Bearer ${tokenTwo}` },
+        data: { blocking: 'wait', contacts: clientTwoRecipients },
+      }),
+    ]).catch((err: Error | AxiosError) => {
+      if (axios.isAxiosError(err) && err.response) {
+        throw new Error(
+          `Error validating recipients ${JSON.stringify(
+            inputs
+          )}: ${JSON.stringify(err.response)}`
+        )
+      }
+      throw new Error(
+        `Unexpected error validating recipients ${JSON.stringify(
+          inputs
+        )}. Error: ${JSON.stringify(err)}`
+      )
+    })
+    const clientOneIds = validatedClientOneData.data.contacts.map(
+      (c) => c.wa_id
+    ) as WhatsAppId[]
+    const clientTwoIds = validatedClientTwoData.data.contacts.map(
+      (c) => c.wa_id
+    ) as WhatsAppId[]
+    return [...clientOneIds, ...clientTwoIds]
+  }
 
   public async sendMessage(
     input: WhatsAppTemplateMessageToSend,

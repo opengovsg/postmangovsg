@@ -23,8 +23,8 @@ import {
 } from '@core/constants'
 import {
   ApiInvalidTemplateError,
-  ApiRateLimitError,
   ApiNotFoundError,
+  ApiRateLimitError,
 } from '@core/errors/rest-api.errors'
 import { UploadedFile } from 'express-fileupload'
 
@@ -57,6 +57,7 @@ export const InitEmailTransactionalMiddleware = (
     classification?: TransactionalEmailClassification
     tag?: string
   }
+  type ReqBodyWithId = ReqBody & { emailMessageTransactionalId: string }
 
   function convertMessageModelToResponse(message: EmailMessageTransactional) {
     return {
@@ -124,12 +125,13 @@ export const InitEmailTransactionalMiddleware = (
       tag,
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
     } as unknown as EmailMessageTransactional)
-    req.body.emailMessageTransactionalId = emailMessageTransactional.id // for subsequent middlewares to distinguish whether this is a transactional email
+    // insert id into req.body so that subsequent middlewares can use it
+    req.body.emailMessageTransactionalId = emailMessageTransactional.id
     next()
   }
 
   async function sendMessage(
-    req: Request,
+    req: Request<unknown, unknown, ReqBodyWithId>,
     res: Response,
     next: NextFunction
   ): Promise<void> {
