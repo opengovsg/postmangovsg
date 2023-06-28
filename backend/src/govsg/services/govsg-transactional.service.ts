@@ -7,6 +7,7 @@ import { loggerWithLabel } from '@core/logger'
 import { WhatsAppService } from '@core/services/whatsapp.service'
 import {
   MessageId,
+  NormalisedParam,
   WhatsAppApiClient,
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/interfaces'
@@ -20,7 +21,7 @@ async function sendMessage({
 }: {
   recipient: string
   templateName: string
-  params: { [key: string]: string }
+  params: NormalisedParam[]
 }): Promise<MessageId> {
   const action = 'sendMessage'
   logger.info({ message: 'Sending GovSG message', action })

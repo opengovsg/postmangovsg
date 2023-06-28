@@ -6,6 +6,7 @@ import config from '@core/config'
 import WhatsAppClient from '@shared/clients/whatsapp-client.class'
 import FlamingoDbClient from '@shared/clients/flamingo-db-client.class'
 import {
+  NormalisedParam,
   WhatsAppApiClient,
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/interfaces'
@@ -78,6 +79,9 @@ class Govsg {
       ),
       'get_messages_to_send_govsg'
     )
+    if (dbResults.length === 0) {
+      return []
+    }
 
     const apiClientIdMap = await this.flamingoDbClient.getApiClientId(
       dbResults.map((result) => result.recipient)
@@ -87,13 +91,19 @@ class Govsg {
       id: result.id, // need this to update govsg_ops table
       recipient: result.recipient,
       templateName: result.whatsappTemplateLabel,
-      params: result.params,
+      params: WhatsAppClient.transformNamedParams(
+        result.params,
+        result.paramOrder
+      ),
       apiClient:
         apiClientIdMap.get(result.recipient) ?? WhatsAppApiClient.clientTwo,
       language: WhatsAppLanguages.english,
     }))
     const validatedWhatsAppIds =
-      await this.whatsappClient.validateMultipleRecipients(unvalidatedMessages)
+      await this.whatsappClient.validateMultipleRecipients(
+        unvalidatedMessages,
+        config.get('env') === 'development'
+      )
     const invalidMessages = validatedWhatsAppIds.filter(
       (message) => message.status === 'failed'
     )
@@ -127,21 +137,19 @@ class Govsg {
     params,
     apiClient,
     language,
-    paramOrder,
   }: {
     id: number
     recipient: string
     templateName: string
-    params: { [key: string]: string }
+    params: NormalisedParam[]
     // in practice, these are compulsory parameters
     // but they are optional here to follow the implicit interface in worker class
     apiClient: WhatsAppApiClient
     language: WhatsAppLanguages
-    paramOrder: string[] // TODO: figure out what to do with this param
   }): Promise<void> {
     try {
-      if (!templateName || !paramOrder) {
-        throw new Error('Missing template label or param order')
+      if (!templateName) {
+        throw new Error('Missing template label')
       }
       const isLocal = config.get('env') === 'development'
       const serviceProviderMessageId = await this.whatsappClient.sendMessage(

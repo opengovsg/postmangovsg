@@ -9,6 +9,8 @@ import {
 import { GovsgMessageStatus } from '@core/constants'
 import { GovsgTransactionalService } from '../services/govsg-transactional.service'
 import { PhoneNumberService } from '@core/services'
+import WhatsAppClient from '@shared/clients/whatsapp-client.class'
+import { NormalisedParam } from '@shared/clients/whatsapp-client.class/interfaces'
 
 export interface GovsgTransactionalMiddleware {
   saveMessage: Handler
@@ -24,7 +26,10 @@ export const InitGovsgTransactionalMiddleware =
       whatsapp_template_label: string
       params?: Record<string, string>
     }
-    type ReqBodyWithId = ReqBody & { govsgTransactionalId: string }
+    type ReqBodyWithId = ReqBody & {
+      govsgTransactionalId: string
+      normalisedParams: NormalisedParam[]
+    }
 
     function convertMessageModelToResponse(message: GovsgMessageTransactional) {
       return {
@@ -59,12 +64,17 @@ export const InitGovsgTransactionalMiddleware =
       }
       const normalisedRecipient =
         PhoneNumberService.normalisePhoneNumber(recipient)
-      validateParams(govsgTemplate.params, params, whatsappTemplateLabel)
+
+      req.body.normalisedParams = validateParams(
+        govsgTemplate.params,
+        params,
+        whatsappTemplateLabel
+      )
       const govsgTransactional = await GovsgMessageTransactional.create({
         templateId: govsgTemplate.id,
         userId: req.session?.user?.id,
         recipient: normalisedRecipient,
-        params: params ?? null,
+        params: params ?? [],
         status: GovsgMessageStatus.Unsent,
       } as unknown as GovsgMessageTransactional)
       // insert id into req.body so that subsequent middlewares can use it
@@ -76,13 +86,14 @@ export const InitGovsgTransactionalMiddleware =
       govsgTemplateParams: GovsgTemplate['params'],
       params: Record<string, string> | undefined,
       whatsappTemplateLabel: string
-    ) {
+    ): NormalisedParam[] {
       // no params required or provided
       if (
         (!params && govsgTemplateParams === null) ||
         govsgTemplateParams?.length === 0
-      )
-        return
+      ) {
+        return []
+      }
       // no params provided, but params required
       if (
         (!params && govsgTemplateParams !== null) ||
@@ -105,6 +116,11 @@ export const InitGovsgTransactionalMiddleware =
         // check to ensure both are the same length, if not throw error
         // for key in params, find in govsgTemplate.params
       }
+
+      return WhatsAppClient.transformNamedParams(
+        params as { [key: string]: string },
+        govsgTemplateParams
+      )
     }
 
     async function sendMessage(
@@ -131,7 +147,7 @@ export const InitGovsgTransactionalMiddleware =
         const messageId = await GovsgTransactionalService.sendMessage({
           recipient: govsgTransactional.recipient,
           templateName: whatsappTemplateLabel,
-          params: govsgTransactional.params,
+          params: req.body.normalisedParams as NormalisedParam[],
         })
         govsgTransactional.set('status', GovsgMessageStatus.Accepted)
         govsgTransactional.set('acceptedAt', new Date())

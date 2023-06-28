@@ -91,8 +91,12 @@ const enqueueMessages = (jobId: number, campaignId: number): Promise<void> => {
   return service().enqueueMessages(jobId, campaignId)
 }
 
-const getMessages = async (jobId: number, rate: number): Promise<Message[]> => {
-  return await service().getMessages(jobId, rate)
+// TODO: refactor the return type
+const getMessages = async (
+  jobId: number,
+  rate: number
+): Promise<Message[] | any[]> => {
+  return service().getMessages(jobId, rate)
 }
 
 const sendMessage = tracer.wrap(

@@ -12,6 +12,7 @@ import {
   ValidatedWhatsAppTemplateMessageToSend,
   ContactStatus,
   UnvalidatedWhatsAppTemplateMessageToSend,
+  NormalisedParam,
 } from './interfaces'
 import { AuthenticationError, RateLimitError } from './errors'
 
@@ -117,20 +118,24 @@ export default class WhatsAppClient {
       .filter((i) => i.apiClient === WhatsAppApiClient.clientTwo)
       .map((i) => i.recipient)
     const [validatedClientOneData, validatedClientTwoData] = await Promise.all([
-      this.axiosInstance.request<ValidateContact200Response>({
-        method: 'post',
-        url: CONTACT_ENDPOINT,
-        baseURL: urlOne,
-        headers: { Authorization: `Bearer ${tokenOne}` },
-        data: { blocking: 'wait', contacts: clientOneRecipients },
-      }),
-      this.axiosInstance.request<ValidateContact200Response>({
-        method: 'post',
-        url: CONTACT_ENDPOINT,
-        baseURL: urlTwo,
-        headers: { Authorization: `Bearer ${tokenTwo}` },
-        data: { blocking: 'wait', contacts: clientTwoRecipients },
-      }),
+      clientOneRecipients.length > 0
+        ? this.axiosInstance.request<ValidateContact200Response>({
+            method: 'post',
+            url: CONTACT_ENDPOINT,
+            baseURL: urlOne,
+            headers: { Authorization: `Bearer ${tokenOne}` },
+            data: { blocking: 'wait', contacts: clientOneRecipients },
+          })
+        : { data: { contacts: [] } },
+      clientTwoRecipients.length > 0
+        ? this.axiosInstance.request<ValidateContact200Response>({
+            method: 'post',
+            url: CONTACT_ENDPOINT,
+            baseURL: urlTwo,
+            headers: { Authorization: `Bearer ${tokenTwo}` },
+            data: { blocking: 'wait', contacts: clientTwoRecipients },
+          })
+        : { data: { contacts: [] } },
     ]).catch((err: Error | AxiosError) => {
       if (axios.isAxiosError(err) && err.response) {
         throw new Error(
@@ -227,5 +232,15 @@ export default class WhatsAppClient {
         )
       })
     return messages[0].id
+  }
+
+  public static transformNamedParams(
+    params: { [key: string]: string },
+    paramOrder: string[]
+  ): NormalisedParam[] {
+    return paramOrder.map((k) => ({
+      type: 'text',
+      text: params[k],
+    }))
   }
 }

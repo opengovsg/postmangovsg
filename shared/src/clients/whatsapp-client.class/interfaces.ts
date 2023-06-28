@@ -1,10 +1,15 @@
 // can consider using Brand<T, U> to enforce type safety
 export type WhatsAppId = string
 
+export interface NormalisedParam {
+  type: string
+  text: string
+}
+
 export interface WhatsAppTemplateMessageToSend {
   recipient: string
   templateName: string
-  params: { [key: string]: string }
+  params: NormalisedParam[]
   apiClient: WhatsAppApiClient
   language: WhatsAppLanguages
 }
