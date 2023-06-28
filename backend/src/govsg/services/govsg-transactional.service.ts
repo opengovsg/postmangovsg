@@ -7,6 +7,7 @@ import { loggerWithLabel } from '@core/logger'
 import { WhatsAppService } from '@core/services/whatsapp.service'
 import {
   MessageId,
+  NormalisedParam,
   WhatsAppApiClient,
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/interfaces'
@@ -20,7 +21,7 @@ async function sendMessage({
 }: {
   recipient: string
   templateName: string
-  params: Record<string, string> | null
+  params: NormalisedParam[]
 }): Promise<MessageId> {
   const action = 'sendMessage'
   logger.info({ message: 'Sending GovSG message', action })
@@ -29,16 +30,17 @@ async function sendMessage({
   2. Call WhatsApp contacts endpoint to validate user
   3. Send templated message to user
   */
-  const map = await WhatsAppService.flamingoDbClient.getApiClientId([recipient])
-  // if recipient not in db, map.get(recipient) will return undefined
-  // default to clientTwo in this case
-  const apiClient = map.get(recipient) ?? WhatsAppApiClient.clientTwo
+  const apiClientIdMap = await WhatsAppService.flamingoDbClient.getApiClientId([
+    recipient,
+  ])
   const messageToSend = {
-    to: recipient,
+    recipient,
     templateName,
-    components: params,
-    apiClient,
-    language: WhatsAppLanguages.english,
+    params,
+    // if recipient not in db, map.get(recipient) will return undefined
+    // default to clientTwo in this case
+    apiClient: apiClientIdMap.get(recipient) ?? WhatsAppApiClient.clientTwo,
+    language: WhatsAppLanguages.english, // hardcode for now
   }
   // differential treatment based on local vs staging/prod
   // because WA API Client is inaccessible from local

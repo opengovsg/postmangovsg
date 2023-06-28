@@ -34,8 +34,9 @@ export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> 
   @Column({ type: DataType.STRING, allowNull: false })
   recipient: string
 
-  @Column({ type: DataType.JSONB, allowNull: true })
-  params: Record<string, string> | null
+  // TODO: fix this migration?
+  @Column({ type: DataType.JSONB, allowNull: false })
+  params: { [key: string]: string }
 
   @Column({ type: DataType.STRING, allowNull: true })
   serviceProviderMessageId: string | null
