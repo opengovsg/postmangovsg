@@ -9,6 +9,9 @@ import {
   TemplateMessage200Response,
   MessageId,
   TemplateMessageErrResponse,
+  ValidatedWhatsAppTemplateMessageToSend,
+  ContactStatus,
+  UnvalidatedWhatsAppTemplateMessageToSend,
 } from './interfaces'
 import { AuthenticationError, RateLimitError } from './errors'
 
@@ -57,7 +60,7 @@ export default class WhatsAppClient {
     // bypass validation in local environment because no access to on-prem API
     // proxy can only send message, no endpoint for validation
     if (isLocal) {
-      return input.to
+      return input.recipient
     }
     const { token, url } = this.getCredentials(input.apiClient)
     const res = await this.axiosInstance
@@ -66,19 +69,19 @@ export default class WhatsAppClient {
         url: CONTACT_ENDPOINT,
         baseURL: url,
         headers: { Authorization: `Bearer ${token}` },
-        data: { blocking: 'wait', contacts: [input.to] },
+        data: { blocking: 'wait', contacts: [input.recipient] },
       })
       .catch((err: Error | AxiosError) => {
         if (axios.isAxiosError(err) && err.response) {
           throw new Error(
-            `Error validating recipient ${input.to}: ${JSON.stringify(
+            `Error validating recipient ${input.recipient}: ${JSON.stringify(
               err.response
             )}`
           )
         }
         throw new Error(
           `Unexpected error validating recipient ${
-            input.to
+            input.recipient
           }. Error: ${JSON.stringify(err)}`
         )
       })
@@ -89,13 +92,17 @@ export default class WhatsAppClient {
   }
 
   public async validateMultipleRecipients(
-    inputs: WhatsAppTemplateMessageToSend[],
+    inputs: UnvalidatedWhatsAppTemplateMessageToSend[],
     isLocal = false
-  ): Promise<WhatsAppId[]> {
+  ): Promise<ValidatedWhatsAppTemplateMessageToSend[]> {
     // bypass validation in local environment because no access to on-prem API
     // proxy can only send message, no endpoint for validation
     if (isLocal) {
-      return inputs.map((i) => i.to)
+      return inputs.map((i) => ({
+        ...i,
+        waId: i.recipient,
+        status: ContactStatus.valid, // as long as you're testing locally to your own WhatsApp, should be ok
+      }))
     }
     const { token: tokenOne, url: urlOne } = this.getCredentials(
       WhatsAppApiClient.clientOne
@@ -105,10 +112,10 @@ export default class WhatsAppClient {
     )
     const clientOneRecipients = inputs
       .filter((i) => i.apiClient === WhatsAppApiClient.clientOne)
-      .map((i) => i.to)
+      .map((i) => i.recipient)
     const clientTwoRecipients = inputs
       .filter((i) => i.apiClient === WhatsAppApiClient.clientTwo)
-      .map((i) => i.to)
+      .map((i) => i.recipient)
     const [validatedClientOneData, validatedClientTwoData] = await Promise.all([
       this.axiosInstance.request<ValidateContact200Response>({
         method: 'post',
@@ -138,13 +145,23 @@ export default class WhatsAppClient {
         )}. Error: ${JSON.stringify(err)}`
       )
     })
-    const clientOneIds = validatedClientOneData.data.contacts.map(
-      (c) => c.wa_id
-    ) as WhatsAppId[]
-    const clientTwoIds = validatedClientTwoData.data.contacts.map(
-      (c) => c.wa_id
-    ) as WhatsAppId[]
-    return [...clientOneIds, ...clientTwoIds]
+    const clientOneMap = new Map(
+      validatedClientOneData.data.contacts.map((c) => [c.input, c.wa_id])
+    )
+    const clientTwoMap = new Map(
+      validatedClientTwoData.data.contacts.map((c) => [c.input, c.wa_id])
+    )
+    return inputs.map((i) => {
+      const waId =
+        i.apiClient === WhatsAppApiClient.clientOne
+          ? clientOneMap.get(i.recipient)
+          : clientTwoMap.get(i.recipient)
+      const status =
+        // since blocking is set to wait, if waId is undefined, it means the contact is blocked
+        // see https://developers.facebook.com/docs/whatsapp/on-premises/reference/contacts#blocking
+        waId === undefined ? ContactStatus.failed : ContactStatus.valid
+      return { ...i, waId, status }
+    })
   }
 
   public async sendMessage(
@@ -170,7 +187,7 @@ export default class WhatsAppClient {
         baseURL,
         headers,
         data: {
-          to: input.to,
+          to: input.recipient,
           type: 'template',
           template: {
             namespace: this.credentials['namespace'],
@@ -180,7 +197,7 @@ export default class WhatsAppClient {
               policy: 'deterministic',
             },
           },
-          components: [],
+          components: [], // TODO
         },
       })
       .catch((err: Error | AxiosError) => {

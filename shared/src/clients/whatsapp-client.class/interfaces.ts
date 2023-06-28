@@ -1,12 +1,24 @@
+// can consider using Brand<T, U> to enforce type safety
 export type WhatsAppId = string
 
 export interface WhatsAppTemplateMessageToSend {
-  to: string
+  recipient: string
   templateName: string
-  components: Record<string, string> | null // unsure tbd
+  params: { [key: string]: string }
   apiClient: WhatsAppApiClient
   language: WhatsAppLanguages
 }
+
+export type UnvalidatedWhatsAppTemplateMessageToSend =
+  WhatsAppTemplateMessageToSend & {
+    id: number
+  }
+
+export type ValidatedWhatsAppTemplateMessageToSend =
+  UnvalidatedWhatsAppTemplateMessageToSend & {
+    status: ContactStatus
+    waId: WhatsAppId | undefined // if status is valid, waId is defined
+  }
 
 export enum WhatsAppApiClient {
   clientOne = 'client_one', // 6581290065
@@ -43,8 +55,8 @@ type ContactWithWAId = Contact & {
   wa_id: WhatsAppId // only returned if status is valid
 }
 
-enum ContactStatus {
-  processing = 'processing',
+export enum ContactStatus {
+  processing = 'processing', // will not occur if blocking is set to 'wait' https://developers.facebook.com/docs/whatsapp/on-premises/reference/contacts#blocking
   valid = 'valid',
   failed = 'failed',
 }

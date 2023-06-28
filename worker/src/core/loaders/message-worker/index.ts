@@ -22,7 +22,8 @@ require('module-alias/register') // to resolve aliased paths like @core, @sms, @
 const logger = loggerWithLabel(module)
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 
-let connection: Sequelize,
+let postmanConnection: Sequelize,
+  flamingoConnection: Sequelize,
   workerId: string,
   currentCampaignType: string,
   email: Email,
@@ -57,7 +58,7 @@ const getNextJob = (): Promise<{
   rate: number | undefined
   credName: string | undefined
 }> => {
-  return connection
+  return postmanConnection
     .query('SELECT get_next_job(:worker_id);', {
       replacements: { worker_id: workerId },
       type: QueryTypes.SELECT,
@@ -118,7 +119,8 @@ const sendMessage = tracer.wrap(
       messageValue: message,
       ...metadata,
     })
-    return service().sendMessage(message)
+    // TODO: refactor this away subsequently, the interface is screwed now
+    return service().sendMessage(message as any)
   }
 )
 
@@ -130,7 +132,7 @@ const finalize = tracer.wrap(
     },
   },
   (): Promise<void> => {
-    const logEmailJob = connection
+    const logEmailJob = postmanConnection
       .query('SELECT log_next_job_email();')
       .then(([result]) => get(result, '[0].log_next_job_email', ''))
       .catch((err) => {
@@ -141,14 +143,14 @@ const finalize = tracer.wrap(
         })
       })
 
-    const logSmsJob = connection
+    const logSmsJob = postmanConnection
       .query('SELECT log_next_job_sms();')
       .then(([result]) => get(result, '[0].log_next_job_sms', ''))
       .catch((err) => {
         logger.error({ message: 'Log sms job', error: err, action: 'finalize' })
       })
 
-    const logTelegramJob = connection
+    const logTelegramJob = postmanConnection
       .query('SELECT log_next_job_telegram();')
       .then(([result]) => get(result, '[0].log_next_job_telegram', ''))
       .catch((err) => {
@@ -159,7 +161,7 @@ const finalize = tracer.wrap(
         })
       })
 
-    const logGovsgJob = connection
+    const logGovsgJob = postmanConnection
       .query('SELECT log_next_job_govsg();')
       .then(([result]) => get(result, '[0].log_next_job_govsg', ''))
       .catch((err) => {
@@ -190,7 +192,19 @@ const finalize = tracer.wrap(
   }
 )
 
-const createConnection = (): Sequelize => {
+const createFlamingoConnection = (): Sequelize => {
+  return new Sequelize(config.get('database.flamingoUri'), {
+    dialect: 'postgres',
+    logging: false,
+    dialectOptions: {
+      ssl: {
+        rejectUnauthorized: false,
+      },
+    },
+  })
+}
+
+const createPostmanConnection = (): Sequelize => {
   const dialectOptions =
     config.get('env') !== 'development'
       ? config.get('database.dialectOptions')
@@ -275,7 +289,7 @@ const enqueueAndSend = async (): Promise<void> => {
 
 // to refactor to use orm
 const sendFinalizedNotification = async (campaignId: number): Promise<void> => {
-  const result = await connection.query(
+  const result = await postmanConnection.query(
     "SELECT json_build_object('id', c.id," +
       "'campaign_name', c.name," +
       "'created_at', c.created_at," +
@@ -303,7 +317,7 @@ const sendFinalizedNotification = async (campaignId: number): Promise<void> => {
     halted: halted,
   } = jsonRes
 
-  let mail: MailToSend | void
+  let mail: MailToSend | undefined
   // craft and send mail here
   // if halted, send halted notif
   if (halted) {
@@ -315,7 +329,7 @@ const sendFinalizedNotification = async (campaignId: number): Promise<void> => {
   } else {
     // for scheduled, visible_at must be after created_at
     // normal flow, pull out visibleAt from job_queue table.
-    const result = await connection.query(
+    const result = await postmanConnection.query(
       "select visible_at from job_queue where campaign_id=:campaign_id_input and status = 'LOGGED' order by created_at desc limit 1;",
       {
         replacements: { campaign_id_input: campaignId },
@@ -336,7 +350,7 @@ const sendFinalizedNotification = async (campaignId: number): Promise<void> => {
         )
     }
   }
-  if (mail) {
+  if (mail !== undefined) {
     // Send email using node mailer
     // cannot use singleton mailclient like backend cuz worker will self destruct
     // instantiate it only when needed
@@ -369,9 +383,9 @@ const sendFinalizedNotification = async (campaignId: number): Promise<void> => {
  * and checks if it was working on any existing jobs
  */
 const createAndResumeWorker = (): Promise<void> => {
-  return assignment(connection, workerId)
+  return assignment(postmanConnection, workerId)
     .then(() => {
-      return connection.query('SELECT resume_worker(:worker_id);', {
+      return postmanConnection.query('SELECT resume_worker(:worker_id);', {
         replacements: { worker_id: workerId },
         type: QueryTypes.SELECT,
       })
@@ -388,11 +402,12 @@ const createAndResumeWorker = (): Promise<void> => {
 const start = async (index: string, isLogger = false): Promise<any> => {
   await ECSUtil.load()
   workerId = ECSUtil.getWorkerId(index)
-  connection = createConnection()
-  email = new Email(workerId, connection)
-  sms = new SMS(workerId, connection)
-  telegram = new Telegram(workerId, connection)
-  govsg = new Govsg(workerId, connection)
+  postmanConnection = createPostmanConnection()
+  flamingoConnection = createFlamingoConnection()
+  email = new Email(workerId, postmanConnection)
+  sms = new SMS(workerId, postmanConnection)
+  telegram = new Telegram(workerId, postmanConnection)
+  govsg = new Govsg(workerId, postmanConnection, flamingoConnection)
 
   try {
     shouldRun = true
@@ -412,13 +427,21 @@ const start = async (index: string, isLogger = false): Promise<any> => {
   } catch (err) {
     return Promise.reject(err)
   } finally {
-    if (connection) {
+    if (postmanConnection) {
       logger.info({
-        message: 'Closing database connection',
+        message: 'Closing postman database connection',
         action: 'start',
         workerId,
       })
-      await connection.close()
+      await postmanConnection.close()
+    }
+    if (flamingoConnection) {
+      logger.info({
+        message: 'Closing flamingo database connection',
+        action: 'start',
+        workerId,
+      })
+      await flamingoConnection.close()
     }
   }
 }
