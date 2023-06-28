@@ -28,6 +28,7 @@ export class GovsgTemplate extends Model<GovsgTemplate> {
   })
   body: string
 
+  // not sure about this — should we not accept null and use empty array instead? I think null is more elegant
   @Column({
     type: DataType.ARRAY(DataType.STRING),
     allowNull: true,

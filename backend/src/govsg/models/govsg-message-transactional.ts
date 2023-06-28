@@ -1,5 +1,4 @@
 import {
-  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -8,6 +7,7 @@ import {
 } from 'sequelize-typescript'
 import { GovsgTemplate } from './govsg-template'
 import { GovsgMessageStatus } from '@core/constants'
+import { User } from '@core/models'
 
 @Table({
   tableName: 'govsg_messages_transactional',
@@ -27,14 +27,16 @@ export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> 
   @Column(DataType.BIGINT)
   templateId: number
 
-  @BelongsTo(() => GovsgTemplate)
-  template: GovsgTemplate
+  @ForeignKey(() => User)
+  @Column({ type: DataType.STRING, allowNull: false })
+  userId: string
 
   @Column({ type: DataType.STRING, allowNull: false })
   recipient: string
 
-  @Column({ type: DataType.JSONB, allowNull: true })
-  params: Record<string, string> | null
+  // TODO: fix this migration?
+  @Column({ type: DataType.JSONB, allowNull: false })
+  params: { [key: string]: string }
 
   @Column({ type: DataType.STRING, allowNull: true })
   serviceProviderMessageId: string | null

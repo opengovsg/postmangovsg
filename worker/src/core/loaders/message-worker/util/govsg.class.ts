@@ -2,37 +2,56 @@ import { loggerWithLabel } from '@core/logger'
 import { map } from 'lodash'
 import { QueryTypes, Transaction } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
-import OnpremWhatsappClient from '@shared/clients/onprem-whatsapp-client.class'
-import { PhoneNumberService } from '@core/services/phone-number.service'
 import config from '@core/config'
+import WhatsAppClient from '@shared/clients/whatsapp-client.class'
+import FlamingoDbClient from '@shared/clients/flamingo-db-client.class'
+import {
+  NormalisedParam,
+  WhatsAppApiClient,
+  WhatsAppLanguages,
+} from '@shared/clients/whatsapp-client.class/interfaces'
 
 const logger = loggerWithLabel(module)
 
 class Govsg {
   private workerId: string
-  private connection: Sequelize
-  private client: OnpremWhatsappClient
+  private postmanConnection: Sequelize
+  private whatsappClient: WhatsAppClient
+  private flamingoDbClient: FlamingoDbClient
 
-  constructor(workerId: string, connection: Sequelize) {
+  constructor(
+    workerId: string,
+    postmanConnection: Sequelize,
+    flamingoConnection: Sequelize
+  ) {
     this.workerId = workerId
-    this.connection = connection
-    this.client = new OnpremWhatsappClient()
+    this.postmanConnection = postmanConnection
+    this.whatsappClient = new WhatsAppClient(config.get('whatsapp'))
+    this.flamingoDbClient = new FlamingoDbClient(flamingoConnection)
   }
 
   async enqueueMessages(jobId: number, campaignId: number): Promise<void> {
-    await this.connection.transaction(async (transaction: Transaction) => {
-      await this.connection.query('SELECT enqueue_messages_govsg(:jobId);', {
-        replacements: { jobId },
-        type: QueryTypes.SELECT,
-        transaction,
-      })
+    await this.postmanConnection.transaction(
+      async (transaction: Transaction) => {
+        await this.postmanConnection.query(
+          'SELECT enqueue_messages_govsg(:jobId);',
+          {
+            replacements: { jobId },
+            type: QueryTypes.SELECT,
+            transaction,
+          }
+        )
 
-      await this.connection.query('SELECT update_stats_govsg(:campaignId);', {
-        replacements: { campaignId },
-        type: QueryTypes.SELECT,
-        transaction,
-      })
-    })
+        await this.postmanConnection.query(
+          'SELECT update_stats_govsg(:campaignId);',
+          {
+            replacements: { campaignId },
+            type: QueryTypes.SELECT,
+            transaction,
+          }
+        )
+      }
+    )
     logger.info({
       message: 'Enqueued govsg messages',
       workerId: this.workerId,
@@ -41,11 +60,8 @@ class Govsg {
     })
   }
 
-  async getMessages(
-    jobId: number,
-    rate: number
-  ): Promise<
-    {
+  async getMessages(jobId: number, rate: number) {
+    const dbResults: {
       id: number
       recipient: string
       params: { [key: string]: string }
@@ -53,56 +69,103 @@ class Govsg {
       campaignId: number
       whatsappTemplateLabel: string
       paramOrder: string[]
-    }[]
-  > {
-    const dbResults = await this.connection.query(
-      'SELECT get_messages_to_send_govsg(:jobId, :rate);',
-      {
-        replacements: { jobId, rate },
-        type: QueryTypes.SELECT,
-      }
+    }[] = map(
+      await this.postmanConnection.query(
+        'SELECT get_messages_to_send_govsg(:jobId, :rate);',
+        {
+          replacements: { jobId, rate },
+          type: QueryTypes.SELECT,
+        }
+      ),
+      'get_messages_to_send_govsg'
     )
-    return map(dbResults, 'get_messages_to_send_govsg')
+    if (dbResults.length === 0) {
+      return []
+    }
+
+    const apiClientIdMap = await this.flamingoDbClient.getApiClientId(
+      dbResults.map((result) => result.recipient)
+    )
+
+    const unvalidatedMessages = dbResults.map((result) => ({
+      id: result.id, // need this to update govsg_ops table
+      recipient: result.recipient,
+      templateName: result.whatsappTemplateLabel,
+      params: WhatsAppClient.transformNamedParams(
+        result.params,
+        result.paramOrder
+      ),
+      apiClient:
+        apiClientIdMap.get(result.recipient) ?? WhatsAppApiClient.clientTwo,
+      language: WhatsAppLanguages.english,
+    }))
+    const validatedWhatsAppIds =
+      await this.whatsappClient.validateMultipleRecipients(
+        unvalidatedMessages,
+        config.get('env') === 'development'
+      )
+    const invalidMessages = validatedWhatsAppIds.filter(
+      (message) => message.status === 'failed'
+    )
+    // update govsg_ops table with invalid messages
+    if (invalidMessages.length > 0) {
+      await this.postmanConnection.query(
+        `UPDATE
+                                            govsg_ops
+                                          SET
+                                            status = 'INVALID_RECIPIENT', updated_at=clock_timestamp()
+                                          WHERE
+                                            id IN (:ids);`,
+        {
+          replacements: { ids: invalidMessages.map((message) => message.id) },
+          type: QueryTypes.UPDATE,
+        }
+      )
+    }
+    return validatedWhatsAppIds
+      .filter((message) => message.status === 'valid')
+      .map((message) => ({
+        ...message,
+        body: '', // just putting this in to satisfy the interface grrr
+      }))
   }
 
   async sendMessage({
     id,
     recipient,
+    templateName,
     params,
-    paramOrder,
-    whatsappTemplateLabel,
+    apiClient,
+    language,
   }: {
     id: number
     recipient: string
-    params: { [key: string]: string }
-    paramOrder?: string[]
-    whatsappTemplateLabel?: string
+    templateName: string
+    params: NormalisedParam[]
+    // in practice, these are compulsory parameters
+    // but they are optional here to follow the implicit interface in worker class
+    apiClient: WhatsAppApiClient
+    language: WhatsAppLanguages
   }): Promise<void> {
     try {
-      let normalisedRecipient
-      try {
-        normalisedRecipient = PhoneNumberService.normalisePhoneNumber(
+      if (!templateName) {
+        throw new Error('Missing template label')
+      }
+      const isLocal = config.get('env') === 'development'
+      const serviceProviderMessageId = await this.whatsappClient.sendMessage(
+        {
           recipient,
-          config.get('defaultCountry')
-        )
-      } catch (e: any) {
-        throw {
-          errorCode: 'invalid_recipient',
-          message: (e as Error).message,
-        }
-      }
-      if (!whatsappTemplateLabel || !paramOrder) {
-        throw new Error('Missing template label or param order')
-      }
-      const serviceProviderMessageId = await this.client.send(
-        normalisedRecipient,
-        whatsappTemplateLabel,
-        paramOrder.map((p) => params[p])
+          templateName,
+          params,
+          apiClient,
+          language,
+        },
+        isLocal
       )
-      await this.connection.query(
-        `UPDATE govsg_ops SET status='ACCEPTED', accepted_at=clock_timestamp(), 
-	service_provider_message_id=:serviceProviderMessageId, updated_at=clock_timestamp() 
-	WHERE id=:id;`,
+      await this.postmanConnection.query(
+        `UPDATE govsg_ops SET status='ACCEPTED', accepted_at=clock_timestamp(),
+        service_provider_message_id=:serviceProviderMessageId, updated_at=clock_timestamp()
+        WHERE id=:id;`,
         {
           replacements: { id, serviceProviderMessageId },
           type: QueryTypes.UPDATE,
@@ -116,8 +179,8 @@ class Govsg {
       })
     } catch (error: any) {
       if ((error as { errorCode: string }).errorCode === 'invalid_recipient') {
-        await this.connection.query(
-          `UPDATE govsg_ops SET status='INVALID_RECIPIENT', 
+        await this.postmanConnection.query(
+          `UPDATE govsg_ops SET status='INVALID_RECIPIENT',
             sent_at=clock_timestamp(), updated_at=clock_timestamp()
             where id=:id`,
           {
@@ -130,7 +193,7 @@ class Govsg {
         return
       }
 
-      await this.connection.query(
+      await this.postmanConnection.query(
         `UPDATE govsg_ops SET status='ERROR', sent_at=clock_timestamp(),
 	        error_code=:errorCode, error_description=:description, updated_at=clock_timestamp()
 	        where id=:id`,
