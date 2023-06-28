@@ -1,4 +1,4 @@
-import { Campaign } from './Campaign'
+import { Campaign, CampaignRecipient } from './Campaign'
 
 export enum GovsgProgress {
   PickTemplate,
@@ -38,5 +38,11 @@ export class GovsgCampaign extends Campaign {
     } else {
       this.progress = GovsgProgress.Send
     }
+  }
+}
+
+export class GovsgCampaignRecipient extends CampaignRecipient {
+  formatErrorCode(errorCode: string): string {
+    return errorCode || ''
   }
 }

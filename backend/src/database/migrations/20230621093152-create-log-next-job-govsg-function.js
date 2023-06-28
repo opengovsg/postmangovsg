@@ -19,13 +19,13 @@ module.exports = {
             AND
             q1.status IN ('SENT','STOPPED')
             -- if status is sent or stopped, we check that  
-              -- all messages with send_attempted_at have sent_at
-              -- OR X time has passed since the most recent sent_at (in the case that the worker died and did not write back to some records)
+              -- all messages with send_attempted_at have accepted_at
+              -- OR X time has passed since the most recent accepted_at (in the case that the worker died and did not write back to some records)
             AND
             (
               (
                   NOT EXISTS 
-                    ( SELECT 1 FROM govsg_ops p WHERE p.campaign_id = q1.campaign_id AND send_attempted_at IS NOT NULL AND sent_at IS NULL LIMIT 1 )
+                    ( SELECT 1 FROM govsg_ops p WHERE p.campaign_id = q1.campaign_id AND send_attempted_at IS NOT NULL AND accepted_at IS NULL LIMIT 1 )
               )
               OR
               (
