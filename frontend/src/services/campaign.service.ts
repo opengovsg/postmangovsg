@@ -1,6 +1,10 @@
 import axios from 'axios'
 
-import { CampaignRecipient, GovsgCampaign } from 'classes'
+import {
+  CampaignRecipient,
+  GovsgCampaign,
+  GovsgCampaignRecipient,
+} from 'classes'
 import {
   Campaign,
   CampaignStats,
@@ -207,6 +211,8 @@ export async function exportCampaignStats(
           return new SMSCampaignRecipient(record)
         case ChannelType.Telegram:
           return new TelegramCampaignRecipient(record)
+        case ChannelType.Govsg:
+          return new GovsgCampaignRecipient(record)
         default:
           throw new Error('Invalid channel type')
       }
