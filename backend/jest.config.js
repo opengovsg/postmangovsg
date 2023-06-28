@@ -1,18 +1,17 @@
 module.exports = {
   roots: ['<rootDir>'],
   testMatch: ['**/tests/**/*.(spec|test).+(ts|tsx|js)'],
-  // testMatch: [
-  //   '**/tests/**/email-transactional.routes.(spec|test).+(ts|tsx|js)',
-  // ],
   testPathIgnorePatterns: ['<rootDir>/build/', '<rootDir>/node_modules/'],
   moduleNameMapper: {
     '@core/(.*)': '<rootDir>/src/core/$1',
     '@sms/(.*)': '<rootDir>/src/sms/$1',
     '@email/(.*)': '<rootDir>/src/email/$1',
     '@telegram/(.*)': '<rootDir>/src/telegram/$1',
+    '@govsg/(.*)': '<rootDir>/src/govsg/$1',
     '@test-utils/(.*)': '<rootDir>/src/test-utils/$1',
     '@shared/(.*)': '<rootDir>/../shared/src/$1',
     '@mocks/(.*)': '<rootDir>/src/__mocks__/$1',
+    "axios": "axios/dist/node/axios.cjs", // https://stackoverflow.com/a/74297004
   },
   modulePathIgnorePatterns: ['<rootDir>/build'],
   transform: {

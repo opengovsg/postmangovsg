@@ -39,11 +39,13 @@ import {
   TelegramSubscriber,
   TelegramTemplate,
 } from '@telegram/models'
-import { GovsgMessage } from '@govsg/models/govsg-message'
-import { GovsgMessageTransactional } from '@govsg/models/govsg-message-transactional'
-import { GovsgOp } from '@govsg/models/govsg-op'
-import { GovsgTemplate } from '@govsg/models/govsg-template'
-import { CampaignGovsgTemplate } from '@govsg/models/campaign-govsg-template'
+import {
+  GovsgMessageTransactional,
+  GovsgTemplate,
+  CampaignGovsgTemplate,
+  GovsgMessage,
+  GovsgOp,
+} from '@govsg/models'
 
 export const initializeModels = (sequelize: Sequelize): void => {
   const coreModels = [

@@ -301,7 +301,7 @@ module.exports = {
     })
   },
 
-  down: async (queryInterface, Sequelize) => {
+  down: async (queryInterface, _) => {
     await queryInterface.dropTable('govsg_messages_transactional')
     await queryInterface.dropTable('govsg_ops')
     await queryInterface.dropTable('campaign_govsg_template')

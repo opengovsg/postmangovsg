@@ -46,7 +46,12 @@ import { InitTelegramMiddleware } from '@telegram/middlewares'
 import { InitApiKeyRoute } from '@core/routes/api-key.routes'
 import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 import { InitCommonAttachmentRoute } from './common-attachment.routes'
-import { govsgCampaignRoutes, govsgTemplateRoutes } from '@govsg/routes'
+import {
+  govsgCampaignRoutes,
+  govsgTemplateRoutes,
+  InitGovsgMessageTransactionalRoute,
+} from '@govsg/routes'
+import { InitGovsgTransactionalMiddleware } from '@govsg/middlewares/govsg-transactional.middleware'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -96,6 +101,10 @@ export const InitV1Route = (app: Application): Router => {
   )
   const apiKeyMiddleware = InitApiKeyMiddleware((app as any).credentialService)
   const apiKeyRoutes = InitApiKeyRoute(apiKeyMiddleware)
+  const govsgTransactionalMiddleware = InitGovsgTransactionalMiddleware()
+  const govsgTransactionalRoutes = InitGovsgMessageTransactionalRoute(
+    govsgTransactionalMiddleware
+  )
 
   const CHANNEL_ROUTES = Object.values(ChannelType).map(
     (route) => `/${route.toLowerCase()}`
@@ -257,6 +266,12 @@ export const InitV1Route = (app: Application): Router => {
     '/transactional/email',
     authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     emailTransactionalRoutes
+  )
+
+  router.use(
+    '/transactional/govsg',
+    authMiddleware.getAuthMiddleware([AuthType.ApiKey]),
+    govsgTransactionalRoutes
   )
 
   router.use('/callback/email', emailCallbackRoutes)

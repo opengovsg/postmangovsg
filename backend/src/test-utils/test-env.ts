@@ -15,3 +15,5 @@ process.env.API_KEY_SALT_V1 = bcrypt.genSaltSync(1)
 process.env.TRANSACTIONAL_EMAIL_RATE = '1'
 process.env.TWILIO_CREDENTIAL_CACHE_MAX_AGE = '0'
 process.env.UPLOAD_REDIS_URI = 'redis://localhost:6379/6'
+process.env.FLAMINGO_DB_URI =
+  'postgres://postgres:postgres@localhost:5432/postmangovsg_test'
