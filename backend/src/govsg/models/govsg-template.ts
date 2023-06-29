@@ -36,6 +36,12 @@ export class GovsgTemplate extends Model<GovsgTemplate> {
   params: Array<string> | null
 
   @Column({
+    type: DataType.JSONB,
+    allowNull: true,
+  })
+  defaultParamValues: Record<string, string>
+
+  @Column({
     type: DataType.STRING,
     unique: true,
     allowNull: true,

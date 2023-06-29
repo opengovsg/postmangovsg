@@ -47,7 +47,6 @@ const ExportRecipients = ({
   )
   const [disabled, setDisabled] = useState(false)
 
-  console.log(campaignName, campaignType)
   useEffect(() => {
     let timeoutId: NodeJS.Timeout
 
@@ -84,7 +83,6 @@ const ExportRecipients = ({
       setExportStatus(CampaignExportStatus.Exporting)
 
       const list = await exportCampaignStats(campaignId, campaignType)
-      console.log(list)
       const exportedAt = moment().format('LLL').replace(',', '')
       const explanation =
         `"Exported ${exportedAt}. Reports are updated as and when Postman receives new notifications about message status."\n` +

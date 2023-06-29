@@ -27,7 +27,9 @@ async function loginWithOtp(email: string, otp: string): Promise<void> {
   }
 }
 
-async function getUser(): Promise<{ email: string; id: number } | undefined> {
+async function getUser(): Promise<
+  { email: string; id: number; experimental_features: string[] } | undefined
+> {
   try {
     const response = await axios.get('/auth/userinfo')
     return response.data

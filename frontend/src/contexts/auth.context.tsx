@@ -11,6 +11,8 @@ interface ContextProps {
   setAuthenticated: Dispatch<SetStateAction<boolean>>
   email: string
   setEmail: Dispatch<SetStateAction<string>>
+  experimentalAccess: string[]
+  setExperimentalAccess: Dispatch<SetStateAction<string[]>>
 }
 
 export const AuthContext = createContext({} as ContextProps)
@@ -19,6 +21,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setAuthenticated] = useState(false)
   const [isLoaded, setLoaded] = useState(false)
   const [email, setEmail] = useState('')
+  const [experimentalAccess, setExperimentalAccess] = useState<string[]>([])
 
   const location = useLocation()
 
@@ -33,6 +36,7 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         const user = await getUser()
         setAuthenticated(!!user?.email)
         setEmail(user?.email || '')
+        setExperimentalAccess(user?.experimental_features || [])
 
         initializeGA()
         setUserAnalytics(user)
@@ -65,6 +69,8 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         setAuthenticated,
         email,
         setEmail,
+        experimentalAccess,
+        setExperimentalAccess,
       }}
     >
       {isLoaded && children}
