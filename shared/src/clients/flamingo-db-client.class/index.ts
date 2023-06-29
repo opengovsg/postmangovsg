@@ -16,7 +16,7 @@ export default class FlamingoDbClient {
   }
   public async getApiClientId(phoneNumbers: string[]) {
     if (phoneNumbers.length === 0) {
-      return {} as Map<string, WhatsAppApiClient>
+      return new Map<string, WhatsAppApiClient>()
     }
     interface QueryResult {
       apiClientId: number
