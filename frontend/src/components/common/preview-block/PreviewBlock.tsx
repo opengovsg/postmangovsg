@@ -3,6 +3,7 @@ import escapeHTML from 'escape-html'
 
 import type { FunctionComponent } from 'react'
 
+import { RichTextEditor } from '..'
 import DetailBlock from '../detail-block'
 
 import styles from './PreviewBlock.module.scss'
@@ -13,6 +14,7 @@ interface PreviewBlockProps {
   replyTo?: string | null
   from?: string
   className?: string
+  richPreview?: boolean
 }
 
 const PreviewBlock: FunctionComponent<PreviewBlockProps> = ({
@@ -21,6 +23,7 @@ const PreviewBlock: FunctionComponent<PreviewBlockProps> = ({
   replyTo,
   from,
   className,
+  richPreview,
   ...otherProps
 }) => {
   if (!body && !subject) {
@@ -30,6 +33,37 @@ const PreviewBlock: FunctionComponent<PreviewBlockProps> = ({
           <i className="bx bx-loader-alt bx-spin"></i>
           <p>Loading preview...</p>
         </li>
+      </DetailBlock>
+    )
+  }
+
+  if (richPreview) {
+    return (
+      <DetailBlock>
+        {from && (
+          <>
+            <h5>From</h5>
+            <RichTextEditor value={from} preview shouldHighlightVariables />
+          </>
+        )}
+        {subject && (
+          <>
+            <h5>Subject</h5>
+            <RichTextEditor value={subject} preview shouldHighlightVariables />
+          </>
+        )}
+        {body && (
+          <>
+            <h5>Body</h5>
+            <RichTextEditor value={body} preview shouldHighlightVariables />
+          </>
+        )}
+        {replyTo && (
+          <>
+            <h5>Replies</h5>
+            <RichTextEditor value={replyTo} preview shouldHighlightVariables />
+          </>
+        )}
       </DetailBlock>
     )
   }

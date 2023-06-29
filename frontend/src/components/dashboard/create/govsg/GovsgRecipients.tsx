@@ -12,14 +12,17 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import { GovsgProgress } from 'classes'
+import { confirmSendCampaign } from '../util'
+
+import { ChannelType, GovsgProgress } from 'classes'
 import {
   ButtonGroup,
+  ConfirmModal,
   CsvUpload,
   ErrorBlock,
   FileInput,
-  NextButton,
   PreviewBlock,
+  PrimaryButton,
   SampleCsv,
   StepHeader,
   StepSection,
@@ -30,6 +33,7 @@ import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { LINKS } from 'config'
 
 import { CampaignContext } from 'contexts/campaign.context'
+import { ModalContext } from 'contexts/modal.context'
 import {
   CsvStatusResponse,
   deleteCsvStatus,
@@ -59,6 +63,7 @@ const GovsgRecipients = ({
   const isMounted = useIsMounted()
   const { id: campaignId } = useParams<{ id: string }>()
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
+  const modalContext = useContext(ModalContext)
 
   // Poll csv status
   useEffect(() => {
@@ -131,6 +136,27 @@ const GovsgRecipients = ({
     }
   }
 
+  const onModalConfirm = () => {
+    if (!campaignId) return
+    void confirmSendCampaign({
+      campaignId: +campaignId,
+      channelType: ChannelType.Govsg,
+      sendRate: 0,
+      updateCampaign,
+    })
+  }
+  const openModal = () => {
+    modalContext.setModalContent(
+      <ConfirmModal
+        title="Are you absolutely sure?"
+        subtitle="Sending out a campaign is irreversible."
+        buttonText="Confirm send now"
+        buttonIcon="bx-send"
+        onConfirm={onModalConfirm}
+      />
+    )
+  }
+
   return (
     <>
       <StepSection>
@@ -183,15 +209,18 @@ const GovsgRecipients = ({
       {!isCsvProcessing && numRecipients > 0 && (
         <StepSection>
           <p className={styles.greyText}>Message preview</p>
-          <PreviewBlock body={preview.body} />
+          <PreviewBlock body={preview.body} richPreview />
         </StepSection>
       )}
 
       <ButtonGroup>
-        <NextButton
+        <PrimaryButton
           disabled={!numRecipients || !csvFilename}
-          onClick={() => setActiveStep((s) => s + 1)}
-        />
+          className={styles.turquoiseGreenBtn}
+          onClick={openModal}
+        >
+          Send campaign now <i className="bx bx-send" />
+        </PrimaryButton>
         <TextButton
           disabled={isCsvProcessing}
           onClick={() => setActiveStep((s) => s - 1)}

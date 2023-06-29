@@ -3,7 +3,6 @@ import { Campaign, CampaignRecipient } from './Campaign'
 export enum GovsgProgress {
   PickTemplate,
   UploadRecipients,
-  Send,
 }
 
 export type GovsgTemplate = {
@@ -33,10 +32,8 @@ export class GovsgCampaign extends Campaign {
   setProgress() {
     if (!this.templateId) {
       this.progress = GovsgProgress.PickTemplate
-    } else if (!this.numRecipients) {
-      this.progress = GovsgProgress.UploadRecipients
     } else {
-      this.progress = GovsgProgress.Send
+      this.progress = GovsgProgress.UploadRecipients
     }
   }
 }
