@@ -2,6 +2,7 @@ import {
   Column,
   DataType,
   ForeignKey,
+  Index,
   Model,
   Table,
 } from 'sequelize-typescript'
@@ -39,6 +40,7 @@ export class GovsgMessageTransactional extends Model<GovsgMessageTransactional> 
   params: { [key: string]: string }
 
   @Column({ type: DataType.STRING, allowNull: true })
+  @Index({ unique: true })
   serviceProviderMessageId: string | null
 
   @Column({ type: DataType.STRING, allowNull: true })
