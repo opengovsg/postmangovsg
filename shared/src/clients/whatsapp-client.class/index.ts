@@ -13,6 +13,7 @@ import {
   ContactStatus,
   UnvalidatedWhatsAppTemplateMessageToSend,
   NormalisedParam,
+  WhatsAppTextMessageToSend,
 } from './types'
 import { AuthenticationError, RateLimitError } from './errors'
 
@@ -169,7 +170,7 @@ export default class WhatsAppClient {
     })
   }
 
-  public async sendMessage(
+  public async sendTemplateMessage(
     input: WhatsAppTemplateMessageToSend,
     isLocal = false
   ): Promise<MessageId> {
@@ -225,13 +226,65 @@ export default class WhatsAppClient {
             throw new RateLimitError(`${code}: ${title} - ${detail}`)
           }
           throw new Error(
-            `Error sending message ${JSON.stringify(
+            `Error sending template message ${JSON.stringify(
+              input
+            )}.\n Errors encountered: ${JSON.stringify(errors)}`
+          )
+        }
+        throw new Error(
+          `Unexpected error while sending template message. Input: ${JSON.stringify(
+            input
+          )}, Error: ${JSON.stringify(err)}`
+        )
+      })
+    return messages[0].id
+  }
+
+  public async sendTextMessage(
+    input: WhatsAppTextMessageToSend
+  ): Promise<MessageId> {
+    const { token, url } = this.getCredentials(input.apiClient)
+    const {
+      data: { messages },
+    } = await this.axiosInstance
+      // not sure about this generic, might need to fix later
+      .request<TemplateMessage200Response>({
+        method: 'post',
+        url: MESSAGE_ENDPOINT,
+        baseURL: url,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        data: {
+          to: input.recipient,
+          type: 'text',
+          text: {
+            body: input.body,
+          },
+        },
+      })
+      .catch((err: Error | AxiosError) => {
+        if (
+          axios.isAxiosError<TemplateMessageErrResponse>(err) &&
+          err.response
+        ) {
+          const { status } = err.response
+          const { errors } = err.response.data
+          const { code, title, detail } = errors[0]
+          if (status === 401) {
+            throw new AuthenticationError(`${code}: ${title} - ${detail}`)
+          }
+          if (status === 429) {
+            throw new RateLimitError(`${code}: ${title} - ${detail}`)
+          }
+          throw new Error(
+            `Error sending text message ${JSON.stringify(
               input
             )}.\n Errors countered: ${JSON.stringify(errors)}`
           )
         }
         throw new Error(
-          `Unexpected error while sending message. Input: ${JSON.stringify(
+          `Unexpected error while sending text message. Input: ${JSON.stringify(
             input
           )}, Error: ${JSON.stringify(err)}`
         )

@@ -57,7 +57,7 @@ async function sendMessage({
     })
 
   const messageId = await WhatsAppService.whatsappClient
-    .sendMessage(messageToSend, isLocal)
+    .sendTemplateMessage(messageToSend, isLocal)
     .catch((err) => {
       logger.error({
         message: 'Error sending message',

@@ -15,7 +15,7 @@ export interface UserMessageWebhook {
 }
 
 export interface UserTextMessageWebhook extends UserMessageWebhook {
-  messages: TextMessage[]
+  messages: WhatsAppWebhookTextMessage[]
 }
 
 export enum WhatsAppMessageStatus {
@@ -62,17 +62,17 @@ interface GenericMessage {
   from: WhatsAppId
   id: MessageId
   timestamp: string // UNIX timestamp in seconds, as a string
-  type: MessageType
+  type: WhatsappWebhookMessageType
 }
 
-interface TextMessage extends GenericMessage {
-  type: MessageType.text
+export interface WhatsAppWebhookTextMessage extends GenericMessage {
+  type: WhatsappWebhookMessageType.text
   text: {
     body: string
   }
 }
 
-enum MessageType {
+export enum WhatsappWebhookMessageType {
   text = 'text',
   image = 'image',
   audio = 'audio',

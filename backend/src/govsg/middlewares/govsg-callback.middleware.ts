@@ -2,6 +2,7 @@ import { loggerWithLabel } from '@core/logger'
 import { Request, Response, NextFunction } from 'express'
 import { GovsgCallbackService } from '@govsg/services/govsg-callback.service'
 import { UnexpectedWebhookError } from '@shared/clients/whatsapp-client.class/errors'
+import { WhatsAppApiClient } from '@shared/clients/whatsapp-client.class/types'
 
 const logger = loggerWithLabel(module)
 
@@ -36,7 +37,31 @@ const parseWebhook = async (
   next: NextFunction
 ) => {
   try {
-    await GovsgCallbackService.parseWebhook(req.body)
+    const { id } = req.query
+    if (!id || typeof id !== 'string') {
+      logger.warn({
+        message: 'Missing API Client ID',
+        meta: {
+          query: req.query,
+        },
+      })
+      res.sendStatus(400)
+      return
+    }
+    if (
+      id !== WhatsAppApiClient.clientOne &&
+      id !== WhatsAppApiClient.clientTwo
+    ) {
+      logger.warn({
+        message: 'Invalid API Client ID',
+        meta: {
+          query: req.query,
+        },
+      })
+      res.sendStatus(400)
+      return
+    }
+    await GovsgCallbackService.parseWebhook(req.body, id)
     res.sendStatus(200)
   } catch (err) {
     if (err instanceof UnexpectedWebhookError) {

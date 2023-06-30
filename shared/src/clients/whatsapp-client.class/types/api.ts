@@ -8,6 +8,12 @@ export interface WhatsAppTemplateMessageToSend {
   language: WhatsAppLanguages
 }
 
+export interface WhatsAppTextMessageToSend {
+  recipient: string
+  body: string
+  apiClient: WhatsAppApiClient
+}
+
 export type UnvalidatedWhatsAppTemplateMessageToSend =
   WhatsAppTemplateMessageToSend & {
     id: number
