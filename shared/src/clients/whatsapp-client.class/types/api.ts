@@ -1,10 +1,4 @@
-// can consider using Brand<T, U> to enforce type safety
-export type WhatsAppId = string
-
-export interface NormalisedParam {
-  type: string
-  text: string
-}
+import { MessageId, WhatsAppId } from './general'
 
 export interface WhatsAppTemplateMessageToSend {
   recipient: string
@@ -24,6 +18,10 @@ export type ValidatedWhatsAppTemplateMessageToSend =
     status: ContactStatus
     waId: WhatsAppId | undefined // if status is valid, waId is defined
   }
+export interface NormalisedParam {
+  type: string
+  text: string
+}
 
 export enum WhatsAppApiClient {
   clientOne = 'client_one', // 6581290065
@@ -51,32 +49,6 @@ export interface ValidateContact200Response {
   contacts: ContactWithWAId[]
 }
 
-type Contact = {
-  input: string // input supplied; WhatsApp can sanitise this
-  status: ContactStatus
-}
-
-type ContactWithWAId = Contact & {
-  wa_id: WhatsAppId // only returned if status is valid
-}
-
-export enum ContactStatus {
-  processing = 'processing', // will not occur if blocking is set to 'wait' https://developers.facebook.com/docs/whatsapp/on-premises/reference/contacts#blocking
-  valid = 'valid',
-  failed = 'failed',
-}
-
-export type MessageId = string
-
-export type Message = {
-  id: MessageId
-}
-
-type Meta = {
-  version: string
-  api_status: string
-}
-
 export interface TemplateMessage200Response {
   contacts: Contact[]
   messages: Message[]
@@ -90,4 +62,28 @@ export interface TemplateMessageErrResponse {
     detail: string
   }>
   meta: Meta
+}
+
+export enum ContactStatus {
+  processing = 'processing', // will not occur if blocking is set to 'wait' https://developers.facebook.com/docs/whatsapp/on-premises/reference/contacts#blocking
+  valid = 'valid',
+  failed = 'failed',
+}
+
+type Contact = {
+  input: string // input supplied; WhatsApp can sanitise this
+  status: ContactStatus
+}
+
+type ContactWithWAId = Contact & {
+  wa_id: WhatsAppId // only returned if status is valid
+}
+
+type Meta = {
+  version: string
+  api_status: string
+}
+
+type Message = {
+  id: MessageId
 }

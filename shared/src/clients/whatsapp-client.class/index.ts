@@ -13,7 +13,7 @@ import {
   ContactStatus,
   UnvalidatedWhatsAppTemplateMessageToSend,
   NormalisedParam,
-} from './interfaces'
+} from './types'
 import { AuthenticationError, RateLimitError } from './errors'
 
 const CONTACT_ENDPOINT = 'v1/contacts'

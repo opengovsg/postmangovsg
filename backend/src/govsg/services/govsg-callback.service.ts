@@ -20,4 +20,6 @@ const parseEvent = async (req: any): Promise<void> => {
   console.log(parsed)
 }
 
+// const isUserInitiatedConversation =
+
 export const GovsgCallbackService = { isAuthenticated, parseEvent }

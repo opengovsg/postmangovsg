@@ -10,7 +10,7 @@ import { GovsgMessageStatus } from '@core/constants'
 import { GovsgTransactionalService } from '../services/govsg-transactional.service'
 import { PhoneNumberService } from '@core/services'
 import WhatsAppClient from '@shared/clients/whatsapp-client.class'
-import { NormalisedParam } from '@shared/clients/whatsapp-client.class/interfaces'
+import { NormalisedParam } from '@shared/clients/whatsapp-client.class/types'
 
 export interface GovsgTransactionalMiddleware {
   saveMessage: Handler

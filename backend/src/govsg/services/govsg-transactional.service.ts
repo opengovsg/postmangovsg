@@ -10,7 +10,7 @@ import {
   NormalisedParam,
   WhatsAppApiClient,
   WhatsAppLanguages,
-} from '@shared/clients/whatsapp-client.class/interfaces'
+} from '@shared/clients/whatsapp-client.class/types'
 
 const logger = loggerWithLabel(module)
 
