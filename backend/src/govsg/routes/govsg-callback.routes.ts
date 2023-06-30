@@ -19,6 +19,6 @@ const router = Router()
 router.post(
   '/',
   GovsgCallbackMiddleware.isAuthenticated,
-  GovsgCallbackMiddleware.parseEvent
+  GovsgCallbackMiddleware.parseWebhook
 )
 export default router

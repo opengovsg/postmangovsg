@@ -1,3 +1,5 @@
+import { WhatsAppMessageStatus } from '@shared/clients/whatsapp-client.class/types'
+
 export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
@@ -38,6 +40,25 @@ export enum GovsgMessageStatus {
   Error = 'ERROR',
   InvalidRecipient = 'INVALID_RECIPIENT',
   Deleted = 'DELETED',
+}
+
+export const govsgMessageStatusMapper = (
+  whatsappStatus: WhatsAppMessageStatus
+) => {
+  switch (whatsappStatus) {
+    case WhatsAppMessageStatus.sent:
+      return GovsgMessageStatus.Sent
+    case WhatsAppMessageStatus.delivered:
+      return GovsgMessageStatus.Delivered
+    case WhatsAppMessageStatus.read:
+      return GovsgMessageStatus.Read
+    case WhatsAppMessageStatus.failed:
+      return GovsgMessageStatus.Error
+    case WhatsAppMessageStatus.deleted:
+      return GovsgMessageStatus.Deleted
+    case WhatsAppMessageStatus.warning:
+      return null
+  }
 }
 
 export enum DefaultCredentialName {

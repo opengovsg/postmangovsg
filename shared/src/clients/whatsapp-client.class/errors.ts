@@ -9,3 +9,9 @@ export class RateLimitError extends Error {
     super(message)
   }
 }
+
+export class UnexpectedWebhookError extends Error {
+  constructor(message: string) {
+    super(message)
+  }
+}
