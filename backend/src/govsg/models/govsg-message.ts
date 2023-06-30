@@ -5,7 +5,6 @@ import {
   Column,
   DataType,
   ForeignKey,
-  Index,
   Model,
   Table,
 } from 'sequelize-typescript'
@@ -25,8 +24,8 @@ export class GovsgMessage extends Model<GovsgMessage> {
   @Column(DataType.JSONB)
   params: object
 
+  // indexed and unique for faster lookup
   @Column({ type: DataType.STRING, allowNull: true })
-  @Index({ unique: true })
   serviceProviderMessageId: string | null
 
   @Column({ type: DataType.STRING, allowNull: true })
