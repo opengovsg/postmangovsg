@@ -43,7 +43,7 @@ export enum GovsgMessageStatus {
 }
 
 export const govsgMessageStatusMapper = (
-  whatsappStatus: WhatsAppMessageStatus
+  whatsappStatus: Exclude<WhatsAppMessageStatus, WhatsAppMessageStatus.warning>
 ) => {
   switch (whatsappStatus) {
     case WhatsAppMessageStatus.sent:
@@ -56,8 +56,10 @@ export const govsgMessageStatusMapper = (
       return GovsgMessageStatus.Error
     case WhatsAppMessageStatus.deleted:
       return GovsgMessageStatus.Deleted
-    case WhatsAppMessageStatus.warning:
-      return null
+    default: {
+      const exhaustiveCheck: never = whatsappStatus
+      throw new Error(`Unhandled status: ${exhaustiveCheck}`)
+    }
   }
 }
 

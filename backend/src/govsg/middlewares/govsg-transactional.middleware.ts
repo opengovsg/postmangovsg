@@ -88,7 +88,7 @@ export const InitGovsgTransactionalMiddleware =
       whatsappTemplateLabel: string
     ): NormalisedParam[] {
       const isParamsProvided =
-        params === undefined || Object.keys(params).length > 0
+        params !== undefined && Object.keys(params).length > 0
       const isParamsRequired =
         govsgTemplateParams !== null && govsgTemplateParams.length > 0
       if (!isParamsRequired && !isParamsProvided) {
@@ -96,7 +96,7 @@ export const InitGovsgTransactionalMiddleware =
       }
       if (!isParamsProvided && isParamsRequired) {
         throw new ApiValidationError(
-          `missing params for template ${whatsappTemplateLabel}`
+          `no params provided; params needed for template ${whatsappTemplateLabel}`
         )
       }
       // not sure whether throwing this error is necessary
