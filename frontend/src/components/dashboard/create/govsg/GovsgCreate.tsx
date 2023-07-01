@@ -7,17 +7,12 @@ import GovsgDetail from './GovsgDetail'
 import GovsgPickTemplate from './GovsgPickTemplate'
 
 import GovsgRecipients from './GovsgRecipients'
-import GovsgSend from './GovsgSend'
 
 import { GovsgCampaign, GovsgProgress, Status } from 'classes'
 import { ProgressPane } from 'components/common'
 import { CampaignContext } from 'contexts/campaign.context'
 
-const GOVSG_PROGRESS_STEPS = [
-  'Pick a template',
-  'Upload recipients',
-  'Preview and send',
-]
+const GOVSG_PROGRESS_STEPS = ['Pick a template', 'Upload recipients']
 
 const CreateGovsg = () => {
   const { campaign } = useContext(CampaignContext)
@@ -37,8 +32,6 @@ const CreateGovsg = () => {
         return <GovsgPickTemplate setActiveStep={setActiveStep} />
       case GovsgProgress.UploadRecipients:
         return <GovsgRecipients setActiveStep={setActiveStep} />
-      case GovsgProgress.Send:
-        return <GovsgSend />
       default:
         return <p>Invalid step</p>
     }
