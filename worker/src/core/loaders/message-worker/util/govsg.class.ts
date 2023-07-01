@@ -193,7 +193,7 @@ class Govsg {
       }
 
       await this.postmanConnection.query(
-        `UPDATE govsg_ops SET status='ERROR', accepted_at=clock_timestamp(),
+        `UPDATE govsg_ops SET status='ERROR', errored_at=clock_timestamp(),
 	        error_code=:errorCode, error_description=:description, updated_at=clock_timestamp()
 	        where id=:id`,
         {

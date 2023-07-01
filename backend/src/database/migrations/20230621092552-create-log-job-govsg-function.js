@@ -21,8 +21,7 @@ module.exports = {
           error_description = COALESCE(m.error_description, p.error_description),
           service_provider_message_id = p.service_provider_message_id,
           send_attempted_at = p.send_attempted_at,
-          sent_at = p.sent_at,
-          read_at = COALESCE(m.read_at, p.read_at),
+          accepted_at = p.accepted_at,
           updated_at = clock_timestamp()
         FROM govsg_ops p WHERE
         m.id = p.id;
