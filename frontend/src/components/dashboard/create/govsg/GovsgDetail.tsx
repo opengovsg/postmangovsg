@@ -72,7 +72,7 @@ const GovsgDetail = () => {
       <>
         <div className="separator"></div>
         <h3>Template</h3>
-        <PreviewBlock body={campaign.body} />
+        <PreviewBlock body={campaign.body} richPreview />
         <div className="separator"></div>
         {stats.status && campaign.status !== Status.Scheduled && (
           <ProgressDetails
