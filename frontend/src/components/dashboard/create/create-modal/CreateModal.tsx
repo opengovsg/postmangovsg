@@ -29,8 +29,8 @@ const CreateModal = ({
   const [selectedChannel, setSelectedChannel] = useState(channelType)
   const [selectedName, setSelectedName] = useState(name)
   const [protect, setProtected] = useState(false)
-  const { experimentalAccess } = useContext(AuthContext)
-  const canAccessGovsg = experimentalAccess.includes(ChannelType.Govsg)
+  const { experimentalData } = useContext(AuthContext)
+  const canAccessGovsg = !!experimentalData[ChannelType.Govsg]
 
   async function handleCreateCampaign() {
     try {

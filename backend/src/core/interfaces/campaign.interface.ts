@@ -1,3 +1,5 @@
+import { GovsgTemplateParamMetadata } from '@govsg/models'
+
 export interface CampaignS3ObjectInterface {
   key?: string
   bucket?: string
@@ -41,6 +43,8 @@ export interface CampaignDetails {
     id: number
     body: string
     params: Array<string> | null
+    for_single_recipient: boolean
+    param_metadata: Record<string, GovsgTemplateParamMetadata>
   }
   job_queue?: {
     status: string

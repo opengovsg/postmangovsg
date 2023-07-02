@@ -31,14 +31,19 @@ function GovsgPickTemplate({
   setActiveStep: Dispatch<SetStateAction<GovsgProgress>>
 }) {
   const { campaign: campaign, updateCampaign } = useContext(CampaignContext)
-  const [templateId, setTemplateId] = useState(
-    (campaign as GovsgCampaign).templateId
-  )
+  const typedCampaign = campaign as GovsgCampaign
+  const [templateId, setTemplateId] = useState(typedCampaign.templateId)
   const [availableTemplates, setAvailableTemplates] = useState<
     GovsgTemplate[] | null
   >(null)
   const [errorMsg, setErrorMsg] = useState<ReactNode>(null)
   const { id: campaignId } = useParams<{ id: string }>()
+  const [forSingleRecipient, setForSingleRecipient] = useState<boolean | null>(
+    typedCampaign.forSingleRecipient !== null
+      ? typedCampaign.forSingleRecipient
+      : null
+  )
+
   useEffect(() => {
     void (async function () {
       try {
@@ -61,24 +66,42 @@ function GovsgPickTemplate({
       if (!campaignId) {
         throw new Error('Invalid campaign id')
       }
+      if (!templateId) {
+        return
+      }
+      if (forSingleRecipient === null) {
+        return
+      }
 
-      if (templateId !== (campaign as GovsgCampaign).templateId) {
+      if (
+        templateId !== typedCampaign.templateId ||
+        forSingleRecipient !== typedCampaign.forSingleRecipient
+      ) {
         const update = await pickTemplate({
           campaignId: +campaignId,
           templateId,
+          forSingleRecipient,
         })
         updateCampaign({
           body: update.template.body,
           params: update.template.params,
           templateId,
           numRecipients: update.num_recipients,
+          forSingleRecipient,
         })
       }
       setActiveStep((s: GovsgProgress) => s + 1)
     } catch (e) {
       setErrorMsg((e as Error).message)
     }
-  }, [campaignId, setActiveStep, updateCampaign, campaign, templateId])
+  }, [
+    campaignId,
+    setActiveStep,
+    updateCampaign,
+    campaign,
+    templateId,
+    forSingleRecipient,
+  ])
 
   return (
     <>
@@ -114,10 +137,31 @@ function GovsgPickTemplate({
             ))
           )}
           <p className={styles.italicSubtext}>More templates coming soon...</p>
+          {templateId && (
+            <>
+              <h4>How many people to send to</h4>
+              <RadioChoice
+                aria-label="One recipient"
+                id="recipient-single"
+                value="single recipient"
+                checked={forSingleRecipient === true}
+                onChange={() => setForSingleRecipient(true)}
+                label="One recipient"
+              />
+              <RadioChoice
+                aria-label="Many recipients (bulk send by uploading CSV)"
+                id="recipient-multiple"
+                value="multiple recipients"
+                checked={forSingleRecipient === false}
+                onChange={() => setForSingleRecipient(false)}
+                label="Many recipients (bulk send by uploading CSV)"
+              />
+            </>
+          )}
         </div>
       </StepSection>
       <NextButton
-        disabled={!templateId || !campaignId}
+        disabled={!templateId || !campaignId || forSingleRecipient === null}
         onClick={handlePickTemplate}
       />
       <ErrorBlock>{errorMsg}</ErrorBlock>

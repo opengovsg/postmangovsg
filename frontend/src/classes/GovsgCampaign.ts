@@ -12,6 +12,11 @@ export type GovsgTemplate = {
   params: Array<string>
 }
 
+type GovsgTemplateParamMetadata = {
+  displayName?: string
+  defaultFromMetaField?: string
+}
+
 export class GovsgCampaign extends Campaign {
   templateId: number
   body: string
@@ -19,6 +24,8 @@ export class GovsgCampaign extends Campaign {
   csvFilename: string
   numRecipients: number
   progress: GovsgProgress = GovsgProgress.PickTemplate
+  forSingleRecipient: boolean
+  paramMetadata: Record<string, GovsgTemplateParamMetadata>
 
   constructor(input: any) {
     super(input)
@@ -27,6 +34,8 @@ export class GovsgCampaign extends Campaign {
     this.params = input['govsg_templates']?.params
     this.csvFilename = input['csv_filename']
     this.numRecipients = input['num_recipients']
+    this.forSingleRecipient = input['govsg_templates']?.for_single_recipient
+    this.paramMetadata = input['govsg_templates']?.param_metadata
     this.setProgress()
   }
   setProgress() {

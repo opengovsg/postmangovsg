@@ -12,11 +12,11 @@ export function getExperimentalUser(
   })
 }
 
-export async function getFeaturesUserHasAccessTo(
+export async function getUserExperimentalData(
   userId: number
-): Promise<string[]> {
+): Promise<{ [key: string]: Record<string, string> }> {
   const records = await UserExperimental.findAll({
     where: { userId },
   })
-  return records.map((r) => r.feature)
+  return records.reduce((cul, r) => ({ [r.feature]: r.metadata, ...cul }), {})
 }

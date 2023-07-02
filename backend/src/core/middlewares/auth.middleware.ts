@@ -103,9 +103,9 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     res: Response
   ): Promise<Response | void> => {
     if (req?.session?.user?.id) {
-      const [user, experimentalFeatures] = await Promise.all([
+      const [user, experimentalData] = await Promise.all([
         authService.findUser(req?.session?.user?.id),
-        experimentService.getFeaturesUserHasAccessTo(req?.session?.user?.id),
+        experimentService.getUserExperimentalData(req?.session?.user?.id),
       ])
       logger.info({
         message: 'Existing user session found',
@@ -114,7 +114,7 @@ export const InitAuthMiddleware = (authService: AuthService) => {
       return res.json({
         email: user?.email,
         id: user?.id,
-        experimental_features: experimentalFeatures,
+        experimental_data: experimentalData,
       })
     }
     logger.info({

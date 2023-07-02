@@ -22,6 +22,7 @@ router.put(
   celebrate({
     [Segments.BODY]: Joi.object({
       template_id: Joi.number().required(),
+      for_single_recipient: Joi.boolean().default(false).required(),
     }),
   }),
   CampaignMiddleware.canEditCampaign,
@@ -74,6 +75,24 @@ router.post(
   }),
   CampaignMiddleware.canEditCampaign,
   CampaignMiddleware.canSendCampaign,
+  GovsgMiddleware.setDefaultCredentials,
+  JobMiddleware.sendCampaign
+)
+
+router.post(
+  '/send-single',
+  celebrate({
+    [Segments.BODY]: {
+      // fix rate to 100
+      rate: Joi.number().integer().min(100).max(100).default(100),
+      scheduledTiming: Joi.date().optional(),
+      recipient: Joi.string().alphanum().required(),
+      params: Joi.object().required(),
+    },
+  }),
+  CampaignMiddleware.canEditCampaign,
+  CampaignMiddleware.canSendCampaign,
+  GovsgMiddleware.processSingleRecipientCampaign,
   GovsgMiddleware.setDefaultCredentials,
   JobMiddleware.sendCampaign
 )

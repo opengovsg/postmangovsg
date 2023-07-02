@@ -2,10 +2,6 @@
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.addColumn('govsg_templates', 'default_param_values', {
-      type: Sequelize.DataTypes.JSONB,
-      allowNull: true,
-    })
     await queryInterface.createTable('user_experimental', {
       id: {
         autoIncrement: true,
@@ -47,6 +43,5 @@ module.exports = {
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('user_experimental')
-    await queryInterface.removeColumn('govsg_templates', 'default_param_values')
   },
 }
