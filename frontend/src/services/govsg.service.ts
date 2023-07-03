@@ -1,10 +1,13 @@
 import axios from 'axios'
 
+import { GovsgTemplateParamMetadata } from 'classes'
+
 type GovsgTemplate = {
   id: number
   name: string
   body: string
   params: Array<string>
+  param_metadata: Record<string, GovsgTemplateParamMetadata>
 }
 
 export async function getAvailableTemplates(): Promise<Array<GovsgTemplate>> {

@@ -12,7 +12,7 @@ export type GovsgTemplate = {
   params: Array<string>
 }
 
-type GovsgTemplateParamMetadata = {
+export type GovsgTemplateParamMetadata = {
   displayName?: string
   defaultFromMetaField?: string
 }
@@ -24,7 +24,7 @@ export class GovsgCampaign extends Campaign {
   csvFilename: string
   numRecipients: number
   progress: GovsgProgress = GovsgProgress.PickTemplate
-  forSingleRecipient: boolean
+  forSingleRecipient: boolean | null
   paramMetadata: Record<string, GovsgTemplateParamMetadata>
 
   constructor(input: any) {
