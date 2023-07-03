@@ -100,8 +100,6 @@ export async function processSingleRecipientCampaign(
     const fieldsToSupply = pivot?.govsgTemplate.params?.filter(
       (p) => !!paramMeta[p].displayName
     )
-    console.log(fieldsToDefault, defaultData)
-    console.log(fieldsToSupply, params)
     if (fieldsToDefault?.some((f) => !defaultData[f])) {
       throw new ApiInternalServerError(
         'Missing some fields in default params data'

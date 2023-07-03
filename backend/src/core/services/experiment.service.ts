@@ -14,7 +14,7 @@ export function getExperimentalUser(
 
 export async function getUserExperimentalData(
   userId: number
-): Promise<{ [key: string]: Record<string, string> }> {
+): Promise<{ [feature: string]: Record<string, string> }> {
   const records = await UserExperimental.findAll({
     where: { userId },
   })
