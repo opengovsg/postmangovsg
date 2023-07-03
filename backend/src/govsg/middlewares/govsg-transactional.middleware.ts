@@ -10,7 +10,7 @@ import { GovsgMessageStatus } from '@core/constants'
 import { GovsgTransactionalService } from '../services/govsg-transactional.service'
 import { PhoneNumberService } from '@core/services'
 import WhatsAppClient from '@shared/clients/whatsapp-client.class'
-import { NormalisedParam } from '@shared/clients/whatsapp-client.class/interfaces'
+import { NormalisedParam } from '@shared/clients/whatsapp-client.class/types'
 
 export interface GovsgTransactionalMiddleware {
   saveMessage: Handler
@@ -87,40 +87,35 @@ export const InitGovsgTransactionalMiddleware =
       params: Record<string, string> | undefined,
       whatsappTemplateLabel: string
     ): NormalisedParam[] {
-      // no params required or provided
-      if (
-        (!params && govsgTemplateParams === null) ||
-        govsgTemplateParams?.length === 0
-      ) {
+      const isParamsProvided =
+        params !== undefined && Object.keys(params).length > 0
+      const isParamsRequired =
+        govsgTemplateParams !== null && govsgTemplateParams.length > 0
+      if (!isParamsRequired && !isParamsProvided) {
         return []
       }
-      // no params provided, but params required
-      if (
-        (!params && govsgTemplateParams !== null) ||
-        govsgTemplateParams?.length !== 0
-      ) {
+      if (!isParamsProvided && isParamsRequired) {
         throw new ApiValidationError(
-          `missing params for template ${whatsappTemplateLabel}`
+          `no params provided; params needed for template ${whatsappTemplateLabel}`
         )
       }
-      // no params required, but params provided
       // not sure whether throwing this error is necessary
-      if (params && !govsgTemplateParams) {
+      if (isParamsProvided && !isParamsRequired) {
         throw new ApiValidationError(
           `template ${whatsappTemplateLabel} does not accept any params`
         )
       }
-      if (params && govsgTemplateParams) {
-        // todo
+      if (isParamsProvided && isParamsRequired) {
+        // TODO:
         // validate params actually match the array of params accepted by GovsgTemplate
         // check to ensure both are the same length, if not throw error
         // for key in params, find in govsgTemplate.params
+        return WhatsAppClient.transformNamedParams(
+          params as { [key: string]: string },
+          govsgTemplateParams
+        )
       }
-
-      return WhatsAppClient.transformNamedParams(
-        params as { [key: string]: string },
-        govsgTemplateParams
-      )
+      throw new Error('impossible to reach here')
     }
 
     async function sendMessage(

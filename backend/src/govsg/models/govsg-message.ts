@@ -24,8 +24,9 @@ export class GovsgMessage extends Model<GovsgMessage> {
   @Column(DataType.JSONB)
   params: object
 
-  @Column(DataType.STRING)
-  serviceProviderMessageId?: string
+  // indexed and unique for faster lookup
+  @Column({ type: DataType.STRING, allowNull: true })
+  serviceProviderMessageId: string | null
 
   @Column({ type: DataType.STRING, allowNull: true })
   errorCode: string | null

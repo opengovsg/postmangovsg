@@ -51,6 +51,7 @@ import {
   govsgCampaignRoutes,
   govsgTemplateRoutes,
   InitGovsgMessageTransactionalRoute,
+  govsgCallbackRoutes,
 } from '@govsg/routes'
 import { InitGovsgTransactionalMiddleware } from '@govsg/middlewares/govsg-transactional.middleware'
 
@@ -282,6 +283,8 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/callback/sms', smsCallbackRoutes)
 
   router.use('/callback/telegram', telegramCallbackRoutes)
+
+  router.use('/callback/govsg', govsgCallbackRoutes)
 
   router.use(
     '/lists',
