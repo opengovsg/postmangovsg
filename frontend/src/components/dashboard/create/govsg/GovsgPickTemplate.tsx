@@ -39,7 +39,8 @@ function GovsgPickTemplate({
   const [errorMsg, setErrorMsg] = useState<ReactNode>(null)
   const { id: campaignId } = useParams<{ id: string }>()
   const [forSingleRecipient, setForSingleRecipient] = useState<boolean | null>(
-    typedCampaign.forSingleRecipient !== null
+    typedCampaign.forSingleRecipient === true ||
+      typedCampaign.forSingleRecipient === false
       ? typedCampaign.forSingleRecipient
       : null
   )
@@ -87,6 +88,7 @@ function GovsgPickTemplate({
           params: update.template.params,
           templateId,
           numRecipients: update.num_recipients,
+          paramMetadata: update.template.param_metadata,
           forSingleRecipient,
         })
       }
@@ -98,9 +100,10 @@ function GovsgPickTemplate({
     campaignId,
     setActiveStep,
     updateCampaign,
-    campaign,
     templateId,
     forSingleRecipient,
+    typedCampaign.forSingleRecipient,
+    typedCampaign.templateId,
   ])
 
   return (
