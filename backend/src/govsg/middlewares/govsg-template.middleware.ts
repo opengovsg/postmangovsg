@@ -32,7 +32,8 @@ export async function pickTemplateForCampaign(
   req: Request,
   res: Response
 ): Promise<Response> {
-  const templateId = +req.body.template_id
+  const { template_id: templateId, for_single_recipient: forSingleRecipient } =
+    req.body
   const campaignId = +req.params.campaignId
   const [template, campaign] = await Promise.all([
     GovsgTemplate.findOne({
@@ -50,7 +51,7 @@ export async function pickTemplateForCampaign(
   }
 
   const pivot = await CampaignGovsgTemplate.findOne({
-    where: { campaignId, govsgTemplateId: templateId },
+    where: { campaignId, govsgTemplateId: templateId, forSingleRecipient },
   })
 
   if (!pivot) {
@@ -71,6 +72,7 @@ export async function pickTemplateForCampaign(
         {
           campaignId,
           govsgTemplateId: templateId,
+          forSingleRecipient,
         } as CampaignGovsgTemplate,
         { transaction: t }
       )
@@ -93,6 +95,7 @@ export async function pickTemplateForCampaign(
       body: template.body,
       params: template.params,
     },
+    for_single_recipient: forSingleRecipient,
   })
 }
 

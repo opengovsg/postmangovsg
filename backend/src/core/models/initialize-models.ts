@@ -46,6 +46,7 @@ import {
   GovsgMessage,
   GovsgOp,
 } from '@govsg/models'
+import { UserExperimental } from './user/user-experimental'
 
 export const initializeModels = (sequelize: Sequelize): void => {
   const coreModels = [
@@ -64,6 +65,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
     List,
     UserList,
     ApiKey,
+    UserExperimental,
   ]
   const emailModels = [
     EmailBlacklist,
