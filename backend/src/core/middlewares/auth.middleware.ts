@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, Handler } from 'express'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { AuthService } from '@core/services'
+import { AuthService, experimentService } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
 import { DEFAULT_TX_EMAIL_RATE_LIMIT } from '@core/models'
 import { ApiAuthenticationError } from '@core/errors/rest-api.errors'
@@ -103,12 +103,19 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     res: Response
   ): Promise<Response | void> => {
     if (req?.session?.user?.id) {
-      const user = await authService.findUser(req?.session?.user?.id)
+      const [user, experimentalData] = await Promise.all([
+        authService.findUser(req?.session?.user?.id),
+        experimentService.getUserExperimentalData(req?.session?.user?.id),
+      ])
       logger.info({
         message: 'Existing user session found',
         action: 'getUser',
       })
-      return res.json({ email: user?.email, id: user?.id })
+      return res.json({
+        email: user?.email,
+        id: user?.id,
+        experimental_data: experimentalData,
+      })
     }
     logger.info({
       message: 'No existing user session found!',

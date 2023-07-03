@@ -19,13 +19,16 @@ export async function getAvailableTemplates(): Promise<Array<GovsgTemplate>> {
 export async function pickTemplate({
   campaignId,
   templateId,
+  forSingleRecipient,
 }: {
   campaignId: number
   templateId: number
+  forSingleRecipient: boolean
 }): Promise<{ num_recipients: number; template: GovsgTemplate }> {
   try {
     const response = await axios.put(`/campaign/${campaignId}/govsg/template`, {
       template_id: templateId,
+      for_single_recipient: forSingleRecipient,
     })
     return response.data
   } catch (e) {
@@ -42,6 +45,16 @@ export async function getPreviewMessage(
   } catch (e) {
     errorHandler(e, 'Unable to get preview message')
   }
+}
+
+export async function sendSingleRecipientCampaign(
+  campaignId: number,
+  params: Record<string, string>
+): Promise<void> {
+  await axios.post(`/campaign/${campaignId}/govsg/send-single`, {
+    recipient: params.recipient,
+    params,
+  })
 }
 
 function errorHandler(e: unknown, defaultMsg: string): never {

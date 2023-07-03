@@ -1,7 +1,7 @@
 import { ChannelType, DefaultCredentialName } from '@core/constants'
 import { CampaignDetails } from '@core/interfaces'
 import { Campaign } from '@core/models'
-import { CampaignService, UploadService } from '@core/services'
+import { CampaignService, StatsService, UploadService } from '@core/services'
 import { CSVParams } from '@core/types'
 import { CampaignGovsgTemplate } from '@govsg/models/campaign-govsg-template'
 import { GovsgTemplate } from '@govsg/models/govsg-template'
@@ -20,10 +20,21 @@ export async function getCampaignDetails(
     CampaignService.getCampaignDetails(campaignId, []),
     CampaignGovsgTemplate.findOne({
       where: { campaignId },
-      include: { model: GovsgTemplate, attributes: ['id', 'body', 'params'] },
+      include: {
+        model: GovsgTemplate,
+        attributes: ['id', 'body', 'params', 'param_metadata'],
+      },
     }),
   ])
-  return { ...campaign, govsg_templates: pivot?.govsgTemplate }
+  return {
+    ...campaign,
+    govsg_templates: pivot
+      ? {
+          ...(pivot.govsgTemplate.toJSON() as any), // any to get around the snake vs camel casing difference between TS type and actual db table field
+          for_single_recipient: pivot.forSingleRecipient,
+        }
+      : undefined,
+  }
 }
 
 export const findCampaign = (
@@ -148,4 +159,27 @@ export async function setDefaultCredentials(
     }
   )
   return updatedCount
+}
+
+export async function processSingleRecipientCampaign(
+  data: Record<string, string>,
+  campaignId: number
+): Promise<void> {
+  const transaction = await GovsgMessage.sequelize?.transaction()
+  try {
+    await GovsgMessage.destroy({
+      where: { campaignId },
+      transaction,
+    })
+    await GovsgMessage.create({
+      campaignId,
+      recipient: data.recipient,
+      params: data,
+    } as GovsgMessage)
+    await StatsService.setNumRecipients(campaignId, 1, transaction)
+    await CampaignService.setValid(campaignId, transaction)
+    await transaction?.commit()
+  } catch (e) {
+    await transaction?.rollback()
+  }
 }

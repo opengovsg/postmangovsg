@@ -4,6 +4,7 @@ import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import {
   AuthType,
+  ExperimentMiddleware,
   InitAuthMiddleware,
   InitSettingsMiddleware,
 } from '@core/middlewares'
@@ -219,11 +220,13 @@ export const InitV1Route = (app: Application): Router => {
   router.use(
     '/govsg/templates',
     authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    ExperimentMiddleware.experimentalUserOnly(ChannelType.Govsg),
     govsgTemplateRoutes
   )
   router.use(
     '/campaign/:campaignId/govsg',
     authMiddleware.getAuthMiddleware([AuthType.Cookie]),
+    ExperimentMiddleware.experimentalUserOnly(ChannelType.Govsg),
     celebrate(campaignIdValidator),
     govsgCampaignRoutes
   )

@@ -201,8 +201,13 @@ export default class WhatsAppClient {
               code: input.language,
               policy: 'deterministic',
             },
+            components: [
+              {
+                type: 'body',
+                parameters: input.params,
+              },
+            ],
           },
-          components: [], // TODO
         },
       })
       .catch((err: Error | AxiosError) => {

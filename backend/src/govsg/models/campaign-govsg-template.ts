@@ -39,4 +39,7 @@ export class CampaignGovsgTemplate extends Model<CampaignGovsgTemplate> {
 
   @BelongsTo(() => GovsgTemplate)
   govsgTemplate: GovsgTemplate
+
+  @Column({ type: DataType.BOOLEAN, allowNull: false, defaultValue: false })
+  forSingleRecipient: boolean
 }
