@@ -126,6 +126,8 @@ const parseTemplateMessageWebhook = async (
         },
       })
       // no corresponding status to update
+      // to do with items in catalog (e-commerce use case), not relevant to us
+      // https://developers.facebook.com/docs/whatsapp/on-premises/webhooks/outbound/#notification-types
       return
     }
     case WhatsAppMessageStatus.failed: {
