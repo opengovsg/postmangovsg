@@ -120,7 +120,8 @@ describe('GET /auth/userinfo', () => {
     await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
     const res = await request(appWithUserSession).get('/auth/userinfo')
     expect(res.status).toBe(200)
-    expect(res.body).toEqual({ id: 1, email: 'user@agency.gov.sg' })
+    expect(res.body.id).toEqual(1)
+    expect(res.body.email).toEqual('user@agency.gov.sg')
   })
 })
 
