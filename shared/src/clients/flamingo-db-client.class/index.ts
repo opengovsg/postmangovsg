@@ -1,4 +1,4 @@
-import { WhatsAppApiClient } from '../whatsapp-client.class/interfaces'
+import { WhatsAppApiClient } from '../whatsapp-client.class/types'
 
 export interface SequelizeQueryClient {
   query: <T>(

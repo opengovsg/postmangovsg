@@ -9,7 +9,7 @@ import {
   NormalisedParam,
   WhatsAppApiClient,
   WhatsAppLanguages,
-} from '@shared/clients/whatsapp-client.class/interfaces'
+} from '@shared/clients/whatsapp-client.class/types'
 
 const logger = loggerWithLabel(module)
 
@@ -152,16 +152,17 @@ class Govsg {
         throw new Error('Missing template label')
       }
       const isLocal = config.get('env') === 'development'
-      const serviceProviderMessageId = await this.whatsappClient.sendMessage(
-        {
-          recipient,
-          templateName,
-          params,
-          apiClient,
-          language,
-        },
-        isLocal
-      )
+      const serviceProviderMessageId =
+        await this.whatsappClient.sendTemplateMessage(
+          {
+            recipient,
+            templateName,
+            params,
+            apiClient,
+            language,
+          },
+          isLocal
+        )
       await this.postmanConnection.query(
         `UPDATE govsg_ops SET status='ACCEPTED', accepted_at=clock_timestamp(),
         service_provider_message_id=:serviceProviderMessageId, updated_at=clock_timestamp()

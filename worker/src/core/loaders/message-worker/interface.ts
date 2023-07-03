@@ -1,7 +1,7 @@
 import {
   WhatsAppApiClient,
   WhatsAppLanguages,
-} from '@shared/clients/whatsapp-client.class/interfaces'
+} from '@shared/clients/whatsapp-client.class/types'
 
 export interface Message {
   id: number

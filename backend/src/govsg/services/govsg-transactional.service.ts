@@ -10,7 +10,7 @@ import {
   NormalisedParam,
   WhatsAppApiClient,
   WhatsAppLanguages,
-} from '@shared/clients/whatsapp-client.class/interfaces'
+} from '@shared/clients/whatsapp-client.class/types'
 
 const logger = loggerWithLabel(module)
 
@@ -57,7 +57,7 @@ async function sendMessage({
     })
 
   const messageId = await WhatsAppService.whatsappClient
-    .sendMessage(messageToSend, isLocal)
+    .sendTemplateMessage(messageToSend, isLocal)
     .catch((err) => {
       logger.error({
         message: 'Error sending message',

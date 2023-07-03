@@ -164,6 +164,7 @@ interface ConfigSchema {
     onPremClientTwoUrl: string
     proxyToken: string
     proxyUrl: string
+    callbackVerifyToken: string
   }
   flamingo: {
     dbUri: string
@@ -751,6 +752,11 @@ const config: Config<ConfigSchema> = convict({
     proxyUrl: {
       doc: 'Proxy URL for accessing WhatsApp On Prem Client via proxy',
       env: 'WHATSAPP_PROXY_URL',
+      default: '',
+    },
+    callbackVerifyToken: {
+      doc: 'Callback verify token for WhatsApp On Prem Client',
+      env: 'WHATSAPP_CALLBACK_VERIFY_TOKEN',
       default: '',
     },
   },
