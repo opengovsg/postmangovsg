@@ -73,6 +73,11 @@ const GovsgSingleRecipient = ({
       />
     )
   }
+
+  function validateAndUpdateRecipient(value: string) {
+    if (!/^(\+)?\d*$/.test(value) && value !== '') return
+    getUpdateData('recipient')(value)
+  }
   return (
     <>
       <StepSection>
@@ -85,7 +90,7 @@ const GovsgSingleRecipient = ({
             id="recipient"
             aria-label="Recipient Mobile Number"
             placeholder="Fill in Recipient Mobile Number"
-            onChange={getUpdateData('recipient')}
+            onChange={validateAndUpdateRecipient}
             value={data.recipient}
           />
         </div>
