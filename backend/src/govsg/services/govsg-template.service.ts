@@ -3,11 +3,11 @@ import { UploadService } from '@core/services'
 import { CampaignGovsgTemplate } from '@govsg/models/campaign-govsg-template'
 import { GovsgMessage } from '@govsg/models/govsg-message'
 import { GovsgTemplate } from '@govsg/models/govsg-template'
-import { TemplateClient } from '@shared/templating'
+import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import { GovsgService } from '.'
 
 const templateCli = new TemplateClient({
-  xssOptions: { whiteList: { br: [] }, stripIgnoreTag: true },
+  xssOptions: XSS_EMAIL_OPTION,
 })
 
 export async function getFilledTemplate(

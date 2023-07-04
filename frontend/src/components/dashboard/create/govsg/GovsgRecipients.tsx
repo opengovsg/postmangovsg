@@ -209,7 +209,7 @@ const GovsgRecipients = ({
       {!isCsvProcessing && numRecipients > 0 && (
         <StepSection>
           <p className={styles.greyText}>Message preview</p>
-          <PreviewBlock body={preview.body} richPreview />
+          <PreviewBlock body={preview.body} hideHeaders richPreview />
         </StepSection>
       )}
 
