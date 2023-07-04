@@ -39,6 +39,14 @@ export class TemplateClient {
   }
 
   /**
+   * Check whether input contains cid tags
+   * @param value input to be checked
+   */
+  containsCidTags(value: string): boolean {
+    return value.includes('src="cid:')
+  }
+
+  /**
    * Removes non-whitelisted html tags
    * Replaces new lines with html <br> so that the new lines can be displayed on the front-end
    * @param value

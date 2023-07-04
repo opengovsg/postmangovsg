@@ -13,12 +13,15 @@ const checkExtensions = async (
   return _.every(isAllowed)
 }
 
-const parseFiles = async (
-  files: { data: Buffer; name: string }[]
+const parseFilesAsMailAttachments = async (
+  files: { data: Buffer; name: string }[],
+  bodyContainsCidTags: boolean
 ): Promise<MailAttachment[]> => {
   return files.map(({ data, name }, index) => {
     // include cid field to support content-id images; see PR #1905
-    return { filename: name, content: data, cid: index.toString() }
+    return bodyContainsCidTags
+      ? { filename: name, content: data, cid: index.toString() }
+      : { filename: name, content: data }
   })
 }
 
@@ -27,7 +30,8 @@ export const UNSUPPORTED_FILE_TYPE_ERROR_CODE =
 
 const sanitizeFiles = async (
   files: { data: Buffer; name: string }[],
-  emailMessageTransactionalId: string
+  emailMessageTransactionalId: string,
+  bodyContainsCidTags: boolean
 ): Promise<MailAttachment[]> => {
   const isAcceptedType = await checkExtensions(files)
   if (!isAcceptedType) {
@@ -41,7 +45,7 @@ const sanitizeFiles = async (
     )
     throw new UnsupportedFileTypeError()
   }
-  return parseFiles(files)
+  return parseFilesAsMailAttachments(files, bodyContainsCidTags)
 }
 
 export const FileAttachmentService = {
