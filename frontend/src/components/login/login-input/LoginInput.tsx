@@ -26,8 +26,11 @@ import {
 const RESEND_WAIT_TIME = 30000
 
 const Login = () => {
-  const { setAuthenticated, setEmail: setAuthContextEmail } =
-    useContext(AuthContext)
+  const {
+    setAuthenticated,
+    setEmail: setAuthContextEmail,
+    setExperimentalData,
+  } = useContext(AuthContext)
 
   const [otpSent, setOtpSent] = useState(false)
   const [email, setEmail] = useState('')
@@ -64,6 +67,9 @@ const Login = () => {
       setAuthenticated(true)
       setAuthContextEmail(email)
       const user = await getUser()
+      setExperimentalData(
+        user?.experimental_data as { [feature: string]: Record<string, string> }
+      )
       setUserAnalytics(user)
     } catch (err) {
       setErrorMsg((err as Error).message)

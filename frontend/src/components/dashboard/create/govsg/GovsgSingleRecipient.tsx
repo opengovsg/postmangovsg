@@ -107,9 +107,21 @@ const GovsgSingleRecipient = ({
       <StepSection>
         <p>Preview</p>
         <PreviewBlock
+          hideHeaders
           body={hydrateTemplate(
             typedCampaign.body,
-            Object.assign({}, data, defaultUserData)
+            Object.assign(
+              {},
+              data,
+              fieldsToRender.reduce(
+                (cul, f) =>
+                  !data[f.id]
+                    ? { [f.id]: `<mark>{{ ${f.name} }}</mark>`, ...cul }
+                    : cul,
+                {}
+              ),
+              defaultUserData
+            )
           )}
         />
       </StepSection>
