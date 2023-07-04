@@ -71,11 +71,12 @@ async function sendMessage({
     )
     throw new MessageError()
   }
-
+  const bodyContainsCidTags = EmailTemplateService.client.containsCidTags(body)
   const sanitizedAttachments = attachments
     ? await FileAttachmentService.sanitizeFiles(
         attachments,
-        emailMessageTransactionalId
+        emailMessageTransactionalId,
+        bodyContainsCidTags
       )
     : undefined
 

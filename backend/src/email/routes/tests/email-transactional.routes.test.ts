@@ -610,7 +610,6 @@ describe(`${emailTransactionalRoute}/send`, () => {
         messageId: expect.any(String),
         attachments: [
           {
-            cid: '0',
             content: expect.any(Buffer),
             filename: validAttachmentName,
           },
@@ -633,6 +632,82 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(transactionalEmail?.params).toMatchObject({
       subject: validApiCallAttachment.subject,
       body: validApiCallAttachment.body,
+      from: validApiCallAttachment.from,
+      reply_to: validApiCallAttachment.reply_to,
+    })
+    expect(transactionalEmail?.attachmentsMetadata).not.toBeNull()
+    expect(transactionalEmail?.attachmentsMetadata).toHaveLength(1)
+    expect(transactionalEmail?.attachmentsMetadata).toMatchObject([
+      {
+        fileName: validAttachmentName,
+        fileSize: validAttachmentSize,
+        hash: expect.stringMatching(validAttachmentHashRegex),
+      },
+    ])
+  })
+
+  test('Should send email with a valid attachment and attachment metadata is saved correctly in db (with content id tag)', async () => {
+    mockSendEmail = jest
+      .spyOn(EmailService, 'sendEmail')
+      .mockResolvedValue(true)
+
+    await EmailFromAddress.create({
+      email: user.email,
+      name: 'Agency ABC',
+    } as EmailFromAddress)
+
+    // request.send() cannot be used with file attachments
+    // substitute form values with request.field(). refer to
+    // https://visionmedia.github.io/superagent/#multipart-requests
+    const bodyWithContentIdTag =
+      validApiCallAttachment.body + '<img src="cid:0">'
+    const res = await request(app)
+      .post(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+      .field('recipient', validApiCallAttachment.recipient)
+      .field('subject', validApiCallAttachment.subject)
+      .field('body', bodyWithContentIdTag)
+      .field('from', validApiCallAttachment.from)
+      .field('reply_to', validApiCallAttachment.reply_to)
+      .attach('attachments', validAttachment, validAttachmentName)
+
+    expect(res.status).toBe(201)
+    expect(res.body).toBeDefined()
+    expect(res.body.attachments_metadata).toBeDefined()
+    expect(mockSendEmail).toBeCalledTimes(1)
+    expect(mockSendEmail).toBeCalledWith(
+      {
+        body: bodyWithContentIdTag,
+        from: validApiCallAttachment.from,
+        replyTo: validApiCallAttachment.reply_to,
+        subject: validApiCallAttachment.subject,
+        recipients: [validApiCallAttachment.recipient],
+        messageId: expect.any(String),
+        attachments: [
+          {
+            cid: '0',
+            content: expect.any(Buffer),
+            filename: validAttachmentName,
+          },
+        ],
+      },
+      {
+        extraSmtpHeaders: { isTransactional: true },
+      }
+    )
+    const transactionalEmail = await EmailMessageTransactional.findOne({
+      where: { userId: user.id.toString() },
+    })
+    expect(transactionalEmail).not.toBeNull()
+    expect(transactionalEmail).toMatchObject({
+      recipient: validApiCallAttachment.recipient,
+      from: validApiCallAttachment.from,
+      status: TransactionalEmailMessageStatus.Accepted,
+      errorCode: null,
+    })
+    expect(transactionalEmail?.params).toMatchObject({
+      subject: validApiCallAttachment.subject,
+      body: bodyWithContentIdTag,
       from: validApiCallAttachment.from,
       reply_to: validApiCallAttachment.reply_to,
     })
@@ -740,12 +815,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
         messageId: expect.any(String),
         attachments: [
           {
-            cid: '0',
             content: expect.any(Buffer),
             filename: validAttachmentName,
           },
           {
-            cid: '1',
             content: expect.any(Buffer),
             filename: validAttachment2Name,
           },
