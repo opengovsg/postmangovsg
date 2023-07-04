@@ -15,6 +15,7 @@ interface PreviewBlockProps {
   from?: string
   className?: string
   richPreview?: boolean
+  hideHeaders?: boolean
 }
 
 const PreviewBlock: FunctionComponent<PreviewBlockProps> = ({
@@ -24,6 +25,7 @@ const PreviewBlock: FunctionComponent<PreviewBlockProps> = ({
   from,
   className,
   richPreview,
+  hideHeaders,
   ...otherProps
 }) => {
   if (!body && !subject) {
@@ -42,19 +44,19 @@ const PreviewBlock: FunctionComponent<PreviewBlockProps> = ({
       <DetailBlock>
         {from && (
           <>
-            <h5>From</h5>
+            {!hideHeaders && <h5>From</h5>}
             <RichTextEditor value={from} preview shouldHighlightVariables />
           </>
         )}
         {subject && (
           <>
-            <h5>Subject</h5>
+            {!hideHeaders && <h5>Subject</h5>}
             <RichTextEditor value={subject} preview shouldHighlightVariables />
           </>
         )}
         {body && (
           <>
-            <h5>Body</h5>
+            {!hideHeaders && <h5>Body</h5>}
             <RichTextEditor value={body} preview shouldHighlightVariables />
           </>
         )}
@@ -71,7 +73,7 @@ const PreviewBlock: FunctionComponent<PreviewBlockProps> = ({
   function constructHtml() {
     function h(name: string, value?: string | null, escapeValue = true) {
       if (value)
-        return `<h5>${name}</h5><p>${
+        return `${hideHeaders ? '' : `<h5>${name}</h5>`}<p>${
           escapeValue ? escapeHTML(value) : value
         }</p>`
       return ''
