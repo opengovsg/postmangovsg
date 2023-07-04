@@ -71,9 +71,6 @@ const GovsgDetail = () => {
     return (
       <>
         <div className="separator"></div>
-        <h3>Template</h3>
-        <PreviewBlock body={campaign.body} richPreview />
-        <div className="separator"></div>
         {stats.status && campaign.status !== Status.Scheduled && (
           <ProgressDetails
             stats={stats}
@@ -87,6 +84,9 @@ const GovsgDetail = () => {
             messageNumber={campaign.numRecipients}
           />
         )}
+        <div className="separator"></div>
+        <h3>Template</h3>
+        <PreviewBlock body={campaign.body} richPreview hideHeaders />
       </>
     )
   }
