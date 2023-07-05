@@ -86,7 +86,9 @@ router.post(
       // fix rate to 100
       rate: Joi.number().integer().min(100).max(100).default(100),
       scheduledTiming: Joi.date().optional(),
-      recipient: Joi.string().alphanum().required(),
+      recipient: Joi.string()
+        .pattern(/^(\+)?\d*$/)
+        .required(),
       params: Joi.object().required(),
     },
   }),
