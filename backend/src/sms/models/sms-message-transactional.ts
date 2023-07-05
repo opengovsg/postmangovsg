@@ -44,6 +44,7 @@ export class SmsMessageTransactional extends Model<SmsMessageTransactional> {
   @Column({ type: DataType.TEXT, allowNull: false })
   body: string
 
+  // indexed for faster search
   @Column({ type: DataType.STRING, allowNull: true })
   messageId: string | null
 
