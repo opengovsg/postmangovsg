@@ -1,4 +1,4 @@
-import { authenticator } from 'otplib'
+import { customAlphabet } from 'nanoid'
 import bcrypt from 'bcrypt'
 import { Request } from 'express'
 import config from '@core/config'
@@ -28,12 +28,11 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     resendTimeout: OTP_RESEND_TIMEOUT,
   } = config.get('otp')
 
+  const otpCharset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   /**
    * Generate a six digit otp
    */
-  const generateOtp = (): string => {
-    return authenticator.generate(authenticator.generateSecret())
-  }
+  const generateOtp = customAlphabet(otpCharset, 6)
 
   /**
    * Save hashed otp against the user's email
