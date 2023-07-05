@@ -10,6 +10,7 @@ import {
   WhatsAppApiClient,
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/types'
+import { PhoneNumberService } from '@core/services/phone-number.service'
 
 const logger = loggerWithLabel(module)
 
@@ -82,7 +83,12 @@ class Govsg {
     if (dbResults.length === 0) {
       return []
     }
-
+    dbResults.forEach((r) => {
+      r.recipient = PhoneNumberService.normalisePhoneNumber(
+        r.recipient,
+        config.get('defaultCountry')
+      )
+    })
     const apiClientIdMap = await this.flamingoDbClient.getApiClientId(
       dbResults.map((result) => result.recipient)
     )
