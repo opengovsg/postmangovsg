@@ -15,6 +15,7 @@ const flamingoDbSequelize = new Sequelize(config.get('flamingo.dbUri'), {
       rejectUnauthorized: false,
     },
   },
+  pool: config.get('database.poolOptions'),
 })
 // ugly casting to make things work ugh
 const flamingoDbClient = new FlamingoDbClient(

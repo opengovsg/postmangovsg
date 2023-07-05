@@ -205,6 +205,7 @@ const createFlamingoConnection = (): Sequelize => {
         rejectUnauthorized: false,
       },
     },
+    pool: config.get('database.poolOptions'),
   })
 }
 
