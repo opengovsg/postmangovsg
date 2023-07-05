@@ -139,10 +139,14 @@ function GovsgPickTemplate({
               </RadioChoice>
             ))
           )}
-          <p className={styles.italicSubtext}>More templates coming soon...</p>
+          <p className={styles.italicSubtext} style={{ marginBottom: '3rem' }}>
+            More templates coming soon...
+          </p>
           {templateId && (
             <>
-              <h4>How many people to send to</h4>
+              <h4 style={{ marginBottom: '1rem' }}>
+                How many people to send to
+              </h4>
               <RadioChoice
                 aria-label="One recipient"
                 id="recipient-single"
