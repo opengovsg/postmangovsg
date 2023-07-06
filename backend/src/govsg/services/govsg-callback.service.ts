@@ -18,7 +18,11 @@ import {
   UnexpectedWebhookError,
 } from '@shared/clients/whatsapp-client.class/errors'
 import { GovsgMessage, GovsgMessageTransactional, GovsgOp } from '@govsg/models'
-import { govsgMessageStatusMapper } from '@core/constants'
+import {
+  GovsgMessageStatus,
+  govsgMessageStatusMapper,
+  shouldUpdateStatus,
+} from '@core/constants'
 import { WhatsAppService } from '@core/services'
 
 const logger = loggerWithLabel(module)
@@ -79,7 +83,8 @@ const parseWebhook = async (
 const parseTemplateMessageWebhook = async (
   body: WhatsAppTemplateMessageWebhook
 ): Promise<void> => {
-  const { id: messageId } = body.statuses[0]
+  const { id: messageId, timestamp: timestampRaw } = body.statuses[0]
+  const timestamp = new Date(parseInt(timestampRaw, 10) * 1000) // convert to milliseconds
   const [govsgMessage, govsgMessageTransactional, govsgOp] = await Promise.all([
     GovsgMessage.findOne({ where: { serviceProviderMessageId: messageId } }),
     GovsgMessageTransactional.findOne({
@@ -124,20 +129,26 @@ const parseTemplateMessageWebhook = async (
       serviceProviderMessageId: messageId,
     },
   }
+  // can be certain at least one of these is defined
+  if (whatsappStatus === WhatsAppMessageStatus.warning) {
+    logger.warn({
+      message: 'Received webhook with warning status',
+      meta: {
+        messageId,
+        body,
+      },
+    })
+    // no corresponding status to update
+    // to do with items in catalog (e-commerce use case), not relevant to us
+    // https://developers.facebook.com/docs/whatsapp/on-premises/webhooks/outbound/#notification-types
+    return
+  }
+  const prevStatus =
+    govsgMessage?.status ||
+    govsgOp?.status ||
+    (govsgMessageTransactional?.status as GovsgMessageStatus)
+  const statusIfUpdated = govsgMessageStatusMapper(whatsappStatus)
   switch (whatsappStatus) {
-    case WhatsAppMessageStatus.warning: {
-      logger.warn({
-        message: 'Received webhook with warning status',
-        meta: {
-          messageId,
-          body,
-        },
-      })
-      // no corresponding status to update
-      // to do with items in catalog (e-commerce use case), not relevant to us
-      // https://developers.facebook.com/docs/whatsapp/on-premises/webhooks/outbound/#notification-types
-      return
-    }
     case WhatsAppMessageStatus.failed: {
       logger.info({
         message: 'Received webhook with error status',
@@ -151,8 +162,10 @@ const parseTemplateMessageWebhook = async (
           },
         })
         const fieldOpts = {
-          status: govsgMessageStatusMapper(whatsappStatus),
-          erroredAt: new Date(),
+          status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+            ? statusIfUpdated
+            : undefined,
+          erroredAt: timestamp,
         }
         void govsgMessage?.update(fieldOpts, whereOpts)
         void govsgMessageTransactional?.update(fieldOpts, whereOpts)
@@ -164,10 +177,12 @@ const parseTemplateMessageWebhook = async (
       const errorCode = code.toString()
       const errorDescription = `${title} Details: ${details} href: ${href}`
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
         errorCode,
         errorDescription,
-        erroredAt: new Date(),
+        erroredAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
@@ -176,8 +191,10 @@ const parseTemplateMessageWebhook = async (
     }
     case WhatsAppMessageStatus.sent: {
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
-        sentAt: new Date(),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
+        sentAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
@@ -186,8 +203,10 @@ const parseTemplateMessageWebhook = async (
     }
     case WhatsAppMessageStatus.delivered: {
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
-        deliveredAt: new Date(),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
+        deliveredAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
@@ -196,8 +215,10 @@ const parseTemplateMessageWebhook = async (
     }
     case WhatsAppMessageStatus.read: {
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
-        readAt: new Date(),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
+        readAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
@@ -206,8 +227,10 @@ const parseTemplateMessageWebhook = async (
     }
     case WhatsAppMessageStatus.deleted: {
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
-        deletedAt: new Date(),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
+        deletedAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
