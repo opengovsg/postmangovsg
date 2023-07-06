@@ -96,14 +96,11 @@ class Govsg {
         }
       })
       if (invalidIdsDetectedFromFormat.length > 0) {
-        // Note: have to add accepted_at here though it doesn't make sense conceptually
-        // as the field is being used to check whether a campaign can be logged
         await this.postmanConnection.query(
           `UPDATE
           govsg_ops
         SET
           status = 'INVALID_RECIPIENT',
-          accepted_at=clock_timestamp(),
           updated_at=clock_timestamp()
         WHERE
           id IN (:ids);`,
@@ -114,6 +111,17 @@ class Govsg {
         )
       }
       if (cleanDbResults.length === 0) {
+        if (initialDbResults.length > 0) {
+          // Has to run one more time get_messages db function to set the job
+          // queue item to `SENT` if needed
+          await this.postmanConnection.query(
+            'SELECT get_messages_to_send_govsg(:jobId, :rate);',
+            {
+              replacements: { jobId, rate },
+              type: QueryTypes.SELECT,
+            }
+          )
+        }
         return []
       }
 
@@ -143,14 +151,11 @@ class Govsg {
       )
       // update govsg_ops table with invalid messages
       if (invalidMessages.length > 0) {
-        // Note: have to add accepted_at here though it doesn't make sense conceptually
-        // as the field is being used to check whether a campaign can be logged
         await this.postmanConnection.query(
           `UPDATE
               govsg_ops
             SET
               status = 'INVALID_RECIPIENT',
-              accepted_at=clock_timestamp(),
               updated_at=clock_timestamp()
             WHERE
               id IN (:ids);`,
@@ -226,11 +231,8 @@ class Govsg {
       })
     } catch (error: any) {
       if ((error as { errorCode: string }).errorCode === 'invalid_recipient') {
-        // Note: have to add accepted_at here though it doesn't make sense conceptually
-        // as the field is being used to check whether a campaign can be logged
         await this.postmanConnection.query(
           `UPDATE govsg_ops SET status='INVALID_RECIPIENT',
-          accepted_at=clock_timestamp(),
           updated_at=clock_timestamp()
             where id=:id`,
           {
