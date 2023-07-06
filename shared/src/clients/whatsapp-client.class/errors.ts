@@ -15,3 +15,9 @@ export class UnexpectedWebhookError extends Error {
     super(message)
   }
 }
+
+export class MessageIdNotFoundWebhookError extends Error {
+  constructor(message: string) {
+    super(message)
+  }
+}

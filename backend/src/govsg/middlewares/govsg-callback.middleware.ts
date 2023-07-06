@@ -1,7 +1,10 @@
 import { loggerWithLabel } from '@core/logger'
 import { Request, Response, NextFunction } from 'express'
 import { GovsgCallbackService } from '@govsg/services/govsg-callback.service'
-import { UnexpectedWebhookError } from '@shared/clients/whatsapp-client.class/errors'
+import {
+  MessageIdNotFoundWebhookError,
+  UnexpectedWebhookError,
+} from '@shared/clients/whatsapp-client.class/errors'
 import { WhatsAppApiClient } from '@shared/clients/whatsapp-client.class/types'
 
 const logger = loggerWithLabel(module)
@@ -65,7 +68,11 @@ const parseWebhook = async (
     res.sendStatus(200)
   } catch (err) {
     if (err instanceof UnexpectedWebhookError) {
-      res.sendStatus(500)
+      res.sendStatus(400)
+      return
+    }
+    if (err instanceof MessageIdNotFoundWebhookError) {
+      res.sendStatus(400)
       return
     }
     next(err)

@@ -13,7 +13,10 @@ import {
   WhatsAppWebhookTextMessage,
   WhatsappWebhookMessageType,
 } from '@shared/clients/whatsapp-client.class/types'
-import { UnexpectedWebhookError } from '@shared/clients/whatsapp-client.class/errors'
+import {
+  MessageIdNotFoundWebhookError,
+  UnexpectedWebhookError,
+} from '@shared/clients/whatsapp-client.class/errors'
 import { GovsgMessage, GovsgMessageTransactional, GovsgOp } from '@govsg/models'
 import { govsgMessageStatusMapper } from '@core/constants'
 import { WhatsAppService } from '@core/services'
@@ -92,8 +95,10 @@ const parseTemplateMessageWebhook = async (
         messageId,
       },
     })
-    // no match found, assume it's a Standard Reply webhook, safe to ignore
-    return
+    // throwing error here to return 400
+    // this is because callbacks could hit this endpoint before the messageId is updated
+    // this will trigger a retry from WhatsApp, which will hit this endpoint again after messageId is updated
+    throw new MessageIdNotFoundWebhookError('Message ID not found')
   }
   const inGovsgMessageOrOp = !!(govsgMessage || govsgOp)
   if (inGovsgMessageOrOp && govsgMessageTransactional) {
