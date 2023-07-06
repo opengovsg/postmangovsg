@@ -74,6 +74,7 @@ export async function duplicateCampaign({
         {
           campaignId: duplicate.id,
           govsgTemplateId: pivot.govsgTemplateId,
+          forSingleRecipient: pivot.forSingleRecipient,
         } as CampaignGovsgTemplate,
         { transaction }
       )
