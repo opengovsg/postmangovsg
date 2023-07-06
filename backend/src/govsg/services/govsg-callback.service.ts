@@ -83,7 +83,11 @@ const parseWebhook = async (
 const parseTemplateMessageWebhook = async (
   body: WhatsAppTemplateMessageWebhook
 ): Promise<void> => {
-  const { id: messageId, timestamp: timestampRaw } = body.statuses[0]
+  const {
+    id: messageId,
+    timestamp: timestampRaw,
+    status: whatsappStatus,
+  } = body.statuses[0]
   const timestamp = new Date(parseInt(timestampRaw, 10) * 1000) // convert to milliseconds
   const [govsgMessage, govsgMessageTransactional, govsgOp] = await Promise.all([
     GovsgMessage.findOne({ where: { serviceProviderMessageId: messageId } }),
@@ -101,9 +105,13 @@ const parseTemplateMessageWebhook = async (
       },
     })
     // throwing error here to return 400
-    // this is because callbacks could hit this endpoint before the messageId is updated
+    // this is because callbacks could hit this endpoint before the messageId is updated in GovsgOp table
+    // only do this for sending as this is unlikely to happen for other statuses
     // this will trigger a retry from WhatsApp, which will hit this endpoint again after messageId is updated
-    throw new MessageIdNotFoundWebhookError('Message ID not found')
+    if (whatsappStatus === WhatsAppMessageStatus.sent) {
+      throw new MessageIdNotFoundWebhookError('Message ID not found')
+    }
+    return
   }
   const inGovsgMessageOrOp = !!(govsgMessage || govsgOp)
   if (inGovsgMessageOrOp && govsgMessageTransactional) {
@@ -123,7 +131,6 @@ const parseTemplateMessageWebhook = async (
   // but I am unable to access the methods common to both models with type safety
   // hence the following horrible chunk of code
   // (Drizzle ORM doesn't have this problem)
-  const whatsappStatus = body.statuses[0].status
   const whereOpts = {
     where: {
       serviceProviderMessageId: messageId,
