@@ -165,12 +165,27 @@ class Govsg {
           }
         )
       }
-      return validatedWhatsAppIds
-        .filter((message) => message.status === 'valid')
-        .map((message) => ({
-          ...message,
-          body: '', // just putting this in to satisfy the interface grrr
-        }))
+
+      const validMessages = validatedWhatsAppIds.filter(
+        (message) => message.status === 'valid'
+      )
+
+      if (validMessages.length === 0) {
+        // Has to run one more time get_messages db function to set the job
+        // queue item to `SENT` if needed
+        await this.postmanConnection.query(
+          'SELECT get_messages_to_send_govsg(:jobId, :rate);',
+          {
+            replacements: { jobId, rate },
+            type: QueryTypes.SELECT,
+          }
+        )
+      }
+
+      return validMessages.map((message) => ({
+        ...message,
+        body: '', // just putting this in to satisfy the interface grrr
+      }))
     } catch (error) {
       logger.error({
         message: '[govsg.class.getMessages] Error processing messages',
