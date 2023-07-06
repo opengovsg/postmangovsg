@@ -68,7 +68,7 @@ const parseWebhook = async (
     res.sendStatus(200)
   } catch (err) {
     if (err instanceof UnexpectedWebhookError) {
-      res.sendStatus(400)
+      res.sendStatus(500)
       return
     }
     if (err instanceof MessageIdNotFoundWebhookError) {

@@ -121,7 +121,7 @@ const parseTemplateMessageWebhook = async (
   // NB unable to abstract further with type safety because Sequelize doesn't
   // play well with TypeScript. I wanted to use GovsgMessage | GovsgMessageTransactional type
   // but I am unable to access the methods common to both models with type safety
-  // hence the following verbose code, you gotta do what you gotta do
+  // hence the following horrible chunk of code
   // (Drizzle ORM doesn't have this problem)
   const whatsappStatus = body.statuses[0].status
   const whereOpts = {
