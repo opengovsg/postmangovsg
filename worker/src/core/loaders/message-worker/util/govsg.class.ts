@@ -62,7 +62,7 @@ class Govsg {
   }
 
   async getMessages(jobId: number, rate: number) {
-    const dbResults: {
+    type Message = {
       id: number
       recipient: string
       params: { [key: string]: string }
@@ -70,7 +70,8 @@ class Govsg {
       campaignId: number
       whatsappTemplateLabel: string
       paramOrder: string[]
-    }[] = map(
+    }
+    const initialDbResults: Message[] = map(
       await this.postmanConnection.query(
         'SELECT get_messages_to_send_govsg(:jobId, :rate);',
         {
@@ -80,20 +81,42 @@ class Govsg {
       ),
       'get_messages_to_send_govsg'
     )
-    if (dbResults.length === 0) {
+    const cleanDbResults: Message[] = []
+    const invalidIdsDetectedFromFormat: number[] = []
+    initialDbResults.forEach((r) => {
+      try {
+        r.recipient = PhoneNumberService.normalisePhoneNumber(
+          r.recipient,
+          config.get('defaultCountry')
+        )
+        cleanDbResults.push(r)
+      } catch {
+        invalidIdsDetectedFromFormat.push(r.id)
+      }
+    })
+    if (invalidIdsDetectedFromFormat.length > 0) {
+      await this.postmanConnection.query(
+        `UPDATE
+          govsg_ops
+        SET
+          status = 'INVALID_RECIPIENT', updated_at=clock_timestamp()
+        WHERE
+          id IN (:ids);`,
+        {
+          replacements: { ids: invalidIdsDetectedFromFormat },
+          type: QueryTypes.UPDATE,
+        }
+      )
+    }
+    if (cleanDbResults.length === 0) {
       return []
     }
-    dbResults.forEach((r) => {
-      r.recipient = PhoneNumberService.normalisePhoneNumber(
-        r.recipient,
-        config.get('defaultCountry')
-      )
-    })
+
     const apiClientIdMap = await this.flamingoDbClient.getApiClientId(
-      dbResults.map((result) => result.recipient)
+      cleanDbResults.map((result) => result.recipient)
     )
 
-    const unvalidatedMessages = dbResults.map((result) => ({
+    const unvalidatedMessages = cleanDbResults.map((result) => ({
       id: result.id, // need this to update govsg_ops table
       recipient: result.recipient,
       templateName: result.whatsappTemplateLabel,
