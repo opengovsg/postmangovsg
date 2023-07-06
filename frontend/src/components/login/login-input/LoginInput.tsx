@@ -116,7 +116,7 @@ const Login = () => {
       {!otpSent ? (
         <TextInputWithButton
           value={email}
-          type={'email'}
+          type="email"
           placeholder={t`e.g. postman@agency.gov.sg`}
           onChange={setEmail}
           buttonDisabled={!email}
@@ -128,7 +128,7 @@ const Login = () => {
       ) : (
         <TextInputWithButton
           value={otp}
-          type={'tel'}
+          type="text"
           placeholder={t`Enter OTP`}
           onChange={setOtp}
           buttonDisabled={!otp}
