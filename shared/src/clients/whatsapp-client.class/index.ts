@@ -33,6 +33,10 @@ export default class WhatsAppClient {
         rejectUnauthorized: false,
         keepAlive: true,
       }),
+      // As the on-prem client is super quirky and just doesn't respond when the
+      // input is invalid, we set a timeout so there's a guaranteed error thrown
+      // instead this API client hogging our resources
+      timeout: 30 * 1000,
     })
   }
 

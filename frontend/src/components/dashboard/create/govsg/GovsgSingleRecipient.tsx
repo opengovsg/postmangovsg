@@ -8,6 +8,7 @@ import { ChannelType, GovsgCampaign, GovsgProgress, Status } from 'classes'
 import {
   ButtonGroup,
   ConfirmModal,
+  ErrorBlock,
   PreviewBlock,
   PrimaryButton,
   StepHeader,
@@ -48,6 +49,7 @@ const GovsgSingleRecipient = ({
   )
   const { id: campaignId } = useParams<{ id: string }>()
   const modalContext = useContext(ModalContext)
+  const [errMessage, setErrMessage] = useState<string>('')
 
   const getUpdateData = (field: string) => (value: string) => {
     setData(Object.assign({}, data, { [field]: value }))
@@ -63,6 +65,16 @@ const GovsgSingleRecipient = ({
     }
   }
   const openModal = () => {
+    if (
+      !/^(8|9)\d{7}$/.test(data.recipient) &&
+      !/^\+\d+$/.test(data.recipient)
+    ) {
+      setErrMessage(
+        'Invalid recipient. Phone number must be a Singapore one or include country code with a leading + sign'
+      )
+      return
+    }
+    setErrMessage('')
     modalContext.setModalContent(
       <ConfirmModal
         title="Are you absolutely sure?"
@@ -72,11 +84,6 @@ const GovsgSingleRecipient = ({
         onConfirm={onModalConfirm}
       />
     )
-  }
-
-  function validateAndUpdateRecipient(value: string) {
-    if (!/^(\+)?\d*$/.test(value) && value !== '') return
-    getUpdateData('recipient')(value)
   }
   return (
     <>
@@ -90,7 +97,7 @@ const GovsgSingleRecipient = ({
             id="recipient"
             aria-label="Recipient Mobile Number"
             placeholder="Fill in Recipient Mobile Number"
-            onChange={validateAndUpdateRecipient}
+            onChange={getUpdateData('recipient')}
             value={data.recipient}
           />
         </div>
@@ -130,6 +137,7 @@ const GovsgSingleRecipient = ({
           )}
         />
       </StepSection>
+      {errMessage && <ErrorBlock>{errMessage}</ErrorBlock>}
       <ButtonGroup>
         <PrimaryButton
           disabled={Object.keys(data).some((k) => !data[k])}
