@@ -14,7 +14,7 @@ import {
   WhatsappWebhookMessageType,
 } from '@shared/clients/whatsapp-client.class/types'
 import { UnexpectedWebhookError } from '@shared/clients/whatsapp-client.class/errors'
-import { GovsgMessage, GovsgMessageTransactional } from '@govsg/models'
+import { GovsgMessage, GovsgMessageTransactional, GovsgOp } from '@govsg/models'
 import { govsgMessageStatusMapper } from '@core/constants'
 import { WhatsAppService } from '@core/services'
 
@@ -77,16 +77,17 @@ const parseTemplateMessageWebhook = async (
   body: WhatsAppTemplateMessageWebhook
 ): Promise<void> => {
   const { id: messageId } = body.statuses[0]
-  const [govsgMessage, govsgMessageTransactional] = await Promise.all([
+  const [govsgMessage, govsgMessageTransactional, govsgOp] = await Promise.all([
     GovsgMessage.findOne({ where: { serviceProviderMessageId: messageId } }),
     GovsgMessageTransactional.findOne({
       where: { serviceProviderMessageId: messageId },
     }),
+    GovsgOp.findOne({ where: { serviceProviderMessageId: messageId } }),
   ])
-  if (!govsgMessage && !govsgMessageTransactional) {
+  if (!govsgMessage && !govsgOp && !govsgMessageTransactional) {
     logger.info({
       message:
-        'Received webhook for message not in GovsgMessage or GovsgMessageTransactional',
+        'Received webhook for message not in GovsgMessage or GovsgMessageTransactional or GovsgOp',
       meta: {
         messageId,
       },
@@ -94,7 +95,8 @@ const parseTemplateMessageWebhook = async (
     // no match found, assume it's a Standard Reply webhook, safe to ignore
     return
   }
-  if (govsgMessage && govsgMessageTransactional) {
+  const inGovsgMessageOrOp = !!(govsgMessage || govsgOp)
+  if (inGovsgMessageOrOp && govsgMessageTransactional) {
     // this should basically never happen
     logger.error({
       message: 'Received webhook for message that exists in both tables',
@@ -110,6 +112,7 @@ const parseTemplateMessageWebhook = async (
   // play well with TypeScript. I wanted to use GovsgMessage | GovsgMessageTransactional type
   // but I am unable to access the methods common to both models with type safety
   // hence the following verbose code, you gotta do what you gotta do
+  // (Drizzle ORM doesn't have this problem)
   const whatsappStatus = body.statuses[0].status
   const whereOpts = {
     where: {
@@ -148,6 +151,7 @@ const parseTemplateMessageWebhook = async (
         }
         void govsgMessage?.update(fieldOpts, whereOpts)
         void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+        void govsgOp?.update(fieldOpts, whereOpts)
         // not sure whether need to throw an error hmm probably not?
         return
       }
@@ -162,6 +166,7 @@ const parseTemplateMessageWebhook = async (
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     case WhatsAppMessageStatus.sent: {
@@ -171,6 +176,7 @@ const parseTemplateMessageWebhook = async (
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     case WhatsAppMessageStatus.delivered: {
@@ -180,6 +186,7 @@ const parseTemplateMessageWebhook = async (
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     case WhatsAppMessageStatus.read: {
@@ -189,6 +196,7 @@ const parseTemplateMessageWebhook = async (
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     case WhatsAppMessageStatus.deleted: {
@@ -198,6 +206,7 @@ const parseTemplateMessageWebhook = async (
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     default: {
