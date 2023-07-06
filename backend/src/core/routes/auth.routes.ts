@@ -25,7 +25,7 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
         .required(),
       otp: Joi.string()
         .length(6)
-        .pattern(/^\d+$/, { name: 'numbers' })
+        .pattern(/^[A-Z0-9]+$/, { name: 'alphanumeric' })
         .required(),
     }),
   }
