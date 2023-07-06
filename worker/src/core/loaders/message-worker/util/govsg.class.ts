@@ -96,11 +96,15 @@ class Govsg {
         }
       })
       if (invalidIdsDetectedFromFormat.length > 0) {
+        // Note: have to add accepted_at here though it doesn't make sense conceptually
+        // as the field is being used to check whether a campaign can be logged
         await this.postmanConnection.query(
           `UPDATE
           govsg_ops
         SET
-          status = 'INVALID_RECIPIENT', updated_at=clock_timestamp()
+          status = 'INVALID_RECIPIENT',
+          accepted_at=clock_timestamp(),
+          updated_at=clock_timestamp()
         WHERE
           id IN (:ids);`,
           {
@@ -139,13 +143,17 @@ class Govsg {
       )
       // update govsg_ops table with invalid messages
       if (invalidMessages.length > 0) {
+        // Note: have to add accepted_at here though it doesn't make sense conceptually
+        // as the field is being used to check whether a campaign can be logged
         await this.postmanConnection.query(
           `UPDATE
-                                            govsg_ops
-                                          SET
-                                            status = 'INVALID_RECIPIENT', updated_at=clock_timestamp()
-                                          WHERE
-                                            id IN (:ids);`,
+              govsg_ops
+            SET
+              status = 'INVALID_RECIPIENT',
+              accepted_at=clock_timestamp(),
+              updated_at=clock_timestamp()
+            WHERE
+              id IN (:ids);`,
           {
             replacements: { ids: invalidMessages.map((message) => message.id) },
             type: QueryTypes.UPDATE,
@@ -218,8 +226,12 @@ class Govsg {
       })
     } catch (error: any) {
       if ((error as { errorCode: string }).errorCode === 'invalid_recipient') {
+        // Note: have to add accepted_at here though it doesn't make sense conceptually
+        // as the field is being used to check whether a campaign can be logged
         await this.postmanConnection.query(
-          `UPDATE govsg_ops SET status='INVALID_RECIPIENT', updated_at=clock_timestamp()
+          `UPDATE govsg_ops SET status='INVALID_RECIPIENT',
+          accepted_at=clock_timestamp(),
+          updated_at=clock_timestamp()
             where id=:id`,
           {
             replacements: {
