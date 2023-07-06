@@ -49,7 +49,7 @@ describe('POST /auth/otp', () => {
 
     expect(MailService.mailClient.sendMail).toHaveBeenCalledWith(
       expect.objectContaining({
-        body: expect.stringMatching(/Your OTP is <b>[0-9]{6}<\/b>/),
+        body: expect.stringMatching(/Your OTP is <b>[A-Z0-9]{6}<\/b>/),
       })
     )
   })
