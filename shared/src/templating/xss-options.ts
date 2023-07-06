@@ -69,6 +69,7 @@ export const XSS_EMAIL_OPTION = {
     th: DEFAULT_EMAIL_ATTRS,
     sup: DEFAULT_EMAIL_ATTRS,
     caption: DEFAULT_EMAIL_ATTRS,
+    mark: [],
   },
   safeAttrValue: (
     tag: string,

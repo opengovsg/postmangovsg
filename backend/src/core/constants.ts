@@ -1,7 +1,10 @@
+import { WhatsAppMessageStatus } from '@shared/clients/whatsapp-client.class/types'
+
 export enum ChannelType {
   SMS = 'SMS',
   Email = 'EMAIL',
   Telegram = 'TELEGRAM',
+  Govsg = 'GOVSG',
 }
 
 export enum CampaignStatus {
@@ -28,10 +31,43 @@ export enum MessageStatus {
   InvalidRecipient = 'INVALID_RECIPIENT',
 }
 
+export enum GovsgMessageStatus {
+  Unsent = 'UNSENT',
+  Accepted = 'ACCEPTED',
+  Sent = 'SENT',
+  Delivered = 'DELIVERED',
+  Read = 'READ',
+  Error = 'ERROR',
+  InvalidRecipient = 'INVALID_RECIPIENT',
+  Deleted = 'DELETED',
+}
+
+export const govsgMessageStatusMapper = (
+  whatsappStatus: Exclude<WhatsAppMessageStatus, WhatsAppMessageStatus.warning>
+) => {
+  switch (whatsappStatus) {
+    case WhatsAppMessageStatus.sent:
+      return GovsgMessageStatus.Sent
+    case WhatsAppMessageStatus.delivered:
+      return GovsgMessageStatus.Delivered
+    case WhatsAppMessageStatus.read:
+      return GovsgMessageStatus.Read
+    case WhatsAppMessageStatus.failed:
+      return GovsgMessageStatus.Error
+    case WhatsAppMessageStatus.deleted:
+      return GovsgMessageStatus.Deleted
+    default: {
+      const exhaustiveCheck: never = whatsappStatus
+      throw new Error(`Unhandled status: ${exhaustiveCheck}`)
+    }
+  }
+}
+
 export enum DefaultCredentialName {
   Email = 'EMAIL_DEFAULT',
   SMS = 'Postman_SMS_Demo',
   Telegram = 'Postman_Telegram_Demo',
+  Govsg = 'GOVSG_DEFAULT',
 }
 
 export enum CampaignSortField {

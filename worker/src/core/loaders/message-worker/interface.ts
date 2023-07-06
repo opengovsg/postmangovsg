@@ -1,8 +1,13 @@
+import {
+  WhatsAppApiClient,
+  WhatsAppLanguages,
+} from '@shared/clients/whatsapp-client.class/types'
+
 export interface Message {
   id: number
   recipient: string
   params: { [key: string]: string }
-  body: string
+  body: string // TODO: refactor; not needed for Govsg Messages
   subject?: string
   replyTo?: string | null
   campaignId?: number
@@ -11,6 +16,10 @@ export interface Message {
   agencyLogoURI?: string
   showMasthead?: boolean
   contactPrefLink?: string
+  paramOrder?: string[] // for whatsapp whose templates dont use named params
+  whatsappTemplateLabel?: string
+  apiClient?: WhatsAppApiClient
+  language?: WhatsAppLanguages
 }
 
 export interface ContactChannel {

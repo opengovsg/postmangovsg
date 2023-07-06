@@ -1,0 +1,15 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.loader {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  font-size: 3rem;
+}
+
+.italicSubtext {
+  font-style: italic;
+  color: $grey-700;
+}

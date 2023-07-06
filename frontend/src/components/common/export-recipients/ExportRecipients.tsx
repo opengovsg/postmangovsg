@@ -83,7 +83,6 @@ const ExportRecipients = ({
       setExportStatus(CampaignExportStatus.Exporting)
 
       const list = await exportCampaignStats(campaignId, campaignType)
-
       const exportedAt = moment().format('LLL').replace(',', '')
       const explanation =
         `"Exported ${exportedAt}. Reports are updated as and when Postman receives new notifications about message status."\n` +

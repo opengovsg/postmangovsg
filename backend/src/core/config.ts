@@ -156,6 +156,19 @@ interface ConfigSchema {
     maxFileSize: number
     bucketName: string
   }
+  whatsapp: {
+    namespace: string
+    authTokenOne: string // todo: remove and substitute with extract from KMS
+    authTokenTwo: string // todo: remove and substitute with extract from KMS
+    onPremClientOneUrl: string
+    onPremClientTwoUrl: string
+    proxyToken: string
+    proxyUrl: string
+    callbackVerifyToken: string
+  }
+  flamingo: {
+    dbUri: string
+  }
 }
 
 convict.addFormats({
@@ -698,6 +711,61 @@ const config: Config<ConfigSchema> = convict({
       doc: 'S3 bucket to store common attachments',
       default: 'development.common-attachments',
       env: 'COMMON_ATTACHMENT_BUCKET_NAME',
+    },
+  },
+  whatsapp: {
+    authTokenOne: {
+      doc: 'Auth token for calling WA API Client One (temporary)',
+      env: 'WA_AUTH_TOKEN_ONE',
+      format: 'required-string',
+      default: '',
+    },
+    authTokenTwo: {
+      doc: 'Auth token for calling WA API Client Two (temporary)',
+      env: 'WA_AUTH_TOKEN_TWO',
+      format: 'required-string',
+      default: '',
+    },
+    namespace: {
+      doc: 'WhatsApp Account Namespace',
+      env: 'WHATSAPP_NAMESPACE',
+      format: 'required-string',
+      default: '',
+    },
+    onPremClientOneUrl: {
+      doc: 'Load balancer URL for WhatsApp On Prem Client 1',
+      env: 'WHATSAPP_LB_URL_1',
+      format: 'required-string',
+      default: '',
+    },
+    onPremClientTwoUrl: {
+      doc: 'Load balancer URL for WhatsApp On Prem Client 2',
+      env: 'WHATSAPP_LB_URL_2',
+      format: 'required-string',
+      default: '',
+    },
+    proxyToken: {
+      doc: 'Proxy token for accessing WhatsApp On Prem Client via proxy',
+      env: 'WHATSAPP_PROXY_TOKEN',
+      default: '',
+    },
+    proxyUrl: {
+      doc: 'Proxy URL for accessing WhatsApp On Prem Client via proxy',
+      env: 'WHATSAPP_PROXY_URL',
+      default: '',
+    },
+    callbackVerifyToken: {
+      doc: 'Callback verify token for WhatsApp On Prem Client',
+      env: 'WHATSAPP_CALLBACK_VERIFY_TOKEN',
+      default: '',
+    },
+  },
+  flamingo: {
+    dbUri: {
+      doc: 'URI to the flamingo database',
+      default: '',
+      format: 'required-string',
+      env: 'FLAMINGO_DB_URI',
     },
   },
 })

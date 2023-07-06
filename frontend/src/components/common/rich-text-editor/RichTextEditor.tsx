@@ -434,7 +434,13 @@ const RichTextEditor = ({
   )
 }
 
-const RichTextPreview = ({ placeholder }: { placeholder: string }) => {
+const RichTextPreview = ({
+  placeholder,
+  shouldHighlightVariables,
+}: {
+  placeholder: string
+  shouldHighlightVariables: boolean
+}) => {
   const { editorState, setEditorState } = useContext(EditorContext)
 
   const blockRenderMap = Immutable.Map({
@@ -475,7 +481,11 @@ const RichTextPreview = ({ placeholder }: { placeholder: string }) => {
       onEditorStateChange={setEditorState}
       customBlockRenderFunc={renderBlock}
       blockRenderMap={extendedBlockRenderMap}
-      customDecorators={[PreviewLinkDecorator]}
+      customDecorators={
+        shouldHighlightVariables
+          ? [PreviewLinkDecorator, VariableDecorator]
+          : [PreviewLinkDecorator]
+      }
       readOnly
       toolbarHidden
     />

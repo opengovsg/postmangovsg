@@ -4,7 +4,7 @@ import { useParams } from 'react-router-dom'
 
 import EmailValidationInput from './EmailValidationInput'
 
-import { EmailProgress } from 'classes'
+import { EmailCampaign, EmailProgress } from 'classes'
 import {
   NextButton,
   DetailBlock,
@@ -24,7 +24,8 @@ const EmailCredentials = ({
   setActiveStep: Dispatch<SetStateAction<EmailProgress>>
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
-  const { hasCredential: initialHasCredential, protect } = campaign
+  const { hasCredential: initialHasCredential, protect } =
+    campaign as EmailCampaign
   const [hasCredential, setHasCredential] = useState(initialHasCredential)
   const [errorMsg, setErrorMsg] = useState('')
   const { id: campaignId } = useParams<{ id: string }>()

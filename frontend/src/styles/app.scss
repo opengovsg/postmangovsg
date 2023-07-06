@@ -197,3 +197,10 @@ table {
     height: $height-1;
   }
 }
+
+.bx-govsg {
+  margin-top: 0.5rem;
+}
+.bx-govsg::before {
+  content: url(../assets/img/sg-crest.svg);
+}
