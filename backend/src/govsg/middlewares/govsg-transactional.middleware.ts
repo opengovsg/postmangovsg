@@ -62,8 +62,14 @@ export const InitGovsgTransactionalMiddleware =
           `Template with label ${whatsappTemplateLabel} not found`
         )
       }
-      const normalisedRecipient =
-        PhoneNumberService.normalisePhoneNumber(recipient)
+      let normalisedRecipient
+      try {
+        normalisedRecipient = PhoneNumberService.normalisePhoneNumber(recipient)
+      } catch {
+        throw new ApiValidationError(
+          `recipient ${recipient} is not a valid phone number`
+        )
+      }
 
       req.body.normalisedParams = validateParams(
         govsgTemplate.params,

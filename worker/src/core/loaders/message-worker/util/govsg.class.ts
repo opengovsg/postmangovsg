@@ -62,78 +62,110 @@ class Govsg {
   }
 
   async getMessages(jobId: number, rate: number) {
-    const dbResults: {
-      id: number
-      recipient: string
-      params: { [key: string]: string }
-      body: string
-      campaignId: number
-      whatsappTemplateLabel: string
-      paramOrder: string[]
-    }[] = map(
-      await this.postmanConnection.query(
-        'SELECT get_messages_to_send_govsg(:jobId, :rate);',
-        {
-          replacements: { jobId, rate },
-          type: QueryTypes.SELECT,
+    try {
+      type Message = {
+        id: number
+        recipient: string
+        params: { [key: string]: string }
+        body: string
+        campaignId: number
+        whatsappTemplateLabel: string
+        paramOrder: string[]
+      }
+      const initialDbResults: Message[] = map(
+        await this.postmanConnection.query(
+          'SELECT get_messages_to_send_govsg(:jobId, :rate);',
+          {
+            replacements: { jobId, rate },
+            type: QueryTypes.SELECT,
+          }
+        ),
+        'get_messages_to_send_govsg'
+      )
+      const cleanDbResults: Message[] = []
+      const invalidIdsDetectedFromFormat: number[] = []
+      initialDbResults.forEach((r) => {
+        try {
+          r.recipient = PhoneNumberService.normalisePhoneNumber(
+            r.recipient,
+            config.get('defaultCountry')
+          )
+          cleanDbResults.push(r)
+        } catch {
+          invalidIdsDetectedFromFormat.push(r.id)
         }
-      ),
-      'get_messages_to_send_govsg'
-    )
-    if (dbResults.length === 0) {
-      return []
-    }
-    dbResults.forEach((r) => {
-      r.recipient = PhoneNumberService.normalisePhoneNumber(
-        r.recipient,
-        config.get('defaultCountry')
-      )
-    })
-    const apiClientIdMap = await this.flamingoDbClient.getApiClientId(
-      dbResults.map((result) => result.recipient)
-    )
+      })
+      if (invalidIdsDetectedFromFormat.length > 0) {
+        await this.postmanConnection.query(
+          `UPDATE
+          govsg_ops
+        SET
+          status = 'INVALID_RECIPIENT', updated_at=clock_timestamp()
+        WHERE
+          id IN (:ids);`,
+          {
+            replacements: { ids: invalidIdsDetectedFromFormat },
+            type: QueryTypes.UPDATE,
+          }
+        )
+      }
+      if (cleanDbResults.length === 0) {
+        return []
+      }
 
-    const unvalidatedMessages = dbResults.map((result) => ({
-      id: result.id, // need this to update govsg_ops table
-      recipient: result.recipient,
-      templateName: result.whatsappTemplateLabel,
-      params: WhatsAppClient.transformNamedParams(
-        result.params,
-        result.paramOrder
-      ),
-      apiClient:
-        apiClientIdMap.get(result.recipient) ?? WhatsAppApiClient.clientTwo,
-      language: WhatsAppLanguages.english,
-    }))
-    const validatedWhatsAppIds =
-      await this.whatsappClient.validateMultipleRecipients(
-        unvalidatedMessages,
-        config.get('env') === 'development'
+      const apiClientIdMap = await this.flamingoDbClient.getApiClientId(
+        cleanDbResults.map((result) => result.recipient)
       )
-    const invalidMessages = validatedWhatsAppIds.filter(
-      (message) => message.status === 'failed'
-    )
-    // update govsg_ops table with invalid messages
-    if (invalidMessages.length > 0) {
-      await this.postmanConnection.query(
-        `UPDATE
+
+      const unvalidatedMessages = cleanDbResults.map((result) => ({
+        id: result.id, // need this to update govsg_ops table
+        recipient: result.recipient,
+        templateName: result.whatsappTemplateLabel,
+        params: WhatsAppClient.transformNamedParams(
+          result.params,
+          result.paramOrder
+        ),
+        apiClient:
+          apiClientIdMap.get(result.recipient) ?? WhatsAppApiClient.clientTwo,
+        language: WhatsAppLanguages.english,
+      }))
+      const validatedWhatsAppIds =
+        await this.whatsappClient.validateMultipleRecipients(
+          unvalidatedMessages,
+          config.get('env') === 'development'
+        )
+      const invalidMessages = validatedWhatsAppIds.filter(
+        (message) => message.status === 'failed'
+      )
+      // update govsg_ops table with invalid messages
+      if (invalidMessages.length > 0) {
+        await this.postmanConnection.query(
+          `UPDATE
                                             govsg_ops
                                           SET
                                             status = 'INVALID_RECIPIENT', updated_at=clock_timestamp()
                                           WHERE
                                             id IN (:ids);`,
-        {
-          replacements: { ids: invalidMessages.map((message) => message.id) },
-          type: QueryTypes.UPDATE,
-        }
-      )
+          {
+            replacements: { ids: invalidMessages.map((message) => message.id) },
+            type: QueryTypes.UPDATE,
+          }
+        )
+      }
+      return validatedWhatsAppIds
+        .filter((message) => message.status === 'valid')
+        .map((message) => ({
+          ...message,
+          body: '', // just putting this in to satisfy the interface grrr
+        }))
+    } catch (error) {
+      logger.error({
+        message: '[govsg.class.getMessages] Error processing messages',
+        error,
+        workerId: this.workerId,
+      })
+      return []
     }
-    return validatedWhatsAppIds
-      .filter((message) => message.status === 'valid')
-      .map((message) => ({
-        ...message,
-        body: '', // just putting this in to satisfy the interface grrr
-      }))
   }
 
   async sendMessage({
