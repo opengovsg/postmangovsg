@@ -28,7 +28,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     resendTimeout: OTP_RESEND_TIMEOUT,
   } = config.get('otp')
 
-  const otpCharset = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  const otpCharset = '234567ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   /**
    * Generate a six digit otp
    */
