@@ -23,7 +23,7 @@ async function exportOTPLoginState() {
   });
   const otpMailContent = emails[0].body?.html as string;
   const otp = (otpMailContent.match(/\<b\>([^]+)\<\/b\>/) as string[])[1];
-  await page.locator('input[type=tel]').fill(otp);
+  await page.locator('input[type=text]').fill(otp);
   await page.locator('button[type=submit]').click();
   await expect(page.getByText(/Welcome/)).toBeVisible();
 
