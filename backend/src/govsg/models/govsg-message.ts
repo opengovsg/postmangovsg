@@ -66,4 +66,7 @@ export class GovsgMessage extends Model<GovsgMessage> {
 
   @Column({ type: DataType.DATE, allowNull: true })
   erroredAt: Date | null
+
+  @Column({ type: DataType.DATE, allowNull: true })
+  deletedByUserAt: Date | null
 }

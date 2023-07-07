@@ -237,7 +237,7 @@ const parseTemplateMessageWebhook = async (
         status: shouldUpdateStatus(statusIfUpdated, prevStatus)
           ? statusIfUpdated
           : undefined,
-        deletedAt: timestamp,
+        deletedByUserAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
