@@ -5,7 +5,14 @@ import FlamingoDbClient, {
 import config from '@core/config'
 import { Sequelize } from 'sequelize'
 
-const whatsappClient = new WhatsAppClient(config.get('whatsapp'))
+const isLocal = config.get('env') === 'development'
+
+const whatsappClient = new WhatsAppClient(
+  config.get('whatsapp'),
+  isLocal,
+  isLocal ? config.get('whatsapp.authTokenOne') : undefined,
+  isLocal ? config.get('whatsapp.authTokenTwo') : undefined
+)
 
 const flamingoDbSequelize = new Sequelize(config.get('flamingo.dbUri'), {
   dialect: 'postgres',

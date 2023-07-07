@@ -43,8 +43,8 @@ export enum WhatsAppLanguages {
 
 export interface WhatsAppCredentials {
   namespace: string
-  authTokenOne: string
-  authTokenTwo: string
+  adminCredentialsOne: string
+  adminCredentialsTwo: string
   onPremClientOneUrl: string
   onPremClientTwoUrl: string
   proxyToken: string
@@ -92,4 +92,14 @@ type Meta = {
 
 type Message = {
   id: MessageId
+}
+
+export interface UsersLogin200Response {
+  users: User[]
+  meta: Meta
+}
+
+type User = {
+  token: string
+  expires_after: string // in ISO format e.g. 2018-03-01 15:29:26+00:00 in UTC
 }

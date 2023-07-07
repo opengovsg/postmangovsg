@@ -25,9 +25,15 @@ class Govsg {
     postmanConnection: Sequelize,
     flamingoConnection: Sequelize
   ) {
+    const isLocal = config.get('env') === 'development'
     this.workerId = workerId
     this.postmanConnection = postmanConnection
-    this.whatsappClient = new WhatsAppClient(config.get('whatsapp'))
+    this.whatsappClient = new WhatsAppClient(
+      config.get('whatsapp'),
+      isLocal,
+      isLocal ? config.get('whatsapp.authTokenOne') : undefined,
+      isLocal ? config.get('whatsapp.authTokenTwo') : undefined
+    )
     this.flamingoDbClient = new FlamingoDbClient(flamingoConnection)
   }
 

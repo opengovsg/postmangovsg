@@ -14,17 +14,32 @@ import {
   UnvalidatedWhatsAppTemplateMessageToSend,
   NormalisedParam,
   WhatsAppTextMessageToSend,
+  UsersLogin200Response,
 } from './types'
 import { AuthenticationError, RateLimitError } from './errors'
 
 const CONTACT_ENDPOINT = 'v1/contacts'
 const MESSAGE_ENDPOINT = 'v1/messages'
+const AUTH_ENDPOINT = 'v1/users/login'
+
+interface AuthToken {
+  token: string
+  expiry: Date
+}
 
 export default class WhatsAppClient {
   private credentials: WhatsAppCredentials
   private axiosInstance: AxiosInstance
+  private authTokenOne: AuthToken | undefined
+  private authTokenTwo: AuthToken | undefined
+  private isLocal = false
 
-  constructor(credentials: WhatsAppCredentials) {
+  constructor(
+    credentials: WhatsAppCredentials,
+    isLocal = false,
+    authTokenOne?: AuthToken,
+    authTokenTwo?: AuthToken
+  ) {
     this.credentials = credentials
     this.axiosInstance = axios.create({
       responseType: 'json',
@@ -38,25 +53,95 @@ export default class WhatsAppClient {
       // instead this API client hogging our resources
       timeout: 30 * 1000,
     })
+    if (isLocal) {
+      if (!authTokenOne || !authTokenTwo) {
+        throw new Error(
+          'Auth tokens are required when running WhatsApp client locally'
+        )
+      }
+      this.authTokenOne = authTokenOne
+      this.authTokenTwo = authTokenTwo
+      this.isLocal = true
+    }
   }
 
-  private getCredentials(
+  private async getCredentials(
     apiClient: WhatsAppTemplateMessageToSend['apiClient']
-  ): {
+  ): Promise<{
     token: string
     url: string
-  } {
+  }> {
+    await this.fetchAuthTokensIfNecessary()
     switch (apiClient) {
       case WhatsAppApiClient.clientOne:
         return {
-          token: this.credentials['authTokenOne'],
+          token: (this.authTokenOne as AuthToken).token,
           url: this.credentials['onPremClientOneUrl'],
         }
       case WhatsAppApiClient.clientTwo:
         return {
-          token: this.credentials['authTokenTwo'],
+          token: (this.authTokenTwo as AuthToken).token,
           url: this.credentials['onPremClientTwoUrl'],
         }
+    }
+  }
+  private async fetchAuthTokensIfNecessary() {
+    const lessThanThreeDays = (tokenDate: Date) => {
+      const now = new Date()
+      const diff = now.getTime() - tokenDate.getTime()
+      const days = diff / (1000 * 3600 * 24)
+      return days < 3
+    }
+    const fetchAuthTokenOne =
+      !this.authTokenOne || lessThanThreeDays(this.authTokenOne.expiry)
+    const fetchAuthTokenTwo =
+      !this.authTokenTwo || lessThanThreeDays(this.authTokenTwo.expiry)
+    await Promise.all([
+      fetchAuthTokenOne && this.fetchAuthTokenUsingAdminCredentials('1'),
+      fetchAuthTokenTwo && this.fetchAuthTokenUsingAdminCredentials('2'),
+    ])
+  }
+  private async fetchAuthTokenUsingAdminCredentials(token: '1' | '2') {
+    if (this.isLocal) return
+    switch (token) {
+      case '1': {
+        const {
+          data: { users },
+        } = await this.axiosInstance.request<UsersLogin200Response>({
+          method: 'post',
+          url: AUTH_ENDPOINT,
+          baseURL: this.credentials['onPremClientOneUrl'],
+          headers: {
+            Authorization: `Basic ${this.credentials.adminCredentialsOne}`,
+          },
+          data: {},
+        })
+        const { token, expires_after: expiresAfter } = users[0]
+        this.authTokenOne = {
+          token,
+          expiry: new Date(expiresAfter),
+        }
+        return
+      }
+      case '2': {
+        const {
+          data: { users },
+        } = await this.axiosInstance.request<UsersLogin200Response>({
+          method: 'post',
+          url: AUTH_ENDPOINT,
+          baseURL: this.credentials['onPremClientTwoUrl'],
+          headers: {
+            Authorization: `Basic ${this.credentials.adminCredentialsTwo}`,
+          },
+          data: {},
+        })
+        const { token, expires_after: expiresAfter } = users[0]
+        this.authTokenTwo = {
+          token,
+          expiry: new Date(expiresAfter),
+        }
+        return
+      }
     }
   }
   public async validateSingleRecipient(
@@ -68,7 +153,7 @@ export default class WhatsAppClient {
     if (isLocal) {
       return input.recipient
     }
-    const { token, url } = this.getCredentials(input.apiClient)
+    const { token, url } = await this.getCredentials(input.apiClient)
     const res = await this.axiosInstance
       .request<ValidateContact200Response>({
         method: 'post',
@@ -110,10 +195,10 @@ export default class WhatsAppClient {
         status: ContactStatus.valid, // as long as you're testing locally to your own WhatsApp, should be ok
       }))
     }
-    const { token: tokenOne, url: urlOne } = this.getCredentials(
+    const { token: tokenOne, url: urlOne } = await this.getCredentials(
       WhatsAppApiClient.clientOne
     )
-    const { token: tokenTwo, url: urlTwo } = this.getCredentials(
+    const { token: tokenTwo, url: urlTwo } = await this.getCredentials(
       WhatsAppApiClient.clientTwo
     )
     const clientOneRecipients = inputs
@@ -178,7 +263,7 @@ export default class WhatsAppClient {
     input: WhatsAppTemplateMessageToSend,
     isLocal = false
   ): Promise<MessageId> {
-    const { token, url } = this.getCredentials(input.apiClient)
+    const { token, url } = await this.getCredentials(input.apiClient)
     // modify headers and baseURL if local environment to send to proxy
     const { headers, baseURL } = isLocal
       ? {
@@ -247,7 +332,7 @@ export default class WhatsAppClient {
   public async sendTextMessage(
     input: WhatsAppTextMessageToSend
   ): Promise<MessageId> {
-    const { token, url } = this.getCredentials(input.apiClient)
+    const { token, url } = await this.getCredentials(input.apiClient)
     const {
       data: { messages },
     } = await this.axiosInstance
