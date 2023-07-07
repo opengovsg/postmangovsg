@@ -32,7 +32,7 @@ import {
   TextAlignControl,
   InlineControl,
   FontColorControl,
-  // InlineAttachmentControl,
+  InlineAttachmentControl,
 } from './controls'
 import {
   VariableDecorator,
@@ -126,7 +126,7 @@ const TOOLBAR_OPTIONS = {
 
 const TOOLBAR_CUSTOM_BUTTONS = [
   <TableControl key="tableOption" />,
-  // <InlineAttachmentControl key="attachmentOption" />,
+  <InlineAttachmentControl key="attachmentOption" />,
 ]
 
 const defaultValue = {
