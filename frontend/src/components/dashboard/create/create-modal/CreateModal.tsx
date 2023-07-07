@@ -207,7 +207,7 @@ const CreateModal = ({
                 </label>
                 {selectedChannel === ChannelType.Govsg && (
                   <p className={styles.infotext}>
-                    "Gov.sg" sender ID is a verified business account
+                    Send WhatsApp messages from a verified Gov.sg account
                   </p>
                 )}
               </div>
