@@ -83,12 +83,14 @@ export interface ConfigSchema {
   }
   whatsapp: {
     namespace: string
-    authTokenOne: string // todo: remove and substitute with extract from KMS
-    authTokenTwo: string // todo: remove and substitute with extract from KMS
+    adminCredentialsOne: string
+    adminCredentialsTwo: string
     onPremClientOneUrl: string
     onPremClientTwoUrl: string
     proxyToken: string
     proxyUrl: string
+    authTokenOne: string
+    authTokenTwo: string
   }
 }
 
@@ -351,15 +353,15 @@ const config: Config<ConfigSchema> = convict({
     },
   },
   whatsapp: {
-    authTokenOne: {
-      doc: 'Auth token for calling WA API Client One (temporary)',
-      env: 'WA_AUTH_TOKEN_ONE',
+    adminCredentialsOne: {
+      doc: 'Admin credentials for retrieving WhatsApp tokens for client 1',
+      env: 'WA_ADMIN_CREDS_ONE',
       format: 'required-string',
       default: '',
     },
-    authTokenTwo: {
-      doc: 'Auth token for calling WA API Client Two (temporary)',
-      env: 'WA_AUTH_TOKEN_TWO',
+    adminCredentialsTwo: {
+      doc: 'Admin credentials for retrieving WhatsApp tokens for client 2',
+      env: 'WA_ADMIN_CREDS_TWO',
       format: 'required-string',
       default: '',
     },
@@ -389,6 +391,16 @@ const config: Config<ConfigSchema> = convict({
     proxyUrl: {
       doc: 'Proxy URL for accessing WhatsApp On Prem Client via proxy',
       env: 'WHATSAPP_PROXY_URL',
+      default: '',
+    },
+    authTokenOne: {
+      doc: 'WhatsApp Auth Token for client 1, for local dev only',
+      env: 'WA_AUTH_TOKEN_1',
+      default: '',
+    },
+    authTokenTwo: {
+      doc: 'WhatsApp Auth Token for client 2, for local dev only',
+      env: 'WA_AUTH_TOKEN_2',
       default: '',
     },
   },
