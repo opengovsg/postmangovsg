@@ -18,4 +18,6 @@ process.env.UPLOAD_REDIS_URI = 'redis://localhost:6379/6'
 process.env.FLAMINGO_DB_URI =
   'postgres://postgres:postgres@localhost:5432/postmangovsg_test'
 process.env.WA_AUTH_TOKEN_1 = 'test'
+process.env.WA_AUTH_TOKEN_1_EXPIRY = '2023-07-14 14:55:58+00:00'
 process.env.WA_AUTH_TOKEN_2 = 'test'
+process.env.WA_AUTH_TOKEN_2_EXPIRY = '2023-07-14 14:55:58+00:00'
