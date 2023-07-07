@@ -28,14 +28,7 @@ class Govsg {
     const isLocal = config.get('env') === 'development'
     this.workerId = workerId
     this.postmanConnection = postmanConnection
-    this.whatsappClient = new WhatsAppClient(
-      config.get('whatsapp'),
-      isLocal,
-      isLocal ? config.get('whatsapp.authTokenOne') : undefined,
-      isLocal ? config.get('whatsapp.authTokenOneExpiry') : undefined,
-      isLocal ? config.get('whatsapp.authTokenTwo') : undefined,
-      isLocal ? config.get('whatsapp.authTokenTwoExpiry') : undefined
-    )
+    this.whatsappClient = new WhatsAppClient(config.get('whatsapp'), isLocal)
     this.flamingoDbClient = new FlamingoDbClient(flamingoConnection)
   }
 

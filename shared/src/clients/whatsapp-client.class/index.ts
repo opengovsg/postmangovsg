@@ -30,18 +30,11 @@ interface AuthToken {
 export default class WhatsAppClient {
   private credentials: WhatsAppCredentials
   private axiosInstance: AxiosInstance
-  private authTokenOne: AuthToken | undefined
-  private authTokenTwo: AuthToken | undefined
+  private authTokenOneObj: AuthToken | undefined
+  private authTokenTwoObj: AuthToken | undefined
   private isLocal = false
 
-  constructor(
-    credentials: WhatsAppCredentials,
-    isLocal = false,
-    authTokenOne?: string,
-    authTokenOneExpiry?: string,
-    authTokenTwo?: string,
-    authTokenTwoExpiry?: string
-  ) {
+  constructor(credentials: WhatsAppCredentials, isLocal = false) {
     this.credentials = credentials
     this.axiosInstance = axios.create({
       responseType: 'json',
@@ -57,22 +50,22 @@ export default class WhatsAppClient {
     })
     if (isLocal) {
       if (
-        !authTokenOne ||
-        !authTokenTwo ||
-        !authTokenOneExpiry ||
-        !authTokenTwoExpiry
+        !this.credentials.authTokenOne ||
+        !this.credentials.authTokenTwo ||
+        !this.credentials.authTokenOneExpiry ||
+        !this.credentials.authTokenTwoExpiry
       ) {
         throw new Error(
           'Auth tokens are required when running WhatsApp client locally'
         )
       }
-      this.authTokenOne = {
-        token: authTokenOne,
-        expiry: new Date(authTokenOneExpiry),
+      this.authTokenOneObj = {
+        token: this.credentials.authTokenOne,
+        expiry: new Date(this.credentials.authTokenOneExpiry),
       }
-      this.authTokenTwo = {
-        token: authTokenTwo,
-        expiry: new Date(authTokenTwoExpiry),
+      this.authTokenTwoObj = {
+        token: this.credentials.authTokenTwo,
+        expiry: new Date(this.credentials.authTokenTwoExpiry),
       }
       this.isLocal = true
     }
@@ -84,89 +77,73 @@ export default class WhatsAppClient {
     token: string
     url: string
   }> {
-    await this.fetchAuthTokensIfNecessary()
+    if (!this.isLocal) await this.checkAndRefreshTokens()
+    if (!this.authTokenOneObj || !this.authTokenTwoObj) {
+      throw new Error('Auth tokens not found')
+    }
+    if (this.authTokenOneObj.expiry.getTime() < new Date().getTime()) {
+      throw new Error('Auth token one has expired')
+    }
+    if (this.authTokenTwoObj.expiry.getTime() < new Date().getTime()) {
+      throw new Error('Auth token two has expired')
+    }
     switch (apiClient) {
       case WhatsAppApiClient.clientOne:
         return {
-          token: (this.authTokenOne as AuthToken).token,
+          token: this.authTokenOneObj.token,
           url: this.credentials['onPremClientOneUrl'],
         }
       case WhatsAppApiClient.clientTwo:
         return {
-          token: (this.authTokenTwo as AuthToken).token,
+          token: this.authTokenTwoObj.token,
           url: this.credentials['onPremClientTwoUrl'],
         }
     }
   }
-  private async fetchAuthTokensIfNecessary() {
-    if (this.isLocal) {
-      if (!this.authTokenOne || !this.authTokenTwo) {
-        throw new Error('Auth tokens are required when running locally')
-      }
-      if (this.authTokenOne?.expiry.getTime() < new Date().getTime()) {
-        throw new Error('Auth token one has expired')
-      }
-      if (this.authTokenTwo?.expiry.getTime() < new Date().getTime()) {
-        throw new Error('Auth token two has expired')
-      }
-      return
-    }
+  private async checkAndRefreshTokens() {
     const lessThanThreeDays = (tokenDate: Date) => {
       const now = new Date()
       const diff = now.getTime() - tokenDate.getTime()
       const days = diff / (1000 * 3600 * 24)
       return days < 3
     }
-    const fetchAuthTokenOne =
-      !this.authTokenOne || lessThanThreeDays(this.authTokenOne.expiry)
-    const fetchAuthTokenTwo =
-      !this.authTokenTwo || lessThanThreeDays(this.authTokenTwo.expiry)
+    const refreshAuthTokenOne =
+      !this.authTokenOneObj || lessThanThreeDays(this.authTokenOneObj.expiry)
+    const refreshAuthTokenTwo =
+      !this.authTokenTwoObj || lessThanThreeDays(this.authTokenTwoObj.expiry)
     await Promise.all([
-      fetchAuthTokenOne && this.fetchAuthTokenUsingAdminCredentials('1'),
-      fetchAuthTokenTwo && this.fetchAuthTokenUsingAdminCredentials('2'),
+      refreshAuthTokenOne && this.refreshAuthTokens('1'),
+      refreshAuthTokenTwo && this.refreshAuthTokens('2'),
     ])
   }
-  private async fetchAuthTokenUsingAdminCredentials(token: '1' | '2') {
-    switch (token) {
-      case '1': {
-        const {
-          data: { users },
-        } = await this.axiosInstance.request<UsersLogin200Response>({
-          method: 'post',
-          url: AUTH_ENDPOINT,
-          baseURL: this.credentials['onPremClientOneUrl'],
-          headers: {
-            Authorization: `Basic ${this.credentials.adminCredentialsOne}`,
-          },
-          data: {},
-        })
-        const { token, expires_after: expiresAfter } = users[0]
-        this.authTokenOne = {
-          token,
-          expiry: new Date(expiresAfter),
-        }
-        return
-      }
-      case '2': {
-        const {
-          data: { users },
-        } = await this.axiosInstance.request<UsersLogin200Response>({
-          method: 'post',
-          url: AUTH_ENDPOINT,
-          baseURL: this.credentials['onPremClientTwoUrl'],
-          headers: {
-            Authorization: `Basic ${this.credentials.adminCredentialsTwo}`,
-          },
-          data: {},
-        })
-        const { token, expires_after: expiresAfter } = users[0]
-        this.authTokenTwo = {
-          token,
-          expiry: new Date(expiresAfter),
-        }
-        return
-      }
+  private async refreshAuthTokens(client: '1' | '2') {
+    const {
+      data: { users },
+    } = await this.axiosInstance.request<UsersLogin200Response>({
+      method: 'post',
+      url: AUTH_ENDPOINT,
+      baseURL:
+        client === '1'
+          ? this.credentials['onPremClientOneUrl']
+          : this.credentials['onPremClientTwoUrl'],
+      headers: {
+        Authorization: `Basic ${
+          client === '1'
+            ? this.credentials.adminCredentialsOne
+            : this.credentials.adminCredentialsTwo
+        }`,
+      },
+      data: {},
+    })
+    const { token, expires_after: expiresAfter } = users[0]
+    const authToken = {
+      token,
+      expiry: new Date(expiresAfter),
     }
+    client === '1'
+      ? (this.authTokenOneObj = authToken)
+      : (this.authTokenTwoObj = authToken)
+    return
   }
   public async validateSingleRecipient(
     input: WhatsAppTemplateMessageToSend,
