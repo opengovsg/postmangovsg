@@ -17,3 +17,5 @@ process.env.TWILIO_CREDENTIAL_CACHE_MAX_AGE = '0'
 process.env.UPLOAD_REDIS_URI = 'redis://localhost:6379/6'
 process.env.FLAMINGO_DB_URI =
   'postgres://postgres:postgres@localhost:5432/postmangovsg_test'
+process.env.WA_AUTH_TOKEN_1 = 'test'
+process.env.WA_AUTH_TOKEN_2 = 'test'

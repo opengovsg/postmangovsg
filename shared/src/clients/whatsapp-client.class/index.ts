@@ -86,6 +86,7 @@ export default class WhatsAppClient {
     }
   }
   private async fetchAuthTokensIfNecessary() {
+    if (this.isLocal) return
     const lessThanThreeDays = (tokenDate: Date) => {
       const now = new Date()
       const diff = now.getTime() - tokenDate.getTime()
@@ -102,7 +103,6 @@ export default class WhatsAppClient {
     ])
   }
   private async fetchAuthTokenUsingAdminCredentials(token: '1' | '2') {
-    if (this.isLocal) return
     switch (token) {
       case '1': {
         const {
