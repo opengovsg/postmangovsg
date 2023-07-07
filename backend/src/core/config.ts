@@ -165,7 +165,9 @@ interface ConfigSchema {
     proxyToken: string
     proxyUrl: string
     authTokenOne: string
+    authTokenOneExpiry: string
     authTokenTwo: string
+    authTokenTwoExpiry: string
     callbackVerifyToken: string
   }
   flamingo: {
@@ -751,9 +753,19 @@ const config: Config<ConfigSchema> = convict({
       env: 'WA_AUTH_TOKEN_1',
       default: '',
     },
+    authTokenOneExpiry: {
+      doc: 'WhatsApp Auth Token expiry for client 1, for local dev only',
+      env: 'WA_AUTH_TOKEN_1_EXPIRY',
+      default: '',
+    },
     authTokenTwo: {
       doc: 'WhatsApp Auth Token for client 2, for local dev only',
       env: 'WA_AUTH_TOKEN_2',
+      default: '',
+    },
+    authTokenTwoExpiry: {
+      doc: 'WhatsApp Auth Token expiry for client 2, for local dev only',
+      env: 'WA_AUTH_TOKEN_2_EXPIRY',
       default: '',
     },
     proxyToken: {

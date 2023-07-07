@@ -32,7 +32,9 @@ class Govsg {
       config.get('whatsapp'),
       isLocal,
       isLocal ? config.get('whatsapp.authTokenOne') : undefined,
-      isLocal ? config.get('whatsapp.authTokenTwo') : undefined
+      isLocal ? config.get('whatsapp.authTokenOneExpiry') : undefined,
+      isLocal ? config.get('whatsapp.authTokenTwo') : undefined,
+      isLocal ? config.get('whatsapp.authTokenTwoExpiry') : undefined
     )
     this.flamingoDbClient = new FlamingoDbClient(flamingoConnection)
   }

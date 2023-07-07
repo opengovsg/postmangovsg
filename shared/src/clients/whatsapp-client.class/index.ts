@@ -37,8 +37,10 @@ export default class WhatsAppClient {
   constructor(
     credentials: WhatsAppCredentials,
     isLocal = false,
-    authTokenOne?: AuthToken,
-    authTokenTwo?: AuthToken
+    authTokenOne?: string,
+    authTokenOneExpiry?: string,
+    authTokenTwo?: string,
+    authTokenTwoExpiry?: string
   ) {
     this.credentials = credentials
     this.axiosInstance = axios.create({
@@ -54,13 +56,24 @@ export default class WhatsAppClient {
       timeout: 30 * 1000,
     })
     if (isLocal) {
-      if (!authTokenOne || !authTokenTwo) {
+      if (
+        !authTokenOne ||
+        !authTokenTwo ||
+        !authTokenOneExpiry ||
+        !authTokenTwoExpiry
+      ) {
         throw new Error(
           'Auth tokens are required when running WhatsApp client locally'
         )
       }
-      this.authTokenOne = authTokenOne
-      this.authTokenTwo = authTokenTwo
+      this.authTokenOne = {
+        token: authTokenOne,
+        expiry: new Date(authTokenOneExpiry),
+      }
+      this.authTokenTwo = {
+        token: authTokenTwo,
+        expiry: new Date(authTokenTwoExpiry),
+      }
       this.isLocal = true
     }
   }
@@ -86,7 +99,18 @@ export default class WhatsAppClient {
     }
   }
   private async fetchAuthTokensIfNecessary() {
-    if (this.isLocal) return
+    if (this.isLocal) {
+      if (!this.authTokenOne || !this.authTokenTwo) {
+        throw new Error('Auth tokens are required when running locally')
+      }
+      if (this.authTokenOne?.expiry.getTime() < new Date().getTime()) {
+        throw new Error('Auth token one has expired')
+      }
+      if (this.authTokenTwo?.expiry.getTime() < new Date().getTime()) {
+        throw new Error('Auth token two has expired')
+      }
+      return
+    }
     const lessThanThreeDays = (tokenDate: Date) => {
       const now = new Date()
       const diff = now.getTime() - tokenDate.getTime()
