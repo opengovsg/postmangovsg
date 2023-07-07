@@ -63,6 +63,54 @@ export const govsgMessageStatusMapper = (
   }
 }
 
+// ensure status updates never overrides a less "updated" status
+// there is still a non-zero chance of race condition happening, but ignore for now
+export const shouldUpdateStatus = (
+  status: GovsgMessageStatus,
+  prevStatus: GovsgMessageStatus
+): boolean => {
+  switch (status) {
+    case GovsgMessageStatus.Error:
+      return true // always update error status
+    case GovsgMessageStatus.InvalidRecipient:
+      return true // always update invalid recipient status
+    case GovsgMessageStatus.Unsent:
+      return false // will never be occur in practice
+    case GovsgMessageStatus.Accepted:
+      return prevStatus === GovsgMessageStatus.Unsent
+    case GovsgMessageStatus.Sent:
+      return (
+        prevStatus === GovsgMessageStatus.Unsent ||
+        prevStatus === GovsgMessageStatus.Accepted
+      )
+    case GovsgMessageStatus.Delivered:
+      return (
+        prevStatus === GovsgMessageStatus.Sent ||
+        prevStatus === GovsgMessageStatus.Unsent ||
+        prevStatus === GovsgMessageStatus.Accepted
+      )
+    case GovsgMessageStatus.Read:
+      return (
+        prevStatus === GovsgMessageStatus.Delivered ||
+        prevStatus === GovsgMessageStatus.Sent ||
+        prevStatus === GovsgMessageStatus.Unsent ||
+        prevStatus === GovsgMessageStatus.Accepted
+      )
+    case GovsgMessageStatus.Deleted:
+      return (
+        prevStatus === GovsgMessageStatus.Read ||
+        prevStatus === GovsgMessageStatus.Delivered ||
+        prevStatus === GovsgMessageStatus.Sent ||
+        prevStatus === GovsgMessageStatus.Unsent ||
+        prevStatus === GovsgMessageStatus.Accepted
+      )
+    default: {
+      const exhaustiveCheck: never = status
+      throw new Error(`Unhandled status: ${exhaustiveCheck}`)
+    }
+  }
+}
+
 export enum DefaultCredentialName {
   Email = 'EMAIL_DEFAULT',
   SMS = 'Postman_SMS_Demo',

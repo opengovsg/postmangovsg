@@ -13,9 +13,16 @@ import {
   WhatsAppWebhookTextMessage,
   WhatsappWebhookMessageType,
 } from '@shared/clients/whatsapp-client.class/types'
-import { UnexpectedWebhookError } from '@shared/clients/whatsapp-client.class/errors'
-import { GovsgMessage, GovsgMessageTransactional } from '@govsg/models'
-import { govsgMessageStatusMapper } from '@core/constants'
+import {
+  MessageIdNotFoundWebhookError,
+  UnexpectedWebhookError,
+} from '@shared/clients/whatsapp-client.class/errors'
+import { GovsgMessage, GovsgMessageTransactional, GovsgOp } from '@govsg/models'
+import {
+  GovsgMessageStatus,
+  govsgMessageStatusMapper,
+  shouldUpdateStatus,
+} from '@core/constants'
 import { WhatsAppService } from '@core/services'
 
 const logger = loggerWithLabel(module)
@@ -76,25 +83,38 @@ const parseWebhook = async (
 const parseTemplateMessageWebhook = async (
   body: WhatsAppTemplateMessageWebhook
 ): Promise<void> => {
-  const { id: messageId } = body.statuses[0]
-  const [govsgMessage, govsgMessageTransactional] = await Promise.all([
+  const {
+    id: messageId,
+    timestamp: timestampRaw,
+    status: whatsappStatus,
+  } = body.statuses[0]
+  const timestamp = new Date(parseInt(timestampRaw, 10) * 1000) // convert to milliseconds
+  const [govsgMessage, govsgMessageTransactional, govsgOp] = await Promise.all([
     GovsgMessage.findOne({ where: { serviceProviderMessageId: messageId } }),
     GovsgMessageTransactional.findOne({
       where: { serviceProviderMessageId: messageId },
     }),
+    GovsgOp.findOne({ where: { serviceProviderMessageId: messageId } }),
   ])
-  if (!govsgMessage && !govsgMessageTransactional) {
+  if (!govsgMessage && !govsgOp && !govsgMessageTransactional) {
     logger.info({
       message:
-        'Received webhook for message not in GovsgMessage or GovsgMessageTransactional',
+        'Received webhook for message not in GovsgMessage or GovsgMessageTransactional or GovsgOp',
       meta: {
         messageId,
       },
     })
-    // no match found, assume it's a Standard Reply webhook, safe to ignore
+    // throwing error here to return 400
+    // this is because callbacks could hit this endpoint before the messageId is updated in GovsgOp table
+    // only do this for sending as this is unlikely to happen for other statuses
+    // this will trigger a retry from WhatsApp, which will hit this endpoint again after messageId is updated
+    if (whatsappStatus === WhatsAppMessageStatus.sent) {
+      throw new MessageIdNotFoundWebhookError('Message ID not found')
+    }
     return
   }
-  if (govsgMessage && govsgMessageTransactional) {
+  const inGovsgMessageOrOp = !!(govsgMessage || govsgOp)
+  if (inGovsgMessageOrOp && govsgMessageTransactional) {
     // this should basically never happen
     logger.error({
       message: 'Received webhook for message that exists in both tables',
@@ -109,27 +129,33 @@ const parseTemplateMessageWebhook = async (
   // NB unable to abstract further with type safety because Sequelize doesn't
   // play well with TypeScript. I wanted to use GovsgMessage | GovsgMessageTransactional type
   // but I am unable to access the methods common to both models with type safety
-  // hence the following verbose code, you gotta do what you gotta do
-  const whatsappStatus = body.statuses[0].status
+  // hence the following horrible chunk of code
+  // (Drizzle ORM doesn't have this problem)
   const whereOpts = {
     where: {
       serviceProviderMessageId: messageId,
     },
   }
+  // can be certain at least one of these is defined
+  if (whatsappStatus === WhatsAppMessageStatus.warning) {
+    logger.warn({
+      message: 'Received webhook with warning status',
+      meta: {
+        messageId,
+        body,
+      },
+    })
+    // no corresponding status to update
+    // to do with items in catalog (e-commerce use case), not relevant to us
+    // https://developers.facebook.com/docs/whatsapp/on-premises/webhooks/outbound/#notification-types
+    return
+  }
+  const prevStatus =
+    govsgMessage?.status ||
+    govsgOp?.status ||
+    (govsgMessageTransactional?.status as GovsgMessageStatus)
+  const statusIfUpdated = govsgMessageStatusMapper(whatsappStatus)
   switch (whatsappStatus) {
-    case WhatsAppMessageStatus.warning: {
-      logger.warn({
-        message: 'Received webhook with warning status',
-        meta: {
-          messageId,
-          body,
-        },
-      })
-      // no corresponding status to update
-      // to do with items in catalog (e-commerce use case), not relevant to us
-      // https://developers.facebook.com/docs/whatsapp/on-premises/webhooks/outbound/#notification-types
-      return
-    }
     case WhatsAppMessageStatus.failed: {
       logger.info({
         message: 'Received webhook with error status',
@@ -143,11 +169,14 @@ const parseTemplateMessageWebhook = async (
           },
         })
         const fieldOpts = {
-          status: govsgMessageStatusMapper(whatsappStatus),
-          erroredAt: new Date(),
+          status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+            ? statusIfUpdated
+            : undefined,
+          erroredAt: timestamp,
         }
         void govsgMessage?.update(fieldOpts, whereOpts)
         void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+        void govsgOp?.update(fieldOpts, whereOpts)
         // not sure whether need to throw an error hmm probably not?
         return
       }
@@ -155,49 +184,64 @@ const parseTemplateMessageWebhook = async (
       const errorCode = code.toString()
       const errorDescription = `${title} Details: ${details} href: ${href}`
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
         errorCode,
         errorDescription,
-        erroredAt: new Date(),
+        erroredAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     case WhatsAppMessageStatus.sent: {
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
-        sentAt: new Date(),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
+        sentAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     case WhatsAppMessageStatus.delivered: {
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
-        deliveredAt: new Date(),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
+        deliveredAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     case WhatsAppMessageStatus.read: {
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
-        readAt: new Date(),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
+        readAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     case WhatsAppMessageStatus.deleted: {
       const fieldOpts = {
-        status: govsgMessageStatusMapper(whatsappStatus),
-        deletedAt: new Date(),
+        status: shouldUpdateStatus(statusIfUpdated, prevStatus)
+          ? statusIfUpdated
+          : undefined,
+        deletedByUserAt: timestamp,
       }
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      void govsgOp?.update(fieldOpts, whereOpts)
       return
     }
     default: {

@@ -71,5 +71,4 @@ async function sendMessage({
 
 export const GovsgTransactionalService = {
   sendMessage,
-  // handleStatusCallback,
 }

@@ -15,7 +15,7 @@ import { Message } from './interface'
 import { NotificationService } from '@core/services/notification.service'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import MailClient, { MailToSend } from '@shared/clients/mail-client.class'
-import Govsg from './util/govsg.class'
+import Govsg from './govsg.class'
 
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 
