@@ -357,13 +357,13 @@ const config: Config<ConfigSchema> = convict({
   whatsapp: {
     adminCredentialsOne: {
       doc: 'Admin credentials for retrieving WhatsApp tokens for client 1',
-      env: 'WA_ADMIN_CREDS_ONE',
+      env: 'WA_ADMIN_CREDS_1',
       format: 'required-string',
       default: '',
     },
     adminCredentialsTwo: {
       doc: 'Admin credentials for retrieving WhatsApp tokens for client 2',
-      env: 'WA_ADMIN_CREDS_TWO',
+      env: 'WA_ADMIN_CREDS_2',
       format: 'required-string',
       default: '',
     },
