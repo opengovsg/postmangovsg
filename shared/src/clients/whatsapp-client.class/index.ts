@@ -367,12 +367,16 @@ export default class WhatsAppClient {
         ) {
           const { status } = err.response
           const { errors } = err.response.data
-          const { code, title, details: detail } = errors[0]
+          const { code, title, details } = errors[0]
           if (status === 401) {
-            throw new AuthenticationError(`${code}: ${title} - ${detail}`)
+            throw new AuthenticationError(
+              `${code}: ${title}. ${details ? details : ''}`
+            )
           }
           if (status === 429) {
-            throw new RateLimitError(`${code}: ${title} - ${detail}`)
+            throw new RateLimitError(
+              `${code}: ${title}. ${details ? details : ''}`
+            )
           }
           throw new Error(
             `Error sending text message ${JSON.stringify(
