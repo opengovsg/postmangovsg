@@ -4,21 +4,19 @@ import {
   WhatsAppCredentials,
   WhatsAppTemplateMessageToSend,
   WhatsAppApiClient,
-  ValidateContact200Response,
-  WhatsAppId,
   TemplateMessage200Response,
   MessageId,
   TemplateMessageErrResponse,
-  ValidatedWhatsAppTemplateMessageToSend,
-  ContactStatus,
-  UnvalidatedWhatsAppTemplateMessageToSend,
   NormalisedParam,
   WhatsAppTextMessageToSend,
   UsersLogin200Response,
 } from './types'
-import { AuthenticationError, RateLimitError } from './errors'
+import {
+  AuthenticationError,
+  InvalidRecipientError,
+  RateLimitError,
+} from './errors'
 
-const CONTACT_ENDPOINT = 'v1/contacts'
 const MESSAGE_ENDPOINT = 'v1/messages'
 const AUTH_ENDPOINT = 'v1/users/login'
 
@@ -308,12 +306,21 @@ export default class WhatsAppClient {
         ) {
           const { status } = err.response
           const { errors } = err.response.data
-          const { code, title, detail } = errors[0]
+          const { code, title, details } = errors[0]
+          if (status === 400 && code === 1013) {
+            throw new InvalidRecipientError(
+              `${code}: ${title}. ${details ? details : ''}`
+            )
+          }
           if (status === 401) {
-            throw new AuthenticationError(`${code}: ${title} - ${detail}`)
+            throw new AuthenticationError(
+              `${code}: ${title}. ${details ? details : ''}`
+            )
           }
           if (status === 429) {
-            throw new RateLimitError(`${code}: ${title} - ${detail}`)
+            throw new RateLimitError(
+              `${code}: ${title}. ${details ? details : ''}`
+            )
           }
           throw new Error(
             `Error sending template message ${JSON.stringify(
@@ -360,7 +367,7 @@ export default class WhatsAppClient {
         ) {
           const { status } = err.response
           const { errors } = err.response.data
-          const { code, title, detail } = errors[0]
+          const { code, title, details: detail } = errors[0]
           if (status === 401) {
             throw new AuthenticationError(`${code}: ${title} - ${detail}`)
           }
