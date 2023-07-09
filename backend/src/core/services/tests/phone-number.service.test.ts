@@ -1,5 +1,6 @@
 /* eslint-disable jest/expect-expect */
-import { PhoneNumberService } from '@core/services/phone-number.service'
+
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
 
 const DEFAULT_COUNTRY = 'SG'
 

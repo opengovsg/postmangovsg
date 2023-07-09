@@ -7,7 +7,6 @@ import { UploadService } from '@core/services'
 import { UploadData } from '@core/interfaces'
 import { InvalidRecipientError, HydrationError } from '@core/errors'
 import { Campaign, Statistic } from '@core/models'
-import { PhoneNumberService } from '@core/services'
 import {
   TemplateClient,
   XSS_TELEGRAM_OPTION,
@@ -18,6 +17,7 @@ import { TelegramMessage, TelegramTemplate } from '@telegram/models'
 import { TelegramService } from '@telegram/services'
 import { StoreTemplateInput, StoreTemplateOutput } from '@telegram/interfaces'
 import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
 const client = new TemplateClient({
   xssOptions: XSS_TELEGRAM_OPTION,
   lineBreak: '\n',

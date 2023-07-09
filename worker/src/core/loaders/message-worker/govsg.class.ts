@@ -10,7 +10,7 @@ import {
   WhatsAppApiClient,
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/types'
-import { PhoneNumberService } from '@core/services/phone-number.service'
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
 import { InvalidRecipientError } from '@shared/clients/whatsapp-client.class/errors'
 
 const logger = loggerWithLabel(module)
@@ -144,18 +144,6 @@ class Govsg {
         language: WhatsAppLanguages.english,
       }))
 
-      if (messagesToSend.length === 0) {
-        // Has to run one more time get_messages db function to set the job
-        // queue item to `SENT` if needed
-        await this.postmanConnection.query(
-          'SELECT get_messages_to_send_govsg(:jobId, :rate);',
-          {
-            replacements: { jobId, rate },
-            type: QueryTypes.SELECT,
-          }
-        )
-      }
-
       return messagesToSend.map((message) => ({
         ...message,
         body: '', // just putting this in to satisfy the interface grrr
@@ -219,10 +207,7 @@ class Govsg {
         action: 'sendMessage',
       })
     } catch (error: any) {
-      if (
-        (error as { errorCode: string }).errorCode === 'invalid_recipient' ||
-        error instanceof InvalidRecipientError
-      ) {
+      if (error instanceof InvalidRecipientError) {
         await this.postmanConnection.query(
           `UPDATE govsg_ops SET status='INVALID_RECIPIENT',
           updated_at=clock_timestamp()

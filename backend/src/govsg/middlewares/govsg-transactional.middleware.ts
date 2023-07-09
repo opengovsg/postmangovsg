@@ -9,9 +9,9 @@ import {
 } from '@core/errors/rest-api.errors'
 import { GovsgMessageStatus } from '@core/constants'
 import { GovsgTransactionalService } from '../services/govsg-transactional.service'
-import { PhoneNumberService } from '@core/services'
 import WhatsAppClient from '@shared/clients/whatsapp-client.class'
 import { NormalisedParam } from '@shared/clients/whatsapp-client.class/types'
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
 
 export interface GovsgTransactionalMiddleware {
   saveMessage: Handler

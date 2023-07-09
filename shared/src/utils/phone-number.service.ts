@@ -20,7 +20,7 @@ const normalisePhoneNumber = (
     // we retry by prepending a + sign.
     normalised = parsePhoneNumber(`+${phoneNumber}`)
     if (!normalised.isValid()) {
-      throw new Error('Phone number is invalid')
+      throw new InvalidPhoneNumberError(phoneNumber)
     }
   }
 
@@ -29,4 +29,10 @@ const normalisePhoneNumber = (
 
 export const PhoneNumberService = {
   normalisePhoneNumber,
+}
+
+export class InvalidPhoneNumberError extends Error {
+  constructor(phoneNumber: string) {
+    super(`Phone number ${phoneNumber} is invalid`)
+  }
 }
