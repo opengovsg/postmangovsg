@@ -14,17 +14,27 @@ import {
   UnvalidatedWhatsAppTemplateMessageToSend,
   NormalisedParam,
   WhatsAppTextMessageToSend,
+  UsersLogin200Response,
 } from './types'
 import { AuthenticationError, RateLimitError } from './errors'
 
 const CONTACT_ENDPOINT = 'v1/contacts'
 const MESSAGE_ENDPOINT = 'v1/messages'
+const AUTH_ENDPOINT = 'v1/users/login'
+
+interface AuthToken {
+  token: string
+  expiry: Date
+}
 
 export default class WhatsAppClient {
   private credentials: WhatsAppCredentials
   private axiosInstance: AxiosInstance
+  private authTokenOneObj: AuthToken | undefined
+  private authTokenTwoObj: AuthToken | undefined
+  private isLocal = false
 
-  constructor(credentials: WhatsAppCredentials) {
+  constructor(credentials: WhatsAppCredentials, isLocal = false) {
     this.credentials = credentials
     this.axiosInstance = axios.create({
       responseType: 'json',
@@ -38,26 +48,102 @@ export default class WhatsAppClient {
       // instead this API client hogging our resources
       timeout: 30 * 1000,
     })
+    if (isLocal) {
+      if (
+        !this.credentials.authTokenOne ||
+        !this.credentials.authTokenTwo ||
+        !this.credentials.authTokenOneExpiry ||
+        !this.credentials.authTokenTwoExpiry
+      ) {
+        throw new Error(
+          'Auth tokens are required when running WhatsApp client locally'
+        )
+      }
+      this.authTokenOneObj = {
+        token: this.credentials.authTokenOne,
+        expiry: new Date(this.credentials.authTokenOneExpiry),
+      }
+      this.authTokenTwoObj = {
+        token: this.credentials.authTokenTwo,
+        expiry: new Date(this.credentials.authTokenTwoExpiry),
+      }
+      this.isLocal = true
+    }
   }
 
-  private getCredentials(
+  private async getCredentials(
     apiClient: WhatsAppTemplateMessageToSend['apiClient']
-  ): {
+  ): Promise<{
     token: string
     url: string
-  } {
+  }> {
+    if (!this.isLocal) await this.checkAndRefreshTokens()
+    if (!this.authTokenOneObj || !this.authTokenTwoObj) {
+      throw new Error('Auth tokens not found')
+    }
+    if (this.authTokenOneObj.expiry.getTime() < new Date().getTime()) {
+      throw new Error('Auth token one has expired')
+    }
+    if (this.authTokenTwoObj.expiry.getTime() < new Date().getTime()) {
+      throw new Error('Auth token two has expired')
+    }
     switch (apiClient) {
       case WhatsAppApiClient.clientOne:
         return {
-          token: this.credentials['authTokenOne'],
+          token: this.authTokenOneObj.token,
           url: this.credentials['onPremClientOneUrl'],
         }
       case WhatsAppApiClient.clientTwo:
         return {
-          token: this.credentials['authTokenTwo'],
+          token: this.authTokenTwoObj.token,
           url: this.credentials['onPremClientTwoUrl'],
         }
     }
+  }
+  private async checkAndRefreshTokens() {
+    const lessThanThreeDays = (tokenDate: Date) => {
+      const now = new Date()
+      const diff = now.getTime() - tokenDate.getTime()
+      const days = diff / (1000 * 3600 * 24)
+      return days < 3
+    }
+    const refreshAuthTokenOne =
+      !this.authTokenOneObj || lessThanThreeDays(this.authTokenOneObj.expiry)
+    const refreshAuthTokenTwo =
+      !this.authTokenTwoObj || lessThanThreeDays(this.authTokenTwoObj.expiry)
+    await Promise.all([
+      refreshAuthTokenOne && this.refreshAuthTokens('1'),
+      refreshAuthTokenTwo && this.refreshAuthTokens('2'),
+    ])
+  }
+  private async refreshAuthTokens(client: '1' | '2') {
+    const {
+      data: { users },
+    } = await this.axiosInstance.request<UsersLogin200Response>({
+      method: 'post',
+      url: AUTH_ENDPOINT,
+      baseURL:
+        client === '1'
+          ? this.credentials['onPremClientOneUrl']
+          : this.credentials['onPremClientTwoUrl'],
+      headers: {
+        Authorization: `Basic ${
+          client === '1'
+            ? this.credentials.adminCredentialsOne
+            : this.credentials.adminCredentialsTwo
+        }`,
+      },
+      data: {},
+    })
+    const { token, expires_after: expiresAfter } = users[0]
+    const authToken = {
+      token,
+      expiry: new Date(expiresAfter),
+    }
+    client === '1'
+      ? (this.authTokenOneObj = authToken)
+      : (this.authTokenTwoObj = authToken)
+    return
   }
   public async validateSingleRecipient(
     input: WhatsAppTemplateMessageToSend,
@@ -68,7 +154,7 @@ export default class WhatsAppClient {
     if (isLocal) {
       return input.recipient
     }
-    const { token, url } = this.getCredentials(input.apiClient)
+    const { token, url } = await this.getCredentials(input.apiClient)
     const res = await this.axiosInstance
       .request<ValidateContact200Response>({
         method: 'post',
@@ -110,10 +196,10 @@ export default class WhatsAppClient {
         status: ContactStatus.valid, // as long as you're testing locally to your own WhatsApp, should be ok
       }))
     }
-    const { token: tokenOne, url: urlOne } = this.getCredentials(
+    const { token: tokenOne, url: urlOne } = await this.getCredentials(
       WhatsAppApiClient.clientOne
     )
-    const { token: tokenTwo, url: urlTwo } = this.getCredentials(
+    const { token: tokenTwo, url: urlTwo } = await this.getCredentials(
       WhatsAppApiClient.clientTwo
     )
     const clientOneRecipients = inputs
@@ -178,7 +264,7 @@ export default class WhatsAppClient {
     input: WhatsAppTemplateMessageToSend,
     isLocal = false
   ): Promise<MessageId> {
-    const { token, url } = this.getCredentials(input.apiClient)
+    const { token, url } = await this.getCredentials(input.apiClient)
     // modify headers and baseURL if local environment to send to proxy
     const { headers, baseURL } = isLocal
       ? {
@@ -247,7 +333,7 @@ export default class WhatsAppClient {
   public async sendTextMessage(
     input: WhatsAppTextMessageToSend
   ): Promise<MessageId> {
-    const { token, url } = this.getCredentials(input.apiClient)
+    const { token, url } = await this.getCredentials(input.apiClient)
     const {
       data: { messages },
     } = await this.axiosInstance
