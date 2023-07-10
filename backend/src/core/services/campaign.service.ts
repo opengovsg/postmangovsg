@@ -341,7 +341,6 @@ const getCampaignDetails = async (
       'valid',
       'protect',
       'demo_message_limit',
-      'should_save_list',
       'should_bcc_to_me',
       's3_object',
       [literal('cred_name IS NOT NULL'), 'has_credential'],

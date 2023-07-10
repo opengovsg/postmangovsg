@@ -80,12 +80,6 @@ export class Campaign extends Model<Campaign> {
   })
   protect!: boolean
 
-  @Column({
-    type: DataType.BOOLEAN,
-    allowNull: true,
-  })
-  shouldSaveList!: boolean
-
   @HasOne(() => Statistic)
   statistic?: Statistic
 

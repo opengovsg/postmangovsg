@@ -5,24 +5,24 @@ import {
   XSS_TELEGRAM_OPTION,
 } from '@shared/templating'
 
-import { union, difference } from 'lodash'
+import { difference, union } from 'lodash'
 import { rest } from 'msw'
 
 import {
-  USER_EMAIL,
-  TWILIO_CREDENTIAL,
-  TELEGRAM_CREDENTIAL,
   DEFAULT_FROM,
-  PRESIGNED_URL,
+  INVALID_CSV_FILENAME,
   INVALID_TELEGRAM_CREDENTIAL,
   INVALID_TWILIO_CREDENTIAL,
-  INVALID_CSV_FILENAME,
+  PRESIGNED_URL,
+  TELEGRAM_CREDENTIAL,
+  TWILIO_CREDENTIAL,
+  USER_EMAIL,
 } from './constants'
 
 import type {
-  State,
   EmailTemplate,
   SMSTemplate,
+  State,
   TelegramTemplate,
 } from './interfaces'
 
@@ -267,20 +267,6 @@ function mockBaseCampaignApis(state: State) {
           status_updated_at: new Date(),
         })
       )
-    }),
-    rest.put('/campaigns/:campaignId', (req, res, ctx) => {
-      // TODO: scope this test out more
-      const { campaignId } = req.params
-      const { should_save_list: shouldSaveList, name } = req.body as {
-        should_save_list?: boolean
-        name?: string
-      }
-
-      if (name) state.campaigns[+campaignId - 1].name = name
-      if (shouldSaveList)
-        state.campaigns[+campaignId - 1].should_save_list = shouldSaveList
-
-      return res(ctx.status(200), ctx.json(state.campaigns[0]))
     }),
   ]
 }
