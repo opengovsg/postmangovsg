@@ -26,8 +26,6 @@ import type {
   TelegramTemplate,
 } from './interfaces'
 
-import { ChannelType } from 'classes'
-
 const smsTemplateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const emailTemplateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 const telegramTemplateClient = new TemplateClient({
@@ -89,7 +87,6 @@ function mockCommonApis(initialState?: Partial<State>) {
       ...mockCampaignUploadApis(state),
       ...mockUnsubscribeApis(state),
       ...mockProtectApis(state),
-      ...mockListApis(state),
     ],
   }
 }
@@ -774,22 +771,6 @@ function mockProtectApis(state: State) {
 
       const { payload } = message
       return res(ctx.status(200), ctx.json({ payload }))
-    }),
-  ]
-}
-
-function mockListApis(state: State) {
-  return [
-    rest.get('/lists/:channel', (req, res, ctx) => {
-      const { channel } = req.params
-
-      if (
-        !Object.values(ChannelType).includes(channel as unknown as ChannelType)
-      ) {
-        return res(ctx.status(400))
-      }
-
-      return res(ctx.status(200), ctx.json({ lists: state.lists }))
     }),
   ]
 }
