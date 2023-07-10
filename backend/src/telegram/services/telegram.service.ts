@@ -15,14 +15,11 @@ import { TelegramTemplateService } from '@telegram/services'
 
 import TelegramClient from './telegram-client.class'
 import { CSVParams } from '@core/types'
-import {
-  CampaignService,
-  PhoneNumberService,
-  UploadService,
-} from '@core/services'
+import { CampaignService, UploadService } from '@core/services'
 import { loggerWithLabel } from '@core/logger'
 import { TelegramDuplicateCampaignDetails } from '@telegram/interfaces'
 import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
 
 const logger = loggerWithLabel(module)
 

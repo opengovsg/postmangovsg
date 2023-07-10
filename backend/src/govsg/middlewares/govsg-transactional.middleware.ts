@@ -3,14 +3,15 @@ import { Handler, NextFunction, Request, Response } from 'express'
 import { GovsgMessageTransactional } from '../models/govsg-message-transactional'
 import { GovsgTemplate } from '../models/govsg-template'
 import {
+  ApiInvalidRecipientError,
   ApiNotFoundError,
   ApiValidationError,
 } from '@core/errors/rest-api.errors'
 import { GovsgMessageStatus } from '@core/constants'
 import { GovsgTransactionalService } from '../services/govsg-transactional.service'
-import { PhoneNumberService } from '@core/services'
 import WhatsAppClient from '@shared/clients/whatsapp-client.class'
 import { NormalisedParam } from '@shared/clients/whatsapp-client.class/types'
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
 
 export interface GovsgTransactionalMiddleware {
   saveMessage: Handler
@@ -149,6 +150,18 @@ export const InitGovsgTransactionalMiddleware =
           recipient: govsgTransactional.recipient,
           templateName: whatsappTemplateLabel,
           params: req.body.normalisedParams as NormalisedParam[],
+        }).catch((err) => {
+          if (err instanceof ApiInvalidRecipientError) {
+            govsgTransactional.set(
+              'status',
+              GovsgMessageStatus.InvalidRecipient
+            )
+            govsgTransactional.set('errorCode', err.httpStatusCode.toString())
+            govsgTransactional.set('errorDescription', err.errorCode)
+            govsgTransactional.set('erroredAt', new Date())
+            void govsgTransactional.save()
+          }
+          throw err
         })
         govsgTransactional.set('status', GovsgMessageStatus.Accepted)
         govsgTransactional.set('acceptedAt', new Date())
@@ -163,7 +176,6 @@ export const InitGovsgTransactionalMiddleware =
           action,
           error,
         })
-        // todo process error type
         next(error)
       }
     }

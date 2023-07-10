@@ -4,7 +4,7 @@ import map from 'lodash/map'
 import { loggerWithLabel } from '@core/logger'
 import config from '@core/config'
 import { CredentialService } from '@core/services/credential.service'
-import { PhoneNumberService } from '@core/services/phone-number.service'
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
 import { TemplateClient, XSS_SMS_OPTION } from '@shared/templating'
 import TwilioClient from '@sms/services/twilio-client.class'
 import SnsSmsClient from '@sms/services/sns-sms-client.class'
@@ -125,7 +125,7 @@ class SMS {
         )
         return resolve(normalisedRecipient)
       } catch (err) {
-        return reject(new Error('Recipient is incorrectly formatted'))
+        return reject(err)
       }
     })
       .then((normalisedRecipient: string) => {

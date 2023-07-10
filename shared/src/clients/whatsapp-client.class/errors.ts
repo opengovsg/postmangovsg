@@ -4,6 +4,12 @@ export class AuthenticationError extends Error {
   }
 }
 
+export class InvalidRecipientError extends Error {
+  constructor(message: string) {
+    super(message)
+  }
+}
+
 export class RateLimitError extends Error {
   constructor(message = 'Too Many Requests') {
     super(message)

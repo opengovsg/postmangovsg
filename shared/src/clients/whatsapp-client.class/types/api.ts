@@ -14,16 +14,6 @@ export interface WhatsAppTextMessageToSend {
   apiClient: WhatsAppApiClient
 }
 
-export type UnvalidatedWhatsAppTemplateMessageToSend =
-  WhatsAppTemplateMessageToSend & {
-    id: number
-  }
-
-export type ValidatedWhatsAppTemplateMessageToSend =
-  UnvalidatedWhatsAppTemplateMessageToSend & {
-    status: ContactStatus
-    waId: WhatsAppId | undefined // if status is valid, waId is defined
-  }
 export interface NormalisedParam {
   type: string
   text: string
@@ -55,10 +45,6 @@ export interface WhatsAppCredentials {
   authTokenTwoExpiry: string
 }
 
-export interface ValidateContact200Response {
-  contacts: ContactWithWAId[]
-}
-
 export interface TemplateMessage200Response {
   contacts: Contact[]
   messages: Message[]
@@ -69,24 +55,14 @@ export interface TemplateMessageErrResponse {
   errors: Array<{
     code: number
     title: string
-    detail: string
+    details?: string
   }>
   meta: Meta
 }
 
-export enum ContactStatus {
-  processing = 'processing', // will not occur if blocking is set to 'wait' https://developers.facebook.com/docs/whatsapp/on-premises/reference/contacts#blocking
-  valid = 'valid',
-  failed = 'failed',
-}
-
 type Contact = {
   input: string // input supplied; WhatsApp can sanitise this
-  status: ContactStatus
-}
-
-type ContactWithWAId = Contact & {
-  wa_id: WhatsAppId // only returned if status is valid
+  wa_id: WhatsAppId
 }
 
 type Meta = {

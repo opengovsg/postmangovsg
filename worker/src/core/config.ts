@@ -6,7 +6,6 @@ import convict, { Config } from 'convict'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
-import { isSupportedCountry } from 'libphonenumber-js'
 
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 
@@ -240,9 +239,6 @@ const config: Config<ConfigSchema> = convict({
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
     default: 'SG',
     env: 'DEFAULT_COUNTRY',
-    format: (countryCode: string): boolean => {
-      return isSupportedCountry(countryCode)
-    },
   },
   callbackSecret: {
     doc: 'Secret key used to generate Twilio callback url',
