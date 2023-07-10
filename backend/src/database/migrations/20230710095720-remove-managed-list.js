@@ -4,6 +4,7 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('user_lists')
     await queryInterface.dropTable('lists')
+    await queryInterface.removeColumn('campaigns', 'should_save_list')
   },
 
   down: async (queryInterface, Sequelize) => {
@@ -70,6 +71,10 @@ module.exports = {
         type: Sequelize.DATE,
         allowNull: false,
       },
+    })
+    await queryInterface.addColumn('campaigns', 'should_save_list', {
+      type: Sequelize.DataTypes.BOOLEAN,
+      allowNull: true,
     })
   },
 }
