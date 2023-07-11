@@ -74,6 +74,7 @@ export interface CampaignStatsCount {
   sent: number
   invalid: number
   read?: number
+  delivered?: number
   updated_at: Date
   unsubscribed?: number // only applicable for email stats
 }

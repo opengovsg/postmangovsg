@@ -34,6 +34,7 @@ const getStatsFromArchive = async (
       unsent: 0,
       invalid: 0,
       read: 0,
+      delivered: 0,
       updated_at: new Date(),
     }
   }
@@ -43,6 +44,7 @@ const getStatsFromArchive = async (
     unsent: stats?.unsent,
     invalid: stats?.invalid,
     read: stats?.read,
+    delivered: stats?.delivered,
     updated_at: stats?.updatedAt,
   }
 }
@@ -93,7 +95,7 @@ const getStatsFromTable = async (
   if (model === GovsgOp) {
     const [data] = await model.findAll({
       raw: true,
-      where: { campaign_id: campaignId }, // not sure why it has to be `campaign_id` here
+      where: { campaignId },
       attributes: [
         [fn('sum', cast({ status: GovsgMessageStatus.Error }, 'int')), 'error'],
         [
@@ -105,6 +107,8 @@ const getStatsFromTable = async (
                   { status: GovsgMessageStatus.Sent },
                   { status: GovsgMessageStatus.Accepted },
                   { status: GovsgMessageStatus.Delivered },
+                  { status: GovsgMessageStatus.Read },
+                  { status: GovsgMessageStatus.Deleted },
                 ],
               },
               'int'
