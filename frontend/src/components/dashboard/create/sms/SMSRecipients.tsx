@@ -164,8 +164,6 @@ const SMSRecipients = ({
         return
       }
       clearCsvStatus()
-      // clear phonebook selector
-      setSelectedPhonebookListId(undefined)
       const tempCsvFilename = await uploadFileToS3(+campaignId, files[0])
 
       const uploadTimeEnd = performance.now()
@@ -178,6 +176,8 @@ const SMSRecipients = ({
 
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename }))
+      // clear phonebook selector
+      setSelectedPhonebookListId(undefined)
     } catch (err) {
       setErrorMessage((err as Error).message)
     }
@@ -206,7 +206,9 @@ const SMSRecipients = ({
           isProcessing={isCsvProcessing}
           defaultLabel={
             phonebookLists.filter(
-              (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
+              (l) =>
+                l.label ===
+                csvInfo.csvFilename?.slice(0, -4).replaceAll('-', ' ')
             )[0]?.label
           }
         />

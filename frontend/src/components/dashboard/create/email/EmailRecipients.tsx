@@ -184,9 +184,6 @@ const EmailRecipients = ({
         return
       }
       clearCsvStatus()
-      // clear phonebook selector
-      setSelectedPhonebookListId(undefined)
-
       await (onFileSelected || uploadFileToS3)(+campaignId, files[0])
 
       const uploadTimeEnd = performance.now()
@@ -199,6 +196,8 @@ const EmailRecipients = ({
 
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
+      // clear phonebook selector
+      setSelectedPhonebookListId(undefined)
     } catch (err) {
       setErrorMessage((err as Error).message)
     }
@@ -227,9 +226,12 @@ const EmailRecipients = ({
           isProcessing={isCsvProcessing}
           // have to strip additional appended .csv label
           defaultLabel={
-            phonebookLists.filter(
-              (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
-            )[0]?.label
+            phonebookLists.filter((l) => {
+              return (
+                l.label ===
+                csvInfo.csvFilename?.slice(0, -4).replaceAll('-', ' ')
+              )
+            })[0]?.label
           }
         />
       )}
