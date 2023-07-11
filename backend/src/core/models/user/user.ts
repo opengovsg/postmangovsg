@@ -3,7 +3,6 @@ import {
   AfterCreate,
   BeforeCreate,
   BelongsTo,
-  BelongsToMany,
   Column,
   DataType,
   ForeignKey,
@@ -12,7 +11,7 @@ import {
   Model,
   Table,
 } from 'sequelize-typescript'
-import { List, UserCredential, UserFeature, UserList } from '@core/models'
+import { UserCredential, UserFeature } from '@core/models'
 import { UserDemo } from './user-demo'
 import { validateDomain } from '@core/utils/validate-domain'
 import { CreateOptions } from 'sequelize/types'
@@ -59,14 +58,6 @@ export class User extends Model<User> {
 
   @BelongsTo(() => Domain)
   domain: Domain
-
-  @BelongsToMany(() => List, {
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE',
-    through: () => UserList,
-    as: 'lists',
-  })
-  lists: Array<List & { UserList: UserList }>
 
   // Wrapper function around validation and population of domains
   // to enforce that validation happens before creation of user

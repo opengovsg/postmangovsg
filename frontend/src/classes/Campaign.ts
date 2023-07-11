@@ -51,7 +51,6 @@ export class Campaign {
   redacted: boolean
   demoMessageLimit: number | null
   costPerMessage?: number
-  shouldSaveList: boolean
   scheduledAt?: Date
   visibleAt?: string
 
@@ -70,7 +69,6 @@ export class Campaign {
     this.redacted = input['redacted']
     this.demoMessageLimit = input['demo_message_limit']
     this.costPerMessage = input['cost_per_message']
-    this.shouldSaveList = input['should_save_list']
     this.visibleAt = input['visibleAt']
     // override sentAt if it's a scheduled campaign
     if (this.visibleAt) {
