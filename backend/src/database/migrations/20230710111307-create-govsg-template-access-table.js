@@ -3,14 +3,10 @@
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('govsg_templates_access', {
-      id: {
-        type: Sequelize.INTEGER,
-        primaryKey: true,
-        autoIncrement: true,
-        allowNull: false
-      },
       template_id: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
+        onDelete: 'NO ACTION',
         allowNull: false,
         references: {
           model: 'govsg_templates',
@@ -19,6 +15,8 @@ module.exports = {
       },
       user_id: {
         type: Sequelize.INTEGER,
+        primaryKey: true,
+        onDelete: 'NO ACTION',
         allowNull: false,
         references: {
           model: 'users',
@@ -33,10 +31,6 @@ module.exports = {
         type: Sequelize.DataTypes.DATE,
         allowNull: false,
       },
-    })
-    await queryInterface.addIndex('govsg_templates_access', ['template_id', 'user_id'], {
-      unique: true,
-      name: 'govsg_templates_access_template_id_user_id_unique'
     })
   },
 

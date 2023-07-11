@@ -14,22 +14,11 @@ import { User } from '@core/models'
   timestamps: true,
 })
 export class GovsgTemplatesAccess extends Model<GovsgTemplatesAccess> {
-  @Column({
-    type: DataType.BIGINT,
-    autoIncrement: true,
-    primaryKey: true,
-    allowNull: false,
-  })
-  id: string
-
-  // composite unique index on templateId and userId to ensure
-  // (1) no duplicate entries
-  // (2) fast lookup
   @ForeignKey(() => GovsgTemplate)
-  @Column(DataType.BIGINT)
+  @Column({ type: DataType.BIGINT, primaryKey: true, allowNull: false })
   templateId: number
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.STRING, allowNull: false })
+  @Column({ type: DataType.STRING, primaryKey: true, allowNull: false })
   userId: string
 }
