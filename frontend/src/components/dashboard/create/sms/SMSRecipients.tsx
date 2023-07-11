@@ -164,6 +164,8 @@ const SMSRecipients = ({
         return
       }
       clearCsvStatus()
+      // clear phonebook selector
+      setSelectedPhonebookListId(undefined)
       const tempCsvFilename = await uploadFileToS3(+campaignId, files[0])
 
       const uploadTimeEnd = performance.now()

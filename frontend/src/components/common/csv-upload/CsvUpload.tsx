@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import styles from './CsvUpload.module.scss'
 
-import { DetailBlock, ErrorBlock } from 'components/common'
+import { DetailBlock, ErrorBlock, StepHeader } from 'components/common'
 
 const CsvUpload = ({
   isCsvProcessing,
@@ -27,18 +27,22 @@ const CsvUpload = ({
       return (
         <>
           {numRecipients > 0 && (
-            <DetailBlock>
-              <li>
-                <i className="bx bx-user-check"></i>
-                <p>{numRecipients} recipients</p>
-              </li>
-              {csvFilename && (
+            <>
+              <div className="separator"></div>
+              <StepHeader title={'Summary'} />
+              <DetailBlock>
                 <li>
-                  <i className="bx bx-file"></i>
-                  <p>{csvFilename}</p>
+                  <i className="bx bx-user-check"></i>
+                  <p>{numRecipients} recipients</p>
                 </li>
-              )}
-            </DetailBlock>
+                {csvFilename && (
+                  <li>
+                    <i className="bx bx-file"></i>
+                    <p>{csvFilename}</p>
+                  </li>
+                )}
+              </DetailBlock>
+            </>
           )}
           <div className={styles.uploadActions}>{children}</div>
         </>

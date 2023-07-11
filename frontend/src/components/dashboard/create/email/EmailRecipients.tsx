@@ -184,6 +184,8 @@ const EmailRecipients = ({
         return
       }
       clearCsvStatus()
+      // clear phonebook selector
+      setSelectedPhonebookListId(undefined)
 
       await (onFileSelected || uploadFileToS3)(+campaignId, files[0])
 
