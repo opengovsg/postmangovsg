@@ -17,7 +17,6 @@ import campaignRoutes from './campaign.routes'
 import { InitSettingsRoute } from './settings.routes'
 import statsRoutes from './stats.routes'
 import unsubscriberRoutes from './unsubscriber.routes'
-import listRoutes from './list.routes'
 
 // Import channel-specific routes
 import {
@@ -48,10 +47,10 @@ import { InitApiKeyRoute } from '@core/routes/api-key.routes'
 import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 import { InitCommonAttachmentRoute } from './common-attachment.routes'
 import {
+  govsgCallbackRoutes,
   govsgCampaignRoutes,
   govsgTemplateRoutes,
   InitGovsgMessageTransactionalRoute,
-  govsgCallbackRoutes,
 } from '@govsg/routes'
 import { InitGovsgTransactionalMiddleware } from '@govsg/middlewares/govsg-transactional.middleware'
 
@@ -285,12 +284,6 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/callback/telegram', telegramCallbackRoutes)
 
   router.use('/callback/govsg', govsgCallbackRoutes)
-
-  router.use(
-    '/lists',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
-    listRoutes
-  )
 
   router.use(
     '/api-key',

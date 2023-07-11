@@ -1,24 +1,22 @@
-import { Request, Response, NextFunction, Handler } from 'express'
+import { Handler, NextFunction, Request, Response } from 'express'
 import {
-  MissingTemplateKeysError,
   HydrationError,
-  RecipientColumnMissing,
   InvalidRecipientError,
+  MissingTemplateKeysError,
+  RecipientColumnMissing,
   UserError,
 } from '@core/errors'
 import { TemplateError } from '@shared/templating'
 import {
   AuthService,
-  UploadService,
   StatsService,
   UnsubscriberService,
-  ListService,
+  UploadService,
 } from '@core/services'
-import { EmailTemplateService, EmailService } from '@email/services'
+import { EmailService, EmailTemplateService } from '@email/services'
 import { StoreTemplateOutput } from '@email/interfaces'
 import { loggerWithLabel } from '@core/logger'
 import { ThemeClient } from '@shared/theme'
-import { ChannelType } from '@core/constants'
 import { ApiInvalidTemplateError } from '@core/errors/rest-api.errors'
 
 export interface EmailTemplateMiddleware {
@@ -27,7 +25,6 @@ export interface EmailTemplateMiddleware {
   pollCsvStatusHandler: Handler
   deleteCsvErrorHandler: Handler
   uploadProtectedCompleteHandler: Handler
-  selectListHandler: Handler
 }
 
 export const InitEmailTemplateMiddleware = (
@@ -161,75 +158,6 @@ export const InitEmailTemplateMiddleware = (
     } catch (err) {
       logger.error({
         message: 'Failed to complete upload to s3',
-        error: err,
-        ...logMeta,
-      })
-      const userErrors = [
-        UserError,
-        RecipientColumnMissing,
-        MissingTemplateKeysError,
-        InvalidRecipientError,
-      ]
-      if (userErrors.some((errType) => err instanceof errType)) {
-        throw new ApiInvalidTemplateError((err as Error).message)
-      }
-      return next(err)
-    }
-  }
-
-  /**
-   * TODO: Refactor and cleanup
-   * Set selected list and populate the EmailMessages table
-   * @param req
-   * @param res
-   * @param next
-   */
-  const selectListHandler = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): Promise<Response | void> => {
-    const CHANNEL_TYPE = ChannelType.Email
-    const userId = req.session?.user?.id
-    const { campaignId } = req.params
-
-    const { list_id: listId } = req.body
-    const logMeta = { campaignId, action: 'selectListHandler' }
-
-    try {
-      const list = await ListService.getList({
-        listId,
-        userId,
-        channel: CHANNEL_TYPE,
-      })
-      if (!list) throw new Error('Error: List not found')
-
-      const { s3key: s3Key, etag, filename } = list
-
-      // check if template exists
-      const template = await EmailTemplateService.getFilledTemplate(+campaignId)
-      if (template === null) {
-        throw new Error(
-          'Error: No message template found. Please create a message template before uploading a recipient file.'
-        )
-      }
-
-      // Store temp filename
-      await UploadService.storeS3TempFilename(+campaignId, filename)
-
-      // Enqueue upload job to be processed
-      await EmailTemplateService.enqueueUpload({
-        campaignId: +campaignId,
-        template,
-        s3Key,
-        etag,
-        filename,
-      })
-
-      res.status(202).json({ list_id: listId })
-    } catch (err) {
-      logger.error({
-        message: 'Failed to select managed list',
         error: err,
         ...logMeta,
       })
@@ -384,6 +312,5 @@ export const InitEmailTemplateMiddleware = (
     pollCsvStatusHandler,
     deleteCsvErrorHandler,
     uploadProtectedCompleteHandler,
-    selectListHandler,
   }
 }
