@@ -31,7 +31,7 @@ import {
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { PhonebookListSection } from 'components/phonebook-list'
-import { LINKS } from 'config'
+import { LINKS, PHONEBOOK_FEATURE_ENABLE } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
 import {
@@ -213,7 +213,11 @@ const EmailRecipients = ({
 
   return (
     <>
-      {!campaign.protect && (
+      <StepHeader
+        title="Select existing or upload new recipient list"
+        subtitle="Step 2"
+      ></StepHeader>
+      {!campaign.protect && PHONEBOOK_FEATURE_ENABLE === 'true' && (
         <PhonebookListSection
           phonebookLists={phonebookLists}
           setSelectedPhonebookListId={setSelectedPhonebookListId}

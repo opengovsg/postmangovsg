@@ -27,7 +27,7 @@ import {
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { PhonebookListSection } from 'components/phonebook-list'
-import { LINKS } from 'config'
+import { LINKS, PHONEBOOK_FEATURE_ENABLE } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
 import {
@@ -192,17 +192,23 @@ const SMSRecipients = ({
 
   return (
     <>
-      <PhonebookListSection
-        phonebookLists={phonebookLists}
-        setSelectedPhonebookListId={setSelectedPhonebookListId}
-        retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
-        isProcessing={isCsvProcessing}
-        defaultLabel={
-          phonebookLists.filter(
-            (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
-          )[0]?.label
-        }
-      />
+      <StepHeader
+        title="Select existing or upload new recipient list"
+        subtitle="Step 2"
+      ></StepHeader>
+      {PHONEBOOK_FEATURE_ENABLE === 'true' && (
+        <PhonebookListSection
+          phonebookLists={phonebookLists}
+          setSelectedPhonebookListId={setSelectedPhonebookListId}
+          retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
+          isProcessing={isCsvProcessing}
+          defaultLabel={
+            phonebookLists.filter(
+              (l) => l.label === csvInfo.csvFilename?.slice(0, -4)
+            )[0]?.label
+          }
+        />
+      )}
       <StepSection>
         <StepHeader title="Upload recipient list in CSV format">
           <p>

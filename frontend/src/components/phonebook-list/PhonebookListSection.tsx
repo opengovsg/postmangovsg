@@ -2,13 +2,8 @@ import { Dispatch, SetStateAction } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
-import {
-  Dropdown,
-  InfoBlock,
-  StepHeader,
-  StepSection,
-  TextButton,
-} from 'components/common'
+import { Dropdown, InfoBlock, StepSection, TextButton } from 'components/common'
+import StepHeader from 'components/common/step-header'
 
 export const PhonebookListSection = ({
   phonebookLists,
@@ -25,12 +20,20 @@ export const PhonebookListSection = ({
 }) => {
   return (
     <StepSection>
-      <StepHeader title="Select Phonebook contact list" subtitle="Step 2">
-        <p>
-          All your saved contact lists in Phonebook will automatically appear
-          here.
-        </p>
-      </StepHeader>
+      <StepHeader title={'Phonebook Contact List'} />
+      <p>
+        Phonebook allows you to manage your contact lists and send messages via
+        Postman. &nbsp;
+        <b>New to Phonebook?</b> &nbsp; Log in &nbsp;
+        <OutboundLink
+          eventLabel={'https://phonebook.postman.gov.sg/agency'}
+          to={'https://phonebook.postman.gov.sg/agency'}
+          target="_blank"
+        >
+          here
+        </OutboundLink>
+        &nbsp; to try.
+      </p>
       <Dropdown
         onSelect={(selected) => setSelectedPhonebookListId(+selected)}
         disabled={!phonebookLists.length || isProcessing}
@@ -40,23 +43,15 @@ export const PhonebookListSection = ({
       ></Dropdown>
       <InfoBlock>
         <p>
-          If your Phonebook contact list is not listed, &nbsp;
+          All your contact lists on Phonebook should be listed. &nbsp;
           <TextButton onClick={retrieveAndPopulatePhonebookLists}>
-            click here to refresh.
-          </TextButton>
+            Click here to refresh
+          </TextButton>{' '}
+          &nbsp; if it does not appear above.
         </p>
         <p>
-          New to Phonebook? Log in &nbsp;
-          <OutboundLink
-            eventLabel={'https://phonebook.postman.gov.sg/agency'}
-            to={'https://phonebook.postman.gov.sg/agency'}
-            target="_blank"
-          >
-            here
-          </OutboundLink>
-          &nbsp; to start managing your contacts and allow your recipients to
-          update their contact details through Postman’s Public Phonebook
-          Portal.
+          Note: If your recipient unsubscribe from your Phonebook list, they
+          will automatically be removed from your list.
         </p>
       </InfoBlock>
     </StepSection>
