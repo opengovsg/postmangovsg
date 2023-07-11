@@ -1,9 +1,9 @@
 import { Router } from 'express'
 import {
   CampaignSortField,
+  CampaignStatus,
   ChannelType,
   Ordering,
-  CampaignStatus,
 } from '@core/constants'
 import { celebrate, Joi, Segments } from 'celebrate'
 import { CampaignMiddleware, JobMiddleware } from '@core/middlewares'
@@ -43,7 +43,6 @@ const deleteCampaignValidator = {
 const updateCampaignValidator = {
   [Segments.BODY]: Joi.object({
     name: Joi.string().max(255).trim(),
-    should_save_list: Joi.boolean().allow(null),
     // only applicable to email campaigns
     should_bcc_to_me: Joi.boolean().allow(null),
   }),

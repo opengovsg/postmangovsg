@@ -75,12 +75,6 @@ export const InitSmsCampaignRoute = (
     }),
   }
 
-  const selectListValidator = {
-    [Segments.BODY]: Joi.object({
-      list_id: Joi.number().required(),
-    }),
-  }
-
   // Routes
 
   // Check if campaign belongs to user for this router
@@ -170,10 +164,5 @@ export const InitSmsCampaignRoute = (
     smsMiddleware.duplicateCampaign
   )
 
-  router.post(
-    '/select-list',
-    celebrate(selectListValidator),
-    SmsTemplateMiddleware.selectListHandler
-  )
   return router
 }
