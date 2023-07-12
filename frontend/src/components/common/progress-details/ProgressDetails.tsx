@@ -36,7 +36,7 @@ const ProgressDetails = ({
     unsent,
     sent,
     invalid,
-    read,
+    delivered,
     updatedAt,
     halted,
     unsubscribed,
@@ -192,10 +192,22 @@ const ProgressDetails = ({
             <td className={'md'}>Sent to recipient</td>
             <td className={'sm'}>{sent}</td>
           </tr>
+          {type === ChannelType.Govsg && (
+            <tr>
+              <td className={cx(styles.status, 'md')}>
+                <i
+                  className={cx(styles.icon, styles.grey, 'bx bx-check-double')}
+                ></i>
+                Delivered
+              </td>
+              <td className={'md'}>Delivered to recipient</td>
+              <td className={'sm'}>{delivered}</td>
+            </tr>
+          )}
           <tr>
             <td className={cx(styles.status, 'md')}>
               <i
-                className={cx(styles.icon, styles.grey, 'bx bx-minus-circle')}
+                className={cx(styles.icon, styles.red, 'bx bx-minus-circle')}
               ></i>
               Invalid
             </td>
@@ -212,18 +224,6 @@ const ProgressDetails = ({
               </td>
               <td className={'md'}>Recipient indicated to unsubscribe</td>
               <td className={'sm'}>{unsubscribed}</td>
-            </tr>
-          )}
-          {type === ChannelType.Govsg && (
-            <tr>
-              <td className={cx(styles.status, 'md')}>
-                <i
-                  className={cx(styles.icon, styles.blue, 'bx bx-check-double')}
-                ></i>
-                Read
-              </td>
-              <td className={'md'}>Opened by recipient</td>
-              <td className={'sm'}>{read}</td>
             </tr>
           )}
         </tbody>

@@ -28,7 +28,6 @@ export interface CampaignDetails {
   is_csv_processing: boolean
   protect: boolean
   demo_message_limit: number | null
-  should_save_list: boolean
   num_recipients: number
   redacted?: boolean
   email_templates?: {
@@ -74,6 +73,7 @@ export interface CampaignStatsCount {
   sent: number
   invalid: number
   read?: number
+  delivered?: number
   updated_at: Date
   unsubscribed?: number // only applicable for email stats
 }

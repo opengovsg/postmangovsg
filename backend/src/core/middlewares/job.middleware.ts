@@ -13,7 +13,6 @@ const logger = loggerWithLabel(module)
  * @param next
  */
 const sendCampaign = async (req: Request, res: Response): Promise<Response> => {
-  const userId = req.session?.user?.id
   const { campaignId } = req.params
   // also need to retrieve if its to be scheduled
   const { rate, scheduledTiming } = req.body
@@ -38,7 +37,6 @@ const sendCampaign = async (req: Request, res: Response): Promise<Response> => {
       jobIds = await JobService.sendCampaign({
         campaignId: +campaignId,
         rate: +rate,
-        userId,
         scheduledTiming: formattedTiming,
       })
     }

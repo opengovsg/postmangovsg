@@ -7,11 +7,7 @@ import { CSVParams } from '@core/types'
 import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import { CampaignDetails } from '@core/interfaces'
-import {
-  CampaignService,
-  PhoneNumberService,
-  UploadService,
-} from '@core/services'
+import { CampaignService, UploadService } from '@core/services'
 import { InvalidRecipientError } from '@core/errors'
 
 import { SmsMessage, SmsTemplate } from '@sms/models'
@@ -21,6 +17,7 @@ import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 import TwilioClient, {
   TwilioCredentials,
 } from '@shared/clients/twilio-client.class'
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
 
 const logger = loggerWithLabel(module)
 

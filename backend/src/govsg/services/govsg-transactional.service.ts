@@ -1,10 +1,17 @@
 import config from '@core/config'
 import {
+  ApiAuthenticationError,
   ApiBadGatewayError,
   ApiInvalidRecipientError,
+  ApiRateLimitError,
 } from '@core/errors/rest-api.errors'
 import { loggerWithLabel } from '@core/logger'
 import { WhatsAppService } from '@core/services/whatsapp.service'
+import {
+  AuthenticationError,
+  InvalidRecipientError,
+  RateLimitError,
+} from '@shared/clients/whatsapp-client.class/errors'
 import {
   MessageId,
   NormalisedParam,
@@ -45,20 +52,21 @@ async function sendMessage({
   // differential treatment based on local vs staging/prod
   // because WA API Client is inaccessible from local
   const isLocal = config.get('env') === 'development'
-  await WhatsAppService.whatsappClient
-    .validateSingleRecipient(messageToSend, isLocal)
-    .catch((err) => {
-      logger.error({
-        message: 'Error validating recipient',
-        action,
-        error: err,
-      })
-      throw new ApiInvalidRecipientError(err.message)
-    })
 
   const messageId = await WhatsAppService.whatsappClient
     .sendTemplateMessage(messageToSend, isLocal)
     .catch((err) => {
+      if (err instanceof AuthenticationError) {
+        throw new ApiAuthenticationError(err.message)
+      }
+      if (err instanceof RateLimitError) {
+        throw new ApiRateLimitError(err.message)
+      }
+      if (err instanceof InvalidRecipientError) {
+        throw new ApiInvalidRecipientError(
+          err.message + `. Recipient: ${recipient}`
+        )
+      }
       logger.error({
         message: 'Error sending message',
         action,

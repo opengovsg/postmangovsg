@@ -67,8 +67,6 @@ export interface Campaign {
   valid: boolean
   has_credential: boolean
   cost_per_message?: number
-  should_save_list?: boolean
-
   // Templates
   sms_templates?: SMSTemplate
   email_templates?: EmailTemplate
