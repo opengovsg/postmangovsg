@@ -89,6 +89,12 @@ export const InitEmailCampaignRoute = (
     }),
   }
 
+  const associatePhonebookListValidator = {
+    [Segments.BODY]: Joi.object({
+      list_id: Joi.number().required(),
+    }),
+  }
+
   // Routes
 
   // Check if campaign belongs to user for this router
@@ -189,6 +195,17 @@ export const InitEmailCampaignRoute = (
     '/phonebook-list',
     celebrate(selectPhonebookListValidator),
     emailTemplateMiddleware.selectPhonebookListHandler
+  )
+
+  router.put(
+    '/associations',
+    celebrate(associatePhonebookListValidator),
+    emailTemplateMiddleware.setPhonebookListAssociationHandler
+  )
+
+  router.delete(
+    '/associations',
+    emailTemplateMiddleware.deletePhonebookListAssociationHandler
   )
 
   return router

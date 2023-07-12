@@ -35,8 +35,11 @@ import { LINKS, PHONEBOOK_FEATURE_ENABLE } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
 import {
+  deletePhonebookListForCampaign,
   getPhonebookListsByChannel,
+  isPhonebookAutoUnsubscribeEnabled,
   selectPhonebookList,
+  setPhonebookListForCampaign,
 } from 'services/phonebook.service'
 import {
   CsvStatusResponse,
@@ -131,6 +134,12 @@ const EmailRecipients = ({
             campaignId: +(campaignId as string),
             listId: selectedPhonebookListId,
           })
+          if (isPhonebookAutoUnsubscribeEnabled()) {
+            await setPhonebookListForCampaign({
+              campaignId: +(campaignId as string),
+              listId: selectedPhonebookListId,
+            })
+          }
           setIsCsvProcessing(true)
         }
       } catch (e) {
@@ -191,6 +200,9 @@ const EmailRecipients = ({
       setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
       // clear phonebook selector
       setSelectedPhonebookListId(undefined)
+      if (isPhonebookAutoUnsubscribeEnabled()) {
+        await deletePhonebookListForCampaign(+campaignId)
+      }
     } catch (err) {
       setErrorMessage((err as Error).message)
     }

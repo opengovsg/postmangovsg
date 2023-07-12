@@ -27,6 +27,8 @@ export interface EmailTemplateMiddleware {
   deleteCsvErrorHandler: Handler
   uploadProtectedCompleteHandler: Handler
   selectPhonebookListHandler: Handler
+  setPhonebookListAssociationHandler: Handler
+  deletePhonebookListAssociationHandler: Handler
 }
 
 export const InitEmailTemplateMiddleware = (
@@ -225,6 +227,31 @@ export const InitEmailTemplateMiddleware = (
     }
   }
 
+  /**
+   * Associate a phonebook list to a campaign.
+   */
+  const setPhonebookListAssociationHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    const { campaignId } = req.params
+    const { list_id: listId } = req.body
+    await PhonebookService.setPhonebookListForCampaign({
+      campaignId: +campaignId,
+      listId,
+    })
+    return res.sendStatus(204)
+  }
+
+  const deletePhonebookListAssociationHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    const { campaignId } = req.params
+    await PhonebookService.deletePhonebookListForCampaign(+campaignId)
+    return res.sendStatus(204)
+  }
+
   /*
    * Returns status of csv processing
    */
@@ -364,5 +391,7 @@ export const InitEmailTemplateMiddleware = (
     deleteCsvErrorHandler,
     uploadProtectedCompleteHandler,
     selectPhonebookListHandler,
+    setPhonebookListAssociationHandler,
+    deletePhonebookListAssociationHandler,
   }
 }
