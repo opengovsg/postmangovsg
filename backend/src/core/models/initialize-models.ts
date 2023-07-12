@@ -6,6 +6,7 @@ import {
   Credential,
   Domain,
   JobQueue,
+  ManagedListCampaign,
   ProtectedMessage,
   Statistic,
   Unsubscriber,
@@ -88,12 +89,14 @@ export const initializeModels = (sequelize: Sequelize): void => {
     GovsgTemplate,
     CampaignGovsgTemplate,
   ]
+  const phonebookModels = [ManagedListCampaign]
   sequelize.addModels([
     ...coreModels,
     ...emailModels,
     ...smsModels,
     ...telegramModels,
     ...govsgModels,
+    ...phonebookModels,
   ])
 }
 
