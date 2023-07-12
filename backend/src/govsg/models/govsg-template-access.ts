@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -17,6 +18,9 @@ export class GovsgTemplatesAccess extends Model<GovsgTemplatesAccess> {
   @ForeignKey(() => GovsgTemplate)
   @Column({ type: DataType.BIGINT, primaryKey: true, allowNull: false })
   templateId: number
+
+  @BelongsTo(() => GovsgTemplate)
+  govsgTemplate: GovsgTemplate
 
   @ForeignKey(() => User)
   @Column({ type: DataType.STRING, primaryKey: true, allowNull: false })

@@ -26,14 +26,16 @@ export const getAvailableTemplates = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  const userId = req.session?.user.id as string // safe because authentication middleware has guaranteed this
-  const allowedTemplateIds = await GovsgTemplatesAccess.findAll({
-    where: { userId },
-  }).then((templates) => templates.map((template) => template.templateId))
-  const templates = await GovsgTemplate.findAll({
-    where: { id: allowedTemplateIds },
-  })
-  return res.status(200).json({ data: templates })
+  const userId = req.session?.user.id
+  const allowedTemplates = (
+    await GovsgTemplatesAccess.findAll({
+      where: { userId },
+      include: {
+        model: GovsgTemplate,
+      },
+    })
+  ).map((o) => o.govsgTemplate)
+  return res.status(200).json({ data: allowedTemplates })
 }
 
 async function checkUserTemplateAccess(
