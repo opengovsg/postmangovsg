@@ -139,9 +139,9 @@ const getStatsFromTable = async (
                 ],
               },
               'int'
-            ),
-            'read'
+            )
           ),
+          'read',
         ],
       ],
     })
