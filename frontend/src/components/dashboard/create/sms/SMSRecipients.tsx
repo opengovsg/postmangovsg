@@ -205,16 +205,16 @@ const SMSRecipients = ({
           retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
           isProcessing={isCsvProcessing}
           defaultLabel={
-            phonebookLists.filter(
-              (l) =>
-                l.label ===
-                csvInfo.csvFilename?.slice(0, -4).replaceAll('-', ' ')
-            )[0]?.label
+            selectedPhonebookListId
+              ? phonebookLists.filter(
+                  (l) => +l.value === selectedPhonebookListId
+                )[0]?.label
+              : 'Select an option'
           }
         />
       )}
       <StepSection>
-        <StepHeader title="Upload recipient list in CSV format">
+        <StepHeader title="Upload CSV File">
           <p>
             Only CSV format files are allowed. If you have an Excel file, please
             convert it by going to File &gt; Save As &gt; CSV (Comma delimited).

@@ -126,14 +126,7 @@ const EmailRecipients = ({
   useEffect(() => {
     const setSelectedList = async () => {
       try {
-        // trigger change only if it isn't already the current one
-        const currentValue = phonebookLists.filter(
-          (l) => l.label === csvInfo.csvFilename?.replace('.csv', '')
-        )[0]?.value
-        if (
-          selectedPhonebookListId &&
-          selectedPhonebookListId !== +currentValue
-        ) {
+        if (selectedPhonebookListId) {
           await selectPhonebookList({
             campaignId: +(campaignId as string),
             listId: selectedPhonebookListId,
@@ -224,14 +217,12 @@ const EmailRecipients = ({
           setSelectedPhonebookListId={setSelectedPhonebookListId}
           retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
           isProcessing={isCsvProcessing}
-          // have to strip additional appended .csv label
           defaultLabel={
-            phonebookLists.filter((l) => {
-              return (
-                l.label ===
-                csvInfo.csvFilename?.slice(0, -4).replaceAll('-', ' ')
-              )
-            })[0]?.label
+            selectedPhonebookListId
+              ? phonebookLists.filter(
+                  (l) => +l.value === selectedPhonebookListId
+                )[0]?.label
+              : 'Select an option'
           }
         />
       )}
