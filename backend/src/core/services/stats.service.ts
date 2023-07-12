@@ -106,9 +106,6 @@ const getStatsFromTable = async (
                 [Op.or]: [
                   { status: GovsgMessageStatus.Sent },
                   { status: GovsgMessageStatus.Accepted },
-                  { status: GovsgMessageStatus.Delivered },
-                  { status: GovsgMessageStatus.Read },
-                  { status: GovsgMessageStatus.Deleted },
                 ],
               },
               'int'
@@ -127,6 +124,25 @@ const getStatsFromTable = async (
           ),
           'invalid',
         ],
+        [
+          fn('sum', cast({ status: GovsgMessageStatus.Delivered }, 'int')),
+          'delivered',
+        ],
+        [
+          fn(
+            'sum',
+            cast(
+              {
+                [Op.or]: [
+                  { status: GovsgMessageStatus.Read },
+                  { status: GovsgMessageStatus.Deleted },
+                ],
+              },
+              'int'
+            ),
+            'read'
+          ),
+        ],
       ],
     })
 
@@ -135,6 +151,8 @@ const getStatsFromTable = async (
       sent: +data.sent,
       unsent: +data.unsent,
       invalid: +data.invalid,
+      read: +data.read,
+      delivered: +data.delivered,
       updated_at: new Date(),
     }
   }
@@ -204,6 +222,7 @@ const getCurrentStats = async (
       sent: opsStats.sent + archivedStats.sent,
       // this is needed when invalid might appear in ops table, e.g. telegram immediate bounce errors
       invalid: opsStats.invalid + archivedStats.invalid,
+      delivered: opsStats.delivered,
       read: opsStats.read,
       status: job.status,
       updated_at: job.updatedAt,
