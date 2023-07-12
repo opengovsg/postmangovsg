@@ -14,20 +14,23 @@ export class Statistic extends Model<Statistic> {
     type: DataType.INTEGER,
     primaryKey: true,
   })
-  campaignId!: number
+  campaignId: number
 
   @Column(DataType.INTEGER)
-  unsent!: number
+  unsent: number
 
   @Column(DataType.INTEGER)
-  errored!: number
+  errored: number
 
   @Column(DataType.INTEGER)
-  sent!: number
+  sent: number
 
   @Column(DataType.INTEGER)
   read: number
 
   @Column(DataType.INTEGER)
-  invalid!: number
+  delivered: number
+
+  @Column(DataType.INTEGER)
+  invalid: number
 }
