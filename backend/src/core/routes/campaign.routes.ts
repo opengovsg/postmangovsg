@@ -64,12 +64,14 @@ router.post(
 router.delete(
   '/:campaignId',
   celebrate(deleteCampaignValidator),
+  CampaignMiddleware.isCampaignOwnedByUser,
   CampaignMiddleware.deleteCampaign
 )
 
 router.put(
   '/:campaignId',
   celebrate(updateCampaignValidator),
+  CampaignMiddleware.isCampaignOwnedByUser,
   CampaignMiddleware.updateCampaign
 )
 
