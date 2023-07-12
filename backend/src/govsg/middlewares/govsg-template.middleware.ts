@@ -26,10 +26,7 @@ export const getAvailableTemplates = async (
   req: Request,
   res: Response
 ): Promise<Response> => {
-  if (!req.session?.user?.id) {
-    throw new ApiAuthenticationError('Request not authenticated')
-  }
-  const userId = req.session.user.id
+  const userId = req.session?.user.id as string // safe because authentication middleware has guaranteed this
   const allowedTemplateIds = await GovsgTemplatesAccess.findAll({
     where: { userId },
   }).then((templates) => templates.map((template) => template.templateId))
