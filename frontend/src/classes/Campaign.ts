@@ -119,6 +119,7 @@ export class CampaignStats {
   sent: number
   invalid: number
   read: number
+  delivered: number
   status: Status
   statusUpdatedAt: string // Timestamp when job's status was changed to this status
   updatedAt: string // Timestamp when statistic was updated
@@ -134,6 +135,7 @@ export class CampaignStats {
     this.sent = +input['sent']
     this.invalid = input['invalid']
     this.status = input['status']
+    this.delivered = input['delivered'] || 0
     this.read = input['read'] || 0
     this.statusUpdatedAt = input['status_updated_at']
     this.updatedAt = input['updated_at']
