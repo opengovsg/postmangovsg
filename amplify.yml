@@ -16,14 +16,14 @@ frontend:
         - nvm install 16
         - if [ "${AWS_BRANCH}" = "master" ]; then
           export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION} &&
-          export REACT_APP_SENTRY_ENVIRONMENT="production" &&
+          export REACT_APP_ENVIRONMENT="production" &&
           export REACT_APP_IMG_SERVER_URL="https://postman.gov.sg/v1";
           elif [ "${AWS_BRANCH}" = "momgovsg" ]; then
           export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION_MOM} &&
-          export REACT_APP_SENTRY_ENVIRONMENT="production-02";
+          export REACT_APP_ENVIRONMENT="production-02";
           else
           export REACT_APP_BACKEND_URL=${BACKEND_URL_STAGING} &&
-          export REACT_APP_SENTRY_ENVIRONMENT="staging";
+          export REACT_APP_ENVIRONMENT="staging";
           fi
         - cd shared && npm ci && cd ..
 
