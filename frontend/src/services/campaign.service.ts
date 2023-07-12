@@ -1,16 +1,14 @@
 import axios from 'axios'
 
 import {
-  CampaignRecipient,
-  GovsgCampaign,
-  GovsgCampaignRecipient,
-} from 'classes'
-import {
   Campaign,
+  CampaignRecipient,
   CampaignStats,
   ChannelType,
   EmailCampaign,
   EmailCampaignRecipient,
+  GovsgCampaign,
+  GovsgCampaignRecipient,
   Ordering,
   SMSCampaign,
   SMSCampaignRecipient,
@@ -235,31 +233,18 @@ export async function renameCampaign(
   })
 }
 
-// TODO: Combine with renameCampaign into an updateCampaign service method
-export async function setCampaignToSaveList(
-  campaignId: string,
-  shouldSaveList: boolean
-): Promise<void> {
-  return axios.put(`/campaigns/${campaignId}`, {
-    should_save_list: shouldSaveList,
-  })
-}
-
 export async function updateCampaign(
   campaignId: string | number,
   {
     name,
     shouldBccToMe,
-    shouldSaveList,
   }: {
     name?: string
-    shouldSaveList?: boolean
     shouldBccToMe?: boolean
   }
 ): Promise<void> {
   return axios.put(`/campaigns/${campaignId}`, {
     name,
-    should_save_list: shouldSaveList,
     should_bcc_to_me: shouldBccToMe,
   })
 }

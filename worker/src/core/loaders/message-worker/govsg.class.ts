@@ -10,7 +10,8 @@ import {
   WhatsAppApiClient,
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/types'
-import { PhoneNumberService } from '@core/services/phone-number.service'
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
+import { InvalidRecipientError } from '@shared/clients/whatsapp-client.class/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -25,9 +26,10 @@ class Govsg {
     postmanConnection: Sequelize,
     flamingoConnection: Sequelize
   ) {
+    const isLocal = config.get('env') === 'development'
     this.workerId = workerId
     this.postmanConnection = postmanConnection
-    this.whatsappClient = new WhatsAppClient(config.get('whatsapp'))
+    this.whatsappClient = new WhatsAppClient(config.get('whatsapp'), isLocal)
     this.flamingoDbClient = new FlamingoDbClient(flamingoConnection)
   }
 
@@ -129,7 +131,7 @@ class Govsg {
         cleanDbResults.map((result) => result.recipient)
       )
 
-      const unvalidatedMessages = cleanDbResults.map((result) => ({
+      const messagesToSend = cleanDbResults.map((result) => ({
         id: result.id, // need this to update govsg_ops table
         recipient: result.recipient,
         templateName: result.whatsappTemplateLabel,
@@ -141,48 +143,8 @@ class Govsg {
           apiClientIdMap.get(result.recipient) ?? WhatsAppApiClient.clientTwo,
         language: WhatsAppLanguages.english,
       }))
-      const validatedWhatsAppIds =
-        await this.whatsappClient.validateMultipleRecipients(
-          unvalidatedMessages,
-          config.get('env') === 'development'
-        )
-      const invalidMessages = validatedWhatsAppIds.filter(
-        (message) => message.status === 'failed'
-      )
-      // update govsg_ops table with invalid messages
-      if (invalidMessages.length > 0) {
-        await this.postmanConnection.query(
-          `UPDATE
-              govsg_ops
-            SET
-              status = 'INVALID_RECIPIENT',
-              updated_at=clock_timestamp()
-            WHERE
-              id IN (:ids);`,
-          {
-            replacements: { ids: invalidMessages.map((message) => message.id) },
-            type: QueryTypes.UPDATE,
-          }
-        )
-      }
 
-      const validMessages = validatedWhatsAppIds.filter(
-        (message) => message.status === 'valid'
-      )
-
-      if (validMessages.length === 0) {
-        // Has to run one more time get_messages db function to set the job
-        // queue item to `SENT` if needed
-        await this.postmanConnection.query(
-          'SELECT get_messages_to_send_govsg(:jobId, :rate);',
-          {
-            replacements: { jobId, rate },
-            type: QueryTypes.SELECT,
-          }
-        )
-      }
-
-      return validMessages.map((message) => ({
+      return messagesToSend.map((message) => ({
         ...message,
         body: '', // just putting this in to satisfy the interface grrr
       }))
@@ -245,7 +207,7 @@ class Govsg {
         action: 'sendMessage',
       })
     } catch (error: any) {
-      if ((error as { errorCode: string }).errorCode === 'invalid_recipient') {
+      if (error instanceof InvalidRecipientError) {
         await this.postmanConnection.query(
           `UPDATE govsg_ops SET status='INVALID_RECIPIENT',
           updated_at=clock_timestamp()

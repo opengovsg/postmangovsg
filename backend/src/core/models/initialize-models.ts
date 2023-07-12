@@ -1,36 +1,34 @@
 import { Sequelize } from 'sequelize-typescript'
 import {
-  Credential,
-  JobQueue,
+  Agency,
+  ApiKey,
   Campaign,
-  Worker,
+  Credential,
+  Domain,
+  JobQueue,
+  ProtectedMessage,
+  Statistic,
+  Unsubscriber,
   User,
-  UserFeature,
   UserCredential,
   UserDemo,
-  Statistic,
-  ProtectedMessage,
-  Unsubscriber,
-  Agency,
-  Domain,
-  List,
-  UserList,
-  ApiKey,
+  UserFeature,
+  Worker,
 } from '@core/models'
 import {
+  CommonAttachment,
   EmailBlacklist,
   EmailFromAddress,
   EmailMessage,
   EmailMessageTransactional,
   EmailOp,
   EmailTemplate,
-  CommonAttachment,
 } from '@email/models'
 import {
   SmsMessage,
   SmsMessageTransactional,
-  SmsTemplate,
   SmsOp,
+  SmsTemplate,
 } from '@sms/models'
 import {
   BotSubscriber,
@@ -40,11 +38,11 @@ import {
   TelegramTemplate,
 } from '@telegram/models'
 import {
-  GovsgMessageTransactional,
-  GovsgTemplate,
   CampaignGovsgTemplate,
   GovsgMessage,
+  GovsgMessageTransactional,
   GovsgOp,
+  GovsgTemplate,
 } from '@govsg/models'
 import { UserExperimental } from './user/user-experimental'
 
@@ -62,8 +60,6 @@ export const initializeModels = (sequelize: Sequelize): void => {
     Unsubscriber,
     Agency,
     Domain,
-    List,
-    UserList,
     ApiKey,
     UserExperimental,
   ]

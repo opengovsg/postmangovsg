@@ -6,7 +6,6 @@ import convict, { Config } from 'convict'
 import crypto from 'crypto'
 import fs from 'fs'
 import path from 'path'
-import { isSupportedCountry } from 'libphonenumber-js'
 
 const rdsCa = fs.readFileSync(path.join(__dirname, '../assets/db-ca.pem'))
 
@@ -83,12 +82,16 @@ export interface ConfigSchema {
   }
   whatsapp: {
     namespace: string
-    authTokenOne: string // todo: remove and substitute with extract from KMS
-    authTokenTwo: string // todo: remove and substitute with extract from KMS
+    adminCredentialsOne: string
+    adminCredentialsTwo: string
     onPremClientOneUrl: string
     onPremClientTwoUrl: string
     proxyToken: string
     proxyUrl: string
+    authTokenOne: string
+    authTokenOneExpiry: string
+    authTokenTwo: string
+    authTokenTwoExpiry: string
   }
 }
 
@@ -236,9 +239,6 @@ const config: Config<ConfigSchema> = convict({
     doc: 'Two-letter ISO country code to use in libphonenumber-js',
     default: 'SG',
     env: 'DEFAULT_COUNTRY',
-    format: (countryCode: string): boolean => {
-      return isSupportedCountry(countryCode)
-    },
   },
   callbackSecret: {
     doc: 'Secret key used to generate Twilio callback url',
@@ -351,15 +351,15 @@ const config: Config<ConfigSchema> = convict({
     },
   },
   whatsapp: {
-    authTokenOne: {
-      doc: 'Auth token for calling WA API Client One (temporary)',
-      env: 'WA_AUTH_TOKEN_ONE',
+    adminCredentialsOne: {
+      doc: 'Admin credentials for retrieving WhatsApp tokens for client 1',
+      env: 'WA_ADMIN_CREDS_1',
       format: 'required-string',
       default: '',
     },
-    authTokenTwo: {
-      doc: 'Auth token for calling WA API Client Two (temporary)',
-      env: 'WA_AUTH_TOKEN_TWO',
+    adminCredentialsTwo: {
+      doc: 'Admin credentials for retrieving WhatsApp tokens for client 2',
+      env: 'WA_ADMIN_CREDS_2',
       format: 'required-string',
       default: '',
     },
@@ -389,6 +389,26 @@ const config: Config<ConfigSchema> = convict({
     proxyUrl: {
       doc: 'Proxy URL for accessing WhatsApp On Prem Client via proxy',
       env: 'WHATSAPP_PROXY_URL',
+      default: '',
+    },
+    authTokenOne: {
+      doc: 'WhatsApp Auth Token for client 1, for local dev only',
+      env: 'WA_AUTH_TOKEN_1',
+      default: '',
+    },
+    authTokenOneExpiry: {
+      doc: 'WhatsApp Auth Token expiry for client 1, for local dev only',
+      env: 'WA_AUTH_TOKEN_1_EXPIRY',
+      default: '',
+    },
+    authTokenTwo: {
+      doc: 'WhatsApp Auth Token for client 2, for local dev only',
+      env: 'WA_AUTH_TOKEN_2',
+      default: '',
+    },
+    authTokenTwoExpiry: {
+      doc: 'WhatsApp Auth Token expiry for client 2, for local dev only',
+      env: 'WA_AUTH_TOKEN_2_EXPIRY',
       default: '',
     },
   },

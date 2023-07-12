@@ -208,11 +208,10 @@ const updateCampaign = async (
   res: Response
 ): Promise<Response | void> => {
   const { campaignId } = req.params
-  const { name, should_save_list, should_bcc_to_me } = req.body
+  const { name, should_bcc_to_me } = req.body
   const [count, rows] = await CampaignService.updateCampaign({
     id: +campaignId,
     name,
-    shouldSaveList: should_save_list,
     shouldBccToMe: should_bcc_to_me,
   } as Campaign)
   if (count < 1) {
