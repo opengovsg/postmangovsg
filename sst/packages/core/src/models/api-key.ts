@@ -1,5 +1,5 @@
 import { InferModel } from "drizzle-orm";
-import { pgEnum, pgTable, date, varchar, integer } from "drizzle-orm/pg-core";
+import { pgTable, date, varchar, integer } from "drizzle-orm/pg-core";
 
 export const apiKeys = pgTable("api_keys", {
   id: integer("id").primaryKey(),
@@ -15,3 +15,5 @@ export const apiKeys = pgTable("api_keys", {
   updatedAt: date("updated_at").notNull(),
   deletedAt: date("deleted_at"),
 });
+
+export type ApiKey = InferModel<typeof apiKeys>;
