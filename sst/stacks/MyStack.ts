@@ -6,17 +6,18 @@ export function MyStack({ stack }: StackContext) {
     job: "packages/functions/src/cron.handler",
   });
   cron.attachPermissions(getPermissions());
-  cron.bind([...getEnvVars(stack)]);
+  cron.bind(getSecrets(stack));
   // TODO
   // cron.attachPermissions()
 }
 
-function getEnvVars(stack: Stack) {
+function getSecrets(stack: Stack) {
   return [new Config.Secret(stack, "POSTMAN_DB_URI")];
 }
 
 function getPermissions() {
   return [
+    // necessary to change VPC of Lambda to VPC of RDS
     "ec2:DescribeNetworkInterfaces",
     "ec2:CreateNetworkInterface",
     "ec2:DeleteNetworkInterface",
