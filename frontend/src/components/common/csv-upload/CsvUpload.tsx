@@ -26,6 +26,8 @@ const CsvUpload = ({
     if (!isCsvProcessing) {
       return (
         <>
+          <div className={styles.uploadActions}>{children}</div>
+
           {numRecipients > 0 && (
             <>
               <div className="separator"></div>
@@ -44,7 +46,6 @@ const CsvUpload = ({
               </DetailBlock>
             </>
           )}
-          <div className={styles.uploadActions}>{children}</div>
         </>
       )
     }
