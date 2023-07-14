@@ -1,57 +1,51 @@
 import { Config } from "sst/node/config";
-import { and, lte, gt } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 
 import PostmanDbClient from "@postmangovsg-sst/core/src/database/client";
 import { apiKeys } from "@postmangovsg-sst/core/src/models";
+import { getDayTruncatedISOStringDaysFromNow } from "@postmangovsg-sst/core/src/util/date";
 import { IS_LOCAL, LOCAL_DB_URI } from "./env";
+
+/*
+- This cron job runs every day at 12AM UTC, i.e. 8AM SGT
+- It picks up API keys that are expiring at exactly 28 days, 14 days, 3 days and 1 day from now
+- For this to be "close enough", we use the DATE_TRUNC("day", valid_until) function to round down the valid_until timestamp to the nearest day
+- This means that if a key is expiring at 2021-10-01 12:00:00, it will be picked up by the cron job on 2021-10-01 00:00:00
+*/
 
 export async function handler() {
   const dbUri = IS_LOCAL ? LOCAL_DB_URI : Config.POSTMAN_DB_URI;
   const db = new PostmanDbClient(dbUri).getClient();
-  const timeNow = new Date().getTime();
-  const day = 24 * 60 * 60 * 1000;
-  const oneMonth = new Date(timeNow + 30 * day).toISOString();
-  const twoWeeks = new Date(timeNow + 14 * day).toISOString();
-  const threeDays = new Date(timeNow + 3 * day).toISOString();
-  const oneDay = new Date(timeNow + day).toISOString();
-  /*
-  Send emails at the following junctures:
-  1 month before the expiry date
-  2 weeks before the expiry date
-  3 days before the expiry date
-  1 day before the expiry date
-   */
-  const [oneMonthKeys, twoWeeksKeys, threeDaysKeys, oneDayKeys] =
+  const fourWeeks = getDayTruncatedISOStringDaysFromNow(28);
+  const twoWeeks = getDayTruncatedISOStringDaysFromNow(14);
+  const threeDays = getDayTruncatedISOStringDaysFromNow(3);
+  const oneDay = getDayTruncatedISOStringDaysFromNow(1);
+
+  const [fourWeeksKeys, twoWeeksKeys, threeDaysKeys, oneDayKeys] =
     await Promise.all([
       await db
         .select()
         .from(apiKeys)
         .where(
-          and(
-            lte(apiKeys.validUntil, oneMonth),
-            gt(apiKeys.validUntil, twoWeeks)
-          )
+          sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${fourWeeks})`
         ),
       await db
         .select()
         .from(apiKeys)
         .where(
-          and(
-            lte(apiKeys.validUntil, threeDays),
-            gt(apiKeys.validUntil, oneDay)
-          )
+          sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${twoWeeks})`
         ),
       await db
         .select()
         .from(apiKeys)
         .where(
-          and(
-            lte(apiKeys.validUntil, twoWeeks),
-            gt(apiKeys.validUntil, threeDays)
-          )
+          sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${threeDays})`
         ),
-      await db.select().from(apiKeys).where(lte(apiKeys.validUntil, oneDay)),
+      await db
+        .select()
+        .from(apiKeys)
+        .where(sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${oneDay})`),
     ]);
 
-  console.log(oneMonthKeys);
+  // TODO send emails
 }

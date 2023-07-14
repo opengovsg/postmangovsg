@@ -2,8 +2,8 @@ import { StackContext, Config, Cron, Stack } from "sst/constructs";
 
 export function MyStack({ stack }: StackContext) {
   const apiKeyExpiryCron = new Cron(stack, "cron", {
-    // TODO: set this to every day at 12am
-    schedule: "rate(1 hour)",
+    // runs every day at 12AM UTC, i.e. 8AM SGT
+    schedule: "cron(0 0 */1 * ? *)",
     job: "packages/functions/src/api-key-expiry-cron.handler",
   });
   apiKeyExpiryCron.attachPermissions(getPermissions());
