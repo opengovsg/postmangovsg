@@ -23,7 +23,8 @@ customHeaders:
           https://s3.ap-southeast-1.amazonaws.com/file-staging.postman.gov.sg/
           https://s3.ap-southeast-1.amazonaws.com/file-production.postman.gov.sg/
           https://o399364.ingest.sentry.io/
-          https://www.google-analytics.com;
+          https://www.google-analytics.com
+          https://*.browser-intake-datadoghq.com;
           style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com 'unsafe-inline';
           font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
           default-src 'self' https://*.postman.gov.sg;

@@ -227,6 +227,25 @@ const updateCampaign = async (
   res.json(rows[0])
 }
 
+async function isCampaignOwnedByUser(
+  req: Request,
+  _res: Response,
+  next: NextFunction
+): Promise<void> {
+  const campaignId = +req.params.campaignId
+  const userId = +req.session?.user?.id
+  const campaign = await Campaign.findOne({ where: { id: campaignId } })
+  if (!campaign) {
+    throw new ApiNotFoundError(`Campaign with ID ${campaignId} not found`)
+  }
+  if (campaign.userId !== userId) {
+    throw new ApiAuthorizationError(
+      "User doesn't have access to this campaign."
+    )
+  }
+  return next()
+}
+
 export const CampaignMiddleware = {
   canEditCampaign,
   canSendCampaign,
@@ -235,4 +254,5 @@ export const CampaignMiddleware = {
   isCampaignRedacted,
   deleteCampaign,
   updateCampaign,
+  isCampaignOwnedByUser,
 }
