@@ -1,10 +1,12 @@
-import { db } from "@postmangovsg-sst/core/src/dbClient";
+import { Config } from "sst/node/config";
+
+import PostmanDbClient from "@postmangovsg-sst/core/src/database/client";
 import { apiKeys } from "@postmangovsg-sst/core/src/models";
+import { IS_LOCAL, LOCAL_DB_URI } from "./env";
 
 export async function handler() {
-  console.log("Running my cron job");
-  console.log(process.env.IS_LOCAL);
-  console.log(process.env.LOCAL_DB_URI);
+  const dbUri = IS_LOCAL ? LOCAL_DB_URI : Config.POSTMAN_DB_URI;
+  const db = new PostmanDbClient(dbUri).getClient();
   const apiKey = await db.select().from(apiKeys).limit(1);
   console.log(apiKey);
 }
