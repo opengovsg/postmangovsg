@@ -11,7 +11,9 @@ import {
   UnsupportedFileTypeError,
 } from '@core/errors'
 import {
+  CcType,
   EmailMessageTransactional,
+  EmailMessageTransactionalCc,
   TransactionalEmailClassification,
   TransactionalEmailMessageStatus,
 } from '@email/models'
@@ -27,6 +29,7 @@ import {
   ApiRateLimitError,
 } from '@core/errors/rest-api.errors'
 import { UploadedFile } from 'express-fileupload'
+import { Op } from 'sequelize'
 
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler
@@ -56,12 +59,15 @@ export const InitEmailTransactionalMiddleware = (
     attachments?: UploadedFile[]
     classification?: TransactionalEmailClassification
     tag?: string
+    cc?: string[]
+    bcc?: string[]
   }
   type ReqBodyWithId = ReqBody & { emailMessageTransactionalId: string }
 
   function convertMessageModelToResponse(
     message: EmailMessageTransactional,
-    excludeParams = false
+    excludeParams = false,
+    ccEmails?: { cc?: string[]; bcc?: string[] }
   ) {
     return {
       id: message.id,
@@ -80,6 +86,8 @@ export const InitEmailTransactionalMiddleware = (
       updated_at: message.updatedAt.toISOString(),
       classification: message.classification,
       tag: message.tag,
+      cc: ccEmails?.cc,
+      bcc: ccEmails?.bcc,
     }
   }
 
@@ -99,6 +107,8 @@ export const InitEmailTransactionalMiddleware = (
       attachments,
       classification,
       tag,
+      cc,
+      bcc,
       // use of as is safe because of validation by Joi; see email-transactional.routes.ts
     } = req.body as ReqBody
 
@@ -128,6 +138,34 @@ export const InitEmailTransactionalMiddleware = (
       tag,
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
     } as unknown as EmailMessageTransactional)
+
+    // save cc and bcc
+    if (cc) {
+      await EmailMessageTransactionalCc.bulkCreate(
+        cc.map(
+          (c) =>
+            ({
+              emailMessageTransactionalId: emailMessageTransactional.id,
+              email: c,
+              ccType: CcType.Cc,
+            } as EmailMessageTransactionalCc)
+        )
+      )
+    }
+
+    if (bcc) {
+      await EmailMessageTransactionalCc.bulkCreate(
+        bcc.map(
+          (c) =>
+            ({
+              emailMessageTransactionalId: emailMessageTransactional.id,
+              email: c,
+              ccType: CcType.Bcc,
+            } as EmailMessageTransactionalCc)
+        )
+      )
+    }
+
     // insert id into req.body so that subsequent middlewares can use it
     req.body.emailMessageTransactionalId = emailMessageTransactional.id
     next()
@@ -147,6 +185,8 @@ export const InitEmailTransactionalMiddleware = (
       recipient,
       reply_to: replyTo,
       attachments,
+      cc,
+      bcc,
       emailMessageTransactionalId, // added by saveMessage middleware
     } = req.body
 
@@ -167,6 +207,8 @@ export const InitEmailTransactionalMiddleware = (
         replyTo:
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
         attachments,
+        cc,
+        bcc,
         emailMessageTransactionalId,
       })
       emailMessageTransactional.set(
@@ -176,9 +218,13 @@ export const InitEmailTransactionalMiddleware = (
       emailMessageTransactional.set('acceptedAt', new Date())
       await emailMessageTransactional.save()
 
+      const ccEmails = await getCCEmails(emailMessageTransactional.id)
+
       res
         .status(201)
-        .json(convertMessageModelToResponse(emailMessageTransactional))
+        .json(
+          convertMessageModelToResponse(emailMessageTransactional, undefined, ccEmails)
+        )
       return
     } catch (error) {
       logger.error({
@@ -199,6 +245,29 @@ export const InitEmailTransactionalMiddleware = (
     }
   }
 
+  async function getCCEmails(emailMessageTransactionalId: string) {
+    const cc = (
+      await EmailMessageTransactionalCc.findAll({
+        where: {
+          emailMessageTransactionalId,
+          ccType: CcType.Cc,
+          errorCode: { [Op.is]: null },
+        },
+      })
+    )?.map((c) => c.email)
+    const bcc = (
+      await EmailMessageTransactionalCc.findAll({
+        where: {
+          emailMessageTransactionalId,
+          ccType: CcType.Bcc,
+          errorCode: { [Op.is]: null },
+        },
+      })
+    )?.map((c) => c.email)
+
+    return { cc, bcc }
+  }
+
   async function getById(req: Request, res: Response): Promise<void> {
     const { emailId } = req.params
     const message = await EmailMessageTransactional.findOne({
@@ -210,8 +279,9 @@ export const InitEmailTransactionalMiddleware = (
         .json({ message: `Email message with ID ${emailId} not found.` })
       return
     }
+    const ccEmails = await getCCEmails(message.id)
 
-    res.status(200).json(convertMessageModelToResponse(message))
+    res.status(200).json(convertMessageModelToResponse(message, undefined, ccEmails))
   }
 
   async function listMessages(req: Request, res: Response): Promise<void> {

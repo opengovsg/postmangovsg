@@ -452,6 +452,17 @@ const isRecipientBlacklisted = async (
   return !!result
 }
 
+const findBlacklistedRecipients = async (
+  recipientEmails: string[]
+): Promise<string[] | null> => {
+  const result = await EmailBlacklist.findAll({
+    where: {
+      recipient: recipientEmails,
+    },
+  })
+  return result?.map((r) => r.recipient)
+}
+
 export const EmailService = {
   findCampaign,
   sendCampaignMessage,
@@ -459,6 +470,7 @@ export const EmailService = {
   getCampaignDetails,
   getHydratedMessage,
   isRecipientBlacklisted,
+  findBlacklistedRecipients,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
   uploadProtectedCompleteOnPreview,

@@ -8,7 +8,9 @@ import {
 } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 import {
+  CcType,
   EmailMessageTransactional,
+  EmailMessageTransactionalCc,
   TransactionalEmailMessageStatus,
 } from '@email/models'
 import { SesEventType } from '@email/interfaces/callback.interface'
@@ -41,6 +43,8 @@ async function sendMessage({
   recipient,
   replyTo,
   attachments,
+  cc,
+  bcc,
   emailMessageTransactionalId,
 }: {
   subject: string
@@ -49,6 +53,8 @@ async function sendMessage({
   recipient: string
   replyTo?: string
   attachments?: { data: Buffer; name: string }[]
+  cc?: string[]
+  bcc?: string[]
   emailMessageTransactionalId: string
 }): Promise<void> {
   // TODO: flagging this coupling for future refactoring:
@@ -93,6 +99,50 @@ async function sendMessage({
     throw new InvalidRecipientError('Recipient email is blacklisted')
   }
 
+  if (cc) {
+    const blacklistedRecipients = await EmailService.findBlacklistedRecipients(
+      cc
+    )
+
+    if (blacklistedRecipients) {
+      cc = cc.filter((c) => !blacklistedRecipients.includes(c))
+      void EmailMessageTransactionalCc.update(
+        {
+          errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
+        },
+        {
+          where: {
+            emailMessageTransactionalId,
+            email: blacklistedRecipients,
+            ccType: CcType.Cc,
+          },
+        }
+      )
+    }
+  }
+
+  if (bcc) {
+    const blacklistedRecipients = await EmailService.findBlacklistedRecipients(
+      bcc
+    )
+
+    if (blacklistedRecipients) {
+      bcc = bcc.filter((c) => !blacklistedRecipients.includes(c))
+      void EmailMessageTransactionalCc.update(
+        {
+          errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
+        },
+        {
+          where: {
+            emailMessageTransactionalId,
+            email: blacklistedRecipients,
+            ccType: CcType.Bcc,
+          },
+        }
+      )
+    }
+  }
+
   const mailToSend: MailToSend = {
     subject: sanitizedSubject,
     from: from,
@@ -101,6 +151,8 @@ async function sendMessage({
     replyTo,
     messageId: emailMessageTransactionalId.toString(),
     attachments: sanitizedAttachments,
+    cc,
+    bcc,
   }
   logger.info({
     message: 'Sending transactional email',
