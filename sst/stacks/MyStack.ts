@@ -1,14 +1,13 @@
 import { StackContext, Config, Cron, Stack } from "sst/constructs";
 
 export function MyStack({ stack }: StackContext) {
-  const cron = new Cron(stack, "cron", {
+  const apiKeyExpiryCron = new Cron(stack, "cron", {
+    // TODO: set this to every day at 12am
     schedule: "rate(1 hour)",
-    job: "packages/functions/src/cron.handler",
+    job: "packages/functions/src/api-key-expiry-cron.handler",
   });
-  cron.attachPermissions(getPermissions());
-  cron.bind(getSecrets(stack));
-  // TODO
-  // cron.attachPermissions()
+  apiKeyExpiryCron.attachPermissions(getPermissions());
+  apiKeyExpiryCron.bind(getSecrets(stack));
 }
 
 function getSecrets(stack: Stack) {
