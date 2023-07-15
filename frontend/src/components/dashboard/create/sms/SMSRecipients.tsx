@@ -201,7 +201,10 @@ const SMSRecipients = ({
       setCsvInfo((info) => ({ ...info, tempCsvFilename }))
       // clear phonebook selector
       setSelectedPhonebookListId(undefined)
-      await deletePhonebookListForCampaign(+campaignId)
+      if (selectedPhonebookListId) {
+        // dissociate current campaign with phonebook list
+        await deletePhonebookListForCampaign(+campaignId)
+      }
     } catch (err) {
       setErrorMessage((err as Error).message)
     }
