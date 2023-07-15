@@ -36,8 +36,8 @@ import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
 import {
   deletePhonebookListForCampaign,
+  getPhonebookListIdForCampaign,
   getPhonebookListsByChannel,
-  isPhonebookAutoUnsubscribeEnabled,
   selectPhonebookList,
   setPhonebookListForCampaign,
 } from 'services/phonebook.service'
@@ -125,30 +125,27 @@ const EmailRecipients = ({
     return () => clearTimeout(timeoutId)
   }, [campaignId, csvFilename, forceReset, isCsvProcessing, isMounted])
 
-  // Select managed list
-  useEffect(() => {
-    const setSelectedList = async () => {
+  const onPhonebookListSelected = useCallback(
+    async (phonebookListId: number) => {
       try {
-        if (selectedPhonebookListId) {
-          await selectPhonebookList({
-            campaignId: +(campaignId as string),
-            listId: selectedPhonebookListId,
-          })
-          if (isPhonebookAutoUnsubscribeEnabled()) {
-            await setPhonebookListForCampaign({
-              campaignId: +(campaignId as string),
-              listId: selectedPhonebookListId,
-            })
-          }
-          setIsCsvProcessing(true)
-        }
+        // Upload phonebook list to s3
+        await selectPhonebookList({
+          campaignId: +(campaignId as string),
+          listId: phonebookListId,
+        })
+        // Associate current campaign with phonebook list
+        await setPhonebookListForCampaign({
+          campaignId: +(campaignId as string),
+          listId: phonebookListId,
+        })
+        setIsCsvProcessing(true)
+        setSelectedPhonebookListId(phonebookListId)
       } catch (e) {
         setErrorMessage((e as Error).message)
       }
-    }
-
-    void setSelectedList()
-  }, [campaignId, selectedPhonebookListId])
+    },
+    [campaignId]
+  )
 
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
@@ -172,6 +169,23 @@ const EmailRecipients = ({
   // On load, retrieve the list of phonebook lists
   useEffect(() => {
     void retrieveAndPopulatePhonebookLists()
+  }, [campaignId])
+
+  // On load, check if user was already using Phonebook.
+  useEffect(() => {
+    if (!campaignId) {
+      return
+    }
+    const checkIfUsingPhonebook = async () => {
+      const defaultPhonebookListId = await getPhonebookListIdForCampaign(
+        +campaignId
+      )
+      if (defaultPhonebookListId) {
+        setSelectedPhonebookListId(defaultPhonebookListId)
+      }
+    }
+
+    void checkIfUsingPhonebook()
   }, [campaignId])
 
   // Handle file upload
@@ -200,9 +214,7 @@ const EmailRecipients = ({
       setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
       // clear phonebook selector
       setSelectedPhonebookListId(undefined)
-      if (isPhonebookAutoUnsubscribeEnabled()) {
-        await deletePhonebookListForCampaign(+campaignId)
-      }
+      await deletePhonebookListForCampaign(+campaignId)
     } catch (err) {
       setErrorMessage((err as Error).message)
     }
@@ -226,7 +238,7 @@ const EmailRecipients = ({
       {!campaign.protect && PHONEBOOK_FEATURE_ENABLE === 'true' && (
         <PhonebookListSection
           phonebookLists={phonebookLists}
-          setSelectedPhonebookListId={setSelectedPhonebookListId}
+          onPhonebookListSelected={onPhonebookListSelected}
           retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
           isProcessing={isCsvProcessing}
           defaultLabel={

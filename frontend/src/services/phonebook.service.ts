@@ -70,6 +70,21 @@ export async function deletePhonebookListForCampaign(campaignId: number) {
   }
 }
 
+/**
+ * Determines if the current campaign is using a Phonebook list.
+ * If it is, return the list Id. Otherwise, return null.
+ */
+export async function getPhonebookListIdForCampaign(
+  campaignId: number
+): Promise<number | undefined> {
+  try {
+    const response = await axios.get(`/campaign/${campaignId}/phonebook-list`)
+    return response.data?.list_id
+  } catch (e) {
+    errorHandler(e, 'Error getting managed list of campaign')
+  }
+}
+
 function errorHandler(e: unknown, defaultMsg?: string): never {
   console.error(e)
   if (

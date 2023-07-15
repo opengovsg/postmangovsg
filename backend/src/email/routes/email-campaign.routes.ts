@@ -208,5 +208,10 @@ export const InitEmailCampaignRoute = (
     emailTemplateMiddleware.deletePhonebookListAssociationHandler
   )
 
+  router.get(
+    '/phonebook-list',
+    emailTemplateMiddleware.getPhonebookListIdForCampaignHandler
+  )
+
   return router
 }

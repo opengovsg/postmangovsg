@@ -78,9 +78,19 @@ const deletePhonebookListForCampaign = async (campaignId: number) => {
   })
 }
 
+const getPhonebookListIdForCampaign = async (campaignId: number) => {
+  const managedListCampaign = await ManagedListCampaign.findOne({
+    where: {
+      campaignId,
+    },
+  })
+  return managedListCampaign?.managedListId
+}
+
 export const PhonebookService = {
   getPhonebookLists,
   getPhonebookListById,
   setPhonebookListForCampaign,
   deletePhonebookListForCampaign,
+  getPhonebookListIdForCampaign,
 }

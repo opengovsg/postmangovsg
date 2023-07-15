@@ -29,6 +29,7 @@ export interface EmailTemplateMiddleware {
   selectPhonebookListHandler: Handler
   setPhonebookListAssociationHandler: Handler
   deletePhonebookListAssociationHandler: Handler
+  getPhonebookListIdForCampaignHandler: Handler
 }
 
 export const InitEmailTemplateMiddleware = (
@@ -252,6 +253,21 @@ export const InitEmailTemplateMiddleware = (
     return res.sendStatus(204)
   }
 
+  const getPhonebookListIdForCampaignHandler = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    const { campaignId } = req.params
+    const phonebookListId =
+      await PhonebookService.getPhonebookListIdForCampaign(+campaignId)
+    if (phonebookListId) {
+      return res.json({ list_id: phonebookListId })
+    }
+    return res.json({
+      message: 'No managed_list_id associated with this campaign',
+    })
+  }
+
   /*
    * Returns status of csv processing
    */
@@ -393,5 +409,6 @@ export const InitEmailTemplateMiddleware = (
     selectPhonebookListHandler,
     setPhonebookListAssociationHandler,
     deletePhonebookListAssociationHandler,
+    getPhonebookListIdForCampaignHandler,
   }
 }

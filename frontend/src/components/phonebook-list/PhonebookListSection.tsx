@@ -1,18 +1,16 @@
-import { Dispatch, SetStateAction } from 'react'
-
 import { OutboundLink } from 'react-ga'
 
 import { Dropdown, InfoBlock, StepSection, TextButton } from 'components/common'
 
 export const PhonebookListSection = ({
   phonebookLists,
-  setSelectedPhonebookListId,
+  onPhonebookListSelected,
   retrieveAndPopulatePhonebookLists,
   isProcessing,
   defaultLabel,
 }: {
   phonebookLists: { label: string; value: string }[]
-  setSelectedPhonebookListId: Dispatch<SetStateAction<number | undefined>>
+  onPhonebookListSelected: (listId: number) => any
   retrieveAndPopulatePhonebookLists: () => void
   isProcessing: boolean
   defaultLabel: string
@@ -34,11 +32,12 @@ export const PhonebookListSection = ({
         &nbsp; to try.
       </p>
       <Dropdown
-        onSelect={(selected) => setSelectedPhonebookListId(+selected)}
+        onSelect={(selected) => onPhonebookListSelected(+selected)}
         disabled={!phonebookLists.length || isProcessing}
         options={phonebookLists}
         aria-label="Phonebook list selector"
         defaultLabel={defaultLabel}
+        skipOnSelectForDefaultLabel={true}
       ></Dropdown>
       <InfoBlock>
         <p>
