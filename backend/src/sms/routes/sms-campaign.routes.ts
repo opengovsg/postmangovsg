@@ -81,6 +81,12 @@ export const InitSmsCampaignRoute = (
     }),
   }
 
+  const associatePhonebookListValidator = {
+    [Segments.BODY]: Joi.object({
+      list_id: Joi.number().required(),
+    }),
+  }
+
   // Routes
 
   // Check if campaign belongs to user for this router
@@ -174,6 +180,22 @@ export const InitSmsCampaignRoute = (
     '/phonebook-list',
     celebrate(selectPhonebookListValidator),
     SmsTemplateMiddleware.selectPhonebookListHandler
+  )
+
+  router.put(
+    '/associations',
+    celebrate(associatePhonebookListValidator),
+    SmsTemplateMiddleware.setPhonebookListAssociationHandler
+  )
+
+  router.delete(
+    '/associations',
+    SmsTemplateMiddleware.deletePhonebookListAssociationHandler
+  )
+
+  router.get(
+    '/phonebook-list',
+    SmsTemplateMiddleware.getPhonebookListIdForCampaignHandler
   )
 
   return router
