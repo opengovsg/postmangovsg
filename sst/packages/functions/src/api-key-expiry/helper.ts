@@ -1,8 +1,9 @@
 import { convertToSGTLocaleString } from '@/core/util/date'
+import { Email } from '@/core/util/email'
 
-export type WhenExpire = 'four weeks' | 'two weeks' | 'three days' | 'one day'
+type WhenExpire = 'four weeks' | 'two weeks' | 'three days' | 'one day'
 
-export const reminderEmailBodyGenerator = (
+const reminderEmailBodyGenerator = (
   whenExpire: WhenExpire,
   apiKeyLabel: string,
   lastFive: string,
@@ -41,7 +42,7 @@ export const reminderEmailBodyGenerator = (
   }
 }
 
-export const reminderEmailSubjectGenerator = (
+const reminderEmailSubjectGenerator = (
   whenExpire: 'four weeks' | 'two weeks' | 'three days' | 'one day',
 ) => {
   switch (whenExpire) {
@@ -56,4 +57,52 @@ export const reminderEmailSubjectGenerator = (
       throw new Error(`Unhandled status: ${exhaustiveCheck}`)
     }
   }
+}
+
+interface Key {
+  userEmail: string
+  apiKeyLabel: string
+  validUntil: string
+  apiKeyLastFiveChars: string
+  notificationContacts: string[] | null
+}
+export const reminderEmailMapper = (
+  keys: Key[],
+  whenExpire: WhenExpire,
+): Email[] => {
+  return keys.flatMap((key) => {
+    if (
+      key.notificationContacts === null ||
+      key.notificationContacts.length === 0
+    ) {
+      return [
+        {
+          recipient: key.userEmail, // default to sending to the user's email if no notification contacts are specified
+          body: reminderEmailBodyGenerator(
+            whenExpire,
+            key.apiKeyLabel,
+            key.apiKeyLastFiveChars,
+            key.validUntil,
+            key.userEmail,
+          ),
+          subject: reminderEmailSubjectGenerator(whenExpire),
+          tag: `API key expiry ${whenExpire}`,
+        },
+      ]
+    }
+    return key.notificationContacts.map((recipient) => {
+      return {
+        recipient,
+        body: reminderEmailBodyGenerator(
+          whenExpire,
+          key.apiKeyLabel,
+          key.apiKeyLastFiveChars,
+          key.validUntil,
+          key.userEmail,
+        ),
+        subject: reminderEmailSubjectGenerator(whenExpire),
+        tag: `API key expiry ${whenExpire}`,
+      }
+    })
+  })
 }
