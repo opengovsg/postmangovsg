@@ -1,8 +1,6 @@
 const dayInMs = 24 * 60 * 60 * 1000
 
-export const getDayTruncatedISOStringDaysFromNow = (
-  numDays: number,
-): string => {
+export const getFutureUTCDate = (numDaysFromNow: number): string => {
   // truncate to nearest day in UTC
   const now = new Date()
   const nowDateTruncated = Date.UTC(
@@ -10,6 +8,5 @@ export const getDayTruncatedISOStringDaysFromNow = (
     now.getUTCMonth(),
     now.getUTCDate(),
   )
-  console.log({ nowDateTruncated })
-  return new Date(nowDateTruncated + numDays * dayInMs).toISOString()
+  return new Date(nowDateTruncated + numDaysFromNow * dayInMs).toISOString()
 }
