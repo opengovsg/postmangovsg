@@ -11,7 +11,10 @@ export function MyStack({ stack }: StackContext) {
 }
 
 function getSecrets(stack: Stack) {
-  return [new Config.Secret(stack, 'POSTMAN_DB_URI')]
+  return [
+    new Config.Secret(stack, 'POSTMAN_DB_URI'),
+    new Config.Secret(stack, 'POSTMAN_API_KEY'),
+  ]
 }
 
 function getPermissions() {
