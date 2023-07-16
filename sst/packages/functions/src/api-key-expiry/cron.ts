@@ -1,11 +1,12 @@
+import { users } from '@postmangovsg-sst/core/models/user'
 import PostmanDbClient from '@postmangovsg-sst/core/src/database/client'
 import { apiKeys } from '@postmangovsg-sst/core/src/models'
 import { getFutureUTCDate } from '@postmangovsg-sst/core/src/util/date'
 import { sendEmail } from '@postmangovsg-sst/core/src/util/email'
-import { sql } from 'drizzle-orm'
+import { eq, sql } from 'drizzle-orm'
 import { Config } from 'sst/node/config'
 
-import { IS_LOCAL, LOCAL_DB_URI } from './env'
+import { IS_LOCAL, LOCAL_DB_URI } from '../env'
 
 /*
 - This cron job runs every day at 12AM UTC, i.e. 8AM SGT
@@ -25,32 +26,57 @@ export async function handler() {
   const [fourWeeksKeys, twoWeeksKeys, threeDaysKeys, oneDayKeys] =
     await Promise.all([
       await db
-        .select()
+        .select({
+          userEmail: users.email,
+          apiKeyLabel: apiKeys.label,
+          validUntil: apiKeys.validUntil,
+          apiKeyLastFiveChars: apiKeys.lastFive,
+        })
         .from(apiKeys)
+        .innerJoin(users, eq(users.id, apiKeys.userId))
         .where(
           sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${fourWeeks})`,
         ),
       await db
-        .select()
+        .select({
+          userEmail: users.email,
+          apiKeyLabel: apiKeys.label,
+          validUntil: apiKeys.validUntil,
+          apiKeyLastFiveChars: apiKeys.lastFive,
+        })
         .from(apiKeys)
+        .innerJoin(users, eq(users.id, apiKeys.userId))
         .where(
           sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${twoWeeks})`,
         ),
       await db
-        .select()
+        .select({
+          userEmail: users.email,
+          apiKeyLabel: apiKeys.label,
+          validUntil: apiKeys.validUntil,
+          apiKeyLastFiveChars: apiKeys.lastFive,
+        })
         .from(apiKeys)
+        .innerJoin(users, eq(users.id, apiKeys.userId))
         .where(
           sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${threeDays})`,
         ),
       await db
-        .select()
+        .select({
+          userEmail: users.email,
+          apiKeyLabel: apiKeys.label,
+          validUntil: apiKeys.validUntil,
+          apiKeyLastFiveChars: apiKeys.lastFive,
+        })
         .from(apiKeys)
+        .innerJoin(users, eq(users.id, apiKeys.userId))
         .where(sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${oneDay})`),
     ])
-  await sendEmail({
-    recipient: 'zixiang@open.gov.sg',
-    body: 'bodyyy',
-    subject: 'subjecttt',
-    tag: 'taggg',
-  })
+  console.log({ fourWeeksKeys, twoWeeksKeys, threeDaysKeys, oneDayKeys })
+  // await sendEmail({
+  //   recipient: 'zixiang@open.gov.sg',
+  //   body: 'bodyyy',
+  //   subject: 'subjecttt',
+  //   tag: 'taggg',
+  // })
 }

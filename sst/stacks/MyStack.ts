@@ -4,7 +4,7 @@ export function MyStack({ stack }: StackContext) {
   const apiKeyExpiryCron = new Cron(stack, 'cron', {
     // runs every day at 12AM UTC, i.e. 8AM SGT
     schedule: 'cron(0 0 */1 * ? *)',
-    job: 'packages/functions/src/api-key-expiry-cron.handler',
+    job: 'packages/functions/src/api-key-expiry/cron.handler',
   })
   apiKeyExpiryCron.attachPermissions(getPermissions())
   apiKeyExpiryCron.bind(getSecrets(stack))
