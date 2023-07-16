@@ -1,12 +1,19 @@
-import { users } from '@postmangovsg-sst/core/models/user'
-import PostmanDbClient from '@postmangovsg-sst/core/src/database/client'
-import { apiKeys } from '@postmangovsg-sst/core/src/models'
-import { getFutureUTCDate } from '@postmangovsg-sst/core/src/util/date'
-import { sendEmail } from '@postmangovsg-sst/core/src/util/email'
 import { eq, sql } from 'drizzle-orm'
 import { Config } from 'sst/node/config'
 
+import PostmanDbClient from '@/core/database/client'
+import { apiKeys } from '@/core/models'
+import { users } from '@/core/models/user'
+import { getFutureUTCDate } from '@/core/util/date'
+import { Email, sendEmail } from '@/core/util/email'
+
 import { IS_LOCAL, LOCAL_DB_URI } from '../env'
+
+import {
+  reminderEmailBodyGenerator,
+  reminderEmailSubjectGenerator,
+  WhenExpire,
+} from './helper'
 
 /*
 - This cron job runs every day at 12AM UTC, i.e. 8AM SGT
@@ -31,6 +38,7 @@ export async function handler() {
           apiKeyLabel: apiKeys.label,
           validUntil: apiKeys.validUntil,
           apiKeyLastFiveChars: apiKeys.lastFive,
+          notificationContacts: apiKeys.notificationContacts,
         })
         .from(apiKeys)
         .innerJoin(users, eq(users.id, apiKeys.userId))
@@ -43,6 +51,7 @@ export async function handler() {
           apiKeyLabel: apiKeys.label,
           validUntil: apiKeys.validUntil,
           apiKeyLastFiveChars: apiKeys.lastFive,
+          notificationContacts: apiKeys.notificationContacts,
         })
         .from(apiKeys)
         .innerJoin(users, eq(users.id, apiKeys.userId))
@@ -55,6 +64,7 @@ export async function handler() {
           apiKeyLabel: apiKeys.label,
           validUntil: apiKeys.validUntil,
           apiKeyLastFiveChars: apiKeys.lastFive,
+          notificationContacts: apiKeys.notificationContacts,
         })
         .from(apiKeys)
         .innerJoin(users, eq(users.id, apiKeys.userId))
@@ -67,16 +77,65 @@ export async function handler() {
           apiKeyLabel: apiKeys.label,
           validUntil: apiKeys.validUntil,
           apiKeyLastFiveChars: apiKeys.lastFive,
+          notificationContacts: apiKeys.notificationContacts,
         })
         .from(apiKeys)
         .innerJoin(users, eq(users.id, apiKeys.userId))
         .where(sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${oneDay})`),
     ])
-  console.log({ fourWeeksKeys, twoWeeksKeys, threeDaysKeys, oneDayKeys })
-  // await sendEmail({
-  //   recipient: 'zixiang@open.gov.sg',
-  //   body: 'bodyyy',
-  //   subject: 'subjecttt',
-  //   tag: 'taggg',
+  const fourWeeksEmails = emailMappingHelper(fourWeeksKeys, 'four weeks')
+  const twoWeeksEmails = emailMappingHelper(twoWeeksKeys, 'two weeks')
+  const threeDaysEmails = emailMappingHelper(threeDaysKeys, 'three days')
+  const oneDayEmails = emailMappingHelper(oneDayKeys, 'one day')
+  await Promise.all([
+    ...fourWeeksEmails.map((email) => sendEmail(email)),
+    ...twoWeeksEmails.map((email) => sendEmail(email)),
+    ...threeDaysEmails.map((email) => sendEmail(email)),
+    ...oneDayEmails.map((email) => sendEmail(email)),
+  ])
   // })
+}
+interface Key {
+  userEmail: string
+  apiKeyLabel: string
+  validUntil: string
+  apiKeyLastFiveChars: string
+  notificationContacts: string[] | null
+}
+const emailMappingHelper = (keys: Key[], whenExpire: WhenExpire): Email[] => {
+  return keys.flatMap((key) => {
+    if (
+      key.notificationContacts === null ||
+      key.notificationContacts.length === 0
+    ) {
+      return [
+        {
+          recipient: key.userEmail,
+          body: reminderEmailBodyGenerator(
+            whenExpire,
+            key.apiKeyLabel,
+            key.apiKeyLastFiveChars,
+            key.validUntil,
+            key.userEmail,
+          ),
+          subject: reminderEmailSubjectGenerator(whenExpire),
+          tag: `API key expiry ${whenExpire}`,
+        },
+      ]
+    }
+    return key.notificationContacts.map((recipient) => {
+      return {
+        recipient, // default to sending to the user's email if no notification contacts are specified
+        body: reminderEmailBodyGenerator(
+          whenExpire,
+          key.apiKeyLabel,
+          key.apiKeyLastFiveChars,
+          key.validUntil,
+          key.userEmail,
+        ),
+        subject: reminderEmailSubjectGenerator(whenExpire),
+        tag: `API key expiry ${whenExpire}`,
+      }
+    })
+  })
 }
