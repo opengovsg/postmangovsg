@@ -10,3 +10,18 @@ export const getFutureUTCDate = (numDaysFromNow: number): string => {
   )
   return new Date(nowDateTruncated + numDaysFromNow * dayInMs).toISOString()
 }
+
+export const convertToSGTLocaleString = (isoString: string) => {
+  const date = new Date(isoString)
+  // example output: 'Thursday, January 4, 2024 at 2:54 PM'
+  return date.toLocaleString('en-US', {
+    timeZone: 'Asia/Singapore',
+    hour12: true,
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    hour: 'numeric',
+    minute: '2-digit',
+  })
+}

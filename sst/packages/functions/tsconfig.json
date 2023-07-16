@@ -5,7 +5,7 @@
     "moduleResolution": "node",
     "baseUrl": ".",
     "paths": {
-      "@postmangovsg-sst/core/*": ["../core/src/*"]
+      "@/core/*": ["../core/src/*"]
     }
   }
 }
