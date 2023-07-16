@@ -10,6 +10,14 @@ export default {
     }
   },
   stacks(app) {
+    app.setDefaultFunctionProps({
+      environment: {
+        NODE_OPTIONS: '--enable-source-maps',
+      },
+      nodejs: {
+        sourcemap: true,
+      },
+    })
     app.stack(MyStack)
   },
 } satisfies SSTConfig
