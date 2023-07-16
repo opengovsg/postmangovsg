@@ -98,6 +98,7 @@ export interface ConfigSchema {
     enabled: boolean
     endpointUrl: string
     apiKey: string
+    autoUnsubscribe: boolean
   }
 }
 
@@ -435,6 +436,11 @@ const config: Config<ConfigSchema> = convict({
       default: 'API_KEY',
       env: 'PHONEBOOK_API_KEY',
       format: 'required-string',
+    },
+    autoUnsubscribe: {
+      doc: 'Use Phonebook unsubscribe URL to automatically remove unsubscribed users from the ManagedList',
+      default: true,
+      env: 'PHONEBOOK_AUTO_UNSUBSCRIBE',
     },
   },
 })

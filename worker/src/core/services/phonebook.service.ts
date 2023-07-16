@@ -1,7 +1,8 @@
 import config from '@core/config'
 import PhonebookClient from '@shared/clients/phonebook-client.class'
 import {
-  PhonebookChannelDto,
+  GetUniqueLinksRequestDto,
+  GetUniqueLinksResponseDto,
   UserChannel,
 } from '@shared/clients/phonebook-client.class/interfaces'
 import { map } from 'lodash'
@@ -20,26 +21,23 @@ const options = {
   enabled: true,
 }
 
-const getUniqueLinksForUsers = async (
-  body: PhonebookChannelDto
-): Promise<Map<string, UserChannel>> => {
+const getUniqueLinksForUsers = async (body: GetUniqueLinksRequestDto) => {
   const userChannelsRes = await phonebookClient.getUniqueLinksForUsers(body)
-  return userChannelsRes.reduce(
-    (map: Map<string, UserChannel>, userChannel: UserChannel) => {
-      map.set(userChannel.channelId, userChannel)
-      return map
-    },
-    new Map<string, UserChannel>()
-  )
+  return userChannelsRes.reduce((map, userChannel) => {
+    map.set(userChannel.channelId, userChannel)
+    return map
+  }, new Map<string, GetUniqueLinksResponseDto>())
 }
 
 const breaker = new CircuitBreaker(getUniqueLinksForUsers, options)
 
 const appendLinkForEmail = async (
   result: EmailResultRow[],
+  managedListId?: number,
   channel = 'Email'
 ): Promise<Message[]> => {
   const showMastheadDomain = config.get('showMastheadDomain')
+  const allowAutoUnsubscribe = config.get('phonebook.autoUnsubscribe')
 
   const channels: UserChannel[] = result.map((row) => {
     return {
@@ -47,8 +45,14 @@ const appendLinkForEmail = async (
       channelId: row.message.recipient,
     }
   })
-  const payload: PhonebookChannelDto = {
+  const payload: GetUniqueLinksRequestDto = {
     userChannels: channels,
+    includeUnsubscribeLink:
+      allowAutoUnsubscribe && managedListId
+        ? {
+            managedListId,
+          }
+        : undefined,
   }
 
   return breaker
@@ -63,6 +67,7 @@ const appendLinkForEmail = async (
           ...row.message,
           showMasthead,
           userUniqueLink: userChannel?.userUniqueLink || '',
+          unsubLink: userChannel?.userUnsubscribeLink,
         }
       })
     })
@@ -95,7 +100,7 @@ const appendLinkForSms = async (
       channelId: message.recipient,
     }
   })
-  const payload: PhonebookChannelDto = {
+  const payload: GetUniqueLinksRequestDto = {
     userChannels: channels,
   }
 

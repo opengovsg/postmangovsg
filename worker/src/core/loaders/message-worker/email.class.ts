@@ -59,9 +59,28 @@ class Email {
       })
   }
 
-  async getMessages(jobId: number, rate: number): Promise<Message[]> {
-    const showMastheadDomain = config.get('showMastheadDomain')
+  async fetchManagedListIdOfCampaign(campaignId: number) {
+    const result = await this.connection.query<{ managed_list_id: number }>(
+      'SELECT managed_list_id FROM managed_list_campaigns WHERE campaign_id = :campaign_id',
+      {
+        replacements: { campaign_id: campaignId },
+        type: QueryTypes.SELECT,
+      }
+    )
 
+    if (result.length > 0) {
+      return result[0].managed_list_id
+    }
+    // Current campaign is not using Phonebook
+    return undefined
+  }
+
+  async getMessages(
+    jobId: number,
+    rate: number,
+    campaignId: number
+  ): Promise<Message[]> {
+    const showMastheadDomain = config.get('showMastheadDomain')
     const result = await this.connection.query<EmailResultRow>(
       'SELECT get_messages_to_send_email_with_agency(:job_id, :rate) AS message;',
       {
@@ -72,7 +91,10 @@ class Email {
     const phonebookFeatureFlag = config.get('phonebook.enabled')
     if (phonebookFeatureFlag && result.length > 0) {
       try {
-        return await PhonebookService.appendLinkForEmail(result)
+        const managedListId = await this.fetchManagedListIdOfCampaign(
+          campaignId
+        )
+        return await PhonebookService.appendLinkForEmail(result, managedListId)
       } catch (error) {
         logger.error({
           message: 'Unable to append links',
@@ -129,6 +151,7 @@ class Email {
     agencyLogoURI,
     showMasthead,
     userUniqueLink,
+    unsubLink,
   }: Message): Promise<void> {
     try {
       if (!validator.isEmail(recipient)) {
@@ -138,11 +161,13 @@ class Email {
       // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const hydratedSubject = templateClient.template(subject!, params)
       const hydratedBody = templateClient.template(body, params)
-      const unsubLink = this.generateUnsubLink(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        campaignId!,
-        recipient
-      ).toString()
+      if (!unsubLink) {
+        unsubLink = this.generateUnsubLink(
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          campaignId!,
+          recipient
+        ).toString()
+      }
       const themedHTMLEmail = await ThemeClient.generateThemedHTMLEmail({
         body: hydratedBody,
         unsubLink,
