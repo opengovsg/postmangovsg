@@ -314,7 +314,7 @@ const config: Config<ConfigSchema> = convict({
   },
   frontendUrl: {
     doc: 'CORS: accept requests from this origin. Can be a string, or regex',
-    default: 'https://postman.gov.sg', // prod only
+    default: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/',
     env: 'FRONTEND_URL',
   },
   protectedUrl: {
@@ -819,7 +819,6 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 switch (config.get('env')) {
   case 'staging':
     config.load({
-      frontendUrl: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/', // all subdomains
       protectedUrl: 'https://staging.postman.gov.sg/p',
       unsubscribeUrl: 'https://staging.postman.gov.sg/unsubscribe',
       aws: {
