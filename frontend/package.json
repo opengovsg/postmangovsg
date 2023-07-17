@@ -19,6 +19,7 @@
     "test": "react-app-rewired test --passWithNoTests"
   },
   "dependencies": {
+    "@datadog/browser-rum": "4.43.0",
     "@lingui/core": "3.14.0",
     "@lingui/react": "3.14.0",
     "@sentry/browser": "5.27.6",

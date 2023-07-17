@@ -49,6 +49,11 @@ function GovsgPickTemplate({
     void (async function () {
       try {
         const templates = await getAvailableTemplates()
+        if (templates.length === 0) {
+          setErrorMsg(
+            'No templates available. Please contact your administrator to create templates.'
+          )
+        }
         setAvailableTemplates(templates)
       } catch {
         setErrorMsg(

@@ -236,9 +236,9 @@ const EmailRecipients = ({
     <>
       <StepHeader
         title="Select existing or upload new recipient list"
-        subtitle="Step 2"
+        subtitle={protect ? '' : 'Step 2'}
       ></StepHeader>
-      {!campaign.protect && PHONEBOOK_FEATURE_ENABLE === 'true' && (
+      {!protect && PHONEBOOK_FEATURE_ENABLE === 'true' && (
         <PhonebookListSection
           phonebookLists={phonebookLists}
           onPhonebookListSelected={onPhonebookListSelected}

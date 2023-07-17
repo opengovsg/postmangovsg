@@ -1,7 +1,10 @@
+import { datadogRum } from '@datadog/browser-rum'
 import axios from 'axios'
 import { createContext, useState, useEffect } from 'react'
 import type { ReactNode, Dispatch, SetStateAction } from 'react'
 import { useLocation } from 'react-router-dom'
+
+import { ChannelType } from 'classes'
 
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
 import { initializeGA, sendPageView } from 'services/ga.service'
@@ -44,6 +47,16 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 
         initializeGA()
         setUserAnalytics(user)
+
+        if (user) {
+          datadogRum.setUser({
+            id: String(user.id),
+            email: user.email,
+          })
+          if (user.experimental_data[ChannelType.Govsg]) {
+            datadogRum.startSessionReplayRecording()
+          }
+        }
       } catch (err) {
         // is unauthorized
       }

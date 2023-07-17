@@ -44,6 +44,7 @@ import {
   GovsgMessageTransactional,
   GovsgOp,
   GovsgTemplate,
+  GovsgTemplatesAccess,
 } from '@govsg/models'
 import { UserExperimental } from './user/user-experimental'
 
@@ -87,6 +88,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
     GovsgMessageTransactional,
     GovsgOp,
     GovsgTemplate,
+    GovsgTemplatesAccess,
     CampaignGovsgTemplate,
   ]
   const phonebookModels = [ManagedListCampaign]

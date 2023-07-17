@@ -1,18 +1,12 @@
-import {
-  ApiAuthenticationError,
-  ApiAuthorizationError,
-} from '@core/errors/rest-api.errors'
+import { ApiAuthorizationError } from '@core/errors/rest-api.errors'
 import { experimentService } from '@core/services'
 import { NextFunction, Request, Response } from 'express'
 
 export const experimentalUserOnly =
   (feature: string) =>
   async (req: Request, _res: Response, next: NextFunction): Promise<void> => {
-    if (!req.session?.user?.id) {
-      throw new ApiAuthenticationError('Request not authenticated')
-    }
     const u = await experimentService.getExperimentalUser(
-      req.session.user.id,
+      req.session?.user.id, // safe because authentication middleware has guaranteed this
       feature
     )
     if (!u) {

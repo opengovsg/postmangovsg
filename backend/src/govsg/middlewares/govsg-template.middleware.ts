@@ -6,12 +6,14 @@ import {
   UserError,
 } from '@core/errors'
 import {
+  ApiAuthenticationError,
   ApiInvalidTemplateError,
   ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign, Statistic } from '@core/models'
 import { CampaignService, StatsService, UploadService } from '@core/services'
+import { GovsgTemplatesAccess } from '@govsg/models'
 import { CampaignGovsgTemplate } from '@govsg/models/campaign-govsg-template'
 import { GovsgMessage } from '@govsg/models/govsg-message'
 import { GovsgTemplate } from '@govsg/models/govsg-template'
@@ -21,19 +23,46 @@ import { NextFunction, Request, Response } from 'express'
 const logger = loggerWithLabel(module)
 
 export const getAvailableTemplates = async (
-  _req: Request,
+  req: Request,
   res: Response
 ): Promise<Response> => {
-  const templates = await GovsgTemplate.findAll()
-  return res.status(200).json({ data: templates })
+  const userId = req.session?.user.id
+  const allowedTemplates = (
+    await GovsgTemplatesAccess.findAll({
+      where: { userId },
+      include: {
+        model: GovsgTemplate,
+      },
+    })
+  ).map((o) => o.govsgTemplate)
+  return res.status(200).json({ data: allowedTemplates })
+}
+
+async function checkUserTemplateAccess(
+  userId: number,
+  templateId: number
+): Promise<void> {
+  const allowed = await GovsgTemplatesAccess.findOne({
+    where: { userId, templateId },
+  })
+  if (!allowed) {
+    throw new ApiInvalidTemplateError(
+      `User ${userId} does not have access to template ${templateId}`
+    )
+  }
 }
 
 export async function pickTemplateForCampaign(
   req: Request,
   res: Response
 ): Promise<Response> {
+  if (!req.session?.user?.id) {
+    throw new ApiAuthenticationError('Request not authenticated')
+  }
+  const userId = req.session.user.id
   const { template_id: templateId, for_single_recipient: forSingleRecipient } =
     req.body
+  await checkUserTemplateAccess(userId, templateId)
   const campaignId = +req.params.campaignId
   const [template, campaign] = await Promise.all([
     GovsgTemplate.findOne({

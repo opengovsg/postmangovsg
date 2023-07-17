@@ -34,6 +34,7 @@ const getStatsFromArchive = async (
       unsent: 0,
       invalid: 0,
       read: 0,
+      delivered: 0,
       updated_at: new Date(),
     }
   }
@@ -43,6 +44,7 @@ const getStatsFromArchive = async (
     unsent: stats?.unsent,
     invalid: stats?.invalid,
     read: stats?.read,
+    delivered: stats?.delivered,
     updated_at: stats?.updatedAt,
   }
 }
@@ -93,7 +95,7 @@ const getStatsFromTable = async (
   if (model === GovsgOp) {
     const [data] = await model.findAll({
       raw: true,
-      where: { campaign_id: campaignId }, // not sure why it has to be `campaign_id` here
+      where: { campaignId },
       attributes: [
         [fn('sum', cast({ status: GovsgMessageStatus.Error }, 'int')), 'error'],
         [
@@ -104,7 +106,6 @@ const getStatsFromTable = async (
                 [Op.or]: [
                   { status: GovsgMessageStatus.Sent },
                   { status: GovsgMessageStatus.Accepted },
-                  { status: GovsgMessageStatus.Delivered },
                 ],
               },
               'int'
@@ -123,6 +124,25 @@ const getStatsFromTable = async (
           ),
           'invalid',
         ],
+        [
+          fn('sum', cast({ status: GovsgMessageStatus.Delivered }, 'int')),
+          'delivered',
+        ],
+        [
+          fn(
+            'sum',
+            cast(
+              {
+                [Op.or]: [
+                  { status: GovsgMessageStatus.Read },
+                  { status: GovsgMessageStatus.Deleted },
+                ],
+              },
+              'int'
+            )
+          ),
+          'read',
+        ],
       ],
     })
 
@@ -131,6 +151,8 @@ const getStatsFromTable = async (
       sent: +data.sent,
       unsent: +data.unsent,
       invalid: +data.invalid,
+      read: +data.read,
+      delivered: +data.delivered,
       updated_at: new Date(),
     }
   }
@@ -200,6 +222,7 @@ const getCurrentStats = async (
       sent: opsStats.sent + archivedStats.sent,
       // this is needed when invalid might appear in ops table, e.g. telegram immediate bounce errors
       invalid: opsStats.invalid + archivedStats.invalid,
+      delivered: opsStats.delivered,
       read: opsStats.read,
       status: job.status,
       updated_at: job.updatedAt,
