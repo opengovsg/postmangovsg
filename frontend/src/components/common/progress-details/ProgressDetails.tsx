@@ -22,10 +22,12 @@ const ProgressDetails = ({
   stats,
   redacted,
   handleRetry,
+  isUsingPhonebook = false,
 }: {
   stats: CampaignStats
   redacted: boolean
   handleRetry: () => Promise<void>
+  isUsingPhonebook?: boolean
 }) => {
   const { campaign } = useContext(CampaignContext)
   const { id, name, type, sentAt, numRecipients } = campaign
@@ -214,7 +216,7 @@ const ProgressDetails = ({
             <td className={'md'}>Recipient does not exist</td>
             <td className={'sm'}>{invalid}</td>
           </tr>
-          {type === ChannelType.Email && (
+          {type === ChannelType.Email && !isUsingPhonebook && (
             <tr>
               <td className={cx(styles.status, 'md')}>
                 <i
@@ -228,7 +230,7 @@ const ProgressDetails = ({
           )}
         </tbody>
       </table>
-      {type === ChannelType.Email && (
+      {type === ChannelType.Email && !isUsingPhonebook && (
         <InfoBlock className={styles.notice}>
           <strong>Remove unsubscribers from your recipient list</strong>, to
           avoid campaigns being marked as spam and affecting the reputation of
