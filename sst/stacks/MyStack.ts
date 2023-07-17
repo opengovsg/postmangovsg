@@ -31,6 +31,10 @@ export function MyStack({ app, stack }: StackContext) {
     new Config.Secret(stack, 'POSTMAN_API_KEY'),
   ])
 
+  // SST's Cron construct does not allow us to create it within a VPC
+  // which is necessary in order to query the database for API key info
+  // as such, we use the Cron to invoke a Function that is within the VPC
+  // and does the db query and the actual sending
   const cron = new Cron(stack, 'cron', {
     // runs every day at 12AM UTC, i.e. 8AM SGT
     schedule: 'cron(0 0 */1 * ? *)',
@@ -46,6 +50,8 @@ export function MyStack({ app, stack }: StackContext) {
     new Config.Parameter(stack, 'FUNCTION_VERSION', {
       value: sendReminderEmail.currentVersion.version,
     }),
+    new Config.Secret(stack, 'CRONITOR_URL_SUFFIX'),
+    new Config.Secret(stack, 'CRONITOR_CODE_API_KEY_EXPIRY'),
   ])
   // because sendReminderEmail uses iam authorizer
   cron.attachPermissions(['lambda:InvokeFunctionUrl'])
