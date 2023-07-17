@@ -89,11 +89,5 @@ export async function handler() {
     ...threeDaysEmails.map((email) => sendEmail(email)),
     ...oneDayEmails.map((email) => sendEmail(email)),
   ])
-  console.log({
-    fourWeeksEmails,
-    twoWeeksEmails,
-    threeDaysEmails,
-    oneDayEmails,
-  })
   console.log('Cron job completed')
 }
