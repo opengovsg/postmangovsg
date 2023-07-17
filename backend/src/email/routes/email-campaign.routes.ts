@@ -83,6 +83,12 @@ export const InitEmailCampaignRoute = (
     }),
   }
 
+  const selectPhonebookListValidator = {
+    [Segments.BODY]: Joi.object({
+      list_id: Joi.number().required(),
+    }),
+  }
+
   // Routes
 
   // Check if campaign belongs to user for this router
@@ -177,6 +183,12 @@ export const InitEmailCampaignRoute = (
     '/duplicate',
     celebrate(duplicateCampaignValidator),
     emailMiddleware.duplicateCampaign
+  )
+
+  router.post(
+    '/phonebook-list',
+    celebrate(selectPhonebookListValidator),
+    emailTemplateMiddleware.selectPhonebookListHandler
   )
 
   return router

@@ -93,11 +93,14 @@ export const GA_INITIALIZE_OPTIONS = gaInitializeOptions
 export const GA_TRACKING_ID = gaTrackingId
 export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN as string
 export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
-export const SENTRY_ENVIRONMENT =
-  (process.env.REACT_APP_SENTRY_ENVIRONMENT as string) || 'development'
+export const APP_ENV =
+  (process.env.REACT_APP_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
 export const INFO_BANNER_COLOR = process.env
   .REACT_APP_INFO_BANNER_COLOR as string
+
+export const PHONEBOOK_FEATURE_ENABLE = process.env
+  .REACT_APP_PHONEBOOK_FEATURE_ENABLE as string
 
 // Feature Launch Announcements
 // If `isActive` is false, the modal will not proc for ANY user

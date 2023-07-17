@@ -172,6 +172,11 @@ interface ConfigSchema {
   flamingo: {
     dbUri: string
   }
+
+  phonebook: {
+    endpointUrl: string
+    apiKey: string
+  }
 }
 
 convict.addFormats({
@@ -786,6 +791,20 @@ const config: Config<ConfigSchema> = convict({
       default: '',
       format: 'required-string',
       env: 'FLAMINGO_DB_URI',
+    },
+  },
+  phonebook: {
+    endpointUrl: {
+      doc: 'Endpoint url of phonebook server',
+      default: 'http://localhost:8080',
+      env: 'PHONEBOOK_URL',
+      format: 'required-string',
+    },
+    apiKey: {
+      doc: 'API key to make requests to Phonebook',
+      default: 'API_KEY',
+      env: 'PHONEBOOK_API_KEY',
+      format: 'required-string',
     },
   },
 })

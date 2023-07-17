@@ -15,11 +15,11 @@ export interface Message {
   agencyName?: string
   agencyLogoURI?: string
   showMasthead?: boolean
-  contactPrefLink?: string
   paramOrder?: string[] // for whatsapp whose templates dont use named params
   whatsappTemplateLabel?: string
   apiClient?: WhatsAppApiClient
   language?: WhatsAppLanguages
+  userUniqueLink?: string
 }
 
 export interface ContactChannel {
