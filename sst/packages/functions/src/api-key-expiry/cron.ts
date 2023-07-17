@@ -1,4 +1,4 @@
-// to replace with fetch when upgraded to Node 18
+import { aws4Interceptor } from 'aws4-axios'
 import axios from 'axios'
 import { Config } from 'sst/node/config'
 
@@ -10,15 +10,23 @@ import { Config } from 'sst/node/config'
 */
 
 export async function handler() {
-  /* To try later
-  https://docs.aws.amazon.com/apigateway/latest/developerguide/api-gateway-iam-policy-examples-for-api-execution.html
-  https://docs.aws.amazon.com/lambda/latest/dg/API_Invoke.html
-  */
-  await axios
+  const client = axios.create({
+    baseURL: Config.FUNCTION_URL,
+  })
+  const interceptor = aws4Interceptor({
+    options: {
+      region: 'ap-southeast-1',
+      service: 'lambda',
+    },
+  })
+  client.interceptors.request.use(interceptor)
+  await client
     .get(
-      `${Config.FUNCTION_URL}2015-03-31/functions/${Config.FUNCTION_NAME}/invocations?Qualifier=${Config.FUNCTION_VERSION}`,
+      // FUNCTION_URL already contains a forward slash /
+      `2015-03-31/functions/${Config.FUNCTION_NAME}/invocations?Qualifier=${Config.FUNCTION_VERSION}`,
     )
     .catch((err) => {
       console.log(err)
+      throw err
     })
 }
