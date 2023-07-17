@@ -148,6 +148,7 @@ const ProgressDetails = ({
           status={status}
           statusUpdatedAt={statusUpdatedAt}
           isButton
+          isUsingPhonebook={isUsingPhonebook}
         />
       ) : (
         <strong>

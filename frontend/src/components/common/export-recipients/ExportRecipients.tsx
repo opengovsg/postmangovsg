@@ -32,6 +32,7 @@ const ExportRecipients = ({
   statusUpdatedAt,
   iconPosition,
   isButton = false,
+  isUsingPhonebook = false,
 }: {
   campaignId: number
   campaignName: string
@@ -41,6 +42,7 @@ const ExportRecipients = ({
   statusUpdatedAt?: string
   iconPosition: 'left' | 'right'
   isButton?: boolean
+  isUsingPhonebook?: boolean
 }) => {
   const [exportStatus, setExportStatus] = useState(
     CampaignExportStatus.Unavailable
@@ -94,13 +96,17 @@ const ExportRecipients = ({
       if (list.length > 0) {
         let keys = Object.keys(list[0]).filter((k) => k !== 'unsubscriber') // this field is only used to detect whether the person has unsub-ed
         if (campaignType === ChannelType.Email) {
-          keys = [
-            'recipient',
-            'status',
-            'unsubscribeReason',
-            'errorCode',
-            'updatedAt',
-          ]
+          if (isUsingPhonebook) {
+            keys = ['recipient', 'status', 'errorCode', 'updatedAt']
+          } else {
+            keys = [
+              'recipient',
+              'status',
+              'unsubscribeReason',
+              'errorCode',
+              'updatedAt',
+            ]
+          }
         }
         const headers = keys
           .map((key) => `"${key}"`)
