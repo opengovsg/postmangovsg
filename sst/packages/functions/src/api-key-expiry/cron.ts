@@ -15,7 +15,7 @@ export async function handler() {
   client.interceptors.request.use(interceptor)
   // eslint-disable-next-line @typescript-eslint/no-var-requires
   const cronitor = require('cronitor')(Config.CRONITOR_URL_SUFFIX)
-  const asyncCall = cronitor.wrap(
+  const invokeFunction = cronitor.wrap(
     Config.CRONITOR_CODE_API_KEY_EXPIRY,
     async function () {
       await client
@@ -29,5 +29,5 @@ export async function handler() {
         })
     },
   )
-  await asyncCall()
+  await invokeFunction()
 }

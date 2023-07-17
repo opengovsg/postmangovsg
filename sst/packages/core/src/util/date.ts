@@ -1,7 +1,7 @@
 const dayInMs = 24 * 60 * 60 * 1000
 
 export const getFutureUTCDate = (numDaysFromNow: number): string => {
-  // truncate to nearest day in UTC
+  // truncate to current day in UTC, user beware of off-by-one error
   const now = new Date()
   const nowDateTruncated = Date.UTC(
     now.getUTCFullYear(),
