@@ -47,16 +47,6 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
 
         initializeGA()
         setUserAnalytics(user)
-
-        if (user) {
-          datadogRum.setUser({
-            id: String(user.id),
-            email: user.email,
-          })
-          if (user.experimental_data[ChannelType.Govsg]) {
-            datadogRum.startSessionReplayRecording()
-          }
-        }
       } catch (err) {
         // is unauthorized
       }
@@ -78,6 +68,20 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     }
     void initialChecks()
   }, [])
+
+  useEffect(() => {
+    if (email) {
+      datadogRum.setUser({
+        email,
+      })
+    }
+  }, [email])
+
+  useEffect(() => {
+    if (email && experimentalData && experimentalData[ChannelType.Govsg]) {
+      datadogRum.startSessionReplayRecording()
+    }
+  }, [email, experimentalData])
 
   return (
     <AuthContext.Provider

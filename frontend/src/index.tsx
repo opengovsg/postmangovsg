@@ -25,7 +25,12 @@ Sentry.init({
   environment: APP_ENV,
 })
 
-if (APP_ENV === 'production' || APP_ENV === 'staging') {
+console.log(APP_ENV)
+if (
+  APP_ENV === 'production' ||
+  APP_ENV === 'staging' ||
+  APP_ENV === 'development'
+) {
   datadogRum.init({
     applicationId: 'cb688eb3-9630-4afa-aeac-64bba039ca6f',
     clientToken: 'pubaa5878fabb0309c23c99df19ef5cc1c0',
