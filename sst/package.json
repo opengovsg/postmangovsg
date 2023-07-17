@@ -9,7 +9,8 @@
     "deploy": "sst deploy",
     "remove": "sst remove",
     "console": "sst console",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "precommit": "lint-staged"
   },
   "devDependencies": {
     "@tsconfig/node16": "^16.1.0",
@@ -21,6 +22,7 @@
     "eslint-plugin-import": "^2.27.5",
     "eslint-plugin-n": "^15.7.0",
     "eslint-plugin-promise": "^6.1.1",
+    "lint-staged": "^13.2.3",
     "sst": "^2.21.0",
     "typescript": "^5.1.6"
   },
@@ -31,5 +33,8 @@
     "aws-cdk": "^2.87.0",
     "aws4-axios": "^3.2.24",
     "dotenv": "^16.3.1"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --cache --fix"
   }
 }
