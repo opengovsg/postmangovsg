@@ -172,10 +172,15 @@ type CallbackMetaData = {
   bounce?: {
     bounceType: string
     bounceSubType: string
+    bouncedRecipients?: { emailAddress: string }[]
   }
   complaint?: {
     complaintFeedbackType: string
     complaintSubType: string
+    complainedRecipients?: { emailAddress: string }[]
+  }
+  delivery?: {
+    recipients: string[]
   }
 }
 
@@ -184,44 +189,68 @@ async function handleStatusCallbacks(
   id: string,
   metadata: CallbackMetaData
 ): Promise<void> {
+  const emailMessageTransactional = await EmailMessageTransactional.findByPk(id)
+  if (!emailMessageTransactional) {
+    throw new Error(`Failed to find emailMessageTransactional for id: ${id}`)
+  }
+
+  const mainRecipientDelivered = metadata.delivery?.recipients?.find(
+    (e) => e === emailMessageTransactional.recipient
+  )
+  const mainRecipientBounced = metadata.bounce?.bouncedRecipients?.find(
+    (e) => e.emailAddress === emailMessageTransactional.recipient
+  )
+  const mainRecipientComplained =
+    metadata.complaint?.complainedRecipients?.find(
+      (e) => e.emailAddress === emailMessageTransactional.recipient
+    )
+
   switch (type) {
     case SesEventType.Delivery:
-      await EmailMessageTransactional.update(
-        {
-          status: TransactionalEmailMessageStatus.Delivered,
-          deliveredAt: metadata.timestamp,
-        },
-        {
-          where: { id },
-        }
-      )
+      if (mainRecipientDelivered) {
+        await EmailMessageTransactional.update(
+          {
+            status: TransactionalEmailMessageStatus.Delivered,
+            deliveredAt: metadata.timestamp,
+          },
+          {
+            where: { id },
+          }
+        )
+      }
       break
     case SesEventType.Bounce:
-      await EmailMessageTransactional.update(
-        {
-          status: TransactionalEmailMessageStatus.Bounced,
-          errorCode:
-            metadata.bounce?.bounceType === 'Permanent'
-              ? 'Hard bounce'
-              : 'Soft bounce',
-          errorSubType: metadata.bounce?.bounceSubType,
-        },
-        {
-          where: { id },
-        }
-      )
+      // check that bounce applies to the main recipient
+      if (mainRecipientBounced) {
+        await EmailMessageTransactional.update(
+          {
+            status: TransactionalEmailMessageStatus.Bounced,
+            errorCode:
+              metadata.bounce?.bounceType === 'Permanent'
+                ? 'Hard bounce'
+                : 'Soft bounce',
+            errorSubType: metadata.bounce?.bounceSubType,
+          },
+          {
+            where: { id },
+          }
+        )
+      }
       break
     case SesEventType.Complaint:
-      await EmailMessageTransactional.update(
-        {
-          status: TransactionalEmailMessageStatus.Complaint,
-          errorCode: metadata.complaint?.complaintFeedbackType,
-          errorSubType: metadata.complaint?.complaintSubType,
-        },
-        {
-          where: { id },
-        }
-      )
+      // check that complaint applies to the main recipient
+      if (mainRecipientComplained) {
+        await EmailMessageTransactional.update(
+          {
+            status: TransactionalEmailMessageStatus.Complaint,
+            errorCode: metadata.complaint?.complaintFeedbackType,
+            errorSubType: metadata.complaint?.complaintSubType,
+          },
+          {
+            where: { id },
+          }
+        )
+      }
       break
     case SesEventType.Open:
       await EmailMessageTransactional.update(
