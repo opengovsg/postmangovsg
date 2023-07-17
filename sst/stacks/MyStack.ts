@@ -1,5 +1,5 @@
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
-import { Api, Config, Cron, Function, StackContext } from 'sst/constructs'
+import { Config, Cron, Function, StackContext } from 'sst/constructs'
 
 export function MyStack({ app, stack }: StackContext) {
   const { vpcName, lookupOptions, sgName, sgId } = getResourceIdentifiers(
@@ -22,31 +22,23 @@ export function MyStack({ app, stack }: StackContext) {
     vpcSubnets: {
       subnets: existingVpc.privateSubnets,
     },
-    url: true,
+    url: {
+      authorizer: 'iam',
+    },
   })
   sendReminderEmail.bind([
     new Config.Secret(stack, 'POSTMAN_DB_URI'),
     new Config.Secret(stack, 'POSTMAN_API_KEY'),
   ])
 
-  // probably can refactor this?
-  new Api(stack, 'Api', {
-    routes: {
-      'GET    /api-key-expiry': {
-        function: sendReminderEmail,
-        // add authorization
-      },
-    },
-  })
   const cron = new Cron(stack, 'cron', {
     // runs every day at 12AM UTC, i.e. 8AM SGT
     schedule: 'cron(0 0 */1 * ? *)',
     job: 'packages/functions/src/api-key-expiry/cron.handler',
   })
-  // sendReminderEmail.grantInvoke(cron)
   cron.bind([
     new Config.Parameter(stack, 'FUNCTION_URL', {
-      value: sendReminderEmail.url as string,
+      value: sendReminderEmail.url as string, // safe because we set url in FunctionProps
     }),
     new Config.Parameter(stack, 'FUNCTION_NAME', {
       value: sendReminderEmail.functionName,
@@ -55,7 +47,8 @@ export function MyStack({ app, stack }: StackContext) {
       value: sendReminderEmail.currentVersion.version,
     }),
   ])
-  cron.attachPermissions('*')
+  // because sendReminderEmail uses iam authorizer
+  cron.attachPermissions(['lambda:InvokeFunctionUrl'])
 }
 
 function getResourceIdentifiers(stage: string) {
