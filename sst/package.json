@@ -32,6 +32,7 @@
   "dependencies": {
     "aws-cdk": "^2.87.0",
     "aws4-axios": "^3.2.24",
+    "cronitor": "^2.3.3",
     "dotenv": "^16.3.1"
   },
   "lint-staged": {
