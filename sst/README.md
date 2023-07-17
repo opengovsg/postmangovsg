@@ -24,13 +24,13 @@ To maintain consistency with the deployment environment, we try to minimise the 
 To set a secret, run:
 
 ```zsh
-npx sst config set <key> <value> --stage <stage>
+npx sst secrets set <key> <value> --stage <stage>
 ```
 
 To avoid leaving secrets in your terminal history, you could add a git-ignored `secret.txt` in the root of this folder, paste the secret in the file, and run:
 
 ```zsh
-npx sst config set <key> $(cat secret.txt) --stage <stage>
+npx sst secrets set <key> $(cat secret.txt) --stage <stage>
 ```
 
 We use `LOCAL_DB_URI` in the `.env` file to develop against a local database. You could also develop against the staging database by using the staging DB's URI and turning on OGP VPN and running a tunnel via the jumphost. Go to `backend` folder and run `npm run tunneldb:staging`.
