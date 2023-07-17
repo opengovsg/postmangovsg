@@ -48,6 +48,10 @@ export const PhonebookListSection = ({
           &nbsp; if it does not appear above. Manual uploading of csv will
           override the Phonebook contact list above.
         </p>
+        <p>
+          <strong>Note:</strong> If your recipient unsubscribe from your
+          Phonebook list, they will automatically be removed from your list.
+        </p>
       </InfoBlock>
     </StepSection>
   )
