@@ -37,7 +37,7 @@ const appendLinkForEmail = async (
   channel = 'Email'
 ): Promise<Message[]> => {
   const showMastheadDomain = config.get('showMastheadDomain')
-  const allowAutoUnsubscribe = config.get('phonebook.autoUnsubscribe')
+  const enableAutoUnsubscribe = config.get('phonebook.enableAutoUnsubscribe')
 
   const channels: UserChannel[] = result.map((row) => {
     return {
@@ -48,7 +48,7 @@ const appendLinkForEmail = async (
   const payload: GetUniqueLinksRequestDto = {
     userChannels: channels,
     includeUnsubscribeLink:
-      allowAutoUnsubscribe && managedListId
+      enableAutoUnsubscribe && managedListId
         ? {
             managedListId,
           }
