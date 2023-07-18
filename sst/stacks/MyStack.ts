@@ -4,6 +4,7 @@ import { Config, Cron, Function, StackContext } from 'sst/constructs'
 export function MyStack({ app, stack }: StackContext) {
   const postmanDbUri = new Config.Secret(stack, 'POSTMAN_DB_URI')
   const postmanApiKey = new Config.Secret(stack, 'POSTMAN_API_KEY')
+  const cronitorUrlSuffix = new Config.Secret(stack, 'CRONITOR_URL_SUFFIX')
 
   const { vpcName, lookupOptions, sgName, sgId } = getResourceIdentifiers(
     app.stage,
@@ -23,7 +24,7 @@ export function MyStack({ app, stack }: StackContext) {
   // and does the db query and the actual sending
 
   // Cron job #1: send reminder email notifying users of expiring API keys
-  const sendApiKeyExpiryEmailFn = new Function(stack, 'api-key-expiry', {
+  const sendApiKeyExpiryEmailFn = new Function(stack, 'api-key-expiry-fn', {
     handler: 'packages/functions/src/cron-jobs/api-key-expiry/main.handler',
     vpc: existingVpc,
     securityGroups: [existingSg],
@@ -36,10 +37,10 @@ export function MyStack({ app, stack }: StackContext) {
   })
   sendApiKeyExpiryEmailFn.bind([postmanApiKey, postmanDbUri])
 
-  const sendApiKeyExpiryEmailCron = new Cron(stack, 'cron', {
+  const sendApiKeyExpiryEmailCron = new Cron(stack, 'api-key-expiry-cron', {
     // runs every day at 12AM UTC, i.e. 8AM SGT
     schedule: 'cron(0 0 */1 * ? *)',
-    job: 'packages/functions/src/cron-jobs/api-key-expiry/cron.handler',
+    job: 'packages/functions/src/cron-jobs/redaction-digest/cron.handler',
   })
   sendApiKeyExpiryEmailCron.bind([
     new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_URL', {
@@ -51,13 +52,47 @@ export function MyStack({ app, stack }: StackContext) {
     new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_VERSION', {
       value: sendApiKeyExpiryEmailFn.currentVersion.version,
     }),
-    new Config.Secret(stack, 'CRONITOR_URL_SUFFIX'),
+    cronitorUrlSuffix,
     new Config.Secret(stack, 'CRONITOR_CODE_API_KEY_EXPIRY'),
   ])
   // required because sendReminderEmail uses iam authorizer
   sendApiKeyExpiryEmailCron.attachPermissions(['lambda:InvokeFunctionUrl'])
 
-  // Cron job #2: send unsubscribe digest email
+  // Cron job #2: send redaction digest email
+  const sendRedactionDigestFn = new Function(stack, 'redaction-digest-fn', {
+    handler: 'packages/functions/src/cron-jobs/redaction-digest/main.handler',
+    vpc: existingVpc,
+    securityGroups: [existingSg],
+    vpcSubnets: {
+      subnets: existingVpc.privateSubnets,
+    },
+    url: {
+      authorizer: 'iam',
+    },
+  })
+  sendRedactionDigestFn.bind([postmanApiKey, postmanDbUri])
+  const sendRedactionDigestCron = new Cron(stack, 'redaction-digest-cron', {
+    schedule: 'cron(0 1 ? * 2 *)',
+    job: 'packages/functions/src/cron-jobs/redaction-digest/cron.handler',
+  })
+  sendRedactionDigestCron.bind([
+    new Config.Parameter(stack, 'SEND_REDACTION_DIGEST_FUNCTION_URL', {
+      value: sendRedactionDigestFn.url as string, // safe because we set url in FunctionProps
+    }),
+    new Config.Parameter(stack, 'SEND_REDACTION_DIGEST_FUNCTION_NAME', {
+      value: sendRedactionDigestFn.functionName,
+    }),
+    new Config.Parameter(stack, 'SEND_REDACTION_DIGEST_FUNCTION_VERSION', {
+      value: sendRedactionDigestFn.currentVersion.version,
+    }),
+    cronitorUrlSuffix,
+    new Config.Secret(stack, 'CRONITOR_CODE_REDACTION_DIGEST'),
+  ])
+  // required because sendReminderEmail uses iam authorizer
+  sendRedactionDigestCron.attachPermissions(['lambda:InvokeFunctionUrl'])
+
+  // Cron job #3: send unsubscribe digest email
+  // TODO
 }
 
 function getResourceIdentifiers(stage: string) {
