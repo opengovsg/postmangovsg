@@ -92,7 +92,37 @@ export function MyStack({ app, stack }: StackContext) {
   sendRedactionDigestCron.attachPermissions(['lambda:InvokeFunctionUrl'])
 
   // Cron job #3: send unsubscribe digest email
-  // TODO
+  const sendUnsubDigest = new Function(stack, 'unsub-digest-fn', {
+    handler: 'packages/functions/src/cron-jobs/unsub-digest/main.handler',
+    vpc: existingVpc,
+    securityGroups: [existingSg],
+    vpcSubnets: {
+      subnets: existingVpc.privateSubnets,
+    },
+    url: {
+      authorizer: 'iam',
+    },
+  })
+  sendUnsubDigest.bind([postmanApiKey, postmanDbUri])
+  const sendUnsubDigestCron = new Cron(stack, 'unsub-digest-cron', {
+    schedule: 'cron(0 1 ? * 2 *)',
+    job: 'packages/functions/src/cron-jobs/unsub-digest/cron.handler',
+  })
+  sendUnsubDigestCron.bind([
+    new Config.Parameter(stack, 'SEND_UNSUB_DIGEST_FUNCTION_URL', {
+      value: sendUnsubDigest.url as string, // safe because we set url in FunctionProps
+    }),
+    new Config.Parameter(stack, 'SEND_UNSUB_DIGEST_FUNCTION_NAME', {
+      value: sendUnsubDigest.functionName,
+    }),
+    new Config.Parameter(stack, 'SEND_UNSUB_DIGEST_FUNCTION_VERSION', {
+      value: sendUnsubDigest.currentVersion.version,
+    }),
+    cronitorUrlSuffix,
+    new Config.Secret(stack, 'CRONITOR_CODE_UNSUB_DIGEST'),
+  ])
+  // required because sendReminderEmail uses iam authorizer
+  sendUnsubDigestCron.attachPermissions(['lambda:InvokeFunctionUrl'])
 }
 
 function getResourceIdentifiers(stage: string) {

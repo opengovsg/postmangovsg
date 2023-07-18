@@ -27,6 +27,7 @@ export async function handler(event: { selectedRecipients?: Array<string> }) {
         subject:
           'Postman.gov.sg: Reminder for expiring campaign delivery reports',
         body: emailBody,
+        tag: 'redaction-digest',
       })
 
       console.log(`Redaction reminder sent to ${email}`)
