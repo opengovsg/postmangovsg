@@ -64,6 +64,7 @@ export const InitEmailTransactionalRoute = (
     [Segments.QUERY]: Joi.object({
       limit: Joi.number().integer().min(1).max(1000).default(10),
       offset: Joi.number().integer().min(0).default(0),
+      tag: Joi.string().max(255),
       status: Joi.string()
         .uppercase()
         .valid(...Object.values(TransactionalEmailMessageStatus)),
