@@ -62,7 +62,7 @@ export const InitEmailTransactionalRoute = (
 
   const listMessagesValidator = {
     [Segments.QUERY]: Joi.object({
-      limit: Joi.number().integer().min(1).max(100).default(10),
+      limit: Joi.number().integer().min(1).max(1000).default(10),
       offset: Joi.number().integer().min(0).default(0),
       status: Joi.string()
         .uppercase()
