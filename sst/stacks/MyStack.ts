@@ -2,6 +2,9 @@ import * as ec2 from 'aws-cdk-lib/aws-ec2'
 import { Config, Cron, Function, StackContext } from 'sst/constructs'
 
 export function MyStack({ app, stack }: StackContext) {
+  const postmanDbUri = new Config.Secret(stack, 'POSTMAN_DB_URI')
+  const postmanApiKey = new Config.Secret(stack, 'POSTMAN_API_KEY')
+
   const { vpcName, lookupOptions, sgName, sgId } = getResourceIdentifiers(
     app.stage,
   )
@@ -14,9 +17,14 @@ export function MyStack({ app, stack }: StackContext) {
       subnets: existingVpc.privateSubnets,
     },
   })
+  // SST's Cron construct does not allow us to create it within a VPC
+  // which is necessary in order to query the database for API key info
+  // as such, we use the Cron to invoke a Function that is within the VPC
+  // and does the db query and the actual sending
 
-  const sendReminderEmail = new Function(stack, 'api-key-expiry', {
-    handler: 'packages/functions/src/api-key-expiry/main.handler',
+  // Cron job #1: send reminder email notifying users of expiring API keys
+  const sendApiKeyExpiryEmailFn = new Function(stack, 'api-key-expiry', {
+    handler: 'packages/functions/src/cron-jobs/api-key-expiry/main.handler',
     vpc: existingVpc,
     securityGroups: [existingSg],
     vpcSubnets: {
@@ -26,35 +34,30 @@ export function MyStack({ app, stack }: StackContext) {
       authorizer: 'iam',
     },
   })
-  sendReminderEmail.bind([
-    new Config.Secret(stack, 'POSTMAN_DB_URI'),
-    new Config.Secret(stack, 'POSTMAN_API_KEY'),
-  ])
+  sendApiKeyExpiryEmailFn.bind([postmanApiKey, postmanDbUri])
 
-  // SST's Cron construct does not allow us to create it within a VPC
-  // which is necessary in order to query the database for API key info
-  // as such, we use the Cron to invoke a Function that is within the VPC
-  // and does the db query and the actual sending
-  const cron = new Cron(stack, 'cron', {
+  const sendApiKeyExpiryEmailCron = new Cron(stack, 'cron', {
     // runs every day at 12AM UTC, i.e. 8AM SGT
     schedule: 'cron(0 0 */1 * ? *)',
-    job: 'packages/functions/src/api-key-expiry/cron.handler',
+    job: 'packages/functions/src/cron-jobs/api-key-expiry/cron.handler',
   })
-  cron.bind([
-    new Config.Parameter(stack, 'FUNCTION_URL', {
-      value: sendReminderEmail.url as string, // safe because we set url in FunctionProps
+  sendApiKeyExpiryEmailCron.bind([
+    new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_URL', {
+      value: sendApiKeyExpiryEmailFn.url as string, // safe because we set url in FunctionProps
     }),
-    new Config.Parameter(stack, 'FUNCTION_NAME', {
-      value: sendReminderEmail.functionName,
+    new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_NAME', {
+      value: sendApiKeyExpiryEmailFn.functionName,
     }),
-    new Config.Parameter(stack, 'FUNCTION_VERSION', {
-      value: sendReminderEmail.currentVersion.version,
+    new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_VERSION', {
+      value: sendApiKeyExpiryEmailFn.currentVersion.version,
     }),
     new Config.Secret(stack, 'CRONITOR_URL_SUFFIX'),
     new Config.Secret(stack, 'CRONITOR_CODE_API_KEY_EXPIRY'),
   ])
-  // because sendReminderEmail uses iam authorizer
-  cron.attachPermissions(['lambda:InvokeFunctionUrl'])
+  // required because sendReminderEmail uses iam authorizer
+  sendApiKeyExpiryEmailCron.attachPermissions(['lambda:InvokeFunctionUrl'])
+
+  // Cron job #2: send unsubscribe digest email
 }
 
 function getResourceIdentifiers(stage: string) {
