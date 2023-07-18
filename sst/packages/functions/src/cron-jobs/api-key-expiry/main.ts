@@ -7,7 +7,7 @@ import { users } from '@/core/models/user'
 import { getFutureUTCDate } from '@/core/util/date'
 import { sendEmail } from '@/core/util/email'
 
-import { IS_LOCAL, LOCAL_DB_URI } from '../env'
+import { IS_LOCAL, LOCAL_DB_URI } from '../../env'
 
 import { reminderEmailMapper } from './helper'
 
