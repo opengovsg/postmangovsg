@@ -1,4 +1,5 @@
 import { drizzle, PostgresJsDatabase } from 'drizzle-orm/postgres-js'
+import * as pg from 'pg'
 import postgres from 'postgres'
 import { Sequelize } from 'sequelize-typescript'
 
@@ -21,5 +22,6 @@ export const getSequelize = (dbUri: string) => {
   return new Sequelize(dbUri, {
     dialect: 'postgres',
     logging: false,
+    dialectModule: pg,
   })
 }
