@@ -19,9 +19,9 @@ jobs:
         run: |
           echo "Running on branch ${{ github.ref }}"
           if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            echo "::set-output name=current_env::production"
+            echo "current_env=production"
           else
-            echo "::set-output name=current_env::staging"
+            echo "current_env=staging"
           fi
 
   lint-test:
