@@ -44,17 +44,26 @@ export const getUnsubscribeList = async (
   return unsubscribeList
 }
 
+export const sendEmailAndUpdate = async (
+  userDigest: UserUnsubscribeDigest,
+  sequelize: Sequelize,
+): Promise<void> => {
+  // call sequentially because we want to update unsubscribers table only after
+  // email is sent
+  await sendUnsubEmail(userDigest)
+  await updateUnsubscribers(userDigest, sequelize)
+}
+
 /**
  * Generates unsubscribe digest email body for a user
  * Send the unsubscribe digest email to the user
  * Update sent_at in subscribers table for all recipients which were included in this digest
  */
-export const sendUnsubEmail = async ({
+const sendUnsubEmail = async ({
   email,
   unsubscribe_list: unsubscribeList,
 }: UserUnsubscribeDigest): Promise<void> => {
   const emailBody = createEmailBody(unsubscribeList)
-
   await sendEmail({
     recipient: email,
     subject: 'Postman.gov.sg: Weekly Digest for Recipients who Unsubscribed',
@@ -68,7 +77,7 @@ export const sendUnsubEmail = async ({
  * Updates unsubscribers table to set sent_at as now for all recipients
  * of campaign ids which have sent_at as null
  */
-export const updateUnsubscribers = async (
+const updateUnsubscribers = async (
   { email: _, unsubscribe_list: unsubscribeList }: UserUnsubscribeDigest,
   sequelize: Sequelize,
 ): Promise<void> => {
