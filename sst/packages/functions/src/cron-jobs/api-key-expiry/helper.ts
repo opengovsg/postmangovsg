@@ -15,9 +15,9 @@ const reminderEmailBodyGenerator = (
     case 'two weeks':
     case 'three days':
     case 'one day':
-      return `Hi there,
+      return `Greetings,
       <br><br>
-      The email address <b>${apiEmailAddress}</b> has an API key on Postman that is expiring soon. <b>Please renew your API key as soon as possible to avoid disruption to your service.</b>
+      This is a reminder that the email address <b>${apiEmailAddress}</b> has an API key on Postman that is expiring soon. <b>Please renew your API key as soon as possible to avoid disruption to your service.</b>
       <br><br>
       You have been listed as a contact for the API key "<b>${apiKeyLabel}</b>" with the following last five characters: <b>${lastFive}</b>. This API key will be expiring on <b>${convertToSGTLocaleString(
         validUntil,
@@ -31,10 +31,8 @@ const reminderEmailBodyGenerator = (
       <br><br>
       For more info on how to renew your API key, please refer to our <a href="https://guide.postman.gov.sg/api-guide/api-key-management/rotate-your-api-key">documentation</a>.
       <br><br>
-      Thank you!
-      <br><br>
-      Best regards,<br>
-      Postman team`
+      Thank you,<br>
+      <a href="https://postman.gov.sg">Postman.gov.sg</a> &bull; Open Government Products &bull; <a href="https://open.gov.sg">open.gov.sg</a>`
     default: {
       const exhaustiveCheck: never = whenExpire
       throw new Error(`Unhandled status: ${exhaustiveCheck}`)
