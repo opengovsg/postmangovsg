@@ -211,6 +211,7 @@ async function listMessages({
   orderBy,
   status,
   filterByTimestamp,
+  tag,
 }: {
   userId: string
   limit?: number
@@ -219,16 +220,20 @@ async function listMessages({
   orderBy?: Ordering
   status?: TransactionalEmailMessageStatus
   filterByTimestamp?: TimestampFilter
+  tag?: string
 }): Promise<{ hasMore: boolean; messages: EmailMessageTransactional[] }> {
   limit = limit || 10
   offset = offset || 0
   sortBy = sortBy || TransactionalEmailSortField.Created
   orderBy = orderBy || Ordering.DESC
   const order: Order = [[sortBy, orderBy]]
-  const where = ((userId, status, filterByTimestamp) => {
+  const where = ((userId, status, filterByTimestamp, tag) => {
     const where: WhereOptions = { userId } // pre-fill with userId for authentication
     if (status) {
       where.status = status
+    }
+    if (tag) {
+      where.tag = tag
     }
     if (filterByTimestamp) {
       if (filterByTimestamp.createdAt) {
@@ -248,7 +253,7 @@ async function listMessages({
       }
     }
     return where
-  })(userId, status, filterByTimestamp)
+  })(userId, status, filterByTimestamp, tag)
   const { count, rows } = await EmailMessageTransactional.findAndCountAll({
     limit,
     offset,
