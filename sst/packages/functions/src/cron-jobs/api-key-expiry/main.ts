@@ -91,7 +91,7 @@ export async function handler() {
       ...threeDaysEmails.map((email) => sendEmail(email)),
       ...oneDayEmails.map((email) => sendEmail(email)),
     ])
-    console.log('Cron job completed')
+    console.log('API key expiry reminder emails sent')
   } catch (err) {
     console.error(err)
     throw err
