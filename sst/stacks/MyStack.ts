@@ -39,8 +39,8 @@ export function MyStack({ app, stack }: StackContext) {
 
   const sendApiKeyExpiryEmailCron = new Cron(stack, 'api-key-expiry-cron', {
     // runs every day at 12AM UTC, i.e. 8AM SGT
-    schedule: 'cron(0 0 */1 * ? *)',
-    job: 'packages/functions/src/cron-jobs/redaction-digest/cron.handler',
+    schedule: 'cron(0 0 * * ? *)',
+    job: 'packages/functions/src/cron-jobs/api-key-expiry/cron.handler',
   })
   sendApiKeyExpiryEmailCron.bind([
     new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_URL', {
@@ -72,6 +72,7 @@ export function MyStack({ app, stack }: StackContext) {
   })
   sendRedactionDigestFn.bind([postmanApiKey, postmanDbUri])
   const sendRedactionDigestCron = new Cron(stack, 'redaction-digest-cron', {
+    // runs every Tuesday at 1AM UTC, i.e. 9AM SGT
     schedule: 'cron(0 1 ? * 2 *)',
     job: 'packages/functions/src/cron-jobs/redaction-digest/cron.handler',
   })
@@ -105,6 +106,7 @@ export function MyStack({ app, stack }: StackContext) {
   })
   sendUnsubDigest.bind([postmanApiKey, postmanDbUri])
   const sendUnsubDigestCron = new Cron(stack, 'unsub-digest-cron', {
+    // runs every Tuesday at 1AM UTC, i.e. 9AM SGT
     schedule: 'cron(0 1 ? * 2 *)',
     job: 'packages/functions/src/cron-jobs/unsub-digest/cron.handler',
   })
