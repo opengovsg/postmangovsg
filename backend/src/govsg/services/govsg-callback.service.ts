@@ -71,6 +71,14 @@ const parseWebhook = async (
     await parseUserMessageWebhook(body as UserMessageWebhook, clientId)
     return
   }
+  if ('errors' in body) {
+    logger.error({
+      message: 'Error webhooks from WhatsApp API client',
+      body,
+      action,
+    })
+    return
+  }
   // body is an object but doesn't have the expected keys
   logger.error({
     message: 'Unexpected webhook body',
