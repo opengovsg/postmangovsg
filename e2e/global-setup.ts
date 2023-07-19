@@ -18,10 +18,10 @@ async function exportOTPLoginState() {
 
   const emails = await checkGmail({
     from: POSTMAN_FROM,
-    subject: 'One-Time Password (OTP) for Postman.gov.sg',
     to: MAILBOX,
   });
-  const otpMailContent = emails[0].body?.html as string;
+  const emailsWithOtp = emails.filter((email) => email.subject.match(/^(One-Time Password (OTP) for Postman.gov.sg - )[A-Z0-9]{6}$/))
+  const otpMailContent = emailsWithOtp[0].body?.html as string;
   const otp = (otpMailContent.match(/\<b\>([^]+)\<\/b\>/) as string[])[1];
   await page.locator('input[type=text]').fill(otp);
   await page.locator('button[type=submit]').click();

@@ -8,7 +8,7 @@ export const checkGmail = async ({
 }: {
   from: string;
   to: string;
-  subject: string;
+  subject?: string;
 }): Promise<Email[]> => {
   // slient unnecessary logging from the library
   const oldLog = console.log;
