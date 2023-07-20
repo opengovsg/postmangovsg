@@ -47,12 +47,8 @@ const appendLinkForEmail = async (
   })
   const payload: GetUniqueLinksRequestDto = {
     userChannels: channels,
-    includeUnsubscribeLink:
-      enableAutoUnsubscribe && managedListId
-        ? {
-            managedListId,
-          }
-        : undefined,
+    managedListId:
+      enableAutoUnsubscribe && managedListId ? managedListId : undefined,
   }
 
   return breaker

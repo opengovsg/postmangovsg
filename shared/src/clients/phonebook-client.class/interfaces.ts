@@ -5,9 +5,7 @@ export type UserChannel = {
 
 export type GetUniqueLinksRequestDto = {
   userChannels: UserChannel[]
-  includeUnsubscribeLink?: {
-    managedListId: number
-  }
+  managedListId?: number
 }
 
 export type GetUniqueLinksResponseDto = {
