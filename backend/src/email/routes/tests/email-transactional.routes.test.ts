@@ -1043,7 +1043,7 @@ describe(`GET ${emailTransactionalRoute}`, () => {
       .set('Authorization', `Bearer ${apiKey}`)
     expect(resInvalidLimit.status).toBe(400)
     const resInvalidLimitTooLarge = await request(app)
-      .get(`${endpoint}?limit=1000`)
+      .get(`${endpoint}?limit=1001`)
       .set('Authorization', `Bearer ${apiKey}`)
     expect(resInvalidLimitTooLarge.status).toBe(400)
     const resInvalidOffset = await request(app)

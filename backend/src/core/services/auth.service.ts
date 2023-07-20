@@ -228,7 +228,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     void MailService.mailClient.sendMail({
       from: config.get('mailFrom'),
       recipients: [email],
-      subject: `One-Time Password (OTP) for ${appName}`,
+      subject: `One-Time Password (OTP) for ${appName} - ${otp}`,
       body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(
         OTP_EXPIRY / 60
       )} minutes.
