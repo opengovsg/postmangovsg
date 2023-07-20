@@ -183,18 +183,18 @@ export const InitSmsCampaignRoute = (
   )
 
   router.put(
-    '/associations',
+    '/phonebook-associations',
     celebrate(associatePhonebookListValidator),
     SmsTemplateMiddleware.setPhonebookListAssociationHandler
   )
 
   router.delete(
-    '/associations',
+    '/phonebook-associations',
     SmsTemplateMiddleware.deletePhonebookListAssociationHandler
   )
 
   router.get(
-    '/phonebook-list',
+    '/phonebook-listid',
     SmsTemplateMiddleware.getPhonebookListIdForCampaignHandler
   )
 

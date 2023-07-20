@@ -198,18 +198,18 @@ export const InitEmailCampaignRoute = (
   )
 
   router.put(
-    '/associations',
+    '/phonebook-associations',
     celebrate(associatePhonebookListValidator),
     emailTemplateMiddleware.setPhonebookListAssociationHandler
   )
 
   router.delete(
-    '/associations',
+    '/phonebook-associations',
     emailTemplateMiddleware.deletePhonebookListAssociationHandler
   )
 
   router.get(
-    '/phonebook-list',
+    '/phonebook-listid',
     emailTemplateMiddleware.getPhonebookListIdForCampaignHandler
   )
 

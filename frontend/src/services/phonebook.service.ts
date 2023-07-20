@@ -50,7 +50,7 @@ export async function setPhonebookListForCampaign({
   listId: number
 }) {
   try {
-    return axios.put(`/campaign/${campaignId}/associations`, {
+    return axios.put(`/campaign/${campaignId}/phonebook-associations`, {
       list_id: listId,
     })
   } catch (e) {
@@ -64,7 +64,7 @@ export async function setPhonebookListForCampaign({
  */
 export async function deletePhonebookListForCampaign(campaignId: number) {
   try {
-    return axios.delete(`/campaign/${campaignId}/associations`)
+    return axios.delete(`/campaign/${campaignId}/phonebook-associations`)
   } catch (e) {
     errorHandler(e, 'Error deleting the association between campaign and list')
   }
@@ -78,7 +78,7 @@ export async function getPhonebookListIdForCampaign(
   campaignId: number
 ): Promise<number | undefined> {
   try {
-    const response = await axios.get(`/campaign/${campaignId}/phonebook-list`)
+    const response = await axios.get(`/campaign/${campaignId}/phonebook-listid`)
     return response.data?.list_id
   } catch (e) {
     errorHandler(e, 'Error getting managed list of campaign')
