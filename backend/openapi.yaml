@@ -1607,6 +1607,9 @@ paths:
               properties:
                 template_id:
                   type: number
+                language_code:
+                  type: string
+                  default: en_GB
       responses:
         200:
           description: Success
@@ -2124,17 +2127,32 @@ paths:
             schema:
               required:
                 - recipient
-                - whatsapp_template_label
+                - template_id
                 - params
               properties:
                 recipient:
                   type: string
-                whatsapp_template_label:
+                  description: >
+                    Mobile phone number of the recipient without special formatting 
+                    (only contains numerical characters and prefixed with plus 
+                    sign if country code is included).
+
+
+                    **Notes**:
+                      - Country code will need to be provided for non-SG mobile numbers.
+                      - If country code is not provided, the phone number will be defaulted to be an SG number.
+                  example: '81234567'
+                template_id:
+                  type: number
+                  example: 2
+                language_code:
                   type: string
+                  default: en_GB
                 params:
                   type: object
                   additionalProperties:
                     type: string
+                  example: { officer_name: 'John Tan' }
       responses:
         '201':
           description: Created. The message is being sent.
@@ -4421,13 +4439,36 @@ components:
           $ref: '#/components/schemas/GovSGTemplate'
     GovSGTemplate:
       type: object
+      required:
+        - id
+        - body
+        - params
       properties:
+        id:
+          type: number
         body:
           type: string
         params:
           type: array
           items:
             type: string
+        multilingual_support:
+          type: array
+          items:
+            type: object
+            required:
+              - language_code
+              - language
+              - body
+            properties:
+              language_code:
+                type: string
+                example: zh_CN
+              language:
+                type: string
+                example: Chinese (CHN)
+              body:
+                type: string
     CampaignStats:
       type: object
       properties:
@@ -4657,9 +4698,16 @@ components:
         recipient:
           type: string
           example: '98765432'
-        body:
+        template_id:
+          type: number
+          example: 2
+        params:
+          type: object
+          additionalProperties:
+            type: string
+        language_code:
           type: string
-          example: 'Hello world'
+          example: en_GB
         created_at:
           type: string
           format: date-time
