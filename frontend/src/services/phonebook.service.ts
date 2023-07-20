@@ -1,10 +1,10 @@
 import axios, { AxiosError } from 'axios'
 
 import { AgencyList, ChannelType } from 'classes'
-import { REACT_APP_PHONEBOOK_AUTO_UNSUBSCRIBE_ENABLE } from 'config'
+import { REACT_APP_PHONEBOOK_ENABLE_AUTO_UNSUBSCRIBE } from 'config'
 
 export function isPhonebookAutoUnsubscribeEnabled(): boolean {
-  return REACT_APP_PHONEBOOK_AUTO_UNSUBSCRIBE_ENABLE === 'true'
+  return REACT_APP_PHONEBOOK_ENABLE_AUTO_UNSUBSCRIBE === 'true'
 }
 
 export async function getPhonebookListsByChannel({
@@ -72,7 +72,7 @@ export async function deletePhonebookListForCampaign(campaignId: number) {
 
 /**
  * Determines if the current campaign is using a Phonebook list.
- * If it is, return the list Id. Otherwise, return null.
+ * If it is, return the list Id. Otherwise, return undefined.
  */
 export async function getPhonebookListIdForCampaign(
   campaignId: number

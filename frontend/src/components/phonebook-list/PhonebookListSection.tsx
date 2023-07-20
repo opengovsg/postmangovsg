@@ -1,6 +1,7 @@
 import { OutboundLink } from 'react-ga'
 
 import { Dropdown, InfoBlock, StepSection, TextButton } from 'components/common'
+import { isPhonebookAutoUnsubscribeEnabled } from 'services/phonebook.service'
 
 export const PhonebookListSection = ({
   phonebookLists,
@@ -10,7 +11,7 @@ export const PhonebookListSection = ({
   defaultLabel,
 }: {
   phonebookLists: { label: string; value: string }[]
-  onPhonebookListSelected: (listId: number) => any
+  onPhonebookListSelected: (listId: number) => void
   retrieveAndPopulatePhonebookLists: () => void
   isProcessing: boolean
   defaultLabel: string
@@ -48,10 +49,12 @@ export const PhonebookListSection = ({
           &nbsp; if it does not appear above. Manual uploading of csv will
           override the Phonebook contact list above.
         </p>
-        <p>
-          <strong>Note:</strong> If your recipient unsubscribe from your
-          Phonebook list, they will automatically be removed from your list.
-        </p>
+        {isPhonebookAutoUnsubscribeEnabled() && (
+          <p>
+            <strong>Note:</strong> If your recipient unsubscribe from your
+            Phonebook list, they will automatically be removed from your list.
+          </p>
+        )}
       </InfoBlock>
     </StepSection>
   )

@@ -212,11 +212,11 @@ const EmailRecipients = ({
 
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
-      // clear phonebook selector
-      setSelectedPhonebookListId(undefined)
       if (selectedPhonebookListId) {
         // dissociate current campaign with phonebook list
         await deletePhonebookListForCampaign(+campaignId)
+        // clear phonebook selector
+        setSelectedPhonebookListId(undefined)
       }
     } catch (err) {
       setErrorMessage((err as Error).message)

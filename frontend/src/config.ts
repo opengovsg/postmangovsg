@@ -101,8 +101,8 @@ export const INFO_BANNER_COLOR = process.env
 
 export const PHONEBOOK_FEATURE_ENABLE = process.env
   .REACT_APP_PHONEBOOK_FEATURE_ENABLE as string
-export const REACT_APP_PHONEBOOK_AUTO_UNSUBSCRIBE_ENABLE = process.env
-  .REACT_APP_PHONEBOOK_AUTO_UNSUBSCRIBE_ENABLE as string
+export const REACT_APP_PHONEBOOK_ENABLE_AUTO_UNSUBSCRIBE = process.env
+  .REACT_APP_PHONEBOOK_ENABLE_AUTO_UNSUBSCRIBE as string
 
 // Feature Launch Announcements
 // If `isActive` is false, the modal will not proc for ANY user
