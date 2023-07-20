@@ -57,7 +57,7 @@ const Dropdown = ({
     } else {
       setSelectedLabel('Select an option')
     }
-  }, [defaultLabel])
+  }, [defaultLabel, skipOnSelectForDefaultLabel])
 
   return (
     <div
