@@ -17,6 +17,7 @@ import {
 } from 'components/common'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
+import { isPhonebookAutoUnsubscribeEnabled } from 'services/phonebook.service'
 
 const ProgressDetails = ({
   stats,
@@ -217,34 +218,40 @@ const ProgressDetails = ({
             <td className={'md'}>Recipient does not exist</td>
             <td className={'sm'}>{invalid}</td>
           </tr>
-          {type === ChannelType.Email && !isUsingPhonebook && (
-            <tr>
-              <td className={cx(styles.status, 'md')}>
-                <i
-                  className={cx(styles.icon, styles.red, 'bx bx-error-circle')}
-                ></i>
-                Unsubscribers
-              </td>
-              <td className={'md'}>Recipient indicated to unsubscribe</td>
-              <td className={'sm'}>{unsubscribed}</td>
-            </tr>
-          )}
+          {type === ChannelType.Email &&
+            !(isUsingPhonebook && isPhonebookAutoUnsubscribeEnabled()) && (
+              <tr>
+                <td className={cx(styles.status, 'md')}>
+                  <i
+                    className={cx(
+                      styles.icon,
+                      styles.red,
+                      'bx bx-error-circle'
+                    )}
+                  ></i>
+                  Unsubscribers
+                </td>
+                <td className={'md'}>Recipient indicated to unsubscribe</td>
+                <td className={'sm'}>{unsubscribed}</td>
+              </tr>
+            )}
         </tbody>
       </table>
-      {type === ChannelType.Email && !isUsingPhonebook && (
-        <InfoBlock className={styles.notice}>
-          <strong>Remove unsubscribers from your recipient list</strong>, to
-          avoid campaigns being marked as spam and affecting the reputation of
-          your agency.{' '}
-          <a
-            href="https://go.gov.sg/postman-unsubscribe-guide"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Learn more
-          </a>
-        </InfoBlock>
-      )}
+      {type === ChannelType.Email &&
+        !(isUsingPhonebook && isPhonebookAutoUnsubscribeEnabled()) && (
+          <InfoBlock className={styles.notice}>
+            <strong>Remove unsubscribers from your recipient list</strong>, to
+            avoid campaigns being marked as spam and affecting the reputation of
+            your agency.{' '}
+            <a
+              href="https://go.gov.sg/postman-unsubscribe-guide"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Learn more
+            </a>
+          </InfoBlock>
+        )}
       {renderUpdateStats()}
     </div>
   )
