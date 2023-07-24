@@ -1547,7 +1547,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error500Response'
-  /campaign/govsg/templates:
+  /govsg/templates:
     get:
       security:
         - bearerAuth: []
