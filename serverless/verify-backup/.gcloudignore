@@ -1,5 +1,0 @@
-node_modules/
-google-cloud-sdk/
-build/
-*.dump
-postman.json

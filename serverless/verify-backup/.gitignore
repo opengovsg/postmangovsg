@@ -1,4 +1,0 @@
-# Generated folders for pg_dump
-*.dump
-postman*.json
-dump-version.txt
