@@ -140,30 +140,36 @@ export const InitEmailTransactionalMiddleware = (
     } as unknown as EmailMessageTransactional)
 
     // save cc and bcc
-    if (cc) {
-      await EmailMessageTransactionalCc.bulkCreate(
-        cc.map(
-          (c) =>
-            ({
-              emailMessageTransactionalId: emailMessageTransactional.id,
-              email: c,
-              ccType: CcType.Cc,
-            } as EmailMessageTransactionalCc)
-        )
-      )
-    }
+    let transactionalCcEmails: EmailMessageTransactionalCc[] = []
 
-    if (bcc) {
-      await EmailMessageTransactionalCc.bulkCreate(
-        bcc.map(
-          (c) =>
-            ({
-              emailMessageTransactionalId: emailMessageTransactional.id,
-              email: c,
-              ccType: CcType.Bcc,
-            } as EmailMessageTransactionalCc)
-        )
-      )
+    transactionalCcEmails = transactionalCcEmails.concat(
+      cc
+        ? cc.map(
+            (c) =>
+              ({
+                emailMessageTransactionalId: emailMessageTransactional.id,
+                email: c,
+                ccType: CcType.Cc,
+              } as EmailMessageTransactionalCc)
+          )
+        : []
+    )
+
+    transactionalCcEmails = transactionalCcEmails.concat(
+      bcc
+        ? bcc.map(
+            (c) =>
+              ({
+                emailMessageTransactionalId: emailMessageTransactional.id,
+                email: c,
+                ccType: CcType.Bcc,
+              } as EmailMessageTransactionalCc)
+          )
+        : []
+    )
+
+    if (transactionalCcEmails && transactionalCcEmails.length > 0) {
+      await EmailMessageTransactionalCc.bulkCreate(transactionalCcEmails)
     }
 
     // insert id into req.body so that subsequent middlewares can use it
@@ -199,7 +205,7 @@ export const InitEmailTransactionalMiddleware = (
           'Unable to find entry in email_messages_transactional'
         )
       }
-      await EmailTransactionalService.sendMessage({
+      const email = await EmailTransactionalService.sendMessage({
         subject,
         body,
         from,
@@ -218,13 +224,12 @@ export const InitEmailTransactionalMiddleware = (
       emailMessageTransactional.set('acceptedAt', new Date())
       await emailMessageTransactional.save()
 
-      const ccEmails = await getCCEmails(emailMessageTransactional.id)
-
-      res
-        .status(201)
-        .json(
-          convertMessageModelToResponse(emailMessageTransactional, undefined, ccEmails)
-        )
+      res.status(201).json(
+        convertMessageModelToResponse(emailMessageTransactional, undefined, {
+          cc: email.cc,
+          bcc: email.bcc,
+        })
+      )
       return
     } catch (error) {
       logger.error({
@@ -246,24 +251,19 @@ export const InitEmailTransactionalMiddleware = (
   }
 
   async function getCCEmails(emailMessageTransactionalId: string) {
-    const cc = (
-      await EmailMessageTransactionalCc.findAll({
-        where: {
-          emailMessageTransactionalId,
-          ccType: CcType.Cc,
-          errorCode: { [Op.is]: null },
-        },
-      })
-    )?.map((c) => c.email)
-    const bcc = (
-      await EmailMessageTransactionalCc.findAll({
-        where: {
-          emailMessageTransactionalId,
-          ccType: CcType.Bcc,
-          errorCode: { [Op.is]: null },
-        },
-      })
-    )?.map((c) => c.email)
+    const ccAndBcc = await EmailMessageTransactionalCc.findAll({
+      where: {
+        emailMessageTransactionalId,
+        errorCode: { [Op.is]: null },
+      },
+    })
+
+    const cc = ccAndBcc
+      ?.filter((c) => c.ccType === CcType.Cc)
+      ?.map((c) => c.email)
+    const bcc = ccAndBcc
+      ?.filter((c) => c.ccType === CcType.Bcc)
+      ?.map((c) => c.email)
 
     return { cc, bcc }
   }

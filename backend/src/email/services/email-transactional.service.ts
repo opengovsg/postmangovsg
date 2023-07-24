@@ -8,7 +8,6 @@ import {
 } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 import {
-  CcType,
   EmailMessageTransactional,
   EmailMessageTransactionalCc,
   TransactionalEmailMessageStatus,
@@ -56,7 +55,7 @@ async function sendMessage({
   cc?: string[]
   bcc?: string[]
   emailMessageTransactionalId: string
-}): Promise<void> {
+}): Promise<MailToSend> {
   // TODO: flagging this coupling for future refactoring:
   // currently, we are using EmailTemplateService to sanitize both tx emails and campaign emails
   // while this works for now, in the future, we might want to have more liberal rules for tx emails
@@ -99,48 +98,26 @@ async function sendMessage({
     throw new InvalidRecipientError('Recipient email is blacklisted')
   }
 
-  if (cc) {
-    const blacklistedRecipients = await EmailService.findBlacklistedRecipients(
-      cc
-    )
+  const ccList = (cc ?? []).concat(bcc ?? [])
+  const blacklistedRecipients = await EmailService.findBlacklistedRecipients(
+    ccList
+  )
 
-    if (blacklistedRecipients) {
-      cc = cc.filter((c) => !blacklistedRecipients.includes(c))
-      void EmailMessageTransactionalCc.update(
-        {
-          errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
+  if (blacklistedRecipients && blacklistedRecipients.length > 0) {
+    if (cc) cc = cc.filter((c) => !blacklistedRecipients.includes(c))
+    if (bcc) bcc = bcc.filter((c) => !blacklistedRecipients.includes(c))
+
+    void EmailMessageTransactionalCc.update(
+      {
+        errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
+      },
+      {
+        where: {
+          emailMessageTransactionalId,
+          email: { [Op.in]: blacklistedRecipients },
         },
-        {
-          where: {
-            emailMessageTransactionalId,
-            email: blacklistedRecipients,
-            ccType: CcType.Cc,
-          },
-        }
-      )
-    }
-  }
-
-  if (bcc) {
-    const blacklistedRecipients = await EmailService.findBlacklistedRecipients(
-      bcc
+      }
     )
-
-    if (blacklistedRecipients) {
-      bcc = bcc.filter((c) => !blacklistedRecipients.includes(c))
-      void EmailMessageTransactionalCc.update(
-        {
-          errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
-        },
-        {
-          where: {
-            emailMessageTransactionalId,
-            email: blacklistedRecipients,
-            ccType: CcType.Bcc,
-          },
-        }
-      )
-    }
   }
 
   const mailToSend: MailToSend = {
@@ -165,6 +142,7 @@ async function sendMessage({
   if (!isEmailSent) {
     throw new Error('Failed to send transactional email')
   }
+  return mailToSend
 }
 
 type CallbackMetaData = {
