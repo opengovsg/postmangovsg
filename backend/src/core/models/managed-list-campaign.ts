@@ -23,11 +23,11 @@ export class ManagedListCampaign extends Model<ManagedListCampaign> {
   campaignId: number
 
   @BelongsTo(() => Campaign)
-  campaign!: Campaign
+  campaign: Campaign
 
   @Column({
     type: DataType.INTEGER,
     allowNull: false,
   })
-  managedListId!: number
+  managedListId: number
 }

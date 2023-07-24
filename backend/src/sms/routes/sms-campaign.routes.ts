@@ -3,6 +3,7 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
   JobMiddleware,
+  PhonebookMiddleware,
   SettingsMiddleware,
   UploadMiddleware,
 } from '@core/middlewares'
@@ -11,6 +12,7 @@ import {
   SmsStatsMiddleware,
   SmsTemplateMiddleware,
 } from '@sms/middlewares'
+import { ChannelType } from '@core/constants'
 
 export const InitSmsCampaignRoute = (
   smsMiddleware: SmsMiddleware,
@@ -185,6 +187,7 @@ export const InitSmsCampaignRoute = (
   router.put(
     '/phonebook-associations',
     celebrate(associatePhonebookListValidator),
+    PhonebookMiddleware.verifyListBelongsToUser(ChannelType.SMS),
     SmsTemplateMiddleware.setPhonebookListAssociationHandler
   )
 
