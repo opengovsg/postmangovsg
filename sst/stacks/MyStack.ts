@@ -26,6 +26,7 @@ export function MyStack({ app, stack }: StackContext) {
   // Cron job #1: send reminder email notifying users of expiring API keys
   const sendApiKeyExpiryEmailFn = new Function(stack, 'api-key-expiry-fn', {
     handler: 'packages/functions/src/cron-jobs/api-key-expiry/main.handler',
+    timeout: '10 minutes',
     vpc: existingVpc,
     securityGroups: [existingSg],
     vpcSubnets: {
@@ -40,7 +41,12 @@ export function MyStack({ app, stack }: StackContext) {
   const sendApiKeyExpiryEmailCron = new Cron(stack, 'api-key-expiry-cron', {
     // runs every day at 12AM UTC, i.e. 8AM SGT
     schedule: 'cron(0 0 * * ? *)',
-    job: 'packages/functions/src/cron-jobs/api-key-expiry/cron.handler',
+    job: {
+      function: {
+        handler: 'packages/functions/src/cron-jobs/api-key-expiry/cron.handler',
+        timeout: '10 minutes',
+      },
+    },
   })
   sendApiKeyExpiryEmailCron.bind([
     new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_URL', {
@@ -61,6 +67,7 @@ export function MyStack({ app, stack }: StackContext) {
   // Cron job #2: send redaction digest email
   const sendRedactionDigestFn = new Function(stack, 'redaction-digest-fn', {
     handler: 'packages/functions/src/cron-jobs/redaction-digest/main.handler',
+    timeout: '10 minutes',
     vpc: existingVpc,
     securityGroups: [existingSg],
     vpcSubnets: {
@@ -72,9 +79,15 @@ export function MyStack({ app, stack }: StackContext) {
   })
   sendRedactionDigestFn.bind([postmanApiKey, postmanDbUri])
   const sendRedactionDigestCron = new Cron(stack, 'redaction-digest-cron', {
-    // runs every Tuesday at 1AM UTC, i.e. 9AM SGT
+    // runs every Monday at 1AM UTC, i.e. 9AM SGT
     schedule: 'cron(0 1 ? * 2 *)',
-    job: 'packages/functions/src/cron-jobs/redaction-digest/cron.handler',
+    job: {
+      function: {
+        handler:
+          'packages/functions/src/cron-jobs/redaction-digest/cron.handler',
+        timeout: '10 minutes',
+      },
+    },
   })
   sendRedactionDigestCron.bind([
     new Config.Parameter(stack, 'SEND_REDACTION_DIGEST_FUNCTION_URL', {
@@ -95,6 +108,7 @@ export function MyStack({ app, stack }: StackContext) {
   // Cron job #3: send unsubscribe digest email
   const sendUnsubDigest = new Function(stack, 'unsub-digest-fn', {
     handler: 'packages/functions/src/cron-jobs/unsub-digest/main.handler',
+    timeout: '10 minutes',
     vpc: existingVpc,
     securityGroups: [existingSg],
     vpcSubnets: {
@@ -106,9 +120,14 @@ export function MyStack({ app, stack }: StackContext) {
   })
   sendUnsubDigest.bind([postmanApiKey, postmanDbUri])
   const sendUnsubDigestCron = new Cron(stack, 'unsub-digest-cron', {
-    // runs every Tuesday at 1AM UTC, i.e. 9AM SGT
-    schedule: 'cron(0 1 ? * 2 *)',
-    job: 'packages/functions/src/cron-jobs/unsub-digest/cron.handler',
+    // runs every Monday at 1:30AM UTC, i.e. 9:30AM SGT
+    schedule: 'cron(30 1 ? * 2 *)',
+    job: {
+      function: {
+        handler: 'packages/functions/src/cron-jobs/unsub-digest/cron.handler',
+        timeout: '10 minutes',
+      },
+    },
   })
   sendUnsubDigestCron.bind([
     new Config.Parameter(stack, 'SEND_UNSUB_DIGEST_FUNCTION_URL', {
