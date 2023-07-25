@@ -4,7 +4,7 @@ import { Suspense, lazy } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import Landing from 'components/landing'
-import Login from 'components/login'
+import Login, { Callback } from 'components/login'
 import ProtectedPage from 'components/protected'
 import TestUtils from 'components/test-utils'
 import Unsubscribe from 'components/unsubscribe'
@@ -21,6 +21,8 @@ const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Landing />}></Route>
+      <Route path="/login/sgid/callback" element={<Callback />}></Route>
+      <Route path="/login/sgid" element={<Login />}></Route>
       <Route path="/login" element={<Login />}></Route>
       <Route path="/test/*" element={<TestUtils />}></Route>
       <Route path="/p/:version/:id" element={<ProtectedPage />}></Route>

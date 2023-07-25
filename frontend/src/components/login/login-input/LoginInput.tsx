@@ -3,11 +3,16 @@ import cx from 'classnames'
 
 import { noop } from 'lodash'
 
-import { useState, useContext, useEffect } from 'react'
+import React, { useState, useContext, useEffect } from 'react'
 
 import styles from './LoginInput.module.scss'
 
-import { TextInputWithButton, TextButton } from 'components/common'
+import {
+  TextInputWithButton,
+  TextButton,
+  PrimaryButton,
+  ErrorBlock,
+} from 'components/common'
 import { AuthContext } from 'contexts/auth.context'
 
 import {
@@ -15,6 +20,7 @@ import {
   loginWithOtp,
   getUser,
   setUserAnalytics,
+  getSgidUrl,
 } from 'services/auth.service'
 
 import {
@@ -38,11 +44,22 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState('')
   const [canResend, setCanResend] = useState(false)
   const [isResending, setIsResending] = useState(false)
+  const [sgidErrorMsg, setSgidErrorMsg] = useState('')
   let timeoutId: NodeJS.Timeout
 
   useEffect(() => {
     return () => timeoutId && clearTimeout(timeoutId)
   })
+
+  useEffect(() => {
+    const params = new URL(window.location.href).searchParams
+    const errorCode = params.get('errorCode')
+    if (errorCode) {
+      setSgidErrorMsg(errorCode)
+    } else {
+      setSgidErrorMsg('')
+    }
+  }, [setSgidErrorMsg])
 
   async function sendOtp() {
     resetButton()
@@ -77,6 +94,19 @@ const Login = () => {
     }
   }
 
+  async function sgidLogin() {
+    setErrorMsg('')
+    try {
+      const authUrl = await getSgidUrl()
+      if (authUrl) {
+        window.location.assign(authUrl)
+      }
+    } catch (err) {
+      setErrorMsg((err as Error).message)
+      sendException((err as Error).message)
+    }
+  }
+
   function resetButton() {
     setErrorMsg('')
     setCanResend(false)
@@ -93,6 +123,7 @@ const Login = () => {
   return (
     <div className={styles.container}>
       <h3 className={styles.text}>
+        {sgidErrorMsg && <ErrorBlock>{sgidErrorMsg}</ErrorBlock>}
         {!otpSent ? (
           <Trans>Sign in with your gov.sg email</Trans>
         ) : (
@@ -137,6 +168,17 @@ const Login = () => {
           loadingButtonLabel={<Trans>Verifying OTP...</Trans>}
           errorMessage={errorMsg}
         />
+      )}
+      {/* This feature is experimental and should only be rendered on the demo URL (/login/sgid) */}
+      {window.location.pathname.includes('sgid') && !otpSent && (
+        <React.Fragment>
+          <h4 className={styles.text}>
+            <Trans>or</Trans>
+          </h4>
+          <PrimaryButton onClick={sgidLogin}>
+            Log in with Singpass
+          </PrimaryButton>
+        </React.Fragment>
       )}
     </div>
   )
