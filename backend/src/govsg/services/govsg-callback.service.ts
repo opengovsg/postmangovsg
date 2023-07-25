@@ -1,4 +1,5 @@
 import config from '@core/config'
+import { MessageId } from '@shared/clients/whatsapp-client.class/types/general'
 import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
@@ -31,6 +32,8 @@ import {
   shouldUpdateStatus,
 } from '@core/constants'
 import { WhatsAppService } from '@core/services'
+import { GovsgVerification } from '@govsg/models/govsg-verification'
+import { randomInt } from 'node:crypto'
 
 const logger = loggerWithLabel(module)
 
@@ -251,7 +254,14 @@ const parseTemplateMessageWebhook = async (
           campaignGovsgTemplate?.govsgTemplate.whatsappTemplateLabel ===
           'sgc_notify_upcoming_call_1' // TODO: Un-hardcode this
         ) {
-          void sendPasscodeCreationMessage(recipient, clientId)
+          void sendPasscodeCreationMessage(recipient, clientId).then(
+            (passcodeCreationWamid) => {
+              void storePrecreatedPasscode(
+                govsgMessage.id,
+                passcodeCreationWamid
+              )
+            }
+          )
         }
       })
       return
@@ -290,7 +300,7 @@ const parseTemplateMessageWebhook = async (
 async function sendPasscodeCreationMessage(
   whatsappId: WhatsAppId,
   clientId: WhatsAppApiClient
-): Promise<void> {
+): Promise<MessageId> {
   const templateMessageToSend: WhatsAppTemplateMessageToSend = {
     recipient: whatsappId,
     apiClient: clientId,
@@ -298,10 +308,27 @@ async function sendPasscodeCreationMessage(
     params: [],
     language: WhatsAppLanguages.english,
   }
-  await WhatsAppService.whatsappClient.sendTemplateMessage(
-    templateMessageToSend
-  )
-  return
+  const passcodeCreationWamid =
+    await WhatsAppService.whatsappClient.sendTemplateMessage(
+      templateMessageToSend
+    )
+  return passcodeCreationWamid
+}
+
+const createPasscode = () => {
+  return randomInt(0, Math.pow(10, 4)).toString().padStart(4, '0')
+}
+
+async function storePrecreatedPasscode(
+  govsgMessageId: GovsgMessage['id'],
+  passcodeCreationWamid: MessageId
+): Promise<GovsgVerification> {
+  const passcode = createPasscode()
+  return await GovsgVerification.create({
+    govsgMessageId,
+    passcodeCreationWamid,
+    passcode,
+  } as GovsgVerification)
 }
 
 const parseUserMessageWebhook = async (
