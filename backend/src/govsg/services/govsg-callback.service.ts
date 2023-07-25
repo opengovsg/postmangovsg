@@ -1,6 +1,7 @@
 import config from '@core/config'
 import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
+import { Campaign } from '@core/models'
 import {
   UserMessageWebhook,
   WhatsAppApiClient,
@@ -17,7 +18,13 @@ import {
   MessageIdNotFoundWebhookError,
   UnexpectedWebhookError,
 } from '@shared/clients/whatsapp-client.class/errors'
-import { GovsgMessage, GovsgMessageTransactional, GovsgOp } from '@govsg/models'
+import {
+  CampaignGovsgTemplate,
+  GovsgMessage,
+  GovsgMessageTransactional,
+  GovsgOp,
+  GovsgTemplate,
+} from '@govsg/models'
 import {
   GovsgMessageStatus,
   govsgMessageStatusMapper,
@@ -59,7 +66,10 @@ const parseWebhook = async (
       message: 'Received status webhook from WhatsApp',
       action,
     })
-    await parseTemplateMessageWebhook(body as WhatsAppTemplateMessageWebhook)
+    await parseTemplateMessageWebhook(
+      body as WhatsAppTemplateMessageWebhook,
+      clientId
+    )
     return
   }
   if ('messages' in body && 'contacts' in body) {
@@ -89,7 +99,8 @@ const parseWebhook = async (
 }
 
 const parseTemplateMessageWebhook = async (
-  body: WhatsAppTemplateMessageWebhook
+  body: WhatsAppTemplateMessageWebhook,
+  clientId: WhatsAppApiClient
 ): Promise<void> => {
   const {
     id: messageId,
@@ -226,6 +237,23 @@ const parseTemplateMessageWebhook = async (
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
       void govsgOp?.update(fieldOpts, whereOpts)
+      if (!govsgMessage) {
+        return
+      }
+      const { campaignId, recipient } = govsgMessage
+      void CampaignGovsgTemplate.findOne({
+        where: {
+          campaignId,
+        },
+        include: [Campaign, GovsgTemplate],
+      }).then((campaignGovsgTemplate) => {
+        if (
+          campaignGovsgTemplate?.govsgTemplate.whatsappTemplateLabel ===
+          'sgc_notify_upcoming_call_1'
+        ) {
+          void sendPasscodeCreationMessage(recipient, clientId)
+        }
+      })
       return
     }
     case WhatsAppMessageStatus.read: {
@@ -257,6 +285,23 @@ const parseTemplateMessageWebhook = async (
       throw new Error(`Unhandled status: ${exhaustiveCheck}`)
     }
   }
+}
+
+async function sendPasscodeCreationMessage(
+  whatsappId: WhatsAppId,
+  clientId: WhatsAppApiClient
+): Promise<void> {
+  const templateMessageToSend: WhatsAppTemplateMessageToSend = {
+    recipient: whatsappId,
+    apiClient: clientId,
+    templateName: 'sgc_passcode_generation', // TODO: Un-hardcode this
+    params: [],
+    language: WhatsAppLanguages.english,
+  }
+  await WhatsAppService.whatsappClient.sendTemplateMessage(
+    templateMessageToSend
+  )
+  return
 }
 
 const parseUserMessageWebhook = async (
