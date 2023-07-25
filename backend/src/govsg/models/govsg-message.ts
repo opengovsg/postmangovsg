@@ -11,6 +11,14 @@ import {
 
 @Table({ tableName: 'govsg_messages', underscored: true, timestamps: true })
 export class GovsgMessage extends Model<GovsgMessage> {
+  @Column({
+    type: DataType.BIGINT,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  })
+  id: number
+
   @ForeignKey(() => Campaign)
   @Column(DataType.BIGINT)
   campaignId: number
