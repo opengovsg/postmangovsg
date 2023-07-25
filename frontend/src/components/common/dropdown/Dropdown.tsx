@@ -57,6 +57,7 @@ const Dropdown = ({
     } else {
       setSelectedLabel('Select an option')
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [defaultLabel, skipOnSelectForDefaultLabel])
 
   return (

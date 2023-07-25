@@ -169,7 +169,7 @@ const EmailRecipients = ({
   // On load, retrieve the list of phonebook lists
   useEffect(() => {
     void retrieveAndPopulatePhonebookLists()
-  }, [campaignId])
+  }, [campaignId, retrieveAndPopulatePhonebookLists])
 
   // On load, check if user was already using Phonebook.
   useEffect(() => {
