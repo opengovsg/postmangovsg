@@ -9,6 +9,7 @@ import { Op } from 'sequelize'
 import csv from 'csvtojson'
 import { UserExperimental } from '@core/models/user/user-experimental'
 import { ChannelType } from '@core/constants'
+import { GovsgTemplatesAccess } from '@govsg/models'
 
 type RawOfficerData = {
   name: string
@@ -30,7 +31,7 @@ void (async function main() {
       (r) =>
         ({
           name: r[0],
-          email: r[1],
+          email: r[1].toLowerCase(),
           designation: r[2],
           agency: r[3],
         } as RawOfficerData)
@@ -47,7 +48,9 @@ void (async function main() {
   })
   if (domains.length !== rawUniqueDomains.length) {
     throw new Error(
-      `There are missing domains in DB. Needed ${rawUniqueDomains}, Got ${domains}`
+      `There are missing domains in DB. Needed ${rawUniqueDomains}, Got ${domains.map(
+        (d) => d.domain
+      )}`
     )
   }
 
@@ -92,7 +95,29 @@ void (async function main() {
         } as UserExperimental)
     )
   )
-  console.log(inserted.map((i) => i.toJSON()))
+  console.log(
+    JSON.stringify(
+      inserted.map((i) => i.toJSON()),
+      null,
+      2
+    )
+  )
+  const insertedAccess = await GovsgTemplatesAccess.bulkCreate(
+    allUsers.map(
+      (u) =>
+        ({
+          userId: u.id,
+          templateId: 1,
+        } as GovsgTemplatesAccess)
+    )
+  )
+  console.log(
+    JSON.stringify(
+      insertedAccess.map((i) => i.toJSON()),
+      null,
+      2
+    )
+  )
   console.log('Done ✅')
   process.exit(0)
 })()

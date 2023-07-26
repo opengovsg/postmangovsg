@@ -1,5 +1,0 @@
-# Generated folders for pg_dump
-bin/
-lib/
-*.dump
-postman*.json
