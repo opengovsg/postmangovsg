@@ -18,12 +18,12 @@ export class GovsgVerification extends Model<GovsgVerification> {
   id: number
 
   @ForeignKey(() => GovsgMessage)
-  @Column(DataType.BIGINT)
+  @Column({ type: DataType.BIGINT, allowNull: false })
   govsgMessageId: number
 
-  @Column({ type: DataType.STRING, allowNull: true })
-  passcodeCreationWamid: string | null
+  @Column({ type: DataType.STRING, allowNull: false })
+  passcodeCreationWamid: string
 
-  @Column(DataType.STRING)
+  @Column({ type: DataType.STRING, allowNull: false })
   passcode: string
 }

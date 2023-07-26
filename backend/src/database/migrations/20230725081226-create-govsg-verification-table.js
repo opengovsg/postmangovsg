@@ -4,14 +4,14 @@ module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('govsg_verification', {
       id: {
-        autoIncrement: true,
         type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
         primaryKey: true,
+        autoIncrement: true,
       },
       govsg_message_id: {
         type: Sequelize.DataTypes.BIGINT,
-        allowNull: true,
+        allowNull: false,
         references: {
           model: 'govsg_messages',
           key: 'id',
@@ -20,10 +20,11 @@ module.exports = {
       },
       passcode_creation_wamid: {
         type: Sequelize.DataTypes.STRING(255),
-        allowNull: true,
+        allowNull: false,
       },
       passcode: {
         type: Sequelize.DataTypes.STRING(255),
+        allowNull: false,
       },
       created_at: {
         type: Sequelize.DataTypes.DATE,
