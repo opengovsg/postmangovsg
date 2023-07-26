@@ -54,5 +54,7 @@
         ]
       }
     ]
-  }
+  },
+  "ssm:account=454894717801:parameterName=/sst/postmangovsg-sst/AWS_SES_FROM:region=ap-southeast-1": "Postman.gov.sg <donotreply@mail.postman.gov.sg>",
+  "ssm:account=454894717801:parameterName=/sst/postmangovsg-sst/AWS_SES_PORT:region=ap-southeast-1": "465"
 }

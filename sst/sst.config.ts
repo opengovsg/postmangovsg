@@ -1,6 +1,7 @@
 import { SSTConfig } from 'sst'
 
-import { MyStack } from './stacks/MyStack'
+import { Crons } from './stacks/Crons'
+import { Padding } from './stacks/Padding'
 
 export default {
   config(_input) {
@@ -18,6 +19,7 @@ export default {
         sourcemap: true,
       },
     })
-    app.stack(MyStack)
+    app.stack(Crons)
+    app.stack(Padding)
   },
 } satisfies SSTConfig

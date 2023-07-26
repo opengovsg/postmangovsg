@@ -1,7 +1,7 @@
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
 import { Config, Cron, StackContext } from 'sst/constructs'
 
-export function MyStack({ app, stack }: StackContext) {
+export function Crons({ app, stack }: StackContext) {
   const postmanDbUri = new Config.Secret(stack, 'POSTMAN_DB_URI')
   const postmanApiKey = new Config.Secret(stack, 'POSTMAN_API_KEY')
   const cronitorUrlSuffix = new Config.Secret(stack, 'CRONITOR_URL_SUFFIX')
