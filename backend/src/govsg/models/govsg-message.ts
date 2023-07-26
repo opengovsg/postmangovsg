@@ -5,9 +5,11 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript'
+import { GovsgVerification } from './govsg-verification'
 
 @Table({ tableName: 'govsg_messages', underscored: true, timestamps: true })
 export class GovsgMessage extends Model<GovsgMessage> {
@@ -25,6 +27,9 @@ export class GovsgMessage extends Model<GovsgMessage> {
 
   @BelongsTo(() => Campaign)
   campaign: Campaign
+
+  @HasOne(() => GovsgVerification)
+  govsgVerification: GovsgVerification
 
   @Column(DataType.STRING)
   recipient: string
