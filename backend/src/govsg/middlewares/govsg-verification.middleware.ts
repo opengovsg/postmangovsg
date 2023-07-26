@@ -14,7 +14,6 @@ export const listMessages = async (
     },
     offset: +(offset as string),
     limit: +(limit as string),
-    order: [['sendAttemptedAt', 'DESC']],
     include: [
       {
         model: GovsgVerification,
