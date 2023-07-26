@@ -21,8 +21,8 @@ const App = () => {
   return (
     <Routes>
       <Route path="/" element={<Landing />}></Route>
-      <Route path="/login/sgid/callback" element={<Callback />}></Route>
-      <Route path="/login/sgid" element={<Login />}></Route>
+      <Route path="/ogp-login/callback" element={<Callback />}></Route>
+      <Route path="/ogp-login" element={<Login />}></Route>
       <Route path="/login" element={<Login />}></Route>
       <Route path="/test/*" element={<TestUtils />}></Route>
       <Route path="/p/:version/:id" element={<ProtectedPage />}></Route>
