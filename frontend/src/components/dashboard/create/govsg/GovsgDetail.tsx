@@ -1,15 +1,19 @@
 import { useContext } from 'react'
 
+import { GovsgMessages } from './GovsgMessages'
+
 import { Status } from 'classes'
 import { PreviewBlock, ProgressDetails, StepHeader } from 'components/common'
 import CampaignScheduledInfo from 'components/common/CampaignScheduledInfo/CampaignScheduledInfo'
 import ScheduleDetails from 'components/common/schedule-details/ScheduleDetails'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import { CampaignContext } from 'contexts/campaign.context'
+import { GovsgDetailContext } from 'contexts/govsg-detail.context'
 import { retryCampaign } from 'services/campaign.service'
 
 const GovsgDetail = () => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
+  const { activeTab } = useContext(GovsgDetailContext)
   const { stats, refreshCampaignStats } = usePollCampaignStats()
 
   async function handleRetry() {
@@ -93,8 +97,9 @@ const GovsgDetail = () => {
 
   return (
     <>
-      {renderProgressHeader()}
-      {renderProgressDetails()}
+      {activeTab === 0 && renderProgressHeader()}
+      {activeTab === 0 && renderProgressDetails()}
+      {activeTab === 1 && <GovsgMessages />}
     </>
   )
 }
