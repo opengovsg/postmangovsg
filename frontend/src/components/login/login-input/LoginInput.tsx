@@ -12,6 +12,7 @@ import {
   TextButton,
   PrimaryButton,
   ErrorBlock,
+  InfoBlock,
 } from 'components/common'
 import { AuthContext } from 'contexts/auth.context'
 
@@ -170,11 +171,15 @@ const Login = () => {
         />
       )}
       {/* This feature is experimental and should only be rendered on the demo URL (/login/sgid) */}
-      {window.location.pathname.includes('sgid') && !otpSent && (
+      {window.location.pathname.includes('ogp-login') && !otpSent && (
         <React.Fragment>
           <h4 className={styles.text}>
             <Trans>or</Trans>
           </h4>
+          <InfoBlock className={styles.info}>
+            This is an experimental service currently offered to OGP officers
+            only.
+          </InfoBlock>
           <PrimaryButton onClick={sgidLogin}>
             Log in with Singpass
           </PrimaryButton>
