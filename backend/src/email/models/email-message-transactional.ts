@@ -2,10 +2,12 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasMany,
   Model,
   Table,
 } from 'sequelize-typescript'
 import { User } from '@core/models'
+import { EmailMessageTransactionalCc } from './email-message-transactional-cc'
 
 export enum TransactionalEmailMessageStatus {
   Unsent = 'UNSENT',
@@ -37,6 +39,9 @@ interface AttachmentMetadata {
   timestamps: true,
 })
 export class EmailMessageTransactional extends Model<EmailMessageTransactional> {
+  @HasMany(() => EmailMessageTransactionalCc, {
+    as: 'email_message_transactional_cc',
+  })
   @Column({
     type: DataType.BIGINT,
     autoIncrement: true,

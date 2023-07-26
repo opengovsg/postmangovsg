@@ -2,7 +2,10 @@ import type { Handler, NextFunction, Request, Response } from 'express'
 import expressRateLimit from 'express-rate-limit'
 import RedisStore from 'rate-limit-redis'
 import { RedisService } from '@core/services'
-import { EmailTransactionalService } from '@email/services'
+import {
+  EmailMessageTransactionalWithRelations,
+  EmailTransactionalService,
+} from '@email/services'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services/auth.service'
 import {
@@ -65,10 +68,21 @@ export const InitEmailTransactionalMiddleware = (
   type ReqBodyWithId = ReqBody & { emailMessageTransactionalId: string }
 
   function convertMessageModelToResponse(
-    message: EmailMessageTransactional,
+    message: EmailMessageTransactionalWithRelations,
     excludeParams = false,
     ccEmails?: { cc?: string[]; bcc?: string[] }
   ) {
+    let cc = ccEmails?.cc
+    let bcc = ccEmails?.bcc
+    if (message.email_message_transactional_cc) {
+      cc = message.email_message_transactional_cc
+        .filter((m) => m.ccType === CcType.Cc)
+        .map((m) => m.email)
+      bcc = message.email_message_transactional_cc
+        .filter((m) => m.ccType === CcType.Bcc)
+        .map((m) => m.email)
+    }
+
     return {
       id: message.id,
       from: message.from,
@@ -86,8 +100,8 @@ export const InitEmailTransactionalMiddleware = (
       updated_at: message.updatedAt.toISOString(),
       classification: message.classification,
       tag: message.tag,
-      cc: ccEmails?.cc,
-      bcc: ccEmails?.bcc,
+      cc,
+      bcc,
     }
   }
 
@@ -250,28 +264,17 @@ export const InitEmailTransactionalMiddleware = (
     }
   }
 
-  async function getCCEmails(emailMessageTransactionalId: string) {
-    const ccAndBcc = await EmailMessageTransactionalCc.findAll({
-      where: {
-        emailMessageTransactionalId,
-        errorCode: { [Op.is]: null },
-      },
-    })
-
-    const cc = ccAndBcc
-      ?.filter((c) => c.ccType === CcType.Cc)
-      ?.map((c) => c.email)
-    const bcc = ccAndBcc
-      ?.filter((c) => c.ccType === CcType.Bcc)
-      ?.map((c) => c.email)
-
-    return { cc, bcc }
-  }
-
   async function getById(req: Request, res: Response): Promise<void> {
     const { emailId } = req.params
     const message = await EmailMessageTransactional.findOne({
       where: { id: emailId, userId: req.session?.user?.id.toString() },
+      include: [
+        {
+          model: EmailMessageTransactionalCc,
+          attributes: ['email', 'ccType'],
+          where: { errorCode: { [Op.eq]: null } },
+        },
+      ],
     })
     if (!message) {
       res
@@ -279,11 +282,8 @@ export const InitEmailTransactionalMiddleware = (
         .json({ message: `Email message with ID ${emailId} not found.` })
       return
     }
-    const ccEmails = await getCCEmails(message.id)
 
-    res
-      .status(200)
-      .json(convertMessageModelToResponse(message, undefined, ccEmails))
+    res.status(200).json(convertMessageModelToResponse(message))
   }
 
   async function listMessages(req: Request, res: Response): Promise<void> {

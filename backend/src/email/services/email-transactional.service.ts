@@ -8,6 +8,7 @@ import {
 } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 import {
+  CcType,
   EmailMessageTransactional,
   EmailMessageTransactionalCc,
   TransactionalEmailMessageStatus,
@@ -262,6 +263,11 @@ async function handleStatusCallbacks(
   }
 }
 
+export type EmailMessageTransactionalWithRelations =
+  EmailMessageTransactional & {
+    email_message_transactional_cc?: { email: string; ccType: CcType }[]
+  }
+
 async function listMessages({
   userId,
   limit,
@@ -280,7 +286,10 @@ async function listMessages({
   status?: TransactionalEmailMessageStatus
   filterByTimestamp?: TimestampFilter
   tag?: string
-}): Promise<{ hasMore: boolean; messages: EmailMessageTransactional[] }> {
+}): Promise<{
+  hasMore: boolean
+  messages: EmailMessageTransactionalWithRelations[]
+}> {
   limit = limit || 10
   offset = offset || 0
   sortBy = sortBy || TransactionalEmailSortField.Created
@@ -318,6 +327,13 @@ async function listMessages({
     offset,
     where,
     order,
+    include: [
+      {
+        model: EmailMessageTransactionalCc,
+        attributes: ['email', 'ccType'],
+        where: { errorCode: { [Op.eq]: null } },
+      },
+    ],
   })
   const hasMore = count > offset + limit
   return { hasMore, messages: rows }
