@@ -1,6 +1,7 @@
 import { Joi, Segments, celebrate } from 'celebrate'
 import { Router } from 'express'
 import { GovsgTransactionalMiddleware } from '../middlewares/govsg-transactional.middleware'
+import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 
 export const InitGovsgMessageTransactionalRoute = (
   govsgTransactionalMiddleware: GovsgTransactionalMiddleware
@@ -9,9 +10,11 @@ export const InitGovsgMessageTransactionalRoute = (
   const sendValidator = {
     [Segments.BODY]: Joi.object({
       recipient: Joi.string().required(),
-      whatsapp_template_label: Joi.string().required(),
-      // not sure whether it's possible to validate that params is a Record<string,string> using Joi
-      params: Joi.object().optional(), // optional because templates might not have params
+      template_id: Joi.number().required(),
+      language_code: Joi.string()
+        .valid(...Object.values(WhatsAppLanguages))
+        .default(WhatsAppLanguages.english),
+      params: Joi.object().pattern(Joi.string(), Joi.string()).default({}),
     }),
   }
 
