@@ -107,7 +107,7 @@ const GovsgDetail = () => {
           {renderProgressDetails()}
         </div>
       )}
-      {activeTab === 1 && <GovsgMessages />}
+      {activeTab === 1 && <GovsgMessages campaignId={campaign.id} />}
     </>
   )
 }

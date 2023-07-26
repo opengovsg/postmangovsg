@@ -1,3 +1,5 @@
+import axios from 'axios'
+
 import { capitalize } from 'lodash'
 
 import { useEffect, useState } from 'react'
@@ -9,6 +11,7 @@ import overrideStylesTitleBar from '../../campaigns/OverrideTitleBar.module.scss
 import styles from './../../campaigns/Campaigns.module.scss'
 
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
+import { Campaign } from 'classes'
 import { Pagination, TitleBar } from 'components/common'
 
 const ITEMS_PER_PAGE = 10
@@ -19,29 +22,16 @@ interface GovsgMessage {
   data: string
   passcode: string
   status: string
-  sentAt: Date
+  sent: Date
   officer: string
 }
 
-export const GovsgMessages = () => {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const singleRow = {
-    name: 'Emily Yeo',
-    mobile: '91234567',
-    data: JSON.stringify({
-      timeslot: '1-2pm',
-      topic: 'PR application #1234',
-    }),
-    passcode: '8374',
-    status: 'READ',
-    sentAt: new Date(Date.parse('04 Dec 1995 00:12:00 GMT')),
-    officer: 'James Tan',
-  }
-  const dummyData = Array(100).fill(singleRow)
+interface GovsgMessagesProps {
+  campaignId: Campaign['id']
+}
 
-  // TODO: Replace with actual data
-  const [govsgMessagesDisplayed, setGovsgMessagesDisplayed] =
-    useState(dummyData)
+export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
+  const [govsgMessagesDisplayed, setGovsgMessagesDisplayed] = useState([])
   const [selectedPage, setSelectedPage] = useState(0)
   const [hasFetchedGovsgMessages, setHasFetchedGovsgMessages] = useState(false)
   const [govsgMessageCount, setGovsgMessageCount] = useState(0)
@@ -51,17 +41,12 @@ export const GovsgMessages = () => {
       offset: selectedPage * ITEMS_PER_PAGE,
       limit: ITEMS_PER_PAGE,
     }
-    // TODO: Replace with real API call
-    // const { govsgMessages, totalCount } = await getGovsgMessages(options)
-    // TODO: Fix mock pagination view
-    const { govsgMessages, totalCount } = ((options) => {
-      const { offset, limit } = options
-      const govsgMessages = dummyData.slice(offset, limit)
-      return {
-        govsgMessages,
-        totalCount: govsgMessages.length,
-      }
-    })(options)
+    const response = await axios.get(`/campaign/${campaignId}/govsg/messages`, {
+      params: {
+        ...options,
+      },
+    })
+    const { messages: govsgMessages, total_count: totalCount } = response.data
     setGovsgMessageCount(totalCount)
     setGovsgMessagesDisplayed(govsgMessages)
     setSelectedPage(selectedPage)
@@ -133,9 +118,9 @@ export const GovsgMessages = () => {
     {
       name: 'Sent'.toUpperCase(),
       render: (govsgMessage: GovsgMessage) =>
-        govsgMessage.sentAt ? (
+        govsgMessage.sent ? (
           <Moment format="MMM DD YYYY, HH:mm" interval={0}>
-            {govsgMessage.sentAt}
+            {govsgMessage.sent}
           </Moment>
         ) : (
           <span></span>
