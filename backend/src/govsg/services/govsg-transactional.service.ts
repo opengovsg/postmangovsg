@@ -1,11 +1,18 @@
 import config from '@core/config'
 import {
+  GovsgMessageStatus,
+  Ordering,
+  TimestampFilter,
+  TransactionalGovsgSortField,
+} from '@core/constants'
+import {
   ApiAuthenticationError,
   ApiInvalidRecipientError,
   ApiRateLimitError,
 } from '@core/errors/rest-api.errors'
 import { loggerWithLabel } from '@core/logger'
 import { WhatsAppService } from '@core/services/whatsapp.service'
+import { GovsgMessageTransactional } from '@govsg/models'
 import {
   AuthenticationError,
   InvalidRecipientError,
@@ -17,6 +24,8 @@ import {
   WhatsAppApiClient,
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/types'
+import { Op } from 'sequelize'
+import { Order, WhereOptions } from 'sequelize'
 
 const logger = loggerWithLabel(module)
 
@@ -77,5 +86,60 @@ export async function sendMessage({
       error: err,
     })
     throw err
+  }
+}
+
+export async function listMessages({
+  userId,
+  limit,
+  offset,
+  sortBy,
+  orderBy,
+  status,
+  filterByTimestamp,
+}: {
+  userId: string
+  limit?: number
+  offset?: number
+  sortBy?: TransactionalGovsgSortField
+  orderBy?: Ordering
+  status?: GovsgMessageStatus
+  filterByTimestamp?: TimestampFilter
+}): Promise<{ hasMore: boolean; messages: GovsgMessageTransactional[] }> {
+  limit = limit || 10
+  offset = offset || 0
+  sortBy = sortBy || TransactionalGovsgSortField.Created
+  orderBy = orderBy || Ordering.DESC
+  const order: Order = [[sortBy, orderBy]]
+  const where: WhereOptions = { userId }
+  if (status) {
+    where.status = status
+  }
+  if (filterByTimestamp) {
+    if (filterByTimestamp.createdAt) {
+      const { gt, gte, lt, lte } = filterByTimestamp.createdAt
+      if (gt) {
+        where.createdAt = { ...where.createdAt, [Op.gt]: gt }
+      }
+      if (gte) {
+        where.createdAt = { ...where.createdAt, [Op.gte]: gte }
+      }
+      if (lt) {
+        where.createdAt = { ...where.createdAt, [Op.lt]: lt }
+      }
+      if (lte) {
+        where.createdAt = { ...where.createdAt, [Op.lte]: lte }
+      }
+    }
+  }
+  const { count, rows } = await GovsgMessageTransactional.findAndCountAll({
+    limit,
+    offset,
+    where,
+    order,
+  })
+  return {
+    hasMore: count > offset + limit,
+    messages: rows,
   }
 }
