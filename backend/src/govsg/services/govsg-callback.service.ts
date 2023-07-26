@@ -12,6 +12,7 @@ import {
   WhatsAppTemplateMessageToSend,
   WhatsAppTemplateMessageWebhook,
   WhatsAppTextMessageToSend,
+  WhatsAppWebhookButtonMessage,
   WhatsAppWebhookTextMessage,
   WhatsappWebhookMessageType,
 } from '@shared/clients/whatsapp-client.class/types'
@@ -331,12 +332,83 @@ async function storePrecreatedPasscode(
   } as GovsgVerification)
 }
 
+// TODO: Tidy up params
+async function sendPasscodeMessage(
+  whatsappId: WhatsAppId,
+  clientId: WhatsAppApiClient,
+  officerName: string,
+  officerAgency: string,
+  passcode: string
+): Promise<MessageId> {
+  const templateMessageToSend: WhatsAppTemplateMessageToSend = {
+    recipient: whatsappId,
+    apiClient: clientId,
+    templateName: 'sgc_send_passcode', // TODO: Un-hardcode this
+    params: [
+      {
+        type: 'text',
+        text: officerName,
+      },
+      {
+        type: 'text',
+        text: officerAgency,
+      },
+      {
+        type: 'text',
+        text: passcode,
+      },
+    ],
+    language: WhatsAppLanguages.english,
+  }
+  const passcodeCreationWamid =
+    await WhatsAppService.whatsappClient.sendTemplateMessage(
+      templateMessageToSend
+    )
+  return passcodeCreationWamid
+}
+
 const parseUserMessageWebhook = async (
   body: UserMessageWebhook,
   clientId: WhatsAppApiClient
 ): Promise<void> => {
   const { wa_id: whatsappId } = body.contacts[0]
   const { id: messageId, type } = body.messages[0]
+  if (type === WhatsappWebhookMessageType.button) {
+    const message = body.messages[0] as WhatsAppWebhookButtonMessage
+    if (message.button.text === 'Create passcode') {
+      const passcodeCreationWamid = message.context.id
+      const govsgVerification = await GovsgVerification.findOne({
+        where: { passcodeCreationWamid },
+        include: [GovsgMessage],
+      })
+      if (!govsgVerification) {
+        // TODO: Update log statement
+        logger.warn({
+          message: `govsgVerification for an expected button reply was not found.`,
+          meta: {
+            whatsappId,
+            messageId,
+            type,
+          },
+        })
+        return
+      }
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const { officer_name: officerName, agency: officerAgency } =
+        govsgVerification.govsgMessage.params
+      const passcode = govsgVerification.passcode
+      await sendPasscodeMessage(
+        whatsappId,
+        clientId,
+        officerName,
+        officerAgency,
+        passcode
+      )
+      // TODO: Add log statement
+    }
+    return
+  }
   if (type !== WhatsappWebhookMessageType.text) {
     // not text message, log and ignore
     logger.info({
