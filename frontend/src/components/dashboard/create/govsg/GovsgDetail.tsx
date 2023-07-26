@@ -1,4 +1,8 @@
+import cx from 'classnames'
+
 import { useContext } from 'react'
+
+import styles from '../Create.module.scss'
 
 import { GovsgMessages } from './GovsgMessages'
 
@@ -97,8 +101,12 @@ const GovsgDetail = () => {
 
   return (
     <>
-      {activeTab === 0 && renderProgressHeader()}
-      {activeTab === 0 && renderProgressDetails()}
+      {activeTab === 0 && (
+        <div className={cx(styles.stepContainer, styles.detailContainer)}>
+          {renderProgressHeader()}
+          {renderProgressDetails()}
+        </div>
+      )}
       {activeTab === 1 && <GovsgMessages />}
     </>
   )

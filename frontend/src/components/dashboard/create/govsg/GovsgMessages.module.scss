@@ -1,0 +1,163 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.linkUnderline {
+  text-decoration: underline;
+}
+
+.buttonSpace {
+  min-width: 142px;
+}
+
+.content {
+  @include flex-vertical;
+  padding: $content-top-padding $site-padding $content-bottom-padding;
+  margin: 0 auto;
+  width: 1200px;
+  max-width: 100%;
+
+  @include mobile() {
+    padding: $content-top-padding $mobile-site-padding $content-bottom-padding;
+  }
+}
+
+.header {
+  margin-bottom: 2rem;
+}
+
+.tableContainer {
+  display: block;
+  max-width: 100%;
+  overflow-x: scroll;
+  overflow-y: hidden;
+
+  .i {
+    font-size: 1.2rem !important;
+    margin: 0.25rem !important;
+  }
+
+  table.campaignTable {
+    min-width: calc(
+      #{$tablet} - #{$mobile-site-padding} - #{$mobile-site-padding}
+    );
+    width: 100%;
+    table-layout: fixed;
+
+    thead tr {
+      th {
+        @extend %caption;
+        text-transform: capitalize;
+      }
+    }
+
+    tbody tr {
+      &:active {
+        opacity: 0.5;
+      }
+
+      td {
+        @extend %body-2;
+
+        .rowName {
+          display: inline-block;
+          width: 100%;
+          overflow: hidden;
+          text-overflow: ellipsis;
+        }
+      }
+    }
+  }
+}
+
+.iconContainer {
+  position: relative;
+}
+
+.duplicate {
+  @include flex-horizontal;
+  color: $primary;
+  padding: 0.5rem;
+  &:hover {
+    color: $blue-300;
+  }
+  &:active {
+    color: $blue-700;
+  }
+  &:disabled {
+    color: $grey-500;
+  }
+  i {
+    margin-right: 0.5rem;
+  }
+}
+
+.demo::before {
+  content: 'DEMO';
+  background: $green-900;
+  color: white;
+  padding: 0.1rem 0.3rem;
+  border-radius: 0.3rem;
+  text-align: center;
+  font-size: 0.7rem;
+  font-weight: 500;
+  float: right;
+  margin-right: 8px;
+}
+
+.icon {
+  @extend %icon;
+  &.mode {
+    @extend %icon-large;
+  }
+}
+
+.lockIcon {
+  font-size: 1rem;
+  line-height: 1rem;
+  position: absolute;
+  bottom: 0.2rem;
+  right: -0.5rem;
+  color: $blue-300;
+}
+
+.spinner {
+  @include spinner;
+  position: relative;
+}
+
+.emptyDashboard {
+  @extend %body-1;
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+
+  .image {
+    width: 350px;
+    margin-bottom: $spacing-7;
+  }
+
+  .darkBlueButton {
+    @extend %secondary-btn;
+  }
+  .darkGreenButton {
+    @include button($green-500, $green-300, $grey-900);
+  }
+
+  .actions {
+    @include flex-horizontal;
+    justify-content: space-evenly;
+    margin-top: $spacing-7;
+    button {
+      margin-bottom: 1rem;
+    }
+    @include mobile() {
+      @include flex-vertical;
+    }
+  }
+  .removeFilter {
+    @extend %body-2;
+    height: auto;
+    color: $blue-500;
+    text-decoration: underline;
+  }
+}
