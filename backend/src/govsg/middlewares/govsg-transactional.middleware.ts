@@ -8,7 +8,7 @@ import {
   ApiValidationError,
 } from '@core/errors/rest-api.errors'
 import { GovsgMessageStatus } from '@core/constants'
-import { GovsgTransactionalService } from '../services/govsg-transactional.service'
+import { GovsgTransactionalService } from '@govsg/services'
 import WhatsAppClient from '@shared/clients/whatsapp-client.class'
 import {
   NormalisedParam,
@@ -19,6 +19,7 @@ import { PhoneNumberService } from '@shared/utils/phone-number.service'
 export interface GovsgTransactionalMiddleware {
   saveMessage: Handler
   sendMessage: Handler
+  getById: Handler
 }
 
 export const InitGovsgTransactionalMiddleware =
@@ -214,8 +215,23 @@ export const InitGovsgTransactionalMiddleware =
       }
     }
 
+    async function getById(req: Request, res: Response): Promise<Response> {
+      const { messageId } = req.params
+      const message = await GovsgMessageTransactional.findOne({
+        where: { id: messageId, userId: req.session?.user?.id.toString() },
+      })
+      if (!message) {
+        throw new ApiNotFoundError(
+          `GovSG message with ID ${messageId} not found.`
+        )
+      }
+
+      return res.status(200).json(convertMessageModelToResponse(message))
+    }
+
     return {
       saveMessage,
       sendMessage,
+      getById,
     }
   }

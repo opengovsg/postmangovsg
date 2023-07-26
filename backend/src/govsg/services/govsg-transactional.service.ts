@@ -20,7 +20,7 @@ import {
 
 const logger = loggerWithLabel(module)
 
-async function sendMessage({
+export async function sendMessage({
   recipient,
   templateName,
   params,
@@ -78,8 +78,4 @@ async function sendMessage({
     })
     throw err
   }
-}
-
-export const GovsgTransactionalService = {
-  sendMessage,
 }
