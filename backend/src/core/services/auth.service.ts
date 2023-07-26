@@ -4,7 +4,7 @@ import { Request } from 'express'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { User } from '@core/models'
-import { validateDomain } from '@core/utils/validate-domain'
+import { isValidDomain, validateDomain } from '@core/utils/validate-domain'
 import { ApiKeyService, MailService, RedisService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import { Transaction } from 'sequelize/types'
@@ -47,6 +47,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     clientSecret: SGID_CLIENT_SECRET,
     privateKey: SGID_PRIVATE_KEY,
     redirectUri: SGID_REDIRECT_URI,
+    validDomains: SGID_VALID_DOMAINS,
   } = config.get('sgid')
 
   const sgidClient = new SgidClient({
@@ -57,7 +58,8 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   })
 
   const SGID_OGP_WORK_EMAIL_SCOPE = 'ogpofficerinfo.work_email'
-
+  const sgidDomainsToWhitelist =
+    SGID_VALID_DOMAINS.split(';').filter(isValidDomain)
   const otpCharset = '234567ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   /**
    * Generate a six digit otp
@@ -400,12 +402,22 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   }
 
   /**
-   * Helper method to retrieve the user's email from their singpass info
+   * Helper method to retrieve the user's email from their singpass info.
+   * User's email must be from the list of whitelisted domains.
    * @param userInfo
-   * @returns
    */
   const getSgidUserEmail = (userInfo: UserInfoReturn): string => {
-    return userInfo.data[SGID_OGP_WORK_EMAIL_SCOPE].toLowerCase()
+    const email = userInfo.data[SGID_OGP_WORK_EMAIL_SCOPE]
+    if (!email) {
+      throw new Error('No email found')
+    }
+    const matched = sgidDomainsToWhitelist.filter((domain: string) =>
+      email.endsWith(domain)
+    )
+    if (matched.length == 0) {
+      throw new Error('Invalid email')
+    }
+    return email.toLowerCase()
   }
 
   return {

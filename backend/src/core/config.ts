@@ -181,6 +181,7 @@ interface ConfigSchema {
     clientSecret: string
     privateKey: string
     redirectUri: string
+    validDomains: string
   }
 }
 
@@ -838,6 +839,13 @@ const config: Config<ConfigSchema> = convict({
       doc: 'Redirect URI of application registered with sgID',
       default: '',
       env: 'SGID_REDIRECT_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
+    validDomains: {
+      doc: 'Valid email domains that can log in with sgID',
+      default: '',
+      env: 'SGID_VALID_DOMAINS',
       format: 'required-string',
       sensitive: true,
     },
