@@ -281,7 +281,9 @@ export const InitEmailTransactionalMiddleware = (
     }
     const ccEmails = await getCCEmails(message.id)
 
-    res.status(200).json(convertMessageModelToResponse(message, undefined, ccEmails))
+    res
+      .status(200)
+      .json(convertMessageModelToResponse(message, undefined, ccEmails))
   }
 
   async function listMessages(req: Request, res: Response): Promise<void> {
