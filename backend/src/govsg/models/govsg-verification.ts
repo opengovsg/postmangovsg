@@ -1,4 +1,5 @@
 import {
+  BelongsTo,
   Column,
   DataType,
   ForeignKey,
@@ -16,6 +17,9 @@ export class GovsgVerification extends Model<GovsgVerification> {
     allowNull: false,
   })
   id: number
+
+  @BelongsTo(() => GovsgMessage)
+  govsgMessage: GovsgMessage
 
   @ForeignKey(() => GovsgMessage)
   @Column({ type: DataType.BIGINT, allowNull: false })
