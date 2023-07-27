@@ -11,19 +11,17 @@ import { reminderEmailMapper } from './helper'
 
 export async function handler() {
   try {
-    if (process.env.IS_LOCAL === 'true') {
-      console.log('Running cron locally')
-      await sendApiKeyExpiryEmail()
-      return
-    }
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const cronitor = require('cronitor')(Config.CRONITOR_URL_SUFFIX) // common to all jobs on our shared Cronitor account
-    const invokeFunction = cronitor.wrap(
-      Config.CRONITOR_CODE_API_KEY_EXPIRY,
-      async function () {
-        await sendApiKeyExpiryEmail()
-      },
-    )
+    const invokeFunction =
+      process.env.IS_LOCAL === 'true'
+        ? async function () {
+            console.log('Running cron locally')
+            await sendApiKeyExpiryEmail()
+          }
+        : cronitor.wrap(Config.CRONITOR_CODE_API_KEY_EXPIRY, async function () {
+            await sendApiKeyExpiryEmail()
+          })
     await invokeFunction()
   } catch (error) {
     console.log(error)

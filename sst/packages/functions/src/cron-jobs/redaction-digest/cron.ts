@@ -10,19 +10,20 @@ interface Event {
 }
 export async function handler(event: Event) {
   try {
-    if (process.env.IS_LOCAL === 'true') {
-      console.log('Running cron locally')
-      await sendRedactionDigest(event)
-      return
-    }
     // eslint-disable-next-line @typescript-eslint/no-var-requires
     const cronitor = require('cronitor')(Config.CRONITOR_URL_SUFFIX) // common to all jobs on our shared Cronitor account
-    const invokeFunction = cronitor.wrap(
-      Config.CRONITOR_CODE_REDACTION_DIGEST,
-      async function () {
-        await sendRedactionDigest(event)
-      },
-    )
+    const invokeFunction =
+      process.env.IS_LOCAL === 'true'
+        ? async function () {
+            console.log('Running cron locally')
+            await sendRedactionDigest(event)
+          }
+        : cronitor.wrap(
+            Config.CRONITOR_CODE_REDACTION_DIGEST,
+            async function () {
+              await sendRedactionDigest(event)
+            },
+          )
     await invokeFunction()
   } catch (error) {
     console.log(error)
