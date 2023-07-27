@@ -265,11 +265,11 @@ export const InitEmailTransactionalMiddleware = (
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
         attachments,
         cc:
-          cc && cc.length > 1
+          cc && cc.length > 0
             ? cc.filter((c) => !blacklistedRecipients.includes(c))
             : undefined,
         bcc:
-          bcc && bcc.length > 1
+          bcc && bcc.length > 0
             ? bcc.filter((c) => !blacklistedRecipients.includes(c))
             : undefined,
         emailMessageTransactionalId,
