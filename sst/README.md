@@ -2,7 +2,7 @@
 
 ## Overview
 
-This folder contains serverless constructs for Postman developed using SST. In the long-term, all the features currently in the `serverless` folder will be migrated to be developed and deployed using SST.
+This folder contains serverless constructs for Postman developed using SST.
 
 ## AWS Credentials
 
@@ -19,7 +19,7 @@ Each developer will be prompted to use a stage corresponding to their username i
 
 ## Local development
 
-To maintain consistency with the deployment environment, we try to minimise the use of `.env` variables. Instead, use `Config` to set secrets and parameters (see the codebase for examples).
+The application accesses environment variables stored in the Parameter Store. To set these secrets, you can use the SST CLI.
 
 To set a secret, run:
 
@@ -33,7 +33,11 @@ To avoid leaving secrets in your terminal history, you could add a git-ignored `
 npx sst secrets set <key> $(cat secret.txt) --stage <stage>
 ```
 
-We use `LOCAL_DB_URI` in the `.env` file to develop against a local database. You could also develop against the staging database by using the staging DB's URI and turning on OGP VPN and running a tunnel via the jumphost. Go to `backend` folder and run `npm run tunneldb:staging`.
+To load a set of environment variables from a local `.env` file, run:
+
+```zsh
+npx sst secrets load .env
+```
 
 ## Deploying to staging and production
 

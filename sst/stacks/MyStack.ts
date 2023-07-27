@@ -38,12 +38,8 @@ export function MyStack({ app, stack }: StackContext) {
     postmanApiKey,
     postmanDbUri,
     cronitorUrlSuffix,
+    new Config.Secret(stack, 'CRONITOR_CODE_API_KEY_EXPIRY'),
   ]
-  if (!app.local) {
-    apiKeyExpiryCronResources.push(
-      new Config.Secret(stack, 'CRONITOR_CODE_API_KEY_EXPIRY'),
-    )
-  }
   apiKeyExpiryCron.bind(apiKeyExpiryCronResources)
 
   // Cron job #2: send redaction digest email
@@ -67,12 +63,8 @@ export function MyStack({ app, stack }: StackContext) {
     postmanApiKey,
     postmanDbUri,
     cronitorUrlSuffix,
+    new Config.Secret(stack, 'CRONITOR_CODE_REDACTION_DIGEST'),
   ]
-  if (!app.local) {
-    redactionDigestCronResources.push(
-      new Config.Secret(stack, 'CRONITOR_CODE_REDACTION_DIGEST'),
-    )
-  }
   redactionDigestCron.bind(redactionDigestCronResources)
 
   // Cron job #3: send unsubscribe digest email
@@ -95,12 +87,8 @@ export function MyStack({ app, stack }: StackContext) {
     postmanApiKey,
     postmanDbUri,
     cronitorUrlSuffix,
+    new Config.Secret(stack, 'CRONITOR_CODE_UNSUB_DIGEST'),
   ]
-  if (!app.local) {
-    unsubDigestCronResources.push(
-      new Config.Secret(stack, 'CRONITOR_CODE_UNSUB_DIGEST'),
-    )
-  }
   unsubDigestCron.bind(unsubDigestCronResources)
 }
 

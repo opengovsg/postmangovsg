@@ -7,7 +7,7 @@ import { users } from '@/core/models/user'
 import { getFutureUTCDate } from '@/core/util/date'
 import { sendEmail } from '@/core/util/email'
 
-import { IS_LOCAL, LOCAL_DB_URI } from '../../env'
+import { IS_LOCAL } from '../../env'
 
 import { reminderEmailMapper } from './helper'
 
@@ -40,8 +40,7 @@ export async function handler() {
 */
 
 async function sendApiKeyExpiryEmail() {
-  const dbUri = IS_LOCAL ? LOCAL_DB_URI : Config.POSTMAN_DB_URI
-  const db = new PostmanDbClient(dbUri).getClient()
+  const db = new PostmanDbClient(Config.POSTMAN_DB_URI).getClient()
   const fourWeeks = getFutureUTCDate(28)
   const twoWeeks = getFutureUTCDate(14)
   const threeDays = getFutureUTCDate(3)

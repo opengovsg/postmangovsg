@@ -3,7 +3,7 @@ import { Config } from 'sst/node/config'
 import { getSequelize } from '@/core/database/client'
 import { sendEmail } from '@/core/util/email'
 
-import { IS_LOCAL, LOCAL_DB_URI } from '../../env'
+import { IS_LOCAL } from '../../env'
 
 import { createEmailBody, getUserRedactedCampaigns } from './helper'
 
@@ -35,8 +35,7 @@ export async function handler(event: Event) {
 export async function sendRedactionDigest(event: Event) {
   // this is an optional parameter that allow for manually triggering the function for a specific set of users
   const { selectedRecipients } = event
-  const dbUri = IS_LOCAL ? LOCAL_DB_URI : Config.POSTMAN_DB_URI
-  const sequelize = getSequelize(dbUri)
+  const sequelize = getSequelize(Config.POSTMAN_DB_URI)
   const userRedactedCampaigns = await getUserRedactedCampaigns(
     sequelize,
     selectedRecipients,

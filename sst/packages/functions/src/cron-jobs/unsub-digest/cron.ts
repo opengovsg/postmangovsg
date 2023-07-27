@@ -2,7 +2,7 @@ import { Config } from 'sst/node/config'
 
 import { getSequelize } from '@/core/database/client'
 
-import { IS_LOCAL, LOCAL_DB_URI } from '../../env'
+import { IS_LOCAL } from '../../env'
 
 import { getUnsubscribeList, sendEmailAndUpdate } from './helper'
 
@@ -29,8 +29,7 @@ export async function handler() {
 }
 
 async function sendUnsubDigest() {
-  const dbUri = IS_LOCAL ? LOCAL_DB_URI : Config.POSTMAN_DB_URI
-  const sequelize = getSequelize(dbUri)
+  const sequelize = getSequelize(Config.POSTMAN_DB_URI)
   // retrieve unsubscribed recipients grouped by campaigns and users
   const unsubscribeDigests = await getUnsubscribeList(sequelize)
 
