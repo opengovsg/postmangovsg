@@ -10,20 +10,6 @@ env:
   DIRECTORY: sst
 
 jobs:
-  set_environment:
-    outputs:
-      current_env: ${{ steps.set_environment.outputs.current_env }}
-    runs-on: ubuntu-latest
-    steps:
-      - id: set-environment
-        run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            echo "current_env=production"
-          else
-            echo "current_env=staging"
-          fi
-
   lint-test:
     runs-on: ubuntu-latest
     steps:
@@ -38,9 +24,7 @@ jobs:
       #   run: cd "$DIRECTORY" && npm test
 
   build_deploy_application:
-    needs: [set_environment, lint-test]
-    environment:
-      name: "${{ needs.set_environment.outputs.current_env }}"
+    needs: [lint-test]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -56,4 +40,4 @@ jobs:
       - name: Install dependencies
         run: cd "$DIRECTORY" && npm ci
       - name: Deploy
-        run: cd "$DIRECTORY" && npx sst deploy --stage ${{ needs.set_environment.outputs.current_env == 'master' && 'prod' || 'stg' }}
+        run: cd "$DIRECTORY" && npx sst deploy --stage ${{ github.ref == 'master' && 'prod' || 'stg' }}
