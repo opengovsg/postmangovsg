@@ -217,6 +217,7 @@ export const InitEmailTransactionalMiddleware = (
             {
               model: EmailMessageTransactionalCc,
               attributes: ['email', 'ccType'],
+              required: false,
             },
           ],
         })
@@ -317,6 +318,7 @@ export const InitEmailTransactionalMiddleware = (
           model: EmailMessageTransactionalCc,
           attributes: ['email', 'ccType'],
           where: { errorCode: { [Op.eq]: null } },
+          required: false,
         },
       ],
     })
@@ -350,6 +352,10 @@ export const InitEmailTransactionalMiddleware = (
       status: status as TransactionalEmailMessageStatus,
       filterByTimestamp: filter as TimestampFilter,
       tag: tag as string,
+    })
+    logger.warn({
+      message: 'messagesmessages1',
+      messages: messages,
     })
     res.status(200).json({
       has_more: hasMore,

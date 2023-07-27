@@ -283,9 +283,11 @@ async function listMessages({
     order,
     include: [
       {
+        //
         model: EmailMessageTransactionalCc,
         attributes: ['email', 'ccType'],
         where: { errorCode: { [Op.eq]: null } },
+        required: false,
       },
     ],
   })
