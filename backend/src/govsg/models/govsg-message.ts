@@ -5,18 +5,31 @@ import {
   Column,
   DataType,
   ForeignKey,
+  HasOne,
   Model,
   Table,
 } from 'sequelize-typescript'
+import { GovsgVerification } from './govsg-verification'
 
 @Table({ tableName: 'govsg_messages', underscored: true, timestamps: true })
 export class GovsgMessage extends Model<GovsgMessage> {
+  @Column({
+    type: DataType.BIGINT,
+    autoIncrement: true,
+    primaryKey: true,
+    allowNull: false,
+  })
+  id: number
+
   @ForeignKey(() => Campaign)
   @Column(DataType.BIGINT)
   campaignId: number
 
   @BelongsTo(() => Campaign)
   campaign: Campaign
+
+  @HasOne(() => GovsgVerification)
+  govsgVerification: GovsgVerification
 
   @Column(DataType.STRING)
   recipient: string

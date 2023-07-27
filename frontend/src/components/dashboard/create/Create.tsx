@@ -9,18 +9,24 @@ import styles from './Create.module.scss'
 import EmailCreate from './email/EmailCreate'
 
 import CreateGovsg from './govsg/GovsgCreate'
+
 import SMSCreate from './sms/SMSCreate'
 
 import TelegramCreate from './telegram/TelegramCreate'
 
 import { ChannelType, Status } from 'classes'
+
 import { TitleBar, PrimaryButton } from 'components/common'
+import { CampaignHeaderTabs } from 'components/common/CampaignHeaderTabs/CampaignHeaderTabs'
+import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import Error from 'components/error'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { GovsgDetailContextProvider } from 'contexts/govsg-detail.context'
 
 import { getCampaignDetails } from 'services/campaign.service'
+
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const Create = () => {
@@ -30,6 +36,7 @@ const Create = () => {
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { handleFinishLater: finishLaterContextHandler, finishLaterContent } =
     useContext(FinishLaterModalContext)
+  const { canAccessGovsgV } = useGovsgV()
   const [isLoading, setLoading] = useState(true)
   const [isInvalid, setIsInvalid] = useState(false)
 
@@ -81,10 +88,13 @@ const Create = () => {
   }
 
   return (
-    <>
+    <GovsgDetailContextProvider>
       {campaign ? (
         <>
           <TitleBar title={campaign.name}>
+            {canAccessGovsgV &&
+              campaign.type === ChannelType.Govsg &&
+              campaign.status !== Status.Draft && <CampaignHeaderTabs />}
             <PrimaryButton onClick={handleFinishLater}>
               {campaign.status === Status.Draft
                 ? 'Finish this later'
@@ -101,7 +111,7 @@ const Create = () => {
       ) : (
         <p>loading..</p>
       )}
-    </>
+    </GovsgDetailContextProvider>
   )
 }
 

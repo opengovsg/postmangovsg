@@ -1,4 +1,3 @@
-import cx from 'classnames'
 import { useContext, useEffect, useState } from 'react'
 
 import styles from '../Create.module.scss'
@@ -44,9 +43,7 @@ const CreateGovsg = () => {
   return (
     <div className={styles.createContainer}>
       {status !== Status.Draft ? (
-        <div className={cx(styles.stepContainer, styles.detailContainer)}>
-          <GovsgDetail />
-        </div>
+        <GovsgDetail />
       ) : (
         <>
           <ProgressPane
