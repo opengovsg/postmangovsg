@@ -7,13 +7,11 @@ import { users } from '@/core/models/user'
 import { getFutureUTCDate } from '@/core/util/date'
 import { sendEmail } from '@/core/util/email'
 
-import { IS_LOCAL } from '../../env'
-
 import { reminderEmailMapper } from './helper'
 
 export async function handler() {
   try {
-    if (IS_LOCAL) {
+    if (process.env.IS_LOCAL === 'true') {
       console.log('Running cron locally')
       await sendApiKeyExpiryEmail()
       return

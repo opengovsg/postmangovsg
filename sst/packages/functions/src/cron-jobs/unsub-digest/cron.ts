@@ -2,13 +2,11 @@ import { Config } from 'sst/node/config'
 
 import { getSequelize } from '@/core/database/client'
 
-import { IS_LOCAL } from '../../env'
-
 import { getUnsubscribeList, sendEmailAndUpdate } from './helper'
 
 export async function handler() {
   try {
-    if (IS_LOCAL) {
+    if (process.env.IS_LOCAL === 'true') {
       console.log('Running cron locally')
       await sendUnsubDigest()
       return

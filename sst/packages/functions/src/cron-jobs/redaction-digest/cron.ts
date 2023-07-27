@@ -3,8 +3,6 @@ import { Config } from 'sst/node/config'
 import { getSequelize } from '@/core/database/client'
 import { sendEmail } from '@/core/util/email'
 
-import { IS_LOCAL } from '../../env'
-
 import { createEmailBody, getUserRedactedCampaigns } from './helper'
 
 interface Event {
@@ -12,7 +10,7 @@ interface Event {
 }
 export async function handler(event: Event) {
   try {
-    if (IS_LOCAL) {
+    if (process.env.IS_LOCAL === 'true') {
       console.log('Running cron locally')
       await sendRedactionDigest(event)
       return
