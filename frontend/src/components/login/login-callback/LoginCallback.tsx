@@ -7,7 +7,7 @@ import { getUser, loginWithSgid, setUserAnalytics } from 'services/auth.service'
 import { sendException } from 'services/ga.service'
 
 const DASHBOARD_PAGE = '/'
-const LOGIN_PAGE = '/ogp-login'
+const LOGIN_PAGE = '/sgid-login'
 
 const LoginCallback = () => {
   const {

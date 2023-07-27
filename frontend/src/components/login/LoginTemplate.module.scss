@@ -2,9 +2,9 @@
 @import 'styles/_mixins';
 
 .topContainer {
+  padding-top: 1rem;
   background-color: $neutral-light;
-  height: 70vh;
-  min-height: 420px;
+  min-height: max(420px, 70vh);
   display: flex;
   align-items: flex-end;
   justify-content: center;
@@ -21,8 +21,10 @@
 
     .landingImg {
       flex: 1;
+      display: flex;
 
       img {
+        align-self: flex-end;
         vertical-align: bottom;
       }
       @include mobile() {
@@ -56,8 +58,7 @@
   max-width: 1000px;
   width: 90vw;
   margin: auto;
-  height: 30vh;
-  min-height: 200px;
+  min-height: max(200px, 30vh);
   display: flex;
   align-items: center;
   justify-content: space-between;

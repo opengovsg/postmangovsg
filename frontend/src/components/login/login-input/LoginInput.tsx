@@ -123,8 +123,8 @@ const Login = () => {
 
   return (
     <div className={styles.container}>
+      {sgidErrorMsg && <ErrorBlock>{sgidErrorMsg}</ErrorBlock>}
       <h3 className={styles.text}>
-        {sgidErrorMsg && <ErrorBlock>{sgidErrorMsg}</ErrorBlock>}
         {!otpSent ? (
           <Trans>Sign in with your gov.sg email</Trans>
         ) : (
@@ -170,8 +170,8 @@ const Login = () => {
           errorMessage={errorMsg}
         />
       )}
-      {/* This feature is experimental and should only be rendered on the demo URL (/ogp-login) */}
-      {window.location.pathname.includes('ogp-login') && !otpSent && (
+      {/* This feature is experimental and should only be rendered on the demo URL (/sgid-login) */}
+      {window.location.pathname.includes('sgid-login') && !otpSent && (
         <React.Fragment>
           <h4 className={styles.text}>
             <Trans>or</Trans>
