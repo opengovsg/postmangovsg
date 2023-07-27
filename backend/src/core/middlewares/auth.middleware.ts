@@ -13,7 +13,7 @@ export interface AuthMiddleware {
   getAuthMiddleware: (authTypes: AuthType[]) => Handler
   logout: Handler
   getSgidUrl: Handler
-  verifySgidCode: Handler
+  verifySgidResponse: Handler
 }
 
 export enum AuthType {
@@ -240,11 +240,11 @@ export const InitAuthMiddleware = (authService: AuthService) => {
   }
 
   /**
-   * Verifies that the sgID code is valid
+   * Verifies that the sgID response is valid
    * @param req
    * @param res
    */
-  const verifySgidCode = async (
+  const verifySgidResponse = async (
     req: Request,
     res: Response
   ): Promise<Response> => {
@@ -282,6 +282,6 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     getAuthMiddleware,
     logout,
     getSgidUrl,
-    verifySgidCode,
+    verifySgidResponse,
   }
 }

@@ -161,7 +161,7 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
   router.post(
     '/login/sgid',
     celebrate(verifySgidCodeValidator),
-    authMiddleware.verifySgidCode
+    authMiddleware.verifySgidResponse
   )
 
   /**

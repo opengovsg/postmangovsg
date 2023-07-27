@@ -371,11 +371,14 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     | { authenticated: true; data: UserInfoReturn }
     | { authenticated: false; reason: string }
   > => {
-    if (!req.session) {
+    if (!req.session || !req.session.sgid) {
       throw new Error('Unable to find user session')
     }
-
     const { codeVerifier, nonce } = req.session.sgid
+
+    if (typeof codeVerifier !== 'string' || typeof nonce !== 'string') {
+      throw new Error('Invalid parameter types')
+    }
 
     try {
       const { accessToken, sub } = await sgidClient.callback({
