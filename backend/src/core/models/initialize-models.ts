@@ -24,6 +24,7 @@ import {
   EmailMessageTransactional,
   EmailOp,
   EmailTemplate,
+  EmailMessageTransactionalCc,
 } from '@email/models'
 import {
   SmsMessage,
@@ -70,6 +71,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
     EmailFromAddress,
     EmailMessage,
     EmailMessageTransactional,
+    EmailMessageTransactionalCc,
     EmailOp,
     EmailTemplate,
     ProtectedMessage,

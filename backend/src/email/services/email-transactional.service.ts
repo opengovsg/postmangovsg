@@ -1,14 +1,11 @@
 import { EmailService, EmailTemplateService } from '@email/services'
 import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@core/logger'
-import {
-  EMPTY_SANITIZED_EMAIL,
-  MessageError,
-  InvalidRecipientError,
-} from '@core/errors'
+import { EMPTY_SANITIZED_EMAIL, MessageError } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 import {
   EmailMessageTransactional,
+  EmailMessageTransactionalCc,
   TransactionalEmailMessageStatus,
 } from '@email/models'
 import { SesEventType } from '@email/interfaces/callback.interface'
@@ -41,6 +38,8 @@ async function sendMessage({
   recipient,
   replyTo,
   attachments,
+  cc,
+  bcc,
   emailMessageTransactionalId,
 }: {
   subject: string
@@ -49,6 +48,8 @@ async function sendMessage({
   recipient: string
   replyTo?: string
   attachments?: { data: Buffer; name: string }[]
+  cc?: string[]
+  bcc?: string[]
   emailMessageTransactionalId: string
 }): Promise<void> {
   // TODO: flagging this coupling for future refactoring:
@@ -80,19 +81,6 @@ async function sendMessage({
       )
     : undefined
 
-  const blacklisted = await EmailService.isRecipientBlacklisted(recipient)
-  if (blacklisted) {
-    void EmailMessageTransactional.update(
-      {
-        errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
-      },
-      {
-        where: { id: emailMessageTransactionalId },
-      }
-    )
-    throw new InvalidRecipientError('Recipient email is blacklisted')
-  }
-
   const mailToSend: MailToSend = {
     subject: sanitizedSubject,
     from: from,
@@ -101,6 +89,8 @@ async function sendMessage({
     replyTo,
     messageId: emailMessageTransactionalId.toString(),
     attachments: sanitizedAttachments,
+    cc,
+    bcc,
   }
   logger.info({
     message: 'Sending transactional email',
@@ -120,10 +110,15 @@ type CallbackMetaData = {
   bounce?: {
     bounceType: string
     bounceSubType: string
+    bouncedRecipients?: { emailAddress: string }[]
   }
   complaint?: {
     complaintFeedbackType: string
     complaintSubType: string
+    complainedRecipients?: { emailAddress: string }[]
+  }
+  delivery?: {
+    recipients: string[]
   }
 }
 
@@ -132,44 +127,68 @@ async function handleStatusCallbacks(
   id: string,
   metadata: CallbackMetaData
 ): Promise<void> {
+  const emailMessageTransactional = await EmailMessageTransactional.findByPk(id)
+  if (!emailMessageTransactional) {
+    throw new Error(`Failed to find emailMessageTransactional for id: ${id}`)
+  }
+
+  const mainRecipientDelivered = metadata.delivery?.recipients?.find(
+    (e) => e === emailMessageTransactional.recipient
+  )
+  const mainRecipientBounced = metadata.bounce?.bouncedRecipients?.find(
+    (e) => e.emailAddress === emailMessageTransactional.recipient
+  )
+  const mainRecipientComplained =
+    metadata.complaint?.complainedRecipients?.find(
+      (e) => e.emailAddress === emailMessageTransactional.recipient
+    )
+
   switch (type) {
     case SesEventType.Delivery:
-      await EmailMessageTransactional.update(
-        {
-          status: TransactionalEmailMessageStatus.Delivered,
-          deliveredAt: metadata.timestamp,
-        },
-        {
-          where: { id },
-        }
-      )
+      if (mainRecipientDelivered) {
+        await EmailMessageTransactional.update(
+          {
+            status: TransactionalEmailMessageStatus.Delivered,
+            deliveredAt: metadata.timestamp,
+          },
+          {
+            where: { id },
+          }
+        )
+      }
       break
     case SesEventType.Bounce:
-      await EmailMessageTransactional.update(
-        {
-          status: TransactionalEmailMessageStatus.Bounced,
-          errorCode:
-            metadata.bounce?.bounceType === 'Permanent'
-              ? 'Hard bounce'
-              : 'Soft bounce',
-          errorSubType: metadata.bounce?.bounceSubType,
-        },
-        {
-          where: { id },
-        }
-      )
+      // check that bounce applies to the main recipient
+      if (mainRecipientBounced) {
+        await EmailMessageTransactional.update(
+          {
+            status: TransactionalEmailMessageStatus.Bounced,
+            errorCode:
+              metadata.bounce?.bounceType === 'Permanent'
+                ? 'Hard bounce'
+                : 'Soft bounce',
+            errorSubType: metadata.bounce?.bounceSubType,
+          },
+          {
+            where: { id },
+          }
+        )
+      }
       break
     case SesEventType.Complaint:
-      await EmailMessageTransactional.update(
-        {
-          status: TransactionalEmailMessageStatus.Complaint,
-          errorCode: metadata.complaint?.complaintFeedbackType,
-          errorSubType: metadata.complaint?.complaintSubType,
-        },
-        {
-          where: { id },
-        }
-      )
+      // check that complaint applies to the main recipient
+      if (mainRecipientComplained) {
+        await EmailMessageTransactional.update(
+          {
+            status: TransactionalEmailMessageStatus.Complaint,
+            errorCode: metadata.complaint?.complaintFeedbackType,
+            errorSubType: metadata.complaint?.complaintSubType,
+          },
+          {
+            where: { id },
+          }
+        )
+      }
       break
     case SesEventType.Open:
       await EmailMessageTransactional.update(
@@ -221,7 +240,10 @@ async function listMessages({
   status?: TransactionalEmailMessageStatus
   filterByTimestamp?: TimestampFilter
   tag?: string
-}): Promise<{ hasMore: boolean; messages: EmailMessageTransactional[] }> {
+}): Promise<{
+  hasMore: boolean
+  messages: EmailMessageTransactional[]
+}> {
   limit = limit || 10
   offset = offset || 0
   sortBy = sortBy || TransactionalEmailSortField.Created
@@ -259,6 +281,15 @@ async function listMessages({
     offset,
     where,
     order,
+    include: [
+      {
+        //
+        model: EmailMessageTransactionalCc,
+        attributes: ['email', 'ccType'],
+        where: { errorCode: { [Op.eq]: null } },
+        required: false,
+      },
+    ],
   })
   const hasMore = count > offset + limit
   return { hasMore, messages: rows }

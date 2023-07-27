@@ -199,7 +199,7 @@ const validateRecord = async (
   }
 }
 const blacklistIfNeeded = async (message: any): Promise<void> => {
-  const notificationType = message?.notificationType
+  const notificationType = message?.notificationType // should this be message?.notificationType || message?.eventType?
   const bounceType = message?.bounce?.bounceType
   const complaintType = message?.complaint?.complaintFeedbackType
 
@@ -243,6 +243,7 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
         timestamp: new Date(record.Timestamp),
         bounce: message.bounce,
         complaint: message.complaint,
+        delivery: message.delivery,
       })
     }
     return parseNotificationAndEvent(type, message, metadata)

@@ -84,6 +84,7 @@ export default class MailClient {
         headers,
         attachments: input.attachments,
         bcc: input.bcc,
+        cc: input.cc,
       }
 
       this.mailer.sendMail(options, (err, info) => {

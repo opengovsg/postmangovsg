@@ -441,15 +441,15 @@ const duplicateCampaign = async ({
   return
 }
 
-const isRecipientBlacklisted = async (
-  recipientEmail: string
-): Promise<boolean> => {
-  const result = await EmailBlacklist.findOne({
+const findBlacklistedRecipients = async (
+  recipientEmails: string[]
+): Promise<string[]> => {
+  const result = await EmailBlacklist.findAll({
     where: {
-      recipient: recipientEmail,
+      recipient: recipientEmails,
     },
   })
-  return !!result
+  return result.map((r) => r.recipient)
 }
 
 export const EmailService = {
@@ -458,7 +458,7 @@ export const EmailService = {
   setCampaignCredential,
   getCampaignDetails,
   getHydratedMessage,
-  isRecipientBlacklisted,
+  findBlacklistedRecipients,
   uploadCompleteOnPreview,
   uploadCompleteOnChunk,
   uploadProtectedCompleteOnPreview,

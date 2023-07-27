@@ -52,6 +52,16 @@ export const InitEmailTransactionalRoute = (
         .valid(...Object.values(TransactionalEmailClassification))
         .optional(),
       tag: Joi.string().max(255).optional(),
+      cc: Joi.array()
+        .unique()
+        .items(
+          Joi.string().trim().email().options({ convert: true }).lowercase()
+        ),
+      bcc: Joi.array()
+        .unique()
+        .items(
+          Joi.string().trim().email().options({ convert: true }).lowercase()
+        ),
     }),
   }
   const getByIdValidator = {
