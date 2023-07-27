@@ -170,7 +170,7 @@ const Login = () => {
           errorMessage={errorMsg}
         />
       )}
-      {/* This feature is experimental and should only be rendered on the demo URL (/login/sgid) */}
+      {/* This feature is experimental and should only be rendered on the demo URL (/ogp-login) */}
       {window.location.pathname.includes('ogp-login') && !otpSent && (
         <React.Fragment>
           <h4 className={styles.text}>
