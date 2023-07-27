@@ -32,8 +32,7 @@
   ],
   "dependencies": {
     "aws-cdk": "^2.87.0",
-    "cronitor": "^2.3.3",
-    "dotenv": "^16.3.1"
+    "cronitor": "^2.3.3"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix"
