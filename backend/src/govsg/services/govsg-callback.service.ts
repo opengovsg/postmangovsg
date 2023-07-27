@@ -114,7 +114,12 @@ const parseTemplateMessageWebhook = async (
   } = body.statuses[0]
   const timestamp = new Date(parseInt(timestampRaw, 10) * 1000) // convert to milliseconds
   const [govsgMessage, govsgMessageTransactional, govsgOp] = await Promise.all([
-    GovsgMessage.findOne({ where: { serviceProviderMessageId: messageId } }),
+    GovsgMessage.findOne({
+      where: {
+        serviceProviderMessageId: messageId,
+      },
+      include: Campaign,
+    }),
     GovsgMessageTransactional.findOne({
       where: { serviceProviderMessageId: messageId },
     }),
