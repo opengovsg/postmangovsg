@@ -101,7 +101,7 @@ jobs:
         env:
           # Update the configuration
           ROLE: "${{ secrets.REDACTION_ROLE }}"
-          RUNTIME: nodejs12.x
+          RUNTIME: nodejs18.x
           HANDLER: serverless/redaction-digest/build/index.handler
           TIMEOUT: 600
           MEMORY_SIZE: 256
