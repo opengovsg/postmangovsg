@@ -411,10 +411,10 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     if (!email) {
       throw new Error('No email found')
     }
-    const matched = sgidDomainsToWhitelist.filter((domain: string) =>
+    const isEmailDomainValid = sgidDomainsToWhitelist.some((domain: string) =>
       email.endsWith(domain)
     )
-    if (matched.length == 0) {
+    if (!isEmailDomainValid) {
       throw new Error('Invalid email')
     }
     return email.toLowerCase()

@@ -44,7 +44,7 @@ const LoginCallback = () => {
         console.error(e)
         sendException((e as Error).message)
         window.location.replace(
-          LOGIN_PAGE + `?errorCode=Unable to log in via singpass`
+          LOGIN_PAGE + `?errorCode=Unable to log in via Singpass`
         )
       }
     }
