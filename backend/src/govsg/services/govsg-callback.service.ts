@@ -28,11 +28,12 @@ import {
   GovsgTemplate,
 } from '@govsg/models'
 import {
+  ChannelType,
   GovsgMessageStatus,
   govsgMessageStatusMapper,
   shouldUpdateStatus,
 } from '@core/constants'
-import { WhatsAppService } from '@core/services'
+import { WhatsAppService, experimentService } from '@core/services'
 import { GovsgVerification } from '@govsg/models/govsg-verification'
 import { randomInt } from 'node:crypto'
 
@@ -244,6 +245,13 @@ const parseTemplateMessageWebhook = async (
       if (!govsgMessage) {
         return
       }
+      const experimentalData = await experimentService.getUserExperimentalData(
+        govsgMessage.campaign.userId
+      )
+      const canAccessGovsgV = `${ChannelType.Govsg}V` in experimentalData
+      if (!canAccessGovsgV) {
+        return
+      }
       const { campaignId, recipient } = govsgMessage
       void CampaignGovsgTemplate.findOne({
         where: {
@@ -398,6 +406,9 @@ const parseUserMessageWebhook = async (
       const { officer_name: officerName, agency: officerAgency } =
         govsgVerification.govsgMessage.params
       const passcode = govsgVerification.passcode
+      // We don't check canAccessGovsgV here because users without canAccessGovsgV
+      // do not even get to send the passcode creation message and thus no replies
+      // of this sort should exist for those users.
       await sendPasscodeMessage(
         whatsappId,
         clientId,
