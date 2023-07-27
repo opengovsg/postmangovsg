@@ -9,12 +9,14 @@ const Dropdown = ({
   defaultLabel,
   disabled,
   'aria-label': ariaLabel,
+  skipOnSelectForDefaultLabel = false,
 }: {
   options: { label: string; value: string }[]
   onSelect: (value: string) => any
   defaultLabel?: string
   disabled?: boolean
   'aria-label'?: string
+  skipOnSelectForDefaultLabel?: boolean
 }) => {
   const containerRef = useRef<HTMLDivElement>(null)
   const [isOpen, setIsOpen] = useState(false)
@@ -47,13 +49,16 @@ const Dropdown = ({
   useEffect(() => {
     if (defaultLabel) {
       setSelectedLabel(defaultLabel)
-
+      if (skipOnSelectForDefaultLabel) {
+        return
+      }
       const selected = options.filter((o) => o.label === defaultLabel)[0]
       if (selected) onSelect(selected.value)
     } else {
       setSelectedLabel('Select an option')
     }
-  }, [defaultLabel])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [defaultLabel, skipOnSelectForDefaultLabel])
 
   return (
     <div
