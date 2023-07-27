@@ -1,9 +1,10 @@
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
-import { Config, Cron, Function, StackContext } from 'sst/constructs'
+import { Config, Cron, StackContext } from 'sst/constructs'
 
 export function MyStack({ app, stack }: StackContext) {
   const postmanDbUri = new Config.Secret(stack, 'POSTMAN_DB_URI')
   const postmanApiKey = new Config.Secret(stack, 'POSTMAN_API_KEY')
+  const cronitorUrlSuffix = new Config.Secret(stack, 'CRONITOR_URL_SUFFIX')
 
   const { vpcName, lookupOptions, sgName, sgId } = getResourceIdentifiers(
     app.stage,
@@ -17,47 +18,90 @@ export function MyStack({ app, stack }: StackContext) {
       subnets: existingVpc.privateSubnets,
     },
   })
-  // SST's Cron construct does not allow us to create it within a VPC
-  // which is necessary in order to query the database for API key info
-  // as such, we use the Cron to invoke a Function that is within the VPC
-  // and does the db query and the actual sending
-
   // Cron job #1: send reminder email notifying users of expiring API keys
-  const sendApiKeyExpiryEmailFn = new Function(stack, 'api-key-expiry', {
-    handler: 'packages/functions/src/cron-jobs/api-key-expiry/main.handler',
-    vpc: existingVpc,
-    securityGroups: [existingSg],
-    vpcSubnets: {
-      subnets: existingVpc.privateSubnets,
-    },
-    url: {
-      authorizer: 'iam',
-    },
-  })
-  sendApiKeyExpiryEmailFn.bind([postmanApiKey, postmanDbUri])
-
-  const sendApiKeyExpiryEmailCron = new Cron(stack, 'cron', {
+  const apiKeyExpiryCron = new Cron(stack, 'api-key-expiry-cron', {
     // runs every day at 12AM UTC, i.e. 8AM SGT
-    schedule: 'cron(0 0 */1 * ? *)',
-    job: 'packages/functions/src/cron-jobs/api-key-expiry/cron.handler',
+    schedule: 'cron(0 0 * * ? *)',
+    job: {
+      function: {
+        handler: 'packages/functions/src/cron-jobs/api-key-expiry/cron.handler',
+        securityGroups: [existingSg],
+        vpc: existingVpc,
+        vpcSubnets: {
+          subnets: existingVpc.privateSubnets,
+        },
+        timeout: '10 minutes',
+      },
+    },
   })
-  sendApiKeyExpiryEmailCron.bind([
-    new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_URL', {
-      value: sendApiKeyExpiryEmailFn.url as string, // safe because we set url in FunctionProps
-    }),
-    new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_NAME', {
-      value: sendApiKeyExpiryEmailFn.functionName,
-    }),
-    new Config.Parameter(stack, 'SEND_API_KEY_EXPIRY_EMAIL_FUNCTION_VERSION', {
-      value: sendApiKeyExpiryEmailFn.currentVersion.version,
-    }),
-    new Config.Secret(stack, 'CRONITOR_URL_SUFFIX'),
-    new Config.Secret(stack, 'CRONITOR_CODE_API_KEY_EXPIRY'),
-  ])
-  // required because sendReminderEmail uses iam authorizer
-  sendApiKeyExpiryEmailCron.attachPermissions(['lambda:InvokeFunctionUrl'])
+  const apiKeyExpiryCronResources = [
+    postmanApiKey,
+    postmanDbUri,
+    cronitorUrlSuffix,
+  ]
+  if (!app.local) {
+    apiKeyExpiryCronResources.push(
+      new Config.Secret(stack, 'CRONITOR_CODE_API_KEY_EXPIRY'),
+    )
+  }
+  apiKeyExpiryCron.bind(apiKeyExpiryCronResources)
 
-  // Cron job #2: send unsubscribe digest email
+  // Cron job #2: send redaction digest email
+  const redactionDigestCron = new Cron(stack, 'redaction-digest-cron', {
+    // runs every Monday at 1AM UTC, i.e. 9AM SGT
+    schedule: 'cron(0 1 ? * 2 *)',
+    job: {
+      function: {
+        handler:
+          'packages/functions/src/cron-jobs/redaction-digest/cron.handler',
+        timeout: '10 minutes',
+        vpc: existingVpc,
+        securityGroups: [existingSg],
+        vpcSubnets: {
+          subnets: existingVpc.privateSubnets,
+        },
+      },
+    },
+  })
+  const redactionDigestCronResources = [
+    postmanApiKey,
+    postmanDbUri,
+    cronitorUrlSuffix,
+  ]
+  if (!app.local) {
+    redactionDigestCronResources.push(
+      new Config.Secret(stack, 'CRONITOR_CODE_REDACTION_DIGEST'),
+    )
+  }
+  redactionDigestCron.bind(redactionDigestCronResources)
+
+  // Cron job #3: send unsubscribe digest email
+  const unsubDigestCron = new Cron(stack, 'unsub-digest-cron', {
+    // runs every Monday at 1:30AM UTC, i.e. 9:30AM SGT
+    schedule: 'cron(30 1 ? * 2 *)',
+    job: {
+      function: {
+        handler: 'packages/functions/src/cron-jobs/unsub-digest/cron.handler',
+        timeout: '10 minutes',
+        vpc: existingVpc,
+        securityGroups: [existingSg],
+        vpcSubnets: {
+          subnets: existingVpc.privateSubnets,
+        },
+      },
+    },
+  })
+  const unsubDigestCronResources = [
+    postmanApiKey,
+    postmanDbUri,
+    cronitorUrlSuffix,
+  ]
+  if (!app.local) {
+    unsubDigestCronResources.push(
+      new Config.Secret(stack, 'CRONITOR_CODE_UNSUB_DIGEST'),
+    )
+  }
+  unsubDigestCron.bind(unsubDigestCronResources)
 }
 
 function getResourceIdentifiers(stage: string) {

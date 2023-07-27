@@ -8,8 +8,8 @@ export interface Email {
   recipient: string
   subject: string
   body: string
+  tag: string
   from?: string
-  tag?: string
   // attachments?
 }
 export const sendEmail = async (email: Email) => {
