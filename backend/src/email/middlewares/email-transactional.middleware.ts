@@ -2,7 +2,11 @@ import type { Handler, NextFunction, Request, Response } from 'express'
 import expressRateLimit from 'express-rate-limit'
 import RedisStore from 'rate-limit-redis'
 import { RedisService } from '@core/services'
-import { EmailService, EmailTransactionalService } from '@email/services'
+import {
+  BLACKLISTED_RECIPIENT_ERROR_CODE,
+  EmailService,
+  EmailTransactionalService,
+} from '@email/services'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services/auth.service'
 import {
@@ -226,6 +230,31 @@ export const InitEmailTransactionalMiddleware = (
 
       const blacklistedRecipients =
         await EmailService.findBlacklistedRecipients(recipientList)
+      const isMainRecipientBlacklisted =
+        blacklistedRecipients.includes(recipient)
+      if (isMainRecipientBlacklisted) {
+        void EmailMessageTransactional.update(
+          {
+            errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
+          },
+          {
+            where: { id: emailMessageTransactionalId },
+          }
+        )
+        throw new InvalidRecipientError('Recipient email is blacklisted')
+      }
+      void EmailMessageTransactionalCc.update(
+        {
+          errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
+        },
+        {
+          where: {
+            emailMessageTransactionalId,
+            email: { [Op.in]: blacklistedRecipients },
+          },
+        }
+      )
+
       await EmailTransactionalService.sendMessage({
         subject,
         body,
@@ -234,10 +263,15 @@ export const InitEmailTransactionalMiddleware = (
         replyTo:
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
         attachments,
-        cc,
-        bcc,
+        cc:
+          cc && cc.length > 1
+            ? cc.filter((c) => !blacklistedRecipients.includes(c))
+            : undefined,
+        bcc:
+          bcc && bcc.length > 1
+            ? bcc.filter((c) => !blacklistedRecipients.includes(c))
+            : undefined,
         emailMessageTransactionalId,
-        blacklistedRecipients,
       })
       emailMessageTransactional.set(
         'status',

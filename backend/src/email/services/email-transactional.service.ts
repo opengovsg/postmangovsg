@@ -1,11 +1,7 @@
 import { EmailService, EmailTemplateService } from '@email/services'
 import { MailToSend } from '@shared/clients/mail-client.class'
 import { loggerWithLabel } from '@core/logger'
-import {
-  EMPTY_SANITIZED_EMAIL,
-  MessageError,
-  InvalidRecipientError,
-} from '@core/errors'
+import { EMPTY_SANITIZED_EMAIL, MessageError } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 import {
   EmailMessageTransactional,
@@ -45,7 +41,6 @@ async function sendMessage({
   cc,
   bcc,
   emailMessageTransactionalId,
-  blacklistedRecipients,
 }: {
   subject: string
   body: string
@@ -56,7 +51,6 @@ async function sendMessage({
   cc?: string[]
   bcc?: string[]
   emailMessageTransactionalId: string
-  blacklistedRecipients: string[] | null
 }): Promise<void> {
   // TODO: flagging this coupling for future refactoring:
   // currently, we are using EmailTemplateService to sanitize both tx emails and campaign emails
@@ -86,36 +80,6 @@ async function sendMessage({
         bodyContainsCidTags
       )
     : undefined
-
-  if (blacklistedRecipients && blacklistedRecipients.length > 0) {
-    const blacklisted = blacklistedRecipients.includes(recipient)
-    if (blacklisted) {
-      void EmailMessageTransactional.update(
-        {
-          errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
-        },
-        {
-          where: { id: emailMessageTransactionalId },
-        }
-      )
-      throw new InvalidRecipientError('Recipient email is blacklisted')
-    }
-
-    if (cc) cc = cc.filter((c) => !blacklistedRecipients.includes(c))
-    if (bcc) bcc = bcc.filter((c) => !blacklistedRecipients.includes(c))
-
-    void EmailMessageTransactionalCc.update(
-      {
-        errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
-      },
-      {
-        where: {
-          emailMessageTransactionalId,
-          email: { [Op.in]: blacklistedRecipients },
-        },
-      }
-    )
-  }
 
   const mailToSend: MailToSend = {
     subject: sanitizedSubject,

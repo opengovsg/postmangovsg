@@ -26,7 +26,7 @@ export enum CcType {
 export class EmailMessageTransactionalCc extends Model<EmailMessageTransactionalCc> {
   @ForeignKey(() => EmailMessageTransactional)
   @Column({
-    type: DataType.STRING,
+    type: DataType.BIGINT,
     allowNull: false,
     primaryKey: true,
   })

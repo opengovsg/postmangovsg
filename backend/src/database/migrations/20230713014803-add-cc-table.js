@@ -1,12 +1,12 @@
-'use strict';
+'use strict'
 
-const { CcType } = require("@email/models");
+const { CcType } = require('@email/models')
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
     await queryInterface.createTable('email_messages_transactional_cc', {
       email_message_transactional_id: {
-        type: Sequelize.DataTypes.INTEGER,
+        type: Sequelize.DataTypes.BIGINT,
         allowNull: false,
         references: {
           model: 'email_messages_transactional',
@@ -20,9 +20,7 @@ module.exports = {
         primaryKey: true,
       },
       cc_type: {
-        type: Sequelize.DataTypes.ENUM(
-          Object.values(CcType)
-        ),
+        type: Sequelize.DataTypes.ENUM(Object.values(CcType)),
         allowNull: false,
         primaryKey: true,
       },
@@ -44,10 +42,9 @@ module.exports = {
       type: 'unique',
       fields: ['email_message_transactional_id', 'email', 'cc_type'],
     })
-
   },
 
   down: async (queryInterface, Sequelize) => {
     await queryInterface.dropTable('email_messages_transactional_cc')
   },
-};
+}
