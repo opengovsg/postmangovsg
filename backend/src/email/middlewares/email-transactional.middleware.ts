@@ -2,10 +2,7 @@ import type { Handler, NextFunction, Request, Response } from 'express'
 import expressRateLimit from 'express-rate-limit'
 import RedisStore from 'rate-limit-redis'
 import { RedisService } from '@core/services'
-import {
-  EmailMessageTransactionalWithRelations,
-  EmailTransactionalService,
-} from '@email/services'
+import { EmailService, EmailTransactionalService } from '@email/services'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services/auth.service'
 import {
@@ -68,17 +65,16 @@ export const InitEmailTransactionalMiddleware = (
   type ReqBodyWithId = ReqBody & { emailMessageTransactionalId: string }
 
   function convertMessageModelToResponse(
-    message: EmailMessageTransactionalWithRelations,
-    excludeParams = false,
-    ccEmails?: { cc?: string[]; bcc?: string[] }
+    message: EmailMessageTransactional,
+    excludeParams = false
   ) {
-    let cc = ccEmails?.cc
-    let bcc = ccEmails?.bcc
-    if (message.email_message_transactional_cc) {
-      cc = message.email_message_transactional_cc
+    let cc: string[] = []
+    let bcc: string[] = []
+    if (message.emailMessageTransactionalCc) {
+      cc = message.emailMessageTransactionalCc
         .filter((m) => m.ccType === CcType.Cc)
         .map((m) => m.email)
-      bcc = message.email_message_transactional_cc
+      bcc = message.emailMessageTransactionalCc
         .filter((m) => m.ccType === CcType.Bcc)
         .map((m) => m.email)
     }
@@ -212,14 +208,25 @@ export const InitEmailTransactionalMiddleware = (
 
     try {
       const emailMessageTransactional =
-        await EmailMessageTransactional.findByPk(emailMessageTransactionalId)
+        await EmailMessageTransactional.findByPk(emailMessageTransactionalId, {
+          include: [
+            {
+              model: EmailMessageTransactionalCc,
+              attributes: ['email', 'ccType'],
+            },
+          ],
+        })
       if (!emailMessageTransactional) {
         // practically this will never happen unless sendMessage is called before saveMessage
         throw new ApiNotFoundError(
           'Unable to find entry in email_messages_transactional'
         )
       }
-      const email = await EmailTransactionalService.sendMessage({
+      const recipientList = [recipient].concat(cc ?? [], bcc ?? [])
+
+      const blacklistedRecipients =
+        await EmailService.findBlacklistedRecipients(recipientList)
+      await EmailTransactionalService.sendMessage({
         subject,
         body,
         from,
@@ -230,6 +237,7 @@ export const InitEmailTransactionalMiddleware = (
         cc,
         bcc,
         emailMessageTransactionalId,
+        blacklistedRecipients,
       })
       emailMessageTransactional.set(
         'status',
@@ -238,12 +246,14 @@ export const InitEmailTransactionalMiddleware = (
       emailMessageTransactional.set('acceptedAt', new Date())
       await emailMessageTransactional.save()
 
-      res.status(201).json(
-        convertMessageModelToResponse(emailMessageTransactional, undefined, {
-          cc: email.cc,
-          bcc: email.bcc,
-        })
-      )
+      // only return non-blacklisted email in cc and bcc
+      emailMessageTransactional.emailMessageTransactionalCc =
+        emailMessageTransactional.emailMessageTransactionalCc.filter(
+          (m) => !blacklistedRecipients?.includes(m.email)
+        )
+      res
+        .status(201)
+        .json(convertMessageModelToResponse(emailMessageTransactional))
       return
     } catch (error) {
       logger.error({

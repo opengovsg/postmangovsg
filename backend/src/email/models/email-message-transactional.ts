@@ -40,8 +40,10 @@ interface AttachmentMetadata {
 })
 export class EmailMessageTransactional extends Model<EmailMessageTransactional> {
   @HasMany(() => EmailMessageTransactionalCc, {
-    as: 'email_message_transactional_cc',
+    as: 'emailMessageTransactionalCc',
   })
+  emailMessageTransactionalCc!: EmailMessageTransactionalCc[]
+
   @Column({
     type: DataType.BIGINT,
     autoIncrement: true,

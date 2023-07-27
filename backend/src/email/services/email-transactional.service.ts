@@ -8,7 +8,6 @@ import {
 } from '@core/errors'
 import { FileAttachmentService } from '@core/services'
 import {
-  CcType,
   EmailMessageTransactional,
   EmailMessageTransactionalCc,
   TransactionalEmailMessageStatus,
@@ -46,6 +45,7 @@ async function sendMessage({
   cc,
   bcc,
   emailMessageTransactionalId,
+  blacklistedRecipients,
 }: {
   subject: string
   body: string
@@ -56,7 +56,8 @@ async function sendMessage({
   cc?: string[]
   bcc?: string[]
   emailMessageTransactionalId: string
-}): Promise<MailToSend> {
+  blacklistedRecipients: string[] | null
+}): Promise<void> {
   // TODO: flagging this coupling for future refactoring:
   // currently, we are using EmailTemplateService to sanitize both tx emails and campaign emails
   // while this works for now, in the future, we might want to have more liberal rules for tx emails
@@ -86,25 +87,20 @@ async function sendMessage({
       )
     : undefined
 
-  const blacklisted = await EmailService.isRecipientBlacklisted(recipient)
-  if (blacklisted) {
-    void EmailMessageTransactional.update(
-      {
-        errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
-      },
-      {
-        where: { id: emailMessageTransactionalId },
-      }
-    )
-    throw new InvalidRecipientError('Recipient email is blacklisted')
-  }
-
-  const ccList = (cc ?? []).concat(bcc ?? [])
-  const blacklistedRecipients = await EmailService.findBlacklistedRecipients(
-    ccList
-  )
-
   if (blacklistedRecipients && blacklistedRecipients.length > 0) {
+    const blacklisted = blacklistedRecipients.includes(recipient)
+    if (blacklisted) {
+      void EmailMessageTransactional.update(
+        {
+          errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
+        },
+        {
+          where: { id: emailMessageTransactionalId },
+        }
+      )
+      throw new InvalidRecipientError('Recipient email is blacklisted')
+    }
+
     if (cc) cc = cc.filter((c) => !blacklistedRecipients.includes(c))
     if (bcc) bcc = bcc.filter((c) => !blacklistedRecipients.includes(c))
 
@@ -143,7 +139,6 @@ async function sendMessage({
   if (!isEmailSent) {
     throw new Error('Failed to send transactional email')
   }
-  return mailToSend
 }
 
 type CallbackMetaData = {
@@ -263,11 +258,6 @@ async function handleStatusCallbacks(
   }
 }
 
-export type EmailMessageTransactionalWithRelations =
-  EmailMessageTransactional & {
-    email_message_transactional_cc?: { email: string; ccType: CcType }[]
-  }
-
 async function listMessages({
   userId,
   limit,
@@ -288,7 +278,7 @@ async function listMessages({
   tag?: string
 }): Promise<{
   hasMore: boolean
-  messages: EmailMessageTransactionalWithRelations[]
+  messages: EmailMessageTransactional[]
 }> {
   limit = limit || 10
   offset = offset || 0
