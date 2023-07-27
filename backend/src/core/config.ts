@@ -172,10 +172,16 @@ interface ConfigSchema {
   flamingo: {
     dbUri: string
   }
-
   phonebook: {
     endpointUrl: string
     apiKey: string
+  }
+  sgid: {
+    clientId: string
+    clientSecret: string
+    privateKey: string
+    redirectUri: string
+    validDomains: string
   }
 }
 
@@ -805,6 +811,43 @@ const config: Config<ConfigSchema> = convict({
       default: 'API_KEY',
       env: 'PHONEBOOK_API_KEY',
       format: 'required-string',
+    },
+  },
+  sgid: {
+    clientId: {
+      doc: 'Client ID of application registered with sgID',
+      default: '',
+      env: 'SGID_CLIENT_ID',
+      format: 'required-string',
+      sensitive: true,
+    },
+    clientSecret: {
+      doc: 'Client secret of application registered with sgID',
+      default: '',
+      env: 'SGID_CLIENT_SECRET',
+      format: 'required-string',
+      sensitive: true,
+    },
+    privateKey: {
+      doc: 'Private key of application registered with sgID',
+      default: '',
+      env: 'SGID_PRIVATE_KEY',
+      format: 'required-string',
+      sensitive: true,
+    },
+    redirectUri: {
+      doc: 'Redirect URI of application registered with sgID',
+      default: '',
+      env: 'SGID_REDIRECT_URI',
+      format: 'required-string',
+      sensitive: true,
+    },
+    validDomains: {
+      doc: 'Valid email domains that can log in with sgID',
+      default: '',
+      env: 'SGID_VALID_DOMAINS',
+      format: 'required-string',
+      sensitive: true,
     },
   },
 })

@@ -12,6 +12,8 @@ export interface AuthMiddleware {
   getUser: Handler
   getAuthMiddleware: (authTypes: AuthType[]) => Handler
   logout: Handler
+  getSgidUrl: Handler
+  verifySgidResponse: Handler
 }
 
 export enum AuthType {
@@ -219,11 +221,67 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     }).catch((err) => next(err))
   }
 
+  /**
+   * Fetches sgID authorisation URL
+   * @param req
+   * @param res
+   */
+  const getSgidUrl = async (req: Request, res: Response): Promise<Response> => {
+    try {
+      const url = authService.getSgidUrl(req)
+      return res.status(200).send(url)
+    } catch (e) {
+      logger.error({
+        message: 'Error fetching sgID auth url',
+        error: e,
+      })
+      return res.sendStatus(500)
+    }
+  }
+
+  /**
+   * Verifies that the sgID response is valid
+   * @param req
+   * @param res
+   */
+  const verifySgidResponse = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    const { code } = req.body
+    const logMeta = { code, action: 'verifySgidCode' }
+    try {
+      if (!req.session) {
+        logger.error({ message: 'Session object not found!', ...logMeta })
+        return res.sendStatus(401)
+      }
+      const sgidUserInfo = await authService.verifySgidCode(req, code)
+      if (!sgidUserInfo.authenticated) {
+        return res.status(401).json({ message: sgidUserInfo.reason })
+      }
+      const userEmail = authService.getSgidUserEmail(sgidUserInfo.data)
+      const user = await authService.findOrCreateUser(userEmail)
+      req.session.user = {
+        id: user.id,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        email: user.email,
+      }
+      return res.sendStatus(200)
+    } catch (e) {
+      const message = (e as Error).message
+      logger.error({ message, ...logMeta })
+      return res.status(500).json({ message })
+    }
+  }
+
   return {
     getOtp,
     verifyOtp,
     getUser,
     getAuthMiddleware,
     logout,
+    getSgidUrl,
+    verifySgidResponse,
   }
 }

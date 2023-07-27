@@ -29,11 +29,11 @@ msgstr ""
 #~ msgid "E.g. Ministry of Health"
 #~ msgstr "E.g. Ministry of Health"
 
-#: components/login/login-input/LoginInput.tsx:126
+#: components/login/login-input/LoginInput.tsx:132
 msgid "Enter OTP"
 msgstr "Enter OTP"
 
-#: components/login/login-input/LoginInput.tsx:118
+#: components/login/login-input/LoginInput.tsx:124
 msgid "Get OTP"
 msgstr "Get OTP"
 
@@ -41,7 +41,7 @@ msgstr "Get OTP"
 #~ msgid "I'd rather stay"
 #~ msgstr "I'd rather stay"
 
-#: components/login/login-input/LoginInput.tsx:93
+#: components/login/login-input/LoginInput.tsx:99
 msgid "One-Time Password"
 msgstr "One-Time Password"
 
@@ -53,23 +53,23 @@ msgstr "Proceed to unsubscribe"
 msgid "Report expired"
 msgstr "Report expired"
 
-#: components/login/login-input/LoginInput.tsx:104
+#: components/login/login-input/LoginInput.tsx:110
 msgid "Resend?"
 msgstr "Resend?"
 
-#: components/login/login-input/LoginInput.tsx:102
+#: components/login/login-input/LoginInput.tsx:108
 msgid "Resending OTP..."
 msgstr "Resending OTP..."
 
-#: components/login/login-input/LoginInput.tsx:119
+#: components/login/login-input/LoginInput.tsx:125
 msgid "Sending OTP..."
 msgstr "Sending OTP..."
 
-#: components/login/login-input/LoginInput.tsx:130
+#: components/login/login-input/LoginInput.tsx:136
 msgid "Sign In"
 msgstr "Sign In"
 
-#: components/login/login-input/LoginInput.tsx:91
+#: components/login/login-input/LoginInput.tsx:97
 msgid "Sign in with your gov.sg email"
 msgstr "Sign in with your gov.sg email"
 
@@ -81,7 +81,7 @@ msgstr "Subscribe me back"
 #~ msgid "Unsubscribe me"
 #~ msgstr "Unsubscribe me"
 
-#: components/login/login-input/LoginInput.tsx:131
+#: components/login/login-input/LoginInput.tsx:137
 msgid "Verifying OTP..."
 msgstr "Verifying OTP..."
 
@@ -89,32 +89,31 @@ msgstr "Verifying OTP..."
 msgid "allowedImageSources"
 msgstr "file.go.gov.sg;file.for.sg;file.for.edu.sg;postman.gov.sg;api.postman.gov.sg;api-staging.postman.gov.sg;localhost:4000"
 
-#: config.ts:108
+#: config.ts:111
 msgid "announcement.mediaUrl"
 msgstr "https://file.go.gov.sg/announcement-whatsapp-interest.png"
 
-#: config.ts:110
+#: config.ts:113
 msgid "announcement.primaryButtonText"
 msgstr "I'm interested!"
 
-#: config.ts:109
+#: config.ts:112
 msgid "announcement.primaryButtonUrl"
 msgstr "https://go.gov.sg/postman-whatsapp-interest"
 
-#: config.ts:112
+#: config.ts:115
 msgid "announcement.secondaryButtonText"
 msgstr "null"
 
-#: config.ts:111
+#: config.ts:114
 msgid "announcement.secondaryButtonUrl"
 msgstr "null"
 
-#: config.ts:107
+#: config.ts:110
 msgid "announcement.subtext"
-msgstr ""
-"We are exploring to expand our messaging channels by offering WhatsApp. If you are interested, let us know your use cases!"
+msgstr "We are exploring to expand our messaging channels by offering WhatsApp. If you are interested, let us know your use cases!"
 
-#: config.ts:106
+#: config.ts:109
 msgid "announcement.title"
 msgstr "Want to send your campaigns through WhatsApp?"
 
@@ -139,7 +138,7 @@ msgstr "e.g. Appointment Confirmation"
 msgid "e.g. Ministry of Health"
 msgstr "e.g. Ministry of Health"
 
-#: components/login/login-input/LoginInput.tsx:114
+#: components/login/login-input/LoginInput.tsx:120
 msgid "e.g. postman@agency.gov.sg"
 msgstr "e.g. postman@agency.gov.sg"
 
