@@ -2,7 +2,7 @@ import { loggerWithLabel } from '@core/logger'
 import { ChannelType } from '@core/constants'
 import PhonebookClient from '@shared/clients/phonebook-client.class'
 import config from '@core/config'
-import { User } from '@core/models'
+import { ManagedListCampaign, User } from '@core/models'
 
 const logger = loggerWithLabel(module)
 
@@ -57,7 +57,40 @@ const getPhonebookListById = async ({
   }
 }
 
+const setPhonebookListForCampaign = async ({
+  campaignId,
+  listId,
+}: {
+  campaignId: number
+  listId: number
+}) => {
+  return await ManagedListCampaign.upsert({
+    campaignId,
+    managedListId: listId,
+  } as ManagedListCampaign)
+}
+
+const deletePhonebookListForCampaign = async (campaignId: number) => {
+  return await ManagedListCampaign.destroy({
+    where: {
+      campaignId,
+    },
+  })
+}
+
+const getPhonebookListIdForCampaign = async (campaignId: number) => {
+  const managedListCampaign = await ManagedListCampaign.findOne({
+    where: {
+      campaignId,
+    },
+  })
+  return managedListCampaign?.managedListId
+}
+
 export const PhonebookService = {
   getPhonebookLists,
   getPhonebookListById,
+  setPhonebookListForCampaign,
+  deletePhonebookListForCampaign,
+  getPhonebookListIdForCampaign,
 }

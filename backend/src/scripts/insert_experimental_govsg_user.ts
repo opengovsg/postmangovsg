@@ -19,6 +19,9 @@ type RawOfficerData = {
   id?: number
 }
 
+const SECTION_DIVIDER =
+  '\n=============================================================\n'
+
 void (async function main() {
   await sequelizeLoader()
   const rawDataToInsert = (
@@ -46,6 +49,7 @@ void (async function main() {
       },
     },
   })
+  console.log(`Number of users in raw data: ${rawDataToInsert.length}`)
   if (domains.length !== rawUniqueDomains.length) {
     throw new Error(
       `There are missing domains in DB. Needed ${rawUniqueDomains}, Got ${domains.map(
@@ -61,7 +65,10 @@ void (async function main() {
       },
     },
   })
+  console.log(SECTION_DIVIDER)
+  console.log(`Number of existing users: ${existingUsers.length}`)
   const existingEmails = existingUsers.map((u) => u.email)
+  console.log(JSON.stringify(existingEmails, null, 2))
   const newUsers = await User.bulkCreate(
     rawDataToInsert
       .filter((r) => !existingEmails.includes(r.email))
@@ -72,6 +79,15 @@ void (async function main() {
             emailDomain: `@${r.email.split('@')[1]}`,
           } as User)
       )
+  )
+  console.log(SECTION_DIVIDER)
+  console.log(`Number of new users: ${newUsers.length}`)
+  console.log(
+    JSON.stringify(
+      newUsers.map((i) => i.toJSON()),
+      null,
+      2
+    )
   )
   const allUsers = [...existingUsers, ...newUsers]
   const officersWithIds = rawDataToInsert.map(
@@ -95,6 +111,11 @@ void (async function main() {
         } as UserExperimental)
     )
   )
+  console.log(SECTION_DIVIDER)
+  console.log(
+    `Number of rows inserted into User Experimental table: ${inserted.length}`
+  )
+  console.log('Info inserted into User Experimental table:')
   console.log(
     JSON.stringify(
       inserted.map((i) => i.toJSON()),
@@ -111,6 +132,11 @@ void (async function main() {
         } as GovsgTemplatesAccess)
     )
   )
+  console.log(SECTION_DIVIDER)
+  console.log(
+    `Number of rows inserted into Govsg Template Access table: ${insertedAccess.length}`
+  )
+  console.log('Info inserted into Govsg Template Access table:')
   console.log(
     JSON.stringify(
       insertedAccess.map((i) => i.toJSON()),
@@ -118,6 +144,7 @@ void (async function main() {
       2
     )
   )
+  console.log(SECTION_DIVIDER)
   console.log('Done ✅')
   process.exit(0)
 })()

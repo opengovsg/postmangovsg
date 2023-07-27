@@ -94,9 +94,10 @@ const enqueueMessages = (jobId: number, campaignId: number): Promise<void> => {
 // TODO: refactor the return type
 const getMessages = async (
   jobId: number,
-  rate: number
+  rate: number,
+  campaignId: number
 ): Promise<Message[] | any[]> => {
-  return service().getMessages(jobId, rate)
+  return service().getMessages(jobId, rate, campaignId)
 }
 
 const sendMessage = tracer.wrap(
@@ -251,7 +252,7 @@ const enqueueAndSend = async (): Promise<void> => {
 
     let hasNext = true
     while (hasNext && shouldRun) {
-      const messages = await getMessages(jobId, rate)
+      const messages = await getMessages(jobId, rate, campaignId)
       if (!messages[0]) {
         hasNext = false
       } else {

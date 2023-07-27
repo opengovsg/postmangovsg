@@ -790,6 +790,21 @@ function mockPhonebookApis(state: State) {
 
       return res(ctx.status(200), ctx.json({ lists: state.lists }))
     }),
+    rest.put(
+      '/campaign/:campaignId/phonebook-associations',
+      (req, res, ctx) => {
+        return res(ctx.status(200))
+      }
+    ),
+    rest.delete(
+      '/campaign/:campaignId/phonebook-associations',
+      (req, res, ctx) => {
+        return res(ctx.status(200))
+      }
+    ),
+    rest.get('/campaign/:campaignId/phonebook-listid', (req, res, ctx) => {
+      return res(ctx.status(200), ctx.json({}))
+    }),
   ]
 }
 
