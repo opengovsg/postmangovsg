@@ -31,6 +31,7 @@ import {
   ApiInvalidTemplateError,
   ApiNotFoundError,
   ApiRateLimitError,
+  ApiTooManyRecipientsError,
 } from '@core/errors/rest-api.errors'
 import { UploadedFile } from 'express-fileupload'
 import { Op } from 'sequelize'
@@ -41,6 +42,7 @@ export interface EmailTransactionalMiddleware {
   rateLimit: Handler
   getById: Handler
   listMessages: Handler
+  checkCcLimit: Handler
 }
 
 export const RATE_LIMIT_ERROR_MESSAGE =
@@ -365,6 +367,16 @@ export const InitEmailTransactionalMiddleware = (
     })
   }
 
+  function checkCcLimit(req: Request, _res: Response, next: NextFunction) {
+    const { cc, bcc } = req.body as ReqBody
+    // limit set by AWS SES: https://docs.aws.amazon.com/ses/latest/APIReference/API_SendEmail.html#:~:text=The%20message%20may%20not%20include%20more%20than%2050%20recipients
+    const TOTAL_CC_LIMIT = 49 // 50 minus 1 to account for main recipient
+    if ((cc?.length ?? 0) + (bcc?.length ?? 0) > TOTAL_CC_LIMIT) {
+      throw new ApiTooManyRecipientsError('Maximum of 50 recipients allowed')
+    }
+    next()
+  }
+
   const rateLimit = expressRateLimit({
     store: new RedisStore({
       prefix: 'transactionalEmail:',
@@ -390,5 +402,6 @@ export const InitEmailTransactionalMiddleware = (
     rateLimit,
     getById,
     listMessages,
+    checkCcLimit,
   }
 }
