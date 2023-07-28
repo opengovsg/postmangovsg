@@ -1,5 +1,5 @@
 // to replace with fetch when upgraded to Node 18
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { Config } from 'sst/node/config'
 
 const SST_STAGE = process.env.SST_STAGE
@@ -25,6 +25,15 @@ export const sendEmail = async (email: Email) => {
       },
     })
     .catch((err) => {
+      if (err instanceof AxiosError && err.response?.status === 400) {
+        const { message } = err.response.data
+        if (message === 'Recipient email is blacklisted') {
+          console.log(
+            `Recipient email ${email.recipient} is blacklisted, skipping`,
+          )
+          return
+        }
+      }
       console.error(err)
       throw err
     })
