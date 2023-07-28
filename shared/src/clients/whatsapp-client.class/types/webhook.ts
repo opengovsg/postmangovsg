@@ -65,15 +65,6 @@ interface GenericMessage {
   type: WhatsappWebhookMessageType
 }
 
-export interface WhatsAppWebhookButtonMessage extends GenericMessage {
-  type: WhatsappWebhookMessageType.button
-  button: {
-    text: string
-  }
-  context: {
-    id: MessageId
-  }
-}
 export interface WhatsAppWebhookTextMessage extends GenericMessage {
   type: WhatsappWebhookMessageType.text
   text: {
@@ -92,7 +83,6 @@ export enum WhatsappWebhookMessageType {
   contacts = 'contacts',
   unknown = 'unknown',
   voice = 'voice',
-  button = 'button',
 }
 
 interface Contact {

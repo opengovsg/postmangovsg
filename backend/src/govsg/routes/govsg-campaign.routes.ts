@@ -1,4 +1,3 @@
-import { GovsgMessageStatus } from '@core/constants'
 import {
   CampaignMiddleware,
   JobMiddleware,
@@ -8,7 +7,6 @@ import {
   GovsgMiddleware,
   GovsgStatsMiddleware,
   GovsgTemplateMiddleware,
-  GovsgVerificationMiddleware,
 } from '@govsg/middlewares'
 import { Joi, Segments, celebrate } from 'celebrate'
 import { Router } from 'express'
@@ -125,19 +123,6 @@ router.get(
   '/export',
   CampaignMiddleware.isCampaignRedacted,
   GovsgStatsMiddleware.getDeliveredRecipients
-)
-
-router.get(
-  '/messages',
-  celebrate({
-    [Segments.QUERY]: Joi.object({
-      limit: Joi.number().integer().min(1).max(100).default(10),
-      offset: Joi.number().integer().min(0).default(0),
-      status: Joi.string().valid(...Object.values(GovsgMessageStatus)),
-    }),
-  }),
-  CampaignMiddleware.canEditCampaign,
-  GovsgVerificationMiddleware.listMessages
 )
 
 export default router

@@ -7,7 +7,7 @@ const TitleBar = ({
   title,
   overrideStyles,
 }: {
-  children?: ReactNode
+  children: ReactNode
   title: string
   overrideStyles?: { readonly [key: string]: string }
 }) => {

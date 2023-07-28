@@ -1,10 +1,4 @@
-import cx from 'classnames'
-
 import { useContext } from 'react'
-
-import styles from '../Create.module.scss'
-
-import { GovsgMessages } from './GovsgMessages'
 
 import { Status } from 'classes'
 import { PreviewBlock, ProgressDetails, StepHeader } from 'components/common'
@@ -12,12 +6,10 @@ import CampaignScheduledInfo from 'components/common/CampaignScheduledInfo/Campa
 import ScheduleDetails from 'components/common/schedule-details/ScheduleDetails'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import { CampaignContext } from 'contexts/campaign.context'
-import { GovsgDetailContext } from 'contexts/govsg-detail.context'
 import { retryCampaign } from 'services/campaign.service'
 
 const GovsgDetail = () => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
-  const { activeTab } = useContext(GovsgDetailContext)
   const { stats, refreshCampaignStats } = usePollCampaignStats()
 
   async function handleRetry() {
@@ -99,19 +91,10 @@ const GovsgDetail = () => {
     )
   }
 
-  const renderGovsgMessages = () => {
-    return <GovsgMessages campaignId={campaign.id} />
-  }
-
   return (
     <>
-      {activeTab === 0 && (
-        <div className={cx(styles.stepContainer, styles.detailContainer)}>
-          {renderProgressHeader()}
-          {renderProgressDetails()}
-        </div>
-      )}
-      {activeTab === 1 && renderGovsgMessages()}
+      {renderProgressHeader()}
+      {renderProgressDetails()}
     </>
   )
 }
