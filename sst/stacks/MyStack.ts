@@ -5,10 +5,6 @@ export function MyStack({ app, stack }: StackContext) {
   const postmanDbUri = new Config.Secret(stack, 'POSTMAN_DB_URI')
   const postmanApiKey = new Config.Secret(stack, 'POSTMAN_API_KEY')
   const cronitorUrlSuffix = new Config.Secret(stack, 'CRONITOR_URL_SUFFIX')
-  app.addDefaultFunctionEnv({
-    SST_STAGE: app.stage,
-  })
-
   const { vpcName, lookupOptions, sgName, sgId } = getResourceIdentifiers(
     app.stage,
   )
