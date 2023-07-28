@@ -69,4 +69,7 @@ export class GovsgMessage extends Model<GovsgMessage> {
 
   @Column({ type: DataType.DATE, allowNull: true })
   deletedByUserAt: Date | null
+
+  @Column({ type: DataType.TEXT, allowNull: false, defaultValue: 'en_GB' })
+  languageCode: string
 }

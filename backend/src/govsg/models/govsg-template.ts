@@ -16,6 +16,12 @@ export type GovsgTemplateParamMetadata = {
   defaultFromMetaField?: string
 }
 
+export type GovsgTemplateLanguageMetadata = {
+  languageCode: string // WhatsApp-API-compatible language code
+  language: string // Human-readable name of the language
+  body: string
+}
+
 @Table({ tableName: 'govsg_templates', underscored: true, timestamps: true })
 export class GovsgTemplate extends Model<GovsgTemplate> {
   @Column({
@@ -36,7 +42,6 @@ export class GovsgTemplate extends Model<GovsgTemplate> {
   })
   body: string
 
-  // not sure about this — should we not accept null and use empty array instead? I think null is more elegant
   @Column({
     type: DataType.ARRAY(DataType.STRING),
     allowNull: true,
@@ -60,4 +65,11 @@ export class GovsgTemplate extends Model<GovsgTemplate> {
     type: DataType.TEXT,
   })
   name: string
+
+  @Column({
+    type: DataType.JSONB,
+    allowNull: true,
+    defaultValue: [],
+  })
+  multilingualSupport: GovsgTemplateLanguageMetadata[]
 }

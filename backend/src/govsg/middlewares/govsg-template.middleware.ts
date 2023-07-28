@@ -22,6 +22,17 @@ import { NextFunction, Request, Response } from 'express'
 
 const logger = loggerWithLabel(module)
 
+function convertGovsgTemplateToResponse(template: GovsgTemplate) {
+  return {
+    id: template.id,
+    body: template.body,
+    params: template.params,
+    param_metadata: template.paramMetadata,
+    name: template.name,
+    multilingual_support: template.multilingualSupport,
+  }
+}
+
 export const getAvailableTemplates = async (
   req: Request,
   res: Response
@@ -34,7 +45,7 @@ export const getAvailableTemplates = async (
         model: GovsgTemplate,
       },
     })
-  ).map((o) => o.govsgTemplate)
+  ).map((o) => convertGovsgTemplateToResponse(o.govsgTemplate))
   return res.status(200).json({ data: allowedTemplates })
 }
 

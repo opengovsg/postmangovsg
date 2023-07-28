@@ -10,7 +10,10 @@ import {
 import { GovsgMessageStatus } from '@core/constants'
 import { GovsgTransactionalService } from '../services/govsg-transactional.service'
 import WhatsAppClient from '@shared/clients/whatsapp-client.class'
-import { NormalisedParam } from '@shared/clients/whatsapp-client.class/types'
+import {
+  NormalisedParam,
+  WhatsAppLanguages,
+} from '@shared/clients/whatsapp-client.class/types'
 import { PhoneNumberService } from '@shared/utils/phone-number.service'
 
 export interface GovsgTransactionalMiddleware {
@@ -24,18 +27,33 @@ export const InitGovsgTransactionalMiddleware =
 
     interface ReqBody {
       recipient: string
-      whatsapp_template_label: string
-      params?: Record<string, string>
+      template_id: string
+      params: Record<string, string>
+      language_code: WhatsAppLanguages
     }
-    type ReqBodyWithId = ReqBody & {
+    type ReqBodyWithSendingDetails = ReqBody & {
       govsgTransactionalId: string
+      templateName: string
       normalisedParams: NormalisedParam[]
     }
 
     function convertMessageModelToResponse(message: GovsgMessageTransactional) {
       return {
         id: message.id,
-        // todo
+        recipient: message.recipient,
+        template_id: message.templateId,
+        params: message.params,
+        language_code: message.languageCode,
+        created_at: message.createdAt,
+        updated_at: message.updatedAt,
+        accepted_at: message.acceptedAt,
+        sent_at: message.sentAt,
+        delivered_at: message.deliveredAt,
+        read_at: message.readAt,
+        errored_at: message.erroredAt,
+        error_code: message.errorCode,
+        error_description: message.errorDescription,
+        status: message.status,
       }
     }
 
@@ -48,19 +66,27 @@ export const InitGovsgTransactionalMiddleware =
       logger.info({ message: 'Saving transactional GovSG message', action })
       const {
         recipient,
-        whatsapp_template_label: whatsappTemplateLabel,
+        template_id: templateId,
+        language_code: languageCode,
         params,
         // use of as is safe because of validation by Joi; see govsg-transactional.route.ts
       } = req.body as ReqBody
 
       const govsgTemplate = await GovsgTemplate.findOne({
         where: {
-          whatsappTemplateLabel,
+          id: +templateId,
         },
       })
       if (!govsgTemplate) {
-        throw new ApiNotFoundError(
-          `Template with label ${whatsappTemplateLabel} not found`
+        throw new ApiNotFoundError(`Template with ID ${templateId} not found`)
+      }
+      const isLanguageAvailable =
+        govsgTemplate.multilingualSupport.findIndex(
+          (v) => v.languageCode === languageCode
+        ) > -1
+      if (!isLanguageAvailable && languageCode !== WhatsAppLanguages.english) {
+        throw new ApiValidationError(
+          `Language Code ${languageCode} not available on the template`
         )
       }
       let normalisedRecipient
@@ -75,27 +101,28 @@ export const InitGovsgTransactionalMiddleware =
       req.body.normalisedParams = validateParams(
         govsgTemplate.params,
         params,
-        whatsappTemplateLabel
+        templateId
       )
       const govsgTransactional = await GovsgMessageTransactional.create({
         templateId: govsgTemplate.id,
         userId: req.session?.user?.id,
         recipient: normalisedRecipient,
-        params: params ?? [],
+        params: params ?? {},
         status: GovsgMessageStatus.Unsent,
+        languageCode,
       } as unknown as GovsgMessageTransactional)
       // insert id into req.body so that subsequent middlewares can use it
       req.body.govsgTransactionalId = govsgTransactional.id
+      req.body.templateName = govsgTemplate.whatsappTemplateLabel
       next()
     }
 
     function validateParams(
       govsgTemplateParams: GovsgTemplate['params'],
-      params: Record<string, string> | undefined,
-      whatsappTemplateLabel: string
+      params: Record<string, string>,
+      templateId: string
     ): NormalisedParam[] {
-      const isParamsProvided =
-        params !== undefined && Object.keys(params).length > 0
+      const isParamsProvided = Object.keys(params).length > 0
       const isParamsRequired =
         govsgTemplateParams !== null && govsgTemplateParams.length > 0
       if (!isParamsRequired && !isParamsProvided) {
@@ -103,38 +130,40 @@ export const InitGovsgTransactionalMiddleware =
       }
       if (!isParamsProvided && isParamsRequired) {
         throw new ApiValidationError(
-          `no params provided; params needed for template ${whatsappTemplateLabel}`
+          `No params provided; params needed for template ${templateId}`
         )
       }
       // not sure whether throwing this error is necessary
       if (isParamsProvided && !isParamsRequired) {
         throw new ApiValidationError(
-          `template ${whatsappTemplateLabel} does not accept any params`
+          `Template ${templateId} does not accept any params`
         )
       }
-      if (isParamsProvided && isParamsRequired) {
-        // TODO:
-        // validate params actually match the array of params accepted by GovsgTemplate
-        // check to ensure both are the same length, if not throw error
-        // for key in params, find in govsgTemplate.params
-        return WhatsAppClient.transformNamedParams(
-          params as { [key: string]: string },
-          govsgTemplateParams
+
+      govsgTemplateParams = govsgTemplateParams as string[]
+      const missingParams = govsgTemplateParams.filter((p) => !params[p])
+      if (missingParams.length > 0) {
+        throw new ApiValidationError(
+          `Missing values for params ${missingParams.join(', ')}`
         )
       }
-      throw new Error('impossible to reach here')
+      return WhatsAppClient.transformNamedParams(
+        params as { [key: string]: string },
+        govsgTemplateParams
+      )
     }
 
     async function sendMessage(
-      req: Request<unknown, unknown, ReqBodyWithId>,
-      res: Response,
-      next: NextFunction
-    ): Promise<void> {
+      req: Request<unknown, unknown, ReqBodyWithSendingDetails>,
+      res: Response
+    ): Promise<Response> {
       const action = 'sendMessage'
       logger.info({ message: 'Sending GovSG transactional msg', action })
       const {
         govsgTransactionalId,
-        whatsapp_template_label: whatsappTemplateLabel,
+        templateName,
+        normalisedParams,
+        language_code: languageCode,
       } = req.body
       try {
         const govsgTransactional = await GovsgMessageTransactional.findByPk(
@@ -146,11 +175,23 @@ export const InitGovsgTransactionalMiddleware =
             `Unable to find id ${govsgTransactionalId} in govsg_messages_transactional`
           )
         }
-        const messageId = await GovsgTransactionalService.sendMessage({
-          recipient: govsgTransactional.recipient,
-          templateName: whatsappTemplateLabel,
-          params: req.body.normalisedParams as NormalisedParam[],
-        }).catch((err) => {
+
+        try {
+          const messageId = await GovsgTransactionalService.sendMessage({
+            recipient: govsgTransactional.recipient,
+            templateName,
+            params: normalisedParams,
+            languageCode,
+          })
+          govsgTransactional.set('status', GovsgMessageStatus.Accepted)
+          govsgTransactional.set('acceptedAt', new Date())
+          govsgTransactional.set('serviceProviderMessageId', messageId)
+          await govsgTransactional.save()
+
+          return res
+            .status(201)
+            .json(convertMessageModelToResponse(govsgTransactional))
+        } catch (err) {
           if (err instanceof ApiInvalidRecipientError) {
             govsgTransactional.set(
               'status',
@@ -162,21 +203,14 @@ export const InitGovsgTransactionalMiddleware =
             void govsgTransactional.save()
           }
           throw err
-        })
-        govsgTransactional.set('status', GovsgMessageStatus.Accepted)
-        govsgTransactional.set('acceptedAt', new Date())
-        govsgTransactional.set('serviceProviderMessageId', messageId)
-        await govsgTransactional.save()
-
-        res.status(201).json(convertMessageModelToResponse(govsgTransactional))
-        return
+        }
       } catch (error) {
         logger.error({
           message: 'Failed to send GovSG transactional msg',
           action,
           error,
         })
-        next(error)
+        throw error
       }
     }
 
