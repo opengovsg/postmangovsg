@@ -5,6 +5,9 @@ export function MyStack({ app, stack }: StackContext) {
   const postmanDbUri = new Config.Secret(stack, 'POSTMAN_DB_URI')
   const postmanApiKey = new Config.Secret(stack, 'POSTMAN_API_KEY')
   const cronitorUrlSuffix = new Config.Secret(stack, 'CRONITOR_URL_SUFFIX')
+  app.addDefaultFunctionEnv({
+    SST_STAGE: app.stage,
+  })
 
   const { vpcName, lookupOptions, sgName, sgId } = getResourceIdentifiers(
     app.stage,
@@ -95,7 +98,7 @@ export function MyStack({ app, stack }: StackContext) {
 function getResourceIdentifiers(stage: string) {
   return stage === 'prod'
     ? {
-        vpcName: 'postmangovsg-production-vpc',
+        vpcName: 'postmangovsg-prod-vpc',
         lookupOptions: {
           vpcId: 'vpc-0e71dfc6b3c022b7a',
           isDefault: false,
