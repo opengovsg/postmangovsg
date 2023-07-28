@@ -31,7 +31,9 @@ export const listMessages = async (
       ...remainingParams
     } = row.params as any
     console.debug(
-      `Excluding agency=${agency} and officer_designation=${officer_designation} from params=${row.params}`
+      `Excluding agency=${agency} and officer_designation=${officer_designation} from params=${JSON.stringify(
+        row.params
+      )}`
     )
     return {
       ...row.get({ plain: true }),
