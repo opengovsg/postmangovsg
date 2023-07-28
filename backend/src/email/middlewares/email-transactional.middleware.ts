@@ -2,7 +2,11 @@ import type { Handler, NextFunction, Request, Response } from 'express'
 import expressRateLimit from 'express-rate-limit'
 import RedisStore from 'rate-limit-redis'
 import { RedisService } from '@core/services'
-import { EmailTransactionalService } from '@email/services'
+import {
+  BLACKLISTED_RECIPIENT_ERROR_CODE,
+  EmailService,
+  EmailTransactionalService,
+} from '@email/services'
 import { loggerWithLabel } from '@core/logger'
 import { AuthService } from '@core/services/auth.service'
 import {
@@ -11,7 +15,9 @@ import {
   UnsupportedFileTypeError,
 } from '@core/errors'
 import {
+  CcType,
   EmailMessageTransactional,
+  EmailMessageTransactionalCc,
   TransactionalEmailClassification,
   TransactionalEmailMessageStatus,
 } from '@email/models'
@@ -25,8 +31,10 @@ import {
   ApiInvalidTemplateError,
   ApiNotFoundError,
   ApiRateLimitError,
+  ApiTooManyRecipientsError,
 } from '@core/errors/rest-api.errors'
 import { UploadedFile } from 'express-fileupload'
+import { Op } from 'sequelize'
 
 export interface EmailTransactionalMiddleware {
   saveMessage: Handler
@@ -34,6 +42,7 @@ export interface EmailTransactionalMiddleware {
   rateLimit: Handler
   getById: Handler
   listMessages: Handler
+  checkCcLimit: Handler
 }
 
 export const RATE_LIMIT_ERROR_MESSAGE =
@@ -56,6 +65,8 @@ export const InitEmailTransactionalMiddleware = (
     attachments?: UploadedFile[]
     classification?: TransactionalEmailClassification
     tag?: string
+    cc?: string[]
+    bcc?: string[]
   }
   type ReqBodyWithId = ReqBody & { emailMessageTransactionalId: string }
 
@@ -63,6 +74,17 @@ export const InitEmailTransactionalMiddleware = (
     message: EmailMessageTransactional,
     excludeParams = false
   ) {
+    let cc: string[] = []
+    let bcc: string[] = []
+    if (message.emailMessageTransactionalCc) {
+      cc = message.emailMessageTransactionalCc
+        .filter((m) => m.ccType === CcType.Cc)
+        .map((m) => m.email)
+      bcc = message.emailMessageTransactionalCc
+        .filter((m) => m.ccType === CcType.Bcc)
+        .map((m) => m.email)
+    }
+
     return {
       id: message.id,
       from: message.from,
@@ -80,6 +102,8 @@ export const InitEmailTransactionalMiddleware = (
       updated_at: message.updatedAt.toISOString(),
       classification: message.classification,
       tag: message.tag,
+      cc,
+      bcc,
     }
   }
 
@@ -99,6 +123,8 @@ export const InitEmailTransactionalMiddleware = (
       attachments,
       classification,
       tag,
+      cc,
+      bcc,
       // use of as is safe because of validation by Joi; see email-transactional.routes.ts
     } = req.body as ReqBody
 
@@ -128,6 +154,40 @@ export const InitEmailTransactionalMiddleware = (
       tag,
       // not sure why unknown is needed to silence TS (yet other parts of the code base can just use `as Model` directly hmm)
     } as unknown as EmailMessageTransactional)
+
+    // save cc and bcc
+    let transactionalCcEmails: EmailMessageTransactionalCc[] = []
+
+    transactionalCcEmails = transactionalCcEmails.concat(
+      cc
+        ? cc.map(
+            (c) =>
+              ({
+                emailMessageTransactionalId: emailMessageTransactional.id,
+                email: c,
+                ccType: CcType.Cc,
+              } as EmailMessageTransactionalCc)
+          )
+        : []
+    )
+
+    transactionalCcEmails = transactionalCcEmails.concat(
+      bcc
+        ? bcc.map(
+            (c) =>
+              ({
+                emailMessageTransactionalId: emailMessageTransactional.id,
+                email: c,
+                ccType: CcType.Bcc,
+              } as EmailMessageTransactionalCc)
+          )
+        : []
+    )
+
+    if (transactionalCcEmails && transactionalCcEmails.length > 0) {
+      await EmailMessageTransactionalCc.bulkCreate(transactionalCcEmails)
+    }
+
     // insert id into req.body so that subsequent middlewares can use it
     req.body.emailMessageTransactionalId = emailMessageTransactional.id
     next()
@@ -147,18 +207,57 @@ export const InitEmailTransactionalMiddleware = (
       recipient,
       reply_to: replyTo,
       attachments,
+      cc,
+      bcc,
       emailMessageTransactionalId, // added by saveMessage middleware
     } = req.body
 
     try {
       const emailMessageTransactional =
-        await EmailMessageTransactional.findByPk(emailMessageTransactionalId)
+        await EmailMessageTransactional.findByPk(emailMessageTransactionalId, {
+          include: [
+            {
+              model: EmailMessageTransactionalCc,
+              attributes: ['email', 'ccType'],
+              required: false,
+            },
+          ],
+        })
       if (!emailMessageTransactional) {
         // practically this will never happen unless sendMessage is called before saveMessage
         throw new ApiNotFoundError(
           'Unable to find entry in email_messages_transactional'
         )
       }
+      const recipientList = [recipient].concat(cc ?? [], bcc ?? [])
+
+      const blacklistedRecipients =
+        await EmailService.findBlacklistedRecipients(recipientList)
+      const isMainRecipientBlacklisted =
+        blacklistedRecipients.includes(recipient)
+      if (isMainRecipientBlacklisted) {
+        void EmailMessageTransactional.update(
+          {
+            errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
+          },
+          {
+            where: { id: emailMessageTransactionalId },
+          }
+        )
+        throw new InvalidRecipientError('Recipient email is blacklisted')
+      }
+      void EmailMessageTransactionalCc.update(
+        {
+          errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
+        },
+        {
+          where: {
+            emailMessageTransactionalId,
+            email: { [Op.in]: blacklistedRecipients },
+          },
+        }
+      )
+
       await EmailTransactionalService.sendMessage({
         subject,
         body,
@@ -167,6 +266,14 @@ export const InitEmailTransactionalMiddleware = (
         replyTo:
           replyTo ?? (await authService.findUser(req.session?.user?.id))?.email,
         attachments,
+        cc:
+          cc && cc.length > 0
+            ? cc.filter((c) => !blacklistedRecipients.includes(c))
+            : undefined,
+        bcc:
+          bcc && bcc.length > 0
+            ? bcc.filter((c) => !blacklistedRecipients.includes(c))
+            : undefined,
         emailMessageTransactionalId,
       })
       emailMessageTransactional.set(
@@ -176,6 +283,11 @@ export const InitEmailTransactionalMiddleware = (
       emailMessageTransactional.set('acceptedAt', new Date())
       await emailMessageTransactional.save()
 
+      // only return non-blacklisted email in cc and bcc
+      emailMessageTransactional.emailMessageTransactionalCc =
+        emailMessageTransactional.emailMessageTransactionalCc.filter(
+          (m) => !blacklistedRecipients?.includes(m.email)
+        )
       res
         .status(201)
         .json(convertMessageModelToResponse(emailMessageTransactional))
@@ -203,6 +315,14 @@ export const InitEmailTransactionalMiddleware = (
     const { emailId } = req.params
     const message = await EmailMessageTransactional.findOne({
       where: { id: emailId, userId: req.session?.user?.id.toString() },
+      include: [
+        {
+          model: EmailMessageTransactionalCc,
+          attributes: ['email', 'ccType'],
+          where: { errorCode: { [Op.eq]: null } },
+          required: false,
+        },
+      ],
     })
     if (!message) {
       res
@@ -235,12 +355,26 @@ export const InitEmailTransactionalMiddleware = (
       filterByTimestamp: filter as TimestampFilter,
       tag: tag as string,
     })
+    logger.warn({
+      message: 'messagesmessages1',
+      messages: messages,
+    })
     res.status(200).json({
       has_more: hasMore,
       data: messages.map((m) =>
         convertMessageModelToResponse(m, exclude_params as unknown as boolean)
       ),
     })
+  }
+
+  function checkCcLimit(req: Request, _res: Response, next: NextFunction) {
+    const { cc, bcc } = req.body as ReqBody
+    // limit set by AWS SES: https://docs.aws.amazon.com/ses/latest/APIReference/API_SendEmail.html#:~:text=The%20message%20may%20not%20include%20more%20than%2050%20recipients
+    const TOTAL_CC_LIMIT = 49 // 50 minus 1 to account for main recipient
+    if ((cc?.length ?? 0) + (bcc?.length ?? 0) > TOTAL_CC_LIMIT) {
+      throw new ApiTooManyRecipientsError('Maximum of 50 recipients allowed')
+    }
+    next()
   }
 
   const rateLimit = expressRateLimit({
@@ -268,5 +402,6 @@ export const InitEmailTransactionalMiddleware = (
     rateLimit,
     getById,
     listMessages,
+    checkCcLimit,
   }
 }

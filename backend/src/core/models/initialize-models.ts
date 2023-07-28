@@ -6,6 +6,7 @@ import {
   Credential,
   Domain,
   JobQueue,
+  ManagedListCampaign,
   ProtectedMessage,
   Statistic,
   Unsubscriber,
@@ -23,6 +24,7 @@ import {
   EmailMessageTransactional,
   EmailOp,
   EmailTemplate,
+  EmailMessageTransactionalCc,
 } from '@email/models'
 import {
   SmsMessage,
@@ -69,6 +71,7 @@ export const initializeModels = (sequelize: Sequelize): void => {
     EmailFromAddress,
     EmailMessage,
     EmailMessageTransactional,
+    EmailMessageTransactionalCc,
     EmailOp,
     EmailTemplate,
     ProtectedMessage,
@@ -90,12 +93,14 @@ export const initializeModels = (sequelize: Sequelize): void => {
     GovsgTemplatesAccess,
     CampaignGovsgTemplate,
   ]
+  const phonebookModels = [ManagedListCampaign]
   sequelize.addModels([
     ...coreModels,
     ...emailModels,
     ...smsModels,
     ...telegramModels,
     ...govsgModels,
+    ...phonebookModels,
   ])
 }
 

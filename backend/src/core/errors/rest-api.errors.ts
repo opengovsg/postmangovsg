@@ -19,6 +19,11 @@ export class ApiInvalidRecipientError extends RestApiError {
     super(400, 'invalid_recipient', message)
   }
 }
+export class ApiTooManyRecipientsError extends RestApiError {
+  constructor(message: string) {
+    super(400, 'too_many_recipients', message)
+  }
+}
 
 export class ApiInvalidCredentialsError extends RestApiError {
   constructor(message: string) {

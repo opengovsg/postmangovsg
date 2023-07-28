@@ -27,6 +27,25 @@ async function loginWithOtp(email: string, otp: string): Promise<void> {
   }
 }
 
+async function getSgidUrl(): Promise<string | undefined> {
+  try {
+    const response = await axios.get('/auth/login/sgid')
+    return response.data
+  } catch (e) {
+    errorHandler(e)
+  }
+}
+
+async function loginWithSgid(code: string): Promise<void> {
+  try {
+    await axios.post(`/auth/login/sgid`, {
+      code,
+    })
+  } catch (e) {
+    errorHandler(e)
+  }
+}
+
 async function getUser(): Promise<
   | {
       email: string
@@ -75,4 +94,12 @@ function errorHandler(e: unknown, customHandlers: any = {}) {
   throw new Error(`${e}`)
 }
 
-export { getOtpWithEmail, loginWithOtp, getUser, logout, setUserAnalytics }
+export {
+  getOtpWithEmail,
+  loginWithOtp,
+  getUser,
+  logout,
+  setUserAnalytics,
+  getSgidUrl,
+  loginWithSgid,
+}

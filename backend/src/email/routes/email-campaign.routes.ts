@@ -3,6 +3,7 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
   JobMiddleware,
+  PhonebookMiddleware,
   ProtectedMiddleware,
   UploadMiddleware,
 } from '@core/middlewares'
@@ -12,6 +13,7 @@ import {
   EmailTemplateMiddleware,
 } from '@email/middlewares'
 import { fromAddressValidator } from '@core/utils/from-address'
+import { ChannelType } from '@core/constants'
 
 export const InitEmailCampaignRoute = (
   emailTemplateMiddleware: EmailTemplateMiddleware,
@@ -84,6 +86,12 @@ export const InitEmailCampaignRoute = (
   }
 
   const selectPhonebookListValidator = {
+    [Segments.BODY]: Joi.object({
+      list_id: Joi.number().required(),
+    }),
+  }
+
+  const associatePhonebookListValidator = {
     [Segments.BODY]: Joi.object({
       list_id: Joi.number().required(),
     }),
@@ -189,6 +197,23 @@ export const InitEmailCampaignRoute = (
     '/phonebook-list',
     celebrate(selectPhonebookListValidator),
     emailTemplateMiddleware.selectPhonebookListHandler
+  )
+
+  router.put(
+    '/phonebook-associations',
+    celebrate(associatePhonebookListValidator),
+    PhonebookMiddleware.verifyListBelongsToUser(ChannelType.Email),
+    emailTemplateMiddleware.setPhonebookListAssociationHandler
+  )
+
+  router.delete(
+    '/phonebook-associations',
+    emailTemplateMiddleware.deletePhonebookListAssociationHandler
+  )
+
+  router.get(
+    '/phonebook-listid',
+    emailTemplateMiddleware.getPhonebookListIdForCampaignHandler
   )
 
   return router

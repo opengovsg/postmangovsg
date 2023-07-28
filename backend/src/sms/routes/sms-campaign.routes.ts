@@ -3,6 +3,7 @@ import { celebrate, Joi, Segments } from 'celebrate'
 import {
   CampaignMiddleware,
   JobMiddleware,
+  PhonebookMiddleware,
   SettingsMiddleware,
   UploadMiddleware,
 } from '@core/middlewares'
@@ -11,6 +12,7 @@ import {
   SmsStatsMiddleware,
   SmsTemplateMiddleware,
 } from '@sms/middlewares'
+import { ChannelType } from '@core/constants'
 
 export const InitSmsCampaignRoute = (
   smsMiddleware: SmsMiddleware,
@@ -76,6 +78,12 @@ export const InitSmsCampaignRoute = (
   }
 
   const selectPhonebookListValidator = {
+    [Segments.BODY]: Joi.object({
+      list_id: Joi.number().required(),
+    }),
+  }
+
+  const associatePhonebookListValidator = {
     [Segments.BODY]: Joi.object({
       list_id: Joi.number().required(),
     }),
@@ -174,6 +182,23 @@ export const InitSmsCampaignRoute = (
     '/phonebook-list',
     celebrate(selectPhonebookListValidator),
     SmsTemplateMiddleware.selectPhonebookListHandler
+  )
+
+  router.put(
+    '/phonebook-associations',
+    celebrate(associatePhonebookListValidator),
+    PhonebookMiddleware.verifyListBelongsToUser(ChannelType.SMS),
+    SmsTemplateMiddleware.setPhonebookListAssociationHandler
+  )
+
+  router.delete(
+    '/phonebook-associations',
+    SmsTemplateMiddleware.deletePhonebookListAssociationHandler
+  )
+
+  router.get(
+    '/phonebook-listid',
+    SmsTemplateMiddleware.getPhonebookListIdForCampaignHandler
   )
 
   return router

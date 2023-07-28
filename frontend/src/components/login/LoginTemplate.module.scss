@@ -1,0 +1,100 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.topContainer {
+  padding-top: 1rem;
+  background-color: $neutral-light;
+  min-height: max(420px, 70vh);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+
+  .innerContainer {
+    display: flex;
+    justify-content: space-between;
+    max-width: 1000px;
+    width: 90vw;
+
+    @include mobile() {
+      justify-content: center;
+    }
+
+    .landingImg {
+      flex: 1;
+      display: flex;
+
+      img {
+        align-self: flex-end;
+        vertical-align: bottom;
+      }
+      @include mobile() {
+        display: none;
+      }
+    }
+
+    .appLogo {
+      margin-bottom: 2.5rem;
+    }
+
+    .textContainer {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      flex: 1;
+      margin-bottom: 3rem;
+
+      @include mobile() {
+        align-items: center;
+      }
+    }
+  }
+}
+
+.bottomContainer {
+  background-color: adjust-color($primary-light, $alpha: -0.7);
+}
+
+.bottomContent {
+  max-width: 1000px;
+  width: 90vw;
+  margin: auto;
+  min-height: max(200px, 30vh);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  @include mobile() {
+    padding: 2rem;
+  }
+
+  .linkBar {
+    font-size: 0.75rem;
+    display: flex;
+    align-items: baseline;
+    margin-bottom: -4px;
+    @include mobile() {
+      flex-direction: column;
+    }
+
+    .navLink {
+      color: $secondary;
+      margin-left: 3vw;
+      font-weight: bold;
+      &:hover,
+      &:active {
+        text-decoration: underline;
+      }
+      @include mobile() {
+        margin: 0;
+        &:not(:last-child) {
+          margin-bottom: 1rem;
+        }
+      }
+    }
+  }
+
+  .companyLogo {
+    @include mobile() {
+      height: 2rem;
+    }
+  }
+}

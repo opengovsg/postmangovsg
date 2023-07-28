@@ -13,6 +13,7 @@ import { Status } from 'classes/Campaign'
 import { ActionButton } from 'components/common'
 import { exportCampaignStats } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
+import { isPhonebookAutoUnsubscribeEnabled } from 'services/phonebook.service'
 
 export enum CampaignExportStatus {
   Unavailable = 'Unavailable',
@@ -32,6 +33,7 @@ const ExportRecipients = ({
   statusUpdatedAt,
   iconPosition,
   isButton = false,
+  isUsingPhonebook = false,
 }: {
   campaignId: number
   campaignName: string
@@ -41,6 +43,7 @@ const ExportRecipients = ({
   statusUpdatedAt?: string
   iconPosition: 'left' | 'right'
   isButton?: boolean
+  isUsingPhonebook?: boolean
 }) => {
   const [exportStatus, setExportStatus] = useState(
     CampaignExportStatus.Unavailable
@@ -94,13 +97,17 @@ const ExportRecipients = ({
       if (list.length > 0) {
         let keys = Object.keys(list[0]).filter((k) => k !== 'unsubscriber') // this field is only used to detect whether the person has unsub-ed
         if (campaignType === ChannelType.Email) {
-          keys = [
-            'recipient',
-            'status',
-            'unsubscribeReason',
-            'errorCode',
-            'updatedAt',
-          ]
+          if (isUsingPhonebook && isPhonebookAutoUnsubscribeEnabled()) {
+            keys = ['recipient', 'status', 'errorCode', 'updatedAt']
+          } else {
+            keys = [
+              'recipient',
+              'status',
+              'unsubscribeReason',
+              'errorCode',
+              'updatedAt',
+            ]
+          }
         }
         const headers = keys
           .map((key) => `"${key}"`)

@@ -20,6 +20,7 @@ export interface Message {
   apiClient?: WhatsAppApiClient
   language?: WhatsAppLanguages
   userUniqueLink?: string
+  unsubLink?: string // custom unsubscribe link
 }
 
 export interface ContactChannel {

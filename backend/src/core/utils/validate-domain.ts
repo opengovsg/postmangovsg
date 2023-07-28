@@ -81,4 +81,4 @@ const validateDomain = async (
   return matched.length > 0
 }
 
-export { validateDomain }
+export { validateDomain, isValidDomain }

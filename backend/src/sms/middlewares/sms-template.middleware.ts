@@ -242,10 +242,51 @@ const deleteCsvErrorHandler = async (
   return res.status(200).json({ id: campaignId })
 }
 
+const setPhonebookListAssociationHandler = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { campaignId } = req.params
+  const { list_id: listId } = req.body
+  await PhonebookService.setPhonebookListForCampaign({
+    campaignId: +campaignId,
+    listId,
+  })
+  return res.sendStatus(204)
+}
+
+const deletePhonebookListAssociationHandler = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { campaignId } = req.params
+  await PhonebookService.deletePhonebookListForCampaign(+campaignId)
+  return res.sendStatus(204)
+}
+
+const getPhonebookListIdForCampaignHandler = async (
+  req: Request,
+  res: Response
+): Promise<Response> => {
+  const { campaignId } = req.params
+  const phonebookListId = await PhonebookService.getPhonebookListIdForCampaign(
+    +campaignId
+  )
+  if (phonebookListId) {
+    return res.json({ list_id: phonebookListId })
+  }
+  return res.json({
+    message: 'No managed_list_id associated with this campaign',
+  })
+}
+
 export const SmsTemplateMiddleware = {
   storeTemplate,
   uploadCompleteHandler,
   pollCsvStatusHandler,
   deleteCsvErrorHandler,
   selectPhonebookListHandler,
+  setPhonebookListAssociationHandler,
+  deletePhonebookListAssociationHandler,
+  getPhonebookListIdForCampaignHandler,
 }

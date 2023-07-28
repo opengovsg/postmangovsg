@@ -542,8 +542,8 @@ describe(`${emailTransactionalRoute}/send`, () => {
     const blacklistedRecipient = 'blacklisted@baddomain.com'
     // instead, mock to return recipient as blacklisted
     const mockIsBlacklisted = jest
-      .spyOn(EmailService, 'isRecipientBlacklisted')
-      .mockResolvedValue(true)
+      .spyOn(EmailService, 'findBlacklistedRecipients')
+      .mockResolvedValue(['blacklisted@baddomain.com'])
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
