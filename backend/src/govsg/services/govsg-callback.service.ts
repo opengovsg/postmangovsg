@@ -103,6 +103,42 @@ const parseWebhook = async (
   throw new UnexpectedWebhookError('Unexpected webhook body')
 }
 
+const sendPasscodeCreationMessage = async (
+  whatsappId: WhatsAppId,
+  clientId: WhatsAppApiClient
+): Promise<MessageId> => {
+  const templateMessageToSend: WhatsAppTemplateMessageToSend = {
+    recipient: whatsappId,
+    apiClient: clientId,
+    templateName: 'sgc_passcode_generation', // TODO: Un-hardcode this
+    params: [],
+    language: WhatsAppLanguages.english,
+  }
+  const isLocal = config.get('env') === 'development'
+  const passcodeCreationWamid =
+    await WhatsAppService.whatsappClient.sendTemplateMessage(
+      templateMessageToSend,
+      isLocal
+    )
+  return passcodeCreationWamid
+}
+
+const createPasscode = () => {
+  return randomInt(0, Math.pow(10, 4)).toString().padStart(4, '0')
+}
+
+const storePrecreatedPasscode = async (
+  govsgMessageId: GovsgMessage['id'],
+  passcodeCreationWamid: MessageId
+): Promise<GovsgVerification> => {
+  const passcode = createPasscode()
+  return await GovsgVerification.create({
+    govsgMessageId,
+    passcodeCreationWamid,
+    passcode,
+  } as GovsgVerification)
+}
+
 const parseTemplateMessageWebhook = async (
   body: WhatsAppTemplateMessageWebhook,
   clientId: WhatsAppApiClient
@@ -316,50 +352,13 @@ const parseTemplateMessageWebhook = async (
   }
 }
 
-async function sendPasscodeCreationMessage(
-  whatsappId: WhatsAppId,
-  clientId: WhatsAppApiClient
-): Promise<MessageId> {
-  const templateMessageToSend: WhatsAppTemplateMessageToSend = {
-    recipient: whatsappId,
-    apiClient: clientId,
-    templateName: 'sgc_passcode_generation', // TODO: Un-hardcode this
-    params: [],
-    language: WhatsAppLanguages.english,
-  }
-  const isLocal = config.get('env') === 'development'
-  const passcodeCreationWamid =
-    await WhatsAppService.whatsappClient.sendTemplateMessage(
-      templateMessageToSend,
-      isLocal
-    )
-  return passcodeCreationWamid
-}
-
-const createPasscode = () => {
-  return randomInt(0, Math.pow(10, 4)).toString().padStart(4, '0')
-}
-
-async function storePrecreatedPasscode(
-  govsgMessageId: GovsgMessage['id'],
-  passcodeCreationWamid: MessageId
-): Promise<GovsgVerification> {
-  const passcode = createPasscode()
-  return await GovsgVerification.create({
-    govsgMessageId,
-    passcodeCreationWamid,
-    passcode,
-  } as GovsgVerification)
-}
-
-// TODO: Tidy up params
-async function sendPasscodeMessage(
+const sendPasscodeMessage = async (
   whatsappId: WhatsAppId,
   clientId: WhatsAppApiClient,
   officerName: string,
   officerAgency: string,
   passcode: string
-): Promise<MessageId> {
+): Promise<MessageId> => {
   const templateMessageToSend: WhatsAppTemplateMessageToSend = {
     recipient: whatsappId,
     apiClient: clientId,

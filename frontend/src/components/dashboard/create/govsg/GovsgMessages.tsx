@@ -36,7 +36,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   const [hasFetchedGovsgMessages, setHasFetchedGovsgMessages] = useState(false)
   const [govsgMessageCount, setGovsgMessageCount] = useState(0)
 
-  async function fetchGovsgMessages(selectedPage: number) {
+  const fetchGovsgMessages = async (selectedPage: number) => {
     const options = {
       offset: selectedPage * ITEMS_PER_PAGE,
       limit: ITEMS_PER_PAGE,
@@ -53,17 +53,15 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     if (!hasFetchedGovsgMessages) setHasFetchedGovsgMessages(true)
   }
 
-  //initial fetch to load page
   useEffect(() => {
     void fetchGovsgMessages(selectedPage)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPage])
 
-  function handlePageChange(index: number) {
+  const handlePageChange = (index: number) => {
     void fetchGovsgMessages(index)
   }
 
-  /* eslint-disable react/display-name */
   const columns = [
     {
       name: 'Recipient name'.toUpperCase(),
@@ -144,9 +142,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     },
   ]
 
-  /* eslint-enable react/display-name */
-
-  function renderRow(govsgMessage: GovsgMessage, key: number) {
+  const renderRow = (govsgMessage: GovsgMessage, key: number) => {
     return (
       <tr key={key}>
         {columns.map(({ render, width }, key) => (
@@ -158,15 +154,11 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     )
   }
 
-  function renderGovsgMessageList() {
-    return (
-      <>
-        <tbody>{govsgMessagesDisplayed.map(renderRow)}</tbody>
-      </>
-    )
+  const renderGovsgMessageList = () => {
+    return <tbody>{govsgMessagesDisplayed.map(renderRow)}</tbody>
   }
 
-  function renderNoMatch() {
+  const renderNoMatch = () => {
     return (
       <div className={styles.content}>
         <div className={styles.emptyDashboard}>
@@ -181,44 +173,40 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     )
   }
 
-  function renderPagination() {
+  const renderPagination = () => {
     return (
-      <>
-        <Pagination
-          itemsCount={govsgMessageCount}
-          selectedPage={govsgMessageCount ? selectedPage : -1}
-          setSelectedPage={handlePageChange}
-          itemsPerPage={ITEMS_PER_PAGE}
-        ></Pagination>
-      </>
+      <Pagination
+        itemsCount={govsgMessageCount}
+        selectedPage={govsgMessageCount ? selectedPage : -1}
+        setSelectedPage={handlePageChange}
+        itemsPerPage={ITEMS_PER_PAGE}
+      ></Pagination>
     )
   }
 
-  function renderGovsgMessage() {
+  const renderGovsgMessage = () => {
     return (
-      <>
-        <div className={styles.content}>
-          <TitleBar
-            title={govsgMessageCount + ' Messages'}
-            overrideStyles={overrideStylesTitleBar}
-          />
-          <div className={styles.tableContainer}>
-            <table className={styles.govsgMessageTable}>
-              <thead>
-                <tr>
-                  {columns.map(({ name, width, renderHeader }, key) =>
-                    renderHeader(name, width, key)
-                  )}
-                </tr>
-              </thead>
-              {govsgMessageCount > 0 ? renderGovsgMessageList() : <></>}
-            </table>
-          </div>
-          {govsgMessageCount > 0 ? renderPagination() : renderNoMatch()}
+      <div className={styles.content}>
+        <TitleBar
+          title={govsgMessageCount + ' Messages'}
+          overrideStyles={overrideStylesTitleBar}
+        />
+        <div className={styles.tableContainer}>
+          <table className={styles.govsgMessageTable}>
+            <thead>
+              <tr>
+                {columns.map(({ name, width, renderHeader }, key) =>
+                  renderHeader(name, width, key)
+                )}
+              </tr>
+            </thead>
+            {govsgMessageCount > 0 ? renderGovsgMessageList() : <></>}
+          </table>
         </div>
-      </>
+        {govsgMessageCount > 0 ? renderPagination() : renderNoMatch()}
+      </div>
     )
   }
 
-  return <>{renderGovsgMessage()}</>
+  return renderGovsgMessage()
 }
