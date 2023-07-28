@@ -126,6 +126,15 @@ export const InitEmailTransactionalMiddleware = (
       // use of as is safe because of validation by Joi; see email-transactional.routes.ts
     } = req.body as ReqBody
 
+    const ccLength = cc ? cc.length : 0
+    const bccLength = bcc ? bcc.length : 0
+    if (ccLength + bccLength > 49) {
+      // SES can't send to more than 50 recipients https://docs.aws.amazon.com/ses/latest/APIReference/API_SendEmail.html
+      throw new ApiInvalidTemplateError(
+        'The total number of recipients should not be more than 50'
+      )
+    }
+
     const attachmentsMetadata = attachments
       ? attachments.map((a) => ({
           fileName: a.name,
