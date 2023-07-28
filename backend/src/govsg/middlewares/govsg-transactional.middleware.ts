@@ -7,7 +7,12 @@ import {
   ApiNotFoundError,
   ApiValidationError,
 } from '@core/errors/rest-api.errors'
-import { GovsgMessageStatus } from '@core/constants'
+import {
+  GovsgMessageStatus,
+  Ordering,
+  TimestampFilter,
+  TransactionalGovsgSortField,
+} from '@core/constants'
 import { GovsgTransactionalService } from '@govsg/services'
 import WhatsAppClient from '@shared/clients/whatsapp-client.class'
 import {
@@ -20,6 +25,7 @@ export interface GovsgTransactionalMiddleware {
   saveMessage: Handler
   sendMessage: Handler
   getById: Handler
+  listMessages: Handler
 }
 
 export const InitGovsgTransactionalMiddleware =
@@ -229,9 +235,38 @@ export const InitGovsgTransactionalMiddleware =
       return res.status(200).json(convertMessageModelToResponse(message))
     }
 
+    async function listMessages(
+      req: Request,
+      res: Response
+    ): Promise<Response> {
+      const { limit, offset, status, created_at, sort_by } = req.query
+      const userId: string = req.session?.user?.id.toString()
+      const filter = created_at ? { createdAt: created_at } : undefined
+      const sortBy = sort_by?.toString().replace(/[+-]/, '')
+      const orderBy = sort_by?.toString().includes('+')
+        ? Ordering.ASC
+        : Ordering.DESC // default to descending order even without '-' prefix
+      const { hasMore, messages } =
+        await GovsgTransactionalService.listMessages({
+          userId,
+          limit: +(limit as string),
+          offset: +(offset as string),
+          sortBy: sortBy as TransactionalGovsgSortField,
+          orderBy,
+          status: status as GovsgMessageStatus,
+          filterByTimestamp: filter as TimestampFilter,
+        })
+
+      return res.status(200).json({
+        has_more: hasMore,
+        data: messages.map(convertMessageModelToResponse),
+      })
+    }
+
     return {
       saveMessage,
       sendMessage,
       getById,
+      listMessages,
     }
   }

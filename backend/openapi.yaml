@@ -2224,6 +2224,7 @@ paths:
           name: created_at
           description: >
             Filter for created_at timestamp of messages:
+
               - gt: greater than
               - gte: greater than or equal
               - lt: less than
@@ -2249,6 +2250,7 @@ paths:
           name: sort_by
           description: >
             Array of fields to sort by, default order is desc, but can be configured by adding a prefix of:
+
              - plus sign (+) for ascending order
              - minus sign (-) for descending order
           required: false
