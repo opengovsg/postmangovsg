@@ -1,0 +1,43 @@
+name: Deploy SST functions
+on:
+  push:
+    branches:
+      - master
+      - staging
+
+concurrency: deploy-sst-functions-${{ github.ref }}
+env:
+  DIRECTORY: sst
+
+jobs:
+  lint-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+      - name: Lint lock file
+        run: cd "$DIRECTORY" && npx lockfile-lint --type npm --path package-lock.json -o "https:" -o "file:" --allowed-hosts npm
+      # no tests yet
+      # - name: Test
+      #   run: cd "$DIRECTORY" && npm test
+
+  build_deploy_application:
+    needs: [lint-test]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: "16"
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: "${{ vars.AWS_DEFAULT_REGION }}"
+      - name: Install dependencies
+        run: cd "$DIRECTORY" && npm ci
+      - name: Deploy
+        run: cd "$DIRECTORY" && npx sst deploy --stage ${{ github.ref == 'master' && 'prod' || 'stg' }}

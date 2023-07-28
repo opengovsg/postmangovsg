@@ -1,0 +1,40 @@
+{
+  "name": "postmangovsg-sst",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "sst dev",
+    "build": "sst build",
+    "deploy": "sst deploy",
+    "remove": "sst remove",
+    "console": "sst console",
+    "typecheck": "tsc --noEmit",
+    "precommit": "lint-staged"
+  },
+  "devDependencies": {
+    "@tsconfig/node16": "^16.1.0",
+    "@types/lodash": "^4.14.195",
+    "@typescript-eslint/eslint-plugin": "^5.62.0",
+    "aws-cdk-lib": "2.84.0",
+    "constructs": "10.1.156",
+    "eslint": "^8.45.0",
+    "eslint-config-standard-with-typescript": "^36.0.1",
+    "eslint-plugin-import": "^2.27.5",
+    "eslint-plugin-n": "^15.7.0",
+    "eslint-plugin-promise": "^6.1.1",
+    "lint-staged": "^13.2.3",
+    "sst": "^2.21.0",
+    "typescript": "^5.1.6"
+  },
+  "workspaces": [
+    "packages/*"
+  ],
+  "dependencies": {
+    "aws-cdk": "^2.87.0",
+    "cronitor": "^2.3.3"
+  },
+  "lint-staged": {
+    "*.{js,ts}": "eslint --cache --fix"
+  }
+}
