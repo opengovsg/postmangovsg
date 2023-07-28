@@ -247,33 +247,38 @@ const parseTemplateMessageWebhook = async (
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
       void govsgOp?.update(fieldOpts, whereOpts)
-      if (!govsgMessage) {
+      // TODO: Add logging statement here for traceability
+      if (!govsgMessage && !govsgOp) {
         return
       }
+      const message = (govsgMessage ?? govsgOp) as GovsgMessage
+      // TODO: Add logging statement here for traceability
       const experimentalData = await experimentService.getUserExperimentalData(
-        govsgMessage.campaign.userId
+        message.campaign.userId
       )
+      // TODO: Add logging statement here for traceability
       const canAccessGovsgV = `${ChannelType.Govsg}V` in experimentalData
       if (!canAccessGovsgV) {
         return
       }
-      const { campaignId, recipient } = govsgMessage
+      const { campaignId, recipient } = message
+      // TODO: Add logging statement here for traceability
       void CampaignGovsgTemplate.findOne({
         where: {
           campaignId,
         },
         include: [Campaign, GovsgTemplate],
       }).then((campaignGovsgTemplate) => {
+        // TODO: Add logging statement here for traceability
         if (
           campaignGovsgTemplate?.govsgTemplate.whatsappTemplateLabel ===
           'sgc_notify_upcoming_call_1' // TODO: Un-hardcode this
         ) {
+          // TODO: Add logging statement here for traceability
           void sendPasscodeCreationMessage(recipient, clientId).then(
             (passcodeCreationWamid) => {
-              void storePrecreatedPasscode(
-                govsgMessage.id,
-                passcodeCreationWamid
-              )
+              // TODO: Add logging statement here for traceability
+              void storePrecreatedPasscode(message.id, passcodeCreationWamid)
             }
           )
         }
@@ -322,9 +327,11 @@ async function sendPasscodeCreationMessage(
     params: [],
     language: WhatsAppLanguages.english,
   }
+  const isLocal = config.get('env') === 'development'
   const passcodeCreationWamid =
     await WhatsAppService.whatsappClient.sendTemplateMessage(
-      templateMessageToSend
+      templateMessageToSend,
+      isLocal
     )
   return passcodeCreationWamid
 }
@@ -373,9 +380,11 @@ async function sendPasscodeMessage(
     ],
     language: WhatsAppLanguages.english,
   }
+  const isLocal = config.get('env') === 'development'
   const passcodeCreationWamid =
     await WhatsAppService.whatsappClient.sendTemplateMessage(
-      templateMessageToSend
+      templateMessageToSend,
+      isLocal
     )
   return passcodeCreationWamid
 }

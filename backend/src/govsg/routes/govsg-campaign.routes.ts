@@ -136,7 +136,6 @@ router.get(
       status: Joi.string().valid(...Object.values(GovsgMessageStatus)),
     }),
   }),
-  CampaignMiddleware.canEditCampaign,
   GovsgVerificationMiddleware.listMessages
 )
 
