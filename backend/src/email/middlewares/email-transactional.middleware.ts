@@ -311,7 +311,7 @@ export const InitEmailTransactionalMiddleware = (
     }
   }
 
-  async function getById(req: Request, res: Response): Promise<void> {
+  async function getById(req: Request, res: Response): Promise<Response> {
     const { emailId } = req.params
     const message = await EmailMessageTransactional.findOne({
       where: { id: emailId, userId: req.session?.user?.id.toString() },
@@ -325,13 +325,10 @@ export const InitEmailTransactionalMiddleware = (
       ],
     })
     if (!message) {
-      res
-        .status(404)
-        .json({ message: `Email message with ID ${emailId} not found.` })
-      return
+      throw new ApiNotFoundError(`Email message with ID ${emailId} not found.`)
     }
 
-    res.status(200).json(convertMessageModelToResponse(message))
+    return res.status(200).json(convertMessageModelToResponse(message))
   }
 
   async function listMessages(req: Request, res: Response): Promise<void> {

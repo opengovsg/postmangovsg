@@ -7,22 +7,32 @@ export const InitGovsgMessageTransactionalRoute = (
   govsgTransactionalMiddleware: GovsgTransactionalMiddleware
 ): Router => {
   const router = Router({ mergeParams: true })
-  const sendValidator = {
-    [Segments.BODY]: Joi.object({
-      recipient: Joi.string().required(),
-      template_id: Joi.number().required(),
-      language_code: Joi.string()
-        .valid(...Object.values(WhatsAppLanguages))
-        .default(WhatsAppLanguages.english),
-      params: Joi.object().pattern(Joi.string(), Joi.string()).default({}),
-    }),
-  }
 
   router.post(
     '/send',
-    celebrate(sendValidator),
+    celebrate({
+      [Segments.BODY]: Joi.object({
+        recipient: Joi.string().required(),
+        template_id: Joi.number().required(),
+        language_code: Joi.string()
+          .valid(...Object.values(WhatsAppLanguages))
+          .default(WhatsAppLanguages.english),
+        params: Joi.object().pattern(Joi.string(), Joi.string()).default({}),
+      }),
+    }),
     govsgTransactionalMiddleware.saveMessage,
     govsgTransactionalMiddleware.sendMessage
   )
+
+  router.get(
+    '/:messageId',
+    celebrate({
+      [Segments.PARAMS]: Joi.object({
+        messageId: Joi.number().required(),
+      }),
+    }),
+    govsgTransactionalMiddleware.getById
+  )
+
   return router
 }
