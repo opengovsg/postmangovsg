@@ -13,6 +13,8 @@ import styles from './GovsgMessages.module.scss'
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
 import { Campaign } from 'classes'
 import { Pagination, TitleBar } from 'components/common'
+import { NegativeText } from 'components/common/StyledText/NegativeText'
+import { PlainBadge } from 'components/common/StyledText/PlainBadge'
 
 const ITEMS_PER_PAGE = 10
 
@@ -93,7 +95,13 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     },
     {
       name: 'PASSCODE',
-      render: (govsgMessage: GovsgMessage) => govsgMessage.passcode,
+      render: (govsgMessage: GovsgMessage) => {
+        if (!govsgMessage.passcode) {
+          return <NegativeText>Not created yet</NegativeText>
+        } else {
+          return <PlainBadge>{govsgMessage.passcode}</PlainBadge>
+        }
+      },
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
