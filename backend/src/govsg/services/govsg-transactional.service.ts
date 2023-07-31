@@ -11,7 +11,7 @@ import {
   ApiRateLimitError,
 } from '@core/errors/rest-api.errors'
 import { loggerWithLabel } from '@core/logger'
-import { WhatsAppService } from '@core/services/whatsapp.service'
+import { whatsappService } from '@core/services/whatsapp.service'
 import { GovsgMessageTransactional } from '@govsg/models'
 import {
   AuthenticationError,
@@ -47,7 +47,7 @@ export async function sendMessage({
   2. Call WhatsApp contacts endpoint to validate user
   3. Send templated message to user
   */
-  const apiClientIdMap = await WhatsAppService.flamingoDbClient.getApiClientId([
+  const apiClientIdMap = await whatsappService.flamingoDbClient.getApiClientId([
     recipient,
   ])
   const messageToSend = {
@@ -63,7 +63,7 @@ export async function sendMessage({
   // because WA API Client is inaccessible from local
   const isLocal = config.get('env') === 'development'
   try {
-    const messageId = await WhatsAppService.whatsappClient.sendTemplateMessage(
+    const messageId = await whatsappService.whatsappClient.sendTemplateMessage(
       messageToSend,
       isLocal
     )

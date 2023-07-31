@@ -9,18 +9,25 @@ import styles from './Create.module.scss'
 import EmailCreate from './email/EmailCreate'
 
 import CreateGovsg from './govsg/GovsgCreate'
+
 import SMSCreate from './sms/SMSCreate'
 
 import TelegramCreate from './telegram/TelegramCreate'
 
 import { ChannelType, Status } from 'classes'
+
 import { TitleBar, PrimaryButton } from 'components/common'
+import { CampaignHeaderTabs } from 'components/common/CampaignHeaderTabs/CampaignHeaderTabs'
+import { TitleBarWithTabs } from 'components/common/title-bar/TitleBarWithTabs'
+import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import Error from 'components/error'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
+import { GovsgDetailContextProvider } from 'contexts/govsg-detail.context'
 
 import { getCampaignDetails } from 'services/campaign.service'
+
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const Create = () => {
@@ -30,6 +37,7 @@ const Create = () => {
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { handleFinishLater: finishLaterContextHandler, finishLaterContent } =
     useContext(FinishLaterModalContext)
+  const { canAccessGovsgV } = useGovsgV()
   const [isLoading, setLoading] = useState(true)
   const [isInvalid, setIsInvalid] = useState(false)
 
@@ -61,6 +69,33 @@ const Create = () => {
     navigate('/campaigns')
   }
 
+  const renderTitleBar = () => {
+    if (
+      canAccessGovsgV &&
+      campaign.type === ChannelType.Govsg &&
+      campaign.status !== Status.Draft
+    ) {
+      return (
+        <TitleBarWithTabs title={campaign.name}>
+          <CampaignHeaderTabs />
+          <PrimaryButton onClick={handleFinishLater}>
+            Back to campaigns
+          </PrimaryButton>
+        </TitleBarWithTabs>
+      )
+    } else {
+      return (
+        <TitleBar title={campaign.name}>
+          <PrimaryButton onClick={handleFinishLater}>
+            {campaign.status === Status.Draft
+              ? 'Finish this later'
+              : 'Back to campaigns'}
+          </PrimaryButton>
+        </TitleBar>
+      )
+    }
+  }
+
   function renderCreateChannel() {
     switch (campaign.type) {
       case ChannelType.SMS:
@@ -81,16 +116,10 @@ const Create = () => {
   }
 
   return (
-    <>
+    <GovsgDetailContextProvider>
       {campaign ? (
         <>
-          <TitleBar title={campaign.name}>
-            <PrimaryButton onClick={handleFinishLater}>
-              {campaign.status === Status.Draft
-                ? 'Finish this later'
-                : 'Back to campaigns'}
-            </PrimaryButton>
-          </TitleBar>
+          {renderTitleBar()}
           {!!campaign.demoMessageLimit && <DemoInfoBanner></DemoInfoBanner>}
           {isLoading ? (
             <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
@@ -101,7 +130,7 @@ const Create = () => {
       ) : (
         <p>loading..</p>
       )}
-    </>
+    </GovsgDetailContextProvider>
   )
 }
 
