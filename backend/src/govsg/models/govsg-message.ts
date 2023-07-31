@@ -22,7 +22,10 @@ export class GovsgMessage extends Model<GovsgMessage> {
   id: number
 
   @ForeignKey(() => Campaign)
-  @Column(DataType.BIGINT)
+  @Column({
+    type: DataType.BIGINT,
+    allowNull: false,
+  })
   campaignId: number
 
   @BelongsTo(() => Campaign)

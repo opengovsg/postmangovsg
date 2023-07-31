@@ -23,18 +23,15 @@ export const listMessages = async (
   })
   const messages = rows.map((row) => {
     const {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       agency,
       recipient,
       officer_name,
       recipient_name,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       officer_designation,
       ...remainingParams
-    } = row.params as any
-    console.debug(
-      `Excluding agency=${agency} and officer_designation=${officer_designation} from params=${JSON.stringify(
-        row.params
-      )}`
-    )
+    } = row.params as Record<string, string>
     return {
       ...row.get({ plain: true }),
       name: recipient_name,

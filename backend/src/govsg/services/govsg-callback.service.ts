@@ -404,7 +404,7 @@ const parseUserMessageWebhook = async (
       })
       if (!govsgVerification) {
         // TODO: Update log statement
-        logger.warn({
+        logger.error({
           message: `govsgVerification for an expected button reply was not found.`,
           meta: {
             whatsappId,

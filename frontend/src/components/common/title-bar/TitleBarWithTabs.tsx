@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import defaultStyles from './TitleBar.module.scss'
 
-const HStackStyle = {
+const horizontalStackStyle = {
   display: 'flex',
   alignItems: 'center',
 }
@@ -23,7 +23,7 @@ export const TitleBarWithTabs = ({
     <div className={styles.titleBar}>
       {!!children && Array.isArray(children) && children.length === 2 && (
         <>
-          <div style={HStackStyle}>
+          <div style={horizontalStackStyle}>
             <h2 className={styles.titleText}>{title}</h2>
             <div style={subsequentElementStyle}>{children[0]}</div>
           </div>

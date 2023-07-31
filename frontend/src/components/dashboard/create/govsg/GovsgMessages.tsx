@@ -33,7 +33,6 @@ interface GovsgMessagesProps {
 export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   const [govsgMessagesDisplayed, setGovsgMessagesDisplayed] = useState([])
   const [selectedPage, setSelectedPage] = useState(0)
-  const [hasFetchedGovsgMessages, setHasFetchedGovsgMessages] = useState(false)
   const [govsgMessageCount, setGovsgMessageCount] = useState(0)
 
   const fetchGovsgMessages = async (selectedPage: number) => {
@@ -50,7 +49,6 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     setGovsgMessageCount(totalCount)
     setGovsgMessagesDisplayed(govsgMessages)
     setSelectedPage(selectedPage)
-    if (!hasFetchedGovsgMessages) setHasFetchedGovsgMessages(true)
   }
 
   useEffect(() => {
@@ -64,7 +62,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
 
   const columns = [
     {
-      name: 'Recipient name'.toUpperCase(),
+      name: 'RECIPIENT NAME',
       render: (govsgMessage: GovsgMessage) => govsgMessage.name,
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
@@ -74,7 +72,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
       ),
     },
     {
-      name: 'Recipient mobile'.toUpperCase(),
+      name: 'RECIPIENT MOBILE',
       render: (govsgMessage: GovsgMessage) => govsgMessage.mobile,
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
@@ -84,7 +82,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
       ),
     },
     {
-      name: 'Message data'.toUpperCase(),
+      name: 'MESSAGE DATA',
       render: (govsgMessage: GovsgMessage) => govsgMessage.data,
       width: 'md',
       renderHeader: (name: string, width: string, key: number) => (
@@ -94,7 +92,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
       ),
     },
     {
-      name: 'Passcode'.toUpperCase(),
+      name: 'PASSCODE',
       render: (govsgMessage: GovsgMessage) => govsgMessage.passcode,
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
@@ -104,7 +102,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
       ),
     },
     {
-      name: 'Status'.toUpperCase(),
+      name: 'STATUS',
       render: (govsgMessage: GovsgMessage) => capitalize(govsgMessage.status),
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
@@ -114,7 +112,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
       ),
     },
     {
-      name: 'Sent'.toUpperCase(),
+      name: 'SENT',
       render: (govsgMessage: GovsgMessage) =>
         govsgMessage.sent ? (
           <Moment format="MMM DD YYYY, HH:mm" interval={0}>
@@ -131,7 +129,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
       ),
     },
     {
-      name: 'Sent by'.toUpperCase(),
+      name: 'SENT BY',
       render: (govsgMessage: GovsgMessage) => govsgMessage.officer,
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
