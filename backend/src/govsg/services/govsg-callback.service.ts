@@ -4,6 +4,7 @@ import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
 import {
+  GenericMessage,
   UserMessageWebhook,
   WhatsAppApiClient,
   WhatsAppId,
@@ -406,10 +407,18 @@ const parseUserMessageWebhook = async (
   body: UserMessageWebhook,
   clientId: WhatsAppApiClient
 ): Promise<void> => {
-  const { wa_id: whatsappId } = body.contacts[0]
-  const { id: messageId, type } = body.messages[0]
+  await Promise.all(
+    body.messages.map((message) => parseGenericMessage(message, clientId))
+  )
+}
+
+const parseGenericMessage = async (
+  genericMessage: GenericMessage,
+  clientId: WhatsAppApiClient
+): Promise<void> => {
+  const { from: whatsappId, id: messageId, type } = genericMessage
   if (type === WhatsappWebhookMessageType.button) {
-    const message = body.messages[0] as WhatsAppWebhookButtonMessage
+    const message = genericMessage as WhatsAppWebhookButtonMessage
     if (message.button.text === 'Create passcode') {
       const passcodeCreationWamid = message.context.id
       const govsgVerification = await GovsgVerification.findOne({
@@ -457,7 +466,7 @@ const parseUserMessageWebhook = async (
     })
     return
   }
-  const message = body.messages[0] as WhatsAppWebhookTextMessage
+  const message = genericMessage as WhatsAppWebhookTextMessage
   const { body: rawMessageBody } = message.text
   const sanitisedMessageBody = validator.blacklist(
     rawMessageBody,

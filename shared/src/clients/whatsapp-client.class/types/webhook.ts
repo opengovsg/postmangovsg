@@ -58,7 +58,7 @@ interface Origin {
   type: OriginType
 }
 
-interface GenericMessage {
+export interface GenericMessage {
   from: WhatsAppId
   id: MessageId
   timestamp: string // UNIX timestamp in seconds, as a string
