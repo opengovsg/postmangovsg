@@ -8,7 +8,7 @@ import Moment from 'react-moment'
 
 import overrideStylesTitleBar from '../../campaigns/OverrideTitleBar.module.scss'
 
-import styles from './../../campaigns/Campaigns.module.scss'
+import styles from './GovsgMessages.module.scss'
 
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
 import { Campaign } from 'classes'

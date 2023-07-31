@@ -13,7 +13,6 @@
   @include flex-vertical;
   padding: $content-top-padding $site-padding $content-bottom-padding;
   margin: 0 auto;
-  width: 1200px;
   max-width: 100%;
 
   @include mobile() {
@@ -36,7 +35,7 @@
     margin: 0.25rem !important;
   }
 
-  table.campaignTable {
+  table.govsgMessageTable {
     min-width: calc(
       #{$tablet} - #{$mobile-site-padding} - #{$mobile-site-padding}
     );
