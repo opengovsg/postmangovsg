@@ -24,7 +24,7 @@ const flamingoDbClient = new FlamingoDbClient(
   flamingoDbSequelize as unknown as SequelizeQueryClient
 )
 
-export const WhatsAppService = {
+export const whatsappService = {
   whatsappClient,
   flamingoDbClient,
 }

@@ -33,7 +33,7 @@ import {
   govsgMessageStatusMapper,
   shouldUpdateStatus,
 } from '@core/constants'
-import { WhatsAppService, experimentService } from '@core/services'
+import { whatsappService, experimentService } from '@core/services'
 import { GovsgVerification } from '@govsg/models/govsg-verification'
 import { randomInt } from 'node:crypto'
 
@@ -116,7 +116,7 @@ const sendPasscodeCreationMessage = async (
   }
   const isLocal = config.get('env') === 'development'
   const passcodeCreationWamid =
-    await WhatsAppService.whatsappClient.sendTemplateMessage(
+    await whatsappService.whatsappClient.sendTemplateMessage(
       templateMessageToSend,
       isLocal
     )
@@ -374,7 +374,7 @@ const sendPasscodeMessage = async (
   }
   const isLocal = config.get('env') === 'development'
   const passcodeCreationWamid =
-    await WhatsAppService.whatsappClient.sendTemplateMessage(
+    await whatsappService.whatsappClient.sendTemplateMessage(
       templateMessageToSend,
       isLocal
     )
@@ -500,7 +500,7 @@ async function sendAutoReply(
       params: [],
       language: WhatsAppLanguages.english,
     }
-    await WhatsAppService.whatsappClient.sendTemplateMessage(
+    await whatsappService.whatsappClient.sendTemplateMessage(
       templateMessageToSend,
       isLocal
     )
@@ -512,7 +512,7 @@ async function sendAutoReply(
     body: 'We are unable to receive replies at the moment.\n\nIf you are inquiring about COVID-19 updates, the COVID-19 infobot is temporarily unavailable due to maintenance work. For more COVID-19 related information, please visit the Ministry of Health’s website at moh.gov.sg. Thank you',
   }
   // can substitute this with template message if we get such a template approved
-  await WhatsAppService.whatsappClient.sendTextMessage(textMessageToSend)
+  await whatsappService.whatsappClient.sendTextMessage(textMessageToSend)
 }
 
 export const GovsgCallbackService = { isAuthenticated, parseWebhook }
