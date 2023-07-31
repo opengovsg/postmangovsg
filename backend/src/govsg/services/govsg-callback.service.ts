@@ -283,37 +283,30 @@ const parseTemplateMessageWebhook = async (
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
       void govsgOp?.update(fieldOpts, whereOpts)
-      // TODO: Add logging statement here for traceability
       if (!govsgMessage && !govsgOp) {
         return
       }
       const message = (govsgMessage ?? govsgOp) as GovsgMessage
-      // TODO: Add logging statement here for traceability
       const experimentalData = await experimentService.getUserExperimentalData(
         message.campaign.userId
       )
-      // TODO: Add logging statement here for traceability
       const canAccessGovsgV = `${ChannelType.Govsg}V` in experimentalData
       if (!canAccessGovsgV) {
         return
       }
       const { campaignId, recipient } = message
-      // TODO: Add logging statement here for traceability
       void CampaignGovsgTemplate.findOne({
         where: {
           campaignId,
         },
         include: [Campaign, GovsgTemplate],
       }).then((campaignGovsgTemplate) => {
-        // TODO: Add logging statement here for traceability
         if (
           campaignGovsgTemplate?.govsgTemplate.whatsappTemplateLabel ===
           'sgc_notify_upcoming_call_1' // TODO: Un-hardcode this
         ) {
-          // TODO: Add logging statement here for traceability
           void sendPasscodeCreationMessage(recipient, clientId).then(
             (passcodeCreationWamid) => {
-              // TODO: Add logging statement here for traceability
               void storePrecreatedPasscode(message.id, passcodeCreationWamid)
             }
           )
@@ -403,7 +396,6 @@ const parseUserMessageWebhook = async (
         include: [GovsgMessage],
       })
       if (!govsgVerification) {
-        // TODO: Update log statement
         logger.error({
           message: `govsgVerification for an expected button reply was not found.`,
           meta: {
@@ -429,7 +421,6 @@ const parseUserMessageWebhook = async (
         officerAgency,
         passcode
       )
-      // TODO: Add log statement
     }
     return
   }
