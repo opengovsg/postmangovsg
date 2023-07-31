@@ -28,7 +28,7 @@ export enum WhatsAppMessageStatus {
 }
 
 // omitted Pricing object (unused for now) and type field (can't foresee it being useful)
-interface WhatsAppTemplateMessageWebhookStatus {
+export interface WhatsAppTemplateMessageWebhookStatus {
   id: MessageId
   message: {
     recipient_id: WhatsAppId
@@ -102,7 +102,7 @@ interface Contact {
   wa_id: WhatsAppId
 }
 
-interface Error {
+export interface Error {
   code: number
   title: string
   details?: string

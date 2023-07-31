@@ -4,6 +4,7 @@ import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
 import {
+  Error,
   GenericMessage,
   UserMessageWebhook,
   WhatsAppApiClient,
@@ -12,6 +13,7 @@ import {
   WhatsAppMessageStatus,
   WhatsAppTemplateMessageToSend,
   WhatsAppTemplateMessageWebhook,
+  WhatsAppTemplateMessageWebhookStatus,
   WhatsAppTextMessageToSend,
   WhatsAppWebhookButtonMessage,
   WhatsAppWebhookTextMessage,
@@ -144,11 +146,23 @@ const parseTemplateMessageWebhook = async (
   body: WhatsAppTemplateMessageWebhook,
   clientId: WhatsAppApiClient
 ): Promise<void> => {
+  await Promise.all(
+    body.statuses.map((whatsAppTemplateMessageWebhookStatus) =>
+      parseStatus(whatsAppTemplateMessageWebhookStatus, clientId, body.errors)
+    )
+  )
+}
+
+const parseStatus = async (
+  whatsAppTemplateMessageWebhookStatus: WhatsAppTemplateMessageWebhookStatus,
+  clientId: WhatsAppApiClient,
+  errors?: Error[]
+): Promise<void> => {
   const {
     id: messageId,
     timestamp: timestampRaw,
     status: whatsappStatus,
-  } = body.statuses[0]
+  } = whatsAppTemplateMessageWebhookStatus
   const timestamp = new Date(parseInt(timestampRaw, 10) * 1000) // convert to milliseconds
   const [govsgMessage, govsgMessageTransactional, govsgOp] = await Promise.all([
     GovsgMessage.findOne({
@@ -208,7 +222,7 @@ const parseTemplateMessageWebhook = async (
       message: 'Received webhook with warning status',
       meta: {
         messageId,
-        body,
+        status,
       },
     })
     // no corresponding status to update
@@ -226,12 +240,12 @@ const parseTemplateMessageWebhook = async (
       logger.info({
         message: 'Received webhook with error status',
       })
-      if (!body.errors || body.errors.length === 0) {
+      if (!errors || errors.length === 0) {
         logger.error({
           message: 'Received webhook with error status but no error details',
           meta: {
             messageId,
-            body,
+            whatsAppTemplateMessageWebhookStatus,
           },
         })
         const fieldOpts = {
@@ -246,7 +260,7 @@ const parseTemplateMessageWebhook = async (
         // not sure whether need to throw an error hmm probably not?
         return
       }
-      const { code, title, details, href } = body.errors[0]
+      const { code, title, details, href } = errors[0]
       const errorCode = code.toString()
       const errorDescription = `${title} Details: ${details} href: ${href}`
       const fieldOpts = {
