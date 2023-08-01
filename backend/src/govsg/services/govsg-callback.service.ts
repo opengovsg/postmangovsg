@@ -4,7 +4,7 @@ import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
 import {
-  Error,
+  WebhookError,
   GenericMessage,
   UserMessageWebhook,
   WhatsAppApiClient,
@@ -156,7 +156,7 @@ const parseTemplateMessageWebhook = async (
 const parseStatus = async (
   whatsAppTemplateMessageWebhookStatus: WhatsAppTemplateMessageWebhookStatus,
   clientId: WhatsAppApiClient,
-  errors?: Error[]
+  errors?: WebhookError[]
 ): Promise<void> => {
   const {
     id: messageId,
