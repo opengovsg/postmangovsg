@@ -5,13 +5,13 @@ import { MessageId, WhatsAppId } from './general'
 // Cloud API supports fewer statuses: https://developers.facebook.com/docs/whatsapp/cloud-api/webhooks/components#statuses-object
 export interface WhatsAppTemplateMessageWebhook {
   statuses: WhatsAppTemplateMessageWebhookStatus[]
-  errors?: Error[]
+  errors?: WebhookError[]
 }
 
 export interface UserMessageWebhook {
   contacts: Contact[]
   messages: GenericMessage[]
-  errors?: Error[]
+  errors?: WebhookError[]
 }
 
 export interface UserTextMessageWebhook extends UserMessageWebhook {
@@ -102,7 +102,7 @@ interface Contact {
   wa_id: WhatsAppId
 }
 
-export interface Error {
+export interface WebhookError {
   code: number
   title: string
   details?: string
