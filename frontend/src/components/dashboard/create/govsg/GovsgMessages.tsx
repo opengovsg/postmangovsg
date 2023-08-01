@@ -1,18 +1,21 @@
 import axios from 'axios'
 
-import { capitalize } from 'lodash'
-
 import { useEffect, useState } from 'react'
 
 import Moment from 'react-moment'
 
 import overrideStylesTitleBar from '../../campaigns/OverrideTitleBar.module.scss'
 
-import styles from './../../campaigns/Campaigns.module.scss'
+import styles from './GovsgMessages.module.scss'
 
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
+
 import { Campaign } from 'classes'
 import { Pagination, TitleBar } from 'components/common'
+import { StatusIconText } from 'components/common/StatusIconText/StatusIconText'
+
+import { PasscodeBadge } from 'components/common/StyledText/PasscodeBadge'
+import { PrettyJson } from 'components/common/StyledText/PrettyJson'
 
 const ITEMS_PER_PAGE = 10
 
@@ -83,7 +86,10 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     },
     {
       name: 'MESSAGE DATA',
-      render: (govsgMessage: GovsgMessage) => govsgMessage.data,
+      render: (govsgMessage: GovsgMessage) => {
+        const json = JSON.parse(govsgMessage.data)
+        return <PrettyJson json={json} />
+      },
       width: 'md',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
@@ -93,7 +99,14 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     },
     {
       name: 'PASSCODE',
-      render: (govsgMessage: GovsgMessage) => govsgMessage.passcode,
+      render: (govsgMessage: GovsgMessage) => {
+        return (
+          <PasscodeBadge
+            label={govsgMessage.passcode}
+            placeholder="Not created yet"
+          />
+        )
+      },
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
@@ -103,7 +116,9 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     },
     {
       name: 'STATUS',
-      render: (govsgMessage: GovsgMessage) => capitalize(govsgMessage.status),
+      render: (govsgMessage: GovsgMessage) => {
+        return <StatusIconText label={govsgMessage.status} />
+      },
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>

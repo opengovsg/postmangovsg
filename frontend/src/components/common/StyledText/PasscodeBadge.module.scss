@@ -1,0 +1,12 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.positive {
+  background-color: $grey-300;
+  border-radius: 8px;
+  padding: 4px 8px;
+}
+
+.negative {
+  color: $grey-700;
+}

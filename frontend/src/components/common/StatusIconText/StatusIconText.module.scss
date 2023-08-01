@@ -1,0 +1,23 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.icon {
+  @extend %icon-large;
+  margin-right: 0.5rem;
+
+  &.red {
+    color: $error;
+  }
+
+  &.blue {
+    color: $primary;
+  }
+
+  &.green {
+    color: $success;
+  }
+
+  &.grey {
+    color: $grey-700;
+  }
+}
