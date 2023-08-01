@@ -7,7 +7,7 @@ const ICONS: Record<string, JSX.Element> = {
   UNSENT: <i className={cx(styles.icon, styles.blue, 'bx bx-time-five')} />,
   SENT: <i className={cx(styles.icon, styles.green, 'bx bx-check-circle')} />,
   ACCEPTED: (
-    <i className={cx(styles.icon, styles.grey, 'bx bx-check-double')} />
+    <i className={cx(styles.icon, styles.green, 'bx bx-check-circle')} />
   ),
   DELIVERED: (
     <i className={cx(styles.icon, styles.grey, 'bx bx-check-double')} />
@@ -15,6 +15,17 @@ const ICONS: Record<string, JSX.Element> = {
   INVALID_RECIPIENT: (
     <i className={cx(styles.icon, styles.red, 'bx bx-minus-circle')} />
   ),
+}
+
+const renderSimpleStatus = (status: string) => {
+  switch (status) {
+    case 'INVALID_RECIPIENT':
+      return 'INVALID'
+    case 'ACCEPTED':
+      return 'SENT'
+    default:
+      return status
+  }
 }
 
 interface StatusIconProps {
@@ -25,7 +36,7 @@ export const StatusIconText = ({ label }: StatusIconProps) => {
   return (
     <>
       {ICONS[label]}
-      {label === 'INVALID_RECIPIENT' ? 'INVALID' : label}
+      {renderSimpleStatus(label)}
     </>
   )
 }
