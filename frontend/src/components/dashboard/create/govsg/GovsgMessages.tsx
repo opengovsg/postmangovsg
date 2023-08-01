@@ -14,8 +14,7 @@ import { Campaign } from 'classes'
 import { Pagination, TitleBar } from 'components/common'
 import { StatusIconText } from 'components/common/StatusIconText/StatusIconText'
 
-import { NegativeText } from 'components/common/StyledText/NegativeText'
-import { PlainBadge } from 'components/common/StyledText/PlainBadge'
+import { PasscodeBadge } from 'components/common/StyledText/PasscodeBadge'
 import { PrettyJson } from 'components/common/StyledText/PrettyJson'
 
 const ITEMS_PER_PAGE = 10
@@ -101,11 +100,12 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     {
       name: 'PASSCODE',
       render: (govsgMessage: GovsgMessage) => {
-        if (!govsgMessage.passcode) {
-          return <NegativeText>Not created yet</NegativeText>
-        } else {
-          return <PlainBadge>{govsgMessage.passcode}</PlainBadge>
-        }
+        return (
+          <PasscodeBadge
+            label={govsgMessage.passcode}
+            placeholder="Not created yet"
+          />
+        )
       },
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
