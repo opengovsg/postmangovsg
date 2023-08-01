@@ -15,6 +15,7 @@ import { Campaign } from 'classes'
 import { Pagination, TitleBar } from 'components/common'
 import { NegativeText } from 'components/common/StyledText/NegativeText'
 import { PlainBadge } from 'components/common/StyledText/PlainBadge'
+import { PrettyJson } from 'components/common/StyledText/PrettyJson'
 
 const ITEMS_PER_PAGE = 10
 
@@ -85,7 +86,10 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     },
     {
       name: 'MESSAGE DATA',
-      render: (govsgMessage: GovsgMessage) => govsgMessage.data,
+      render: (govsgMessage: GovsgMessage) => {
+        const json = JSON.parse(govsgMessage.data)
+        return <PrettyJson json={json} />
+      },
       width: 'md',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
