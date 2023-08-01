@@ -283,7 +283,6 @@ const parseTemplateMessageWebhook = async (
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
       void govsgOp?.update(fieldOpts, whereOpts)
-      logger.info('GOVSGV feature is active')
       if (!govsgMessage && !govsgOp) {
         return
       }
@@ -298,8 +297,7 @@ const parseTemplateMessageWebhook = async (
       logger.info({
         message: 'User has access to GOVSGV',
         meta: {
-          message,
-          callbackMessageId: messageId,
+          govsgMessage: message,
         },
       })
       const { campaignId, recipient } = message
@@ -313,10 +311,23 @@ const parseTemplateMessageWebhook = async (
           campaignGovsgTemplate?.govsgTemplate.whatsappTemplateLabel ===
           'sgc_notify_upcoming_call_1' // TODO: Un-hardcode this
         ) {
-          logger.info('Sending passcode creation message')
+          logger.info({
+            message: 'Sending passcode creation message',
+            meta: {
+              campaignGovsgTemplate,
+              recipient,
+              clientId,
+            },
+          })
           void sendPasscodeCreationMessage(recipient, clientId).then(
             (passcodeCreationWamid) => {
-              logger.info('Storing precreated passcode')
+              logger.info({
+                message: 'Storing precreated passcode',
+                meta: {
+                  govsgMessageId: message.id,
+                  passcodeCreationWamid,
+                },
+              })
               void storePrecreatedPasscode(message.id, passcodeCreationWamid)
             }
           )
