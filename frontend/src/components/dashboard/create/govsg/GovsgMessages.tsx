@@ -1,7 +1,5 @@
 import axios from 'axios'
 
-import { capitalize } from 'lodash'
-
 import { useEffect, useState } from 'react'
 
 import Moment from 'react-moment'
@@ -11,8 +9,11 @@ import overrideStylesTitleBar from '../../campaigns/OverrideTitleBar.module.scss
 import styles from './GovsgMessages.module.scss'
 
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
+
 import { Campaign } from 'classes'
 import { Pagination, TitleBar } from 'components/common'
+import { StatusIconText } from 'components/common/StatusIconText/StatusIconText'
+
 import { NegativeText } from 'components/common/StyledText/NegativeText'
 import { PlainBadge } from 'components/common/StyledText/PlainBadge'
 import { PrettyJson } from 'components/common/StyledText/PrettyJson'
@@ -115,7 +116,9 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     },
     {
       name: 'STATUS',
-      render: (govsgMessage: GovsgMessage) => capitalize(govsgMessage.status),
+      render: (govsgMessage: GovsgMessage) => {
+        return <StatusIconText label={govsgMessage.status} />
+      },
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
