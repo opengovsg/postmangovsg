@@ -142,15 +142,33 @@ const storePrecreatedPasscode = async (
   } as GovsgVerification)
 }
 
+const timestampComparator: (
+  a: { timestamp: string },
+  b: { timestamp: string }
+) => number = (a, b) => {
+  const t1 = a.timestamp
+  const t2 = b.timestamp
+  if (t1 < t2) {
+    return -1
+  } else if (t1 > t2) {
+    return 1
+  } else {
+    return 0
+  }
+}
+
 const parseTemplateMessageWebhook = async (
   body: WhatsAppTemplateMessageWebhook,
   clientId: WhatsAppApiClient
 ): Promise<void> => {
-  await Promise.all(
-    body.statuses.map((whatsAppTemplateMessageWebhookStatus) =>
-      parseStatus(whatsAppTemplateMessageWebhookStatus, clientId, body.errors)
+  body.statuses.sort(timestampComparator)
+  for (const whatsAppTemplateMessageWebhookStatus of body.statuses) {
+    await parseStatus(
+      whatsAppTemplateMessageWebhookStatus,
+      clientId,
+      body.errors
     )
-  )
+  }
 }
 
 const parseStatus = async (
@@ -421,9 +439,10 @@ const parseUserMessageWebhook = async (
   body: UserMessageWebhook,
   clientId: WhatsAppApiClient
 ): Promise<void> => {
-  await Promise.all(
-    body.messages.map((message) => parseGenericMessage(message, clientId))
-  )
+  body.messages.sort(timestampComparator)
+  for (const genericMessage of body.messages) {
+    await parseGenericMessage(genericMessage, clientId)
+  }
 }
 
 const parseGenericMessage = async (
