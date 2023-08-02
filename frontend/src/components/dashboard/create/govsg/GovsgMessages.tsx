@@ -58,26 +58,10 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     setSelectedPage(selectedPage)
   }
 
-  const openSuccessModal = () => {
-    modalContext.setModalContent(
-      <ConfirmModal
-        title="Resend was successful."
-        subtitle="Great."
-        buttonText="Ok"
-        buttonIcon="bx-ok"
-        onConfirm={() => modalContext.close()}
-      />
-    )
-  }
-
   const onModalConfirm = async (govsgMessage: GovsgMessage) => {
     await axios.post(`/campaign/${campaignId}/govsg/resend-passcode-creation`, {
       govsg_message_id: govsgMessage.id,
     })
-    modalContext.close()
-    // TODO: Debug openSuccessModal
-    console.log('Opening success modal...')
-    openSuccessModal()
   }
 
   const openModal = (govsgMessage: GovsgMessage) => {
