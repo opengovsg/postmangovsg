@@ -1,5 +1,4 @@
 import config from '@core/config'
-import { MessageId } from '@shared/clients/whatsapp-client.class/types/general'
 import validator from 'validator'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
@@ -35,7 +34,11 @@ import {
 } from '@core/constants'
 import { whatsappService, experimentService } from '@core/services'
 import { GovsgVerification } from '@govsg/models/govsg-verification'
-import { randomInt } from 'node:crypto'
+import {
+  sendPasscodeCreationMessage,
+  sendPasscodeMessage,
+  storePrecreatedPasscode,
+} from './govsg-verification-service'
 
 const logger = loggerWithLabel(module)
 
@@ -101,42 +104,6 @@ const parseWebhook = async (
     body,
   })
   throw new UnexpectedWebhookError('Unexpected webhook body')
-}
-
-const sendPasscodeCreationMessage = async (
-  whatsappId: WhatsAppId,
-  clientId: WhatsAppApiClient
-): Promise<MessageId> => {
-  const templateMessageToSend: WhatsAppTemplateMessageToSend = {
-    recipient: whatsappId,
-    apiClient: clientId,
-    templateName: 'sgc_passcode_generation', // TODO: Un-hardcode this
-    params: [],
-    language: WhatsAppLanguages.english,
-  }
-  const isLocal = config.get('env') === 'development'
-  const passcodeCreationWamid =
-    await whatsappService.whatsappClient.sendTemplateMessage(
-      templateMessageToSend,
-      isLocal
-    )
-  return passcodeCreationWamid
-}
-
-const createPasscode = () => {
-  return randomInt(0, Math.pow(10, 4)).toString().padStart(4, '0')
-}
-
-const storePrecreatedPasscode = async (
-  govsgMessageId: GovsgMessage['id'],
-  passcodeCreationWamid: MessageId
-): Promise<GovsgVerification> => {
-  const passcode = createPasscode()
-  return await GovsgVerification.create({
-    govsgMessageId,
-    passcodeCreationWamid,
-    passcode,
-  } as GovsgVerification)
 }
 
 const parseTemplateMessageWebhook = async (
@@ -364,42 +331,6 @@ const parseTemplateMessageWebhook = async (
       throw new Error(`Unhandled status: ${exhaustiveCheck}`)
     }
   }
-}
-
-const sendPasscodeMessage = async (
-  whatsappId: WhatsAppId,
-  clientId: WhatsAppApiClient,
-  officerName: string,
-  officerAgency: string,
-  passcode: string
-): Promise<MessageId> => {
-  const templateMessageToSend: WhatsAppTemplateMessageToSend = {
-    recipient: whatsappId,
-    apiClient: clientId,
-    templateName: 'sgc_send_passcode', // TODO: Un-hardcode this
-    params: [
-      {
-        type: 'text',
-        text: officerName,
-      },
-      {
-        type: 'text',
-        text: officerAgency,
-      },
-      {
-        type: 'text',
-        text: passcode,
-      },
-    ],
-    language: WhatsAppLanguages.english,
-  }
-  const isLocal = config.get('env') === 'development'
-  const passcodeCreationWamid =
-    await whatsappService.whatsappClient.sendTemplateMessage(
-      templateMessageToSend,
-      isLocal
-    )
-  return passcodeCreationWamid
 }
 
 const parseUserMessageWebhook = async (

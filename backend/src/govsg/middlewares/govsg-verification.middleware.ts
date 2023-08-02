@@ -1,6 +1,9 @@
 import { Request, Response } from 'express'
+import { whatsappService } from '@core/services/whatsapp.service'
 import { GovsgMessage } from '@govsg/models'
 import { GovsgVerification } from '@govsg/models/govsg-verification'
+import { WhatsAppApiClient } from '@shared/clients/whatsapp-client.class/types'
+import { sendPasscodeCreationMessage } from '@govsg/services/govsg-verification-service'
 
 export const listMessages = async (
   req: Request,
@@ -45,5 +48,44 @@ export const listMessages = async (
   return res.json({
     messages,
     total_count: count,
+  })
+}
+
+export const resendPasscodeCreationMessage = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  const { govsg_message_id: govsgMessageId } = req.body
+  const govsgMessage = await GovsgMessage.findByPk(govsgMessageId)
+  if (!govsgMessage) {
+    return res.status(404).json({
+      code: 'not_found',
+      message: `GovsgMessage with ID ${govsgMessageId} doesn't exist.`,
+    })
+  }
+  const { recipient } = govsgMessage
+  const apiClientIdMap = await whatsappService.flamingoDbClient.getApiClientId([
+    recipient,
+  ])
+  const apiClientId =
+    apiClientIdMap.get(recipient) ?? WhatsAppApiClient.clientTwo
+  const passcodeCreationWamid = await sendPasscodeCreationMessage(
+    recipient,
+    apiClientId
+  )
+  const govsgVerification = await GovsgVerification.findOne({
+    where: {
+      govsgMessageId,
+    },
+  })
+  if (!govsgVerification) {
+    return res.status(404).json({
+      code: 'not_found',
+      message: `GovsgVerification with govsg_message_id ${govsgMessageId} doesn't exist.`,
+    })
+  }
+  await govsgVerification.update({ passcodeCreationWamid })
+  return res.json({
+    passcode_creation_wamid: passcodeCreationWamid,
   })
 }

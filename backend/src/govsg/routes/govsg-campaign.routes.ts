@@ -139,4 +139,14 @@ router.get(
   GovsgVerificationMiddleware.listMessages
 )
 
+router.post(
+  '/resend-passcode-creation',
+  celebrate({
+    [Segments.BODY]: {
+      govsg_message_id: Joi.string().required(),
+    },
+  }),
+  GovsgVerificationMiddleware.resendPasscodeCreationMessage
+)
+
 export default router
