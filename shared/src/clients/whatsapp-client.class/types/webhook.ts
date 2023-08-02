@@ -27,14 +27,17 @@ export enum WhatsAppMessageStatus {
   warning = 'warning',
 }
 
+export interface HasTimestamp {
+  timestamp: string // UNIX timestamp in seconds, as a string
+}
+
 // omitted Pricing object (unused for now) and type field (can't foresee it being useful)
-export interface WhatsAppTemplateMessageWebhookStatus {
+export interface WhatsAppTemplateMessageWebhookStatus extends HasTimestamp {
   id: MessageId
   message: {
     recipient_id: WhatsAppId
   }
   status: WhatsAppMessageStatus
-  timestamp: string // UNIX timestamp in seconds, as a string
   conversation?: Conversation // only present in sent and delivered, not read
 }
 
@@ -58,10 +61,9 @@ interface Origin {
   type: OriginType
 }
 
-export interface GenericMessage {
+export interface GenericMessage extends HasTimestamp {
   from: WhatsAppId
   id: MessageId
-  timestamp: string // UNIX timestamp in seconds, as a string
   type: WhatsappWebhookMessageType
 }
 

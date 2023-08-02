@@ -18,6 +18,7 @@ import {
   WhatsAppWebhookButtonMessage,
   WhatsAppWebhookTextMessage,
   WhatsappWebhookMessageType,
+  HasTimestamp,
 } from '@shared/clients/whatsapp-client.class/types'
 import {
   MessageIdNotFoundWebhookError,
@@ -142,10 +143,10 @@ const storePrecreatedPasscode = async (
   } as GovsgVerification)
 }
 
-const timestampComparator: (
-  a: { timestamp: string },
-  b: { timestamp: string }
-) => number = (a, b) => {
+const timestampComparator: (a: HasTimestamp, b: HasTimestamp) => number = (
+  a,
+  b
+) => {
   const t1 = a.timestamp
   const t2 = b.timestamp
   if (t1 < t2) {
