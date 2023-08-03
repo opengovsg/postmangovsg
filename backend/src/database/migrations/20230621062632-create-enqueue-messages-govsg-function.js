@@ -25,7 +25,6 @@ module.exports = {
           id,
           campaign_id,
           recipient,
-          recipient_name,
           params,
           dequeued_at,
           created_at,
