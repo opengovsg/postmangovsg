@@ -127,6 +127,7 @@ export function uploadCompleteOnChunk({
       return {
         campaignId,
         recipient: entry.recipient.trim(),
+        recipientName: entry.recipientName.trim(),
         params: entry,
       }
     })
@@ -175,6 +176,7 @@ export async function processSingleRecipientCampaign(
     await GovsgMessage.create({
       campaignId,
       recipient: data.recipient,
+      recipientName: data.recipientName,
       params: data,
     } as GovsgMessage)
     await StatsService.setNumRecipients(campaignId, 1, transaction)

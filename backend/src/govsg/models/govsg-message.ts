@@ -37,6 +37,9 @@ export class GovsgMessage extends Model<GovsgMessage> {
   @Column(DataType.STRING)
   recipient: string
 
+  @Column(DataType.STRING)
+  recipientName: string
+
   @Column(DataType.JSONB)
   params: object
 
