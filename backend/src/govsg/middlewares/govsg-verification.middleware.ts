@@ -7,9 +7,10 @@ import { sendPasscodeCreationMessage } from '@govsg/services/govsg-verification-
 import { Op } from 'sequelize'
 
 const generateSearchOptions = (search: string) => {
+  // TODO: Use an OR operation
   if (!search) {
     return {}
-  } else if (search.match(/\d{1,8}/)) {
+  } else if (search.match(/^\d{1,10}$/)) {
     return {
       recipient: {
         [Op.like]: `%${search}%`,
