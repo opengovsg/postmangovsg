@@ -19,7 +19,7 @@ const generateSearchOptions = (search: string) => {
   return {
     params: {
       recipient_name: {
-        [Op.like]: `%${search}%`,
+        [Op.iLike]: `%${search}%`,
       },
     },
   }
