@@ -30,4 +30,7 @@ export class GovsgVerification extends Model<GovsgVerification> {
 
   @Column({ type: DataType.STRING, allowNull: false })
   passcode: string
+
+  @Column({ type: DataType.DATE, allowNull: true })
+  userClickedAt: Date | null
 }
