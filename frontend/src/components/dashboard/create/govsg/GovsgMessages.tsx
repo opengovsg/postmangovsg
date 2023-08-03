@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-import { useContext, useEffect, useState } from 'react'
 import cx from 'classnames'
+import { useContext, useEffect, useState } from 'react'
 
 import Moment from 'react-moment'
 
@@ -13,7 +13,12 @@ import styles from './GovsgMessages.module.scss'
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
 
 import { Campaign } from 'classes'
-import { ConfirmModal, Pagination, TextInput, TitleBar } from 'components/common'
+import {
+  ConfirmModal,
+  Pagination,
+  TextInput,
+  TitleBar,
+} from 'components/common'
 import { StatusIconText } from 'components/common/StatusIconText/StatusIconText'
 
 import { PasscodeBadge } from 'components/common/StyledText/PasscodeBadge'
