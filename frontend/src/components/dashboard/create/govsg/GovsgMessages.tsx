@@ -1,6 +1,6 @@
 import axios from 'axios'
 
-import { useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import Moment from 'react-moment'
 
@@ -11,15 +11,18 @@ import styles from './GovsgMessages.module.scss'
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
 
 import { Campaign } from 'classes'
-import { Pagination, TitleBar } from 'components/common'
+import { ConfirmModal, Pagination, TitleBar } from 'components/common'
 import { StatusIconText } from 'components/common/StatusIconText/StatusIconText'
 
 import { PasscodeBadge } from 'components/common/StyledText/PasscodeBadge'
 import { PrettyJson } from 'components/common/StyledText/PrettyJson'
+import { ResendButton } from 'components/common/action-button/ResendButton'
+import { ModalContext } from 'contexts/modal.context'
 
 const ITEMS_PER_PAGE = 10
 
 interface GovsgMessage {
+  id: string
   name: string
   mobile: string
   data: string
@@ -37,6 +40,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   const [govsgMessagesDisplayed, setGovsgMessagesDisplayed] = useState([])
   const [selectedPage, setSelectedPage] = useState(0)
   const [govsgMessageCount, setGovsgMessageCount] = useState(0)
+  const modalContext = useContext(ModalContext)
 
   const fetchGovsgMessages = async (selectedPage: number) => {
     const options = {
@@ -52,6 +56,24 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     setGovsgMessageCount(totalCount)
     setGovsgMessagesDisplayed(govsgMessages)
     setSelectedPage(selectedPage)
+  }
+
+  const onModalConfirm = async (govsgMessage: GovsgMessage) => {
+    await axios.post(`/campaign/${campaignId}/govsg/resend-passcode-creation`, {
+      govsg_message_id: govsgMessage.id,
+    })
+  }
+
+  const openModal = (govsgMessage: GovsgMessage) => {
+    modalContext.setModalContent(
+      <ConfirmModal
+        title={`Resend message to ${govsgMessage.name} (${govsgMessage.mobile})?`}
+        subtitle="Resending is irreversible."
+        buttonText="Confirm resend now"
+        buttonIcon="bx-send"
+        onConfirm={() => onModalConfirm(govsgMessage)}
+      />
+    )
   }
 
   useEffect(() => {
@@ -146,6 +168,18 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     {
       name: 'SENT BY',
       render: (govsgMessage: GovsgMessage) => govsgMessage.officer,
+      width: 'xs',
+      renderHeader: (name: string, width: string, key: number) => (
+        <th className={width} key={key}>
+          {name}
+        </th>
+      ),
+    },
+    {
+      name: 'ACTION',
+      render: (govsgMessage: GovsgMessage) => {
+        return <ResendButton onClick={() => openModal(govsgMessage)} />
+      },
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
