@@ -63,16 +63,6 @@ export const resendPasscodeCreationMessage = async (
       message: `GovsgMessage with ID ${govsgMessageId} doesn't exist.`,
     })
   }
-  const { recipient } = govsgMessage
-  const apiClientIdMap = await whatsappService.flamingoDbClient.getApiClientId([
-    recipient,
-  ])
-  const apiClientId =
-    apiClientIdMap.get(recipient) ?? WhatsAppApiClient.clientTwo
-  const passcodeCreationWamid = await sendPasscodeCreationMessage(
-    recipient,
-    apiClientId
-  )
   const govsgVerification = await GovsgVerification.findOne({
     where: {
       govsgMessageId,
@@ -84,6 +74,18 @@ export const resendPasscodeCreationMessage = async (
       message: `GovsgVerification with govsg_message_id ${govsgMessageId} doesn't exist.`,
     })
   }
+  const { recipient } = govsgMessage
+  const apiClientIdMap = await whatsappService.flamingoDbClient.getApiClientId([
+    recipient,
+  ])
+  // if recipient not in db, map.get(recipient) will return undefined
+  // default to clientTwo in this case
+  const apiClientId =
+    apiClientIdMap.get(recipient) ?? WhatsAppApiClient.clientTwo
+  const passcodeCreationWamid = await sendPasscodeCreationMessage(
+    recipient,
+    apiClientId
+  )
   await govsgVerification.update({ passcodeCreationWamid })
   return res.json({
     passcode_creation_wamid: passcodeCreationWamid,
