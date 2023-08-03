@@ -12,7 +12,6 @@ import {
   TextButton,
   PrimaryButton,
   ErrorBlock,
-  InfoBlock,
 } from 'components/common'
 import { AuthContext } from 'contexts/auth.context'
 
@@ -176,10 +175,6 @@ const Login = () => {
           <h4 className={styles.text}>
             <Trans>or</Trans>
           </h4>
-          <InfoBlock className={styles.info}>
-            This is an experimental service currently offered to OGP officers
-            only.
-          </InfoBlock>
           <PrimaryButton onClick={sgidLogin}>
             Log in with Singpass
           </PrimaryButton>
