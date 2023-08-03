@@ -1256,18 +1256,23 @@ paths:
                   type: string
                 recipient:
                   type: string
+                cc:
+                  type: array
+                  items:
+                    type: string
+                bcc:
+                  type: array
+                  items:
+                    type: string
                 from:
                   type: string
                 reply_to:
                   type: string
-                  nullable: true
                 classification:
                   type: string
-                  nullable: true
                   enum: [URGENT, FOR_ACTION, FOR_INFO]
                 tag:
                   type: string
-                  nullable: true
           multipart/form-data:
             schema:
               type: object
@@ -1282,24 +1287,28 @@ paths:
                   type: string
                 recipient:
                   type: string
+                cc:
+                  type: array
+                  items:
+                    type: string
+                bcc:
+                  type: array
+                  items:
+                    type: string
                 from:
                   type: string
                 reply_to:
                   type: string
-                  nullable: true
                 attachments:
                   type: array
-                  nullable: true
                   items:
                     type: string
                     format: binary
                 classification:
                   type: string
-                  nullable: true
                   enum: [URGENT, FOR_ACTION, FOR_INFO]
                 tag:
                   type: string
-                  nullable: true
       responses:
         '201':
           description: Created. The message is being sent.
@@ -2133,8 +2142,8 @@ paths:
                 recipient:
                   type: string
                   description: >
-                    Mobile phone number of the recipient without special formatting 
-                    (only contains numerical characters and prefixed with plus 
+                    Mobile phone number of the recipient without special formatting
+                    (only contains numerical characters and prefixed with plus
                     sign if country code is included).
 
 
