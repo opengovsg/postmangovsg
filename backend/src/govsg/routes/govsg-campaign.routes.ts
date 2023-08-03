@@ -1,4 +1,3 @@
-import { GovsgMessageStatus } from '@core/constants'
 import {
   CampaignMiddleware,
   JobMiddleware,
@@ -133,7 +132,7 @@ router.get(
     [Segments.QUERY]: Joi.object({
       limit: Joi.number().integer().min(1).max(100).default(10),
       offset: Joi.number().integer().min(0).default(0),
-      status: Joi.string().valid(...Object.values(GovsgMessageStatus)),
+      search: Joi.string(),
     }),
   }),
   GovsgVerificationMiddleware.listMessages
