@@ -52,7 +52,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   const [search, setSearch] = useState('')
   const modalContext = useContext(ModalContext)
 
-  const fetchGovsgMessages = async (selectedPage: number, search?: string) => {
+  const fetchGovsgMessages = async (search: string, selectedPage: number) => {
     const searchOptions = search ? { search } : {}
     const options = {
       offset: selectedPage * ITEMS_PER_PAGE,
@@ -89,17 +89,17 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   }
 
   useEffect(() => {
-    void fetchGovsgMessages(selectedPage, search)
+    void fetchGovsgMessages(search, selectedPage)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPage])
 
   const handlePageChange = (index: number) => {
-    void fetchGovsgMessages(index, search)
+    void fetchGovsgMessages(search, index)
   }
 
   const handleSearch = async (newSearch: string) => {
     setSearch(newSearch)
-    await fetchGovsgMessages(0, newSearch)
+    await fetchGovsgMessages(newSearch, 0)
   }
 
   const columns = [
