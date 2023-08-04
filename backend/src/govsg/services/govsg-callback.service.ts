@@ -35,6 +35,7 @@ import {
   sendPasscodeMessage,
   storePrecreatedPasscode,
 } from './govsg-verification-service'
+import { MessageIdNotFoundWebhookError } from '@shared/clients/whatsapp-client.class/errors'
 
 const logger = loggerWithLabel(module)
 
@@ -138,6 +139,7 @@ const parseTemplateMessageWebhook = async (
       logger.error({
         message: 'Message ID not found',
       })
+      throw new MessageIdNotFoundWebhookError('Message ID not found')
     }
     return
   }
