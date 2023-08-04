@@ -10,7 +10,8 @@ const generateSearchOptions = (search: string) => {
   // TODO: Use an OR operation
   if (!search) {
     return {}
-  } else if (search.match(/^\d{1,10}$/)) {
+  }
+  if (search.match(/^\d{1,10}$/)) {
     return {
       recipient: {
         [Op.like]: `%${search}%`,
