@@ -258,7 +258,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
           <TextInput
             value={search}
             type="text"
-            placeholder="Search for a message"
+            placeholder="Search for a message by recipient name or mobile number"
             onChange={handleSearch}
             iconLabel={
               <i className={cx('bx bx-search', overrideStylesTextInput.icon)} />
