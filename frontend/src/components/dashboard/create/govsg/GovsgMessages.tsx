@@ -44,12 +44,12 @@ interface GovsgMessagesProps {
 }
 
 export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
+  const [govsgMessageCount, setGovsgMessageCount] = useState(0)
   const [govsgMessagesDisplayed, setGovsgMessagesDisplayed] = useState<
     GovsgMessage[]
   >([])
-  const [selectedPage, setSelectedPage] = useState(0)
-  const [govsgMessageCount, setGovsgMessageCount] = useState(0)
   const [search, setSearch] = useState('')
+  const [selectedPage, setSelectedPage] = useState(0)
   const modalContext = useContext(ModalContext)
 
   const fetchGovsgMessages = async (search: string, selectedPage: number) => {
@@ -90,8 +90,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
 
   useEffect(() => {
     void fetchGovsgMessages(search, selectedPage)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPage])
+  }, [])
 
   const handlePageChange = (index: number) => {
     void fetchGovsgMessages(search, index)
