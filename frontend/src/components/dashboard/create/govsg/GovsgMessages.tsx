@@ -1,9 +1,11 @@
 import axios from 'axios'
 
+import cx from 'classnames'
 import { useContext, useEffect, useState } from 'react'
 
 import Moment from 'react-moment'
 
+import overrideStylesTextInput from '../../campaigns/OverrideTextInput.module.scss'
 import overrideStylesTitleBar from '../../campaigns/OverrideTitleBar.module.scss'
 
 import styles from './GovsgMessages.module.scss'
@@ -11,7 +13,12 @@ import styles from './GovsgMessages.module.scss'
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
 
 import { Campaign } from 'classes'
-import { ConfirmModal, Pagination, TitleBar } from 'components/common'
+import {
+  ConfirmModal,
+  Pagination,
+  TextInput,
+  TitleBar,
+} from 'components/common'
 import { StatusIconText } from 'components/common/StatusIconText/StatusIconText'
 
 import { PasscodeBadge } from 'components/common/StyledText/PasscodeBadge'
@@ -37,15 +44,20 @@ interface GovsgMessagesProps {
 }
 
 export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
-  const [govsgMessagesDisplayed, setGovsgMessagesDisplayed] = useState([])
-  const [selectedPage, setSelectedPage] = useState(0)
   const [govsgMessageCount, setGovsgMessageCount] = useState(0)
+  const [govsgMessagesDisplayed, setGovsgMessagesDisplayed] = useState<
+    GovsgMessage[]
+  >([])
+  const [search, setSearch] = useState('')
+  const [selectedPage, setSelectedPage] = useState(0)
   const modalContext = useContext(ModalContext)
 
-  const fetchGovsgMessages = async (selectedPage: number) => {
+  const fetchGovsgMessages = async (search: string, selectedPage: number) => {
+    const searchOptions = search ? { search } : {}
     const options = {
       offset: selectedPage * ITEMS_PER_PAGE,
       limit: ITEMS_PER_PAGE,
+      ...searchOptions,
     }
     const response = await axios.get(`/campaign/${campaignId}/govsg/messages`, {
       params: {
@@ -77,12 +89,16 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   }
 
   useEffect(() => {
-    void fetchGovsgMessages(selectedPage)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPage])
+    void fetchGovsgMessages(search, selectedPage)
+  }, [])
 
   const handlePageChange = (index: number) => {
-    void fetchGovsgMessages(index)
+    void fetchGovsgMessages(search, index)
+  }
+
+  const handleSearch = async (newSearch: string) => {
+    setSearch(newSearch)
+    await fetchGovsgMessages(newSearch, 0)
   }
 
   const columns = [
@@ -237,7 +253,18 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         <TitleBar
           title={govsgMessageCount + ' Messages'}
           overrideStyles={overrideStylesTitleBar}
-        />
+        >
+          <TextInput
+            value={search}
+            type="text"
+            placeholder="Search for a message by recipient name or mobile number"
+            onChange={handleSearch}
+            iconLabel={
+              <i className={cx('bx bx-search', overrideStylesTextInput.icon)} />
+            }
+            overrideStyles={overrideStylesTextInput}
+          />
+        </TitleBar>
         <div className={styles.tableContainer}>
           <table className={styles.govsgMessageTable}>
             <thead>

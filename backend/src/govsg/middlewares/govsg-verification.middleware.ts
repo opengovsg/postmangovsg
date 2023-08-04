@@ -4,16 +4,40 @@ import { GovsgMessage } from '@govsg/models'
 import { GovsgVerification } from '@govsg/models/govsg-verification'
 import { WhatsAppApiClient } from '@shared/clients/whatsapp-client.class/types'
 import { sendPasscodeCreationMessage } from '@govsg/services/govsg-verification-service'
+import { Op } from 'sequelize'
+
+const generateSearchOptions = (search: string) => {
+  // TODO: Use an OR operation
+  if (!search) {
+    return {}
+  }
+  if (search.match(/^\d{1,10}$/)) {
+    return {
+      recipient: {
+        [Op.like]: `%${search}%`,
+      },
+    }
+  }
+  return {
+    params: {
+      recipient_name: {
+        [Op.iLike]: `%${search}%`,
+      },
+    },
+  }
+}
 
 export const listMessages = async (
   req: Request,
   res: Response
 ): Promise<Response | void> => {
   const { campaignId } = req.params
-  const { offset, limit } = req.query
+  const { offset, limit, search } = req.query
+  const searchOptions = generateSearchOptions(search as string)
   const { rows, count } = await GovsgMessage.findAndCountAll({
     where: {
       campaignId: +campaignId,
+      ...searchOptions,
     },
     offset: +(offset as string),
     limit: +(limit as string),
