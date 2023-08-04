@@ -89,12 +89,12 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   }
 
   useEffect(() => {
-    void fetchGovsgMessages(selectedPage)
+    void fetchGovsgMessages(selectedPage, search)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPage])
 
   const handlePageChange = (index: number) => {
-    void fetchGovsgMessages(index)
+    void fetchGovsgMessages(index, search)
   }
 
   const handleSearch = async (newSearch: string) => {
