@@ -16,12 +16,6 @@ export class RateLimitError extends Error {
   }
 }
 
-export class UnexpectedWebhookError extends Error {
-  constructor(message: string) {
-    super(message)
-  }
-}
-
 export class MessageIdNotFoundWebhookError extends Error {
   constructor(message: string) {
     super(message)

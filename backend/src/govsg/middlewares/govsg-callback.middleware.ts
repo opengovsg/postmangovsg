@@ -1,10 +1,7 @@
 import { loggerWithLabel } from '@core/logger'
 import { Request, Response, NextFunction } from 'express'
 import { GovsgCallbackService } from '@govsg/services/govsg-callback.service'
-import {
-  MessageIdNotFoundWebhookError,
-  UnexpectedWebhookError,
-} from '@shared/clients/whatsapp-client.class/errors'
+import { MessageIdNotFoundWebhookError } from '@shared/clients/whatsapp-client.class/errors'
 import { WhatsAppApiClient } from '@shared/clients/whatsapp-client.class/types'
 
 const logger = loggerWithLabel(module)
@@ -18,7 +15,7 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
         query: req.query,
       },
     })
-    res.sendStatus(400)
+    res.sendStatus(200)
     return
   }
   if (!GovsgCallbackService.isAuthenticated(auth)) {
@@ -28,7 +25,7 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
         query: req.query,
       },
     })
-    res.sendStatus(400)
+    res.sendStatus(200)
     return
   }
   next()
@@ -48,7 +45,7 @@ const parseWebhook = async (
           query: req.query,
         },
       })
-      res.sendStatus(400)
+      res.sendStatus(200)
       return
     }
     if (
@@ -61,16 +58,12 @@ const parseWebhook = async (
           query: req.query,
         },
       })
-      res.sendStatus(400)
+      res.sendStatus(200)
       return
     }
     await GovsgCallbackService.parseWebhook(req.body, id)
     res.sendStatus(200)
   } catch (err) {
-    if (err instanceof UnexpectedWebhookError) {
-      res.sendStatus(500)
-      return
-    }
     if (err instanceof MessageIdNotFoundWebhookError) {
       res.sendStatus(400)
       return
