@@ -15,6 +15,7 @@ import {
   WhatsAppWebhookTextMessage,
   WhatsappWebhookMessageType,
 } from '@shared/clients/whatsapp-client.class/types'
+import { MessageIdNotFoundWebhookError } from '@shared/clients/whatsapp-client.class/errors'
 import {
   CampaignGovsgTemplate,
   GovsgMessage,
@@ -35,7 +36,6 @@ import {
   sendPasscodeMessage,
   storePrecreatedPasscode,
 } from './govsg-verification-service'
-import { MessageIdNotFoundWebhookError } from '@shared/clients/whatsapp-client.class/errors'
 
 const logger = loggerWithLabel(module)
 
