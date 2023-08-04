@@ -15,7 +15,7 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
         query: req.query,
       },
     })
-    res.sendStatus(400)
+    res.sendStatus(200)
     return
   }
   if (!GovsgCallbackService.isAuthenticated(auth)) {
@@ -25,7 +25,7 @@ const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
         query: req.query,
       },
     })
-    res.sendStatus(400)
+    res.sendStatus(200)
     return
   }
   next()
@@ -45,7 +45,7 @@ const parseWebhook = async (
           query: req.query,
         },
       })
-      res.sendStatus(400)
+      res.sendStatus(200)
       return
     }
     if (
@@ -58,7 +58,7 @@ const parseWebhook = async (
           query: req.query,
         },
       })
-      res.sendStatus(400)
+      res.sendStatus(200)
       return
     }
     await GovsgCallbackService.parseWebhook(req.body, id)
