@@ -65,7 +65,6 @@ const parseWebhook = async (
     return
   }
   if ('statuses' in body) {
-    // can delete this after we verified that it all works
     logger.info({
       message: 'Received status webhook from WhatsApp',
       action,
@@ -77,7 +76,6 @@ const parseWebhook = async (
     return
   }
   if ('messages' in body && 'contacts' in body) {
-    // can delete this after we verified that it all works
     logger.info({
       message: 'Received message webhook from WhatsApp',
       action,
