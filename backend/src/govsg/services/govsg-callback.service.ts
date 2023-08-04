@@ -15,10 +15,7 @@ import {
   WhatsAppWebhookTextMessage,
   WhatsappWebhookMessageType,
 } from '@shared/clients/whatsapp-client.class/types'
-import {
-  MessageIdNotFoundWebhookError,
-  UnexpectedWebhookError,
-} from '@shared/clients/whatsapp-client.class/errors'
+import { MessageIdNotFoundWebhookError } from '@shared/clients/whatsapp-client.class/errors'
 import {
   CampaignGovsgTemplate,
   GovsgMessage,
@@ -58,7 +55,7 @@ const parseWebhook = async (
   })
   // based on current setup, we expect the shape of body to be either
   // WhatsAppTemplateMessageWebhook or UserMessageWebhook
-  // if it's neither, we should thrown an error
+  // if it's neither, we should log an error and return early
   // ideally, should do full validation of the body using sth like Zod
   if (!body || typeof body !== 'object') {
     logger.error({
@@ -66,10 +63,9 @@ const parseWebhook = async (
       action,
       body,
     })
-    throw new UnexpectedWebhookError('Unexpected webhook body')
+    return
   }
   if ('statuses' in body) {
-    // can delete this after we verified that it all works
     logger.info({
       message: 'Received status webhook from WhatsApp',
       action,
@@ -81,7 +77,6 @@ const parseWebhook = async (
     return
   }
   if ('messages' in body && 'contacts' in body) {
-    // can delete this after we verified that it all works
     logger.info({
       message: 'Received message webhook from WhatsApp',
       action,
@@ -103,7 +98,7 @@ const parseWebhook = async (
     action,
     body,
   })
-  throw new UnexpectedWebhookError('Unexpected webhook body')
+  return
 }
 
 const parseTemplateMessageWebhook = async (
@@ -141,6 +136,9 @@ const parseTemplateMessageWebhook = async (
     // only do this for sending as this is unlikely to happen for other statuses
     // this will trigger a retry from WhatsApp, which will hit this endpoint again after messageId is updated
     if (whatsappStatus === WhatsAppMessageStatus.sent) {
+      logger.error({
+        message: 'Message ID not found',
+      })
       throw new MessageIdNotFoundWebhookError('Message ID not found')
     }
     return
@@ -154,9 +152,7 @@ const parseTemplateMessageWebhook = async (
         messageId,
       },
     })
-    throw new UnexpectedWebhookError(
-      'Received webhook for message that exists in both tables'
-    )
+    return
   }
   // NB unable to abstract further with type safety because Sequelize doesn't
   // play well with TypeScript. I wanted to use GovsgMessage | GovsgMessageTransactional type
@@ -209,7 +205,6 @@ const parseTemplateMessageWebhook = async (
         void govsgMessage?.update(fieldOpts, whereOpts)
         void govsgMessageTransactional?.update(fieldOpts, whereOpts)
         void govsgOp?.update(fieldOpts, whereOpts)
-        // not sure whether need to throw an error hmm probably not?
         return
       }
       const { code, title, details, href } = body.errors[0]
@@ -328,7 +323,10 @@ const parseTemplateMessageWebhook = async (
     }
     default: {
       const exhaustiveCheck: never = whatsappStatus
-      throw new Error(`Unhandled status: ${exhaustiveCheck}`)
+      logger.error({
+        message: `Unhandled status: ${exhaustiveCheck}`,
+      })
+      return
     }
   }
 }
