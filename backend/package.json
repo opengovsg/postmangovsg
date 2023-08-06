@@ -83,6 +83,7 @@
     "yamljs": "0.3.0"
   },
   "devDependencies": {
+    "@json2csv/plainjs": "^7.0.1",
     "@types/async-retry": "1.4.4",
     "@types/bcrypt": "3.0.0",
     "@types/bluebird": "3.5.30",

@@ -25,4 +25,7 @@ export class GovsgTemplatesAccess extends Model<GovsgTemplatesAccess> {
   @ForeignKey(() => User)
   @Column({ type: DataType.STRING, primaryKey: true, allowNull: false })
   userId: string
+
+  @BelongsTo(() => User)
+  user: User
 }
