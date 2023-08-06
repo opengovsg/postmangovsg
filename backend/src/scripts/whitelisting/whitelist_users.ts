@@ -26,6 +26,12 @@ type RawOfficerData = {
   id?: number
 }
 
+/**
+ * Receives a csv and whitelists users to use the govsg feature.
+ * In addition to giving users default access for the different template groups (OGP, MCI, ALL),
+ * The user can be given adhoc access by passing in a list of template labels separated by ';' in the 5th column of the csv.
+ * Example: template1;template2;template3
+ */
 void (async function main() {
   await sequelizeLoader()
   const rawDataToInsert = (
