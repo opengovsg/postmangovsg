@@ -1,3 +1,10 @@
+import {
+  GovsgTemplateLanguageMetadata,
+  WhatsAppLanguages,
+} from '@shared/clients/whatsapp-client.class/types'
+
+import { capitalize } from 'lodash'
+
 import { Dispatch, SetStateAction, useContext, useState } from 'react'
 
 import { useParams } from 'react-router-dom'
@@ -16,6 +23,7 @@ import {
   TextButton,
   TextInput,
 } from 'components/common'
+import { SimpleRadioButton } from 'components/common/Radio/RadioButton'
 import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
@@ -29,6 +37,7 @@ const GovsgSingleRecipient = ({
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { experimentalData } = useContext(AuthContext)
+  const { canAccessGovsgV } = useGovsgV()
   const typedCampaign = campaign as GovsgCampaign
   const fieldsToRender: { id: string; name: string }[] = typedCampaign.params
     .filter((p) => !!typedCampaign.paramMetadata[p].displayName)
@@ -45,6 +54,7 @@ const GovsgSingleRecipient = ({
   const [data, setData] = useState<Record<string, string>>(
     fieldsToRender.reduce((cul, f) => ({ [f.id]: '', ...cul }), {
       recipient: '',
+      languageCode: WhatsAppLanguages.english,
     })
   )
   const { id: campaignId } = useParams<{ id: string }>()
@@ -53,6 +63,31 @@ const GovsgSingleRecipient = ({
 
   const getUpdateData = (field: string) => (value: string) => {
     setData(Object.assign({}, data, { [field]: value }))
+  }
+  const getTemplateBody = () => {
+    return (
+      typedCampaign.multilingualSupport.find(
+        (languageSupport: GovsgTemplateLanguageMetadata) =>
+          languageSupport.languageCode === data.languageCode
+      )?.body ?? typedCampaign.body
+    )
+  }
+  const getHydratedTemplateBody = () => {
+    return hydrateTemplate(
+      getTemplateBody(),
+      Object.assign(
+        {},
+        data,
+        fieldsToRender.reduce(
+          (cul, f) =>
+            !data[f.id]
+              ? { [f.id]: `<mark>{{ ${f.name} }}</mark>`, ...cul }
+              : cul,
+          {}
+        ),
+        defaultUserData
+      )
+    )
   }
 
   const onModalConfirm = async () => {
@@ -101,6 +136,34 @@ const GovsgSingleRecipient = ({
             value={data.recipient}
           />
         </div>
+        {canAccessGovsgV && (
+          <div>
+            <p>
+              <label htmlFor="language">Language</label>{' '}
+            </p>
+            {Object.keys(WhatsAppLanguages).map((language) => {
+              const label = capitalize(language)
+              const languageCode =
+                WhatsAppLanguages[language as keyof typeof WhatsAppLanguages]
+              return (
+                <SimpleRadioButton
+                  aria-label={label}
+                  id={`language-${language}`}
+                  value={languageCode}
+                  checked={data.languageCode === languageCode}
+                  onChange={() =>
+                    setData({
+                      ...data,
+                      languageCode,
+                    })
+                  }
+                  label={label}
+                  key={language}
+                />
+              )
+            })}
+          </div>
+        )}
         {fieldsToRender.map((f) => (
           <div key={f.id}>
             <p>
@@ -118,24 +181,7 @@ const GovsgSingleRecipient = ({
       </StepSection>
       <StepSection>
         <p>Preview</p>
-        <PreviewBlock
-          hideHeaders
-          body={hydrateTemplate(
-            typedCampaign.body,
-            Object.assign(
-              {},
-              data,
-              fieldsToRender.reduce(
-                (cul, f) =>
-                  !data[f.id]
-                    ? { [f.id]: `<mark>{{ ${f.name} }}</mark>`, ...cul }
-                    : cul,
-                {}
-              ),
-              defaultUserData
-            )
-          )}
-        />
+        <PreviewBlock hideHeaders body={getHydratedTemplateBody()} />
       </StepSection>
       {errMessage && <ErrorBlock>{errMessage}</ErrorBlock>}
       <ButtonGroup>

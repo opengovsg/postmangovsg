@@ -72,6 +72,7 @@ class Govsg {
         body: string
         campaignId: number
         whatsappTemplateLabel: string
+        languageCode: string
         paramOrder: string[]
       }
       const initialDbResults: Message[] = map(
@@ -141,7 +142,7 @@ class Govsg {
         ),
         apiClient:
           apiClientIdMap.get(result.recipient) ?? WhatsAppApiClient.clientTwo,
-        language: WhatsAppLanguages.english,
+        language: result.languageCode,
       }))
 
       return messagesToSend.map((message) => ({

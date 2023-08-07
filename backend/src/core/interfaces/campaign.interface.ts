@@ -1,4 +1,7 @@
-import { GovsgTemplateParamMetadata } from '@govsg/models'
+import {
+  GovsgTemplateLanguageMetadata,
+  GovsgTemplateParamMetadata,
+} from '@govsg/models'
 
 export interface CampaignS3ObjectInterface {
   key?: string
@@ -44,6 +47,7 @@ export interface CampaignDetails {
     params: Array<string> | null
     for_single_recipient: boolean
     param_metadata: Record<string, GovsgTemplateParamMetadata>
+    multilingual_support: GovsgTemplateLanguageMetadata[]
   }
   job_queue?: {
     status: string

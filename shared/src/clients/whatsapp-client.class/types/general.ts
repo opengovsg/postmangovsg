@@ -6,3 +6,9 @@ export type MessageId = string
 export type Message = {
   id: MessageId
 }
+
+export type GovsgTemplateLanguageMetadata = {
+  languageCode: string // WhatsApp-API-compatible language code
+  language: string // Human-readable name of the language
+  body: string
+}

@@ -9,6 +9,7 @@ import {
   GovsgTemplateMiddleware,
   GovsgVerificationMiddleware,
 } from '@govsg/middlewares'
+import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 import { Joi, Segments, celebrate } from 'celebrate'
 import { Router } from 'express'
 
@@ -90,6 +91,9 @@ router.post(
       recipient: Joi.string()
         .pattern(/^(\+)?\d*$/)
         .required(),
+      language_code: Joi.string()
+        .valid(...Object.values(WhatsAppLanguages))
+        .default(WhatsAppLanguages.english),
       params: Joi.object().required(),
     },
   }),
