@@ -24,6 +24,7 @@ import {
   TextInput,
 } from 'components/common'
 import { SimpleRadioButton } from 'components/common/Radio/RadioButton'
+import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
