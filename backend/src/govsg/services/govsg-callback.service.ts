@@ -101,10 +101,19 @@ const parseWebhook = async (
   return
 }
 
+const statusesWhichRequireMessageId = new Set([
+  WhatsAppMessageStatus.sent,
+  WhatsAppMessageStatus.delivered,
+])
+
 const parseTemplateMessageWebhook = async (
   body: WhatsAppTemplateMessageWebhook,
   clientId: WhatsAppApiClient
 ): Promise<void> => {
+  logger.info({
+    message: 'Logging status update(s) from WhatsApp...',
+    meta: body,
+  })
   const {
     id: messageId,
     timestamp: timestampRaw,
@@ -133,9 +142,9 @@ const parseTemplateMessageWebhook = async (
     })
     // throwing error here to return 400
     // this is because callbacks could hit this endpoint before the messageId is updated in GovsgOp table
-    // only do this for sending as this is unlikely to happen for other statuses
+    // only do this for sent and delivered as this is unlikely to happen for other statuses
     // this will trigger a retry from WhatsApp, which will hit this endpoint again after messageId is updated
-    if (whatsappStatus === WhatsAppMessageStatus.sent) {
+    if (statusesWhichRequireMessageId.has(whatsappStatus)) {
       logger.error({
         message: 'Message ID not found',
       })
