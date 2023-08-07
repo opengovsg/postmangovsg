@@ -19,6 +19,7 @@ import {
   TextInput,
   TitleBar,
 } from 'components/common'
+import { LoadingSpinner } from 'components/common/LoadingSpinner/LoadingSpinner'
 import { StatusIconText } from 'components/common/StatusIconText/StatusIconText'
 
 import { PasscodeBadge } from 'components/common/StyledText/PasscodeBadge'
@@ -50,6 +51,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   >([])
   const [search, setSearch] = useState('')
   const [selectedPage, setSelectedPage] = useState(0)
+  const [loading, setLoading] = useState(true)
   const modalContext = useContext(ModalContext)
 
   const fetchGovsgMessages = async (search: string, selectedPage: number) => {
@@ -89,7 +91,9 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   }
 
   useEffect(() => {
-    void fetchGovsgMessages(search, selectedPage)
+    void fetchGovsgMessages(search, selectedPage).finally(() => {
+      setLoading(false)
+    })
   }, [])
 
   const handlePageChange = (index: number) => {
@@ -282,5 +286,5 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     )
   }
 
-  return renderGovsgMessage()
+  return loading ? <LoadingSpinner /> : renderGovsgMessage()
 }
