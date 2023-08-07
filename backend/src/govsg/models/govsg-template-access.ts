@@ -23,8 +23,8 @@ export class GovsgTemplatesAccess extends Model<GovsgTemplatesAccess> {
   govsgTemplate: GovsgTemplate
 
   @ForeignKey(() => User)
-  @Column({ type: DataType.STRING, primaryKey: true, allowNull: false })
-  userId: string
+  @Column({ type: DataType.BIGINT, primaryKey: true, allowNull: false })
+  userId: number
 
   @BelongsTo(() => User)
   user: User
