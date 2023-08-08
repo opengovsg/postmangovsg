@@ -28,7 +28,9 @@ export class GovsgCampaign extends Campaign {
   progress: GovsgProgress = GovsgProgress.PickTemplate
   forSingleRecipient: boolean | null
   paramMetadata: Record<string, GovsgTemplateParamMetadata>
-  multilingualSupport: GovsgTemplateLanguageMetadata[]
+  multilingualSupport: Array<
+    GovsgTemplateLanguageMetadata & { language_code: string }
+  >
 
   constructor(input: any) {
     super(input)

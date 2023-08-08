@@ -95,6 +95,12 @@ function GovsgPickTemplate({
           numRecipients: update.num_recipients,
           paramMetadata: update.template.param_metadata,
           forSingleRecipient,
+          multilingualSupport: update.template.multilingual_support.map(
+            (languageSupport) => ({
+              ...languageSupport,
+              languageCode: languageSupport.language_code,
+            })
+          ),
         })
       }
       setActiveStep((s: GovsgProgress) => s + 1)

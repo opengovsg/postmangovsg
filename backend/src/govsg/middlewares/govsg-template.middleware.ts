@@ -135,6 +135,7 @@ export async function pickTemplateForCampaign(
       body: template.body,
       params: template.params,
       param_metadata: template.paramMetadata,
+      multilingual_support: template.multilingualSupport,
     },
     for_single_recipient: forSingleRecipient,
   })

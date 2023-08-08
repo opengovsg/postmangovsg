@@ -1,3 +1,4 @@
+import { GovsgTemplateLanguageMetadata } from '@shared/clients/whatsapp-client.class/types'
 import axios from 'axios'
 
 import { GovsgTemplateParamMetadata } from 'classes'
@@ -8,6 +9,9 @@ type GovsgTemplate = {
   body: string
   params: Array<string>
   param_metadata: Record<string, GovsgTemplateParamMetadata>
+  multilingual_support: Array<
+    GovsgTemplateLanguageMetadata & { language_code: string }
+  >
 }
 
 export async function getAvailableTemplates(): Promise<Array<GovsgTemplate>> {
