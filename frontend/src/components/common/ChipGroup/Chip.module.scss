@@ -1,0 +1,19 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.chip {
+  color: #3d3d5c;
+  font-weight: 500;
+  background-color: $grey-300;
+  border-radius: 24px;
+  padding: 4px 12px;
+}
+
+.chip:hover {
+  cursor: pointer;
+}
+
+.selected {
+  color: $white;
+  background-color: $blue-700;
+}

@@ -1,3 +1,4 @@
+import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 import {
   Dispatch,
   ReactNode,
@@ -21,6 +22,7 @@ import {
   StepHeader,
   StepSection,
 } from 'components/common'
+import { LanguageChipGroup } from 'components/common/ChipGroup/LanguageChipGroup'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { getAvailableTemplates, pickTemplate } from 'services/govsg.service'
@@ -38,6 +40,9 @@ function GovsgPickTemplate({
   >(null)
   const [errorMsg, setErrorMsg] = useState<ReactNode>(null)
   const { id: campaignId } = useParams<{ id: string }>()
+  const [selectedLanguage, setSelectedLanguage] = useState<WhatsAppLanguages>(
+    WhatsAppLanguages.english
+  )
   const [forSingleRecipient, setForSingleRecipient] = useState<boolean | null>(
     typedCampaign.forSingleRecipient === true ||
       typedCampaign.forSingleRecipient === false
@@ -133,21 +138,27 @@ function GovsgPickTemplate({
             </div>
           ) : (
             availableTemplates.map((t: GovsgTemplate) => (
-              <RadioChoice
-                key={t.id}
-                aria-label={`${t.id}`}
-                id={`${t.id}`}
-                value={`${t.id}`}
-                checked={templateId === t.id}
-                onChange={() => setTemplateId(t.id)}
-                label={t.name}
-              >
-                <RichTextEditor
-                  value={t.body}
-                  shouldHighlightVariables
-                  preview
-                />
-              </RadioChoice>
+              <>
+                <RadioChoice
+                  key={t.id}
+                  aria-label={`${t.id}`}
+                  id={`${t.id}`}
+                  value={`${t.id}`}
+                  checked={templateId === t.id}
+                  onChange={() => setTemplateId(t.id)}
+                  label={t.name}
+                >
+                  <RichTextEditor
+                    value={t.body}
+                    shouldHighlightVariables
+                    preview
+                  />
+                  <LanguageChipGroup
+                    selected={selectedLanguage}
+                    setSelection={setSelectedLanguage}
+                  />
+                </RadioChoice>
+              </>
             ))
           )}
           <p className={styles.italicSubtext} style={{ marginBottom: '3rem' }}>

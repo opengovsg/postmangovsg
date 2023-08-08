@@ -12,6 +12,9 @@ export type GovsgTemplate = {
   name: string
   body: string
   params: Array<string>
+  multilingual_support: Array<
+    GovsgTemplateLanguageMetadata & { language_code: string }
+  >
 }
 
 export type GovsgTemplateParamMetadata = {

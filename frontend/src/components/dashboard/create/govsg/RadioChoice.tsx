@@ -13,7 +13,7 @@ function RadioChoice({
   onChange: () => void
   id: string
   label: string
-  children?: ReactNode
+  children?: ReactNode[]
 }) {
   return (
     <div
@@ -26,7 +26,10 @@ function RadioChoice({
         <label htmlFor={id}>{label}</label>
       </div>
       {rest.checked && children && (
-        <div className={styles.body}>{children}</div>
+        <div className={styles.body}>{children[0]}</div>
+      )}
+      {rest.checked && children && children.length > 1 && (
+        <div className={styles.footer}>{children.slice(1)}</div>
       )}
     </div>
   )
