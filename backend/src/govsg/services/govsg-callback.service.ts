@@ -259,7 +259,7 @@ const parseTemplateMessageWebhook = async (
       }
       const message = (govsgMessage ?? govsgOp) as GovsgMessage
       const experimentalData = await experimentService.getUserExperimentalData(
-        message.campaign?.userId ?? -1
+        message.campaign.userId
       )
       const canAccessGovsgV = `${ChannelType.Govsg}V` in experimentalData
       if (!canAccessGovsgV) {
