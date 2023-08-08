@@ -23,7 +23,7 @@ import {
   TextButton,
   TextInput,
 } from 'components/common'
-import { SimpleRadioButton } from 'components/common/Radio/RadioButton'
+import { SimpleRadioButton } from 'components/common/Radio/SimpleRadioButton'
 import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
