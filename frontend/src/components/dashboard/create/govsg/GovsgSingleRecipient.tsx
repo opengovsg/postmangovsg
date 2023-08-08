@@ -1,7 +1,4 @@
-import {
-  GovsgTemplateLanguageMetadata,
-  WhatsAppLanguages,
-} from '@shared/clients/whatsapp-client.class/types'
+import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 
 import { capitalize } from 'lodash'
 
@@ -30,6 +27,7 @@ import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 import { sendSingleRecipientCampaign } from 'services/govsg.service'
 import { hydrateTemplate } from 'services/validate-csv.service'
+import { getLocalisedTemplateBody } from 'utils/templateLocalisation'
 
 const GovsgSingleRecipient = ({
   setActiveStep,
@@ -65,17 +63,10 @@ const GovsgSingleRecipient = ({
   const getUpdateData = (field: string) => (value: string) => {
     setData(Object.assign({}, data, { [field]: value }))
   }
-  const getTemplateBody = () => {
-    return (
-      typedCampaign.multilingualSupport.find(
-        (languageSupport: GovsgTemplateLanguageMetadata) =>
-          languageSupport.languageCode === data.languageCode
-      )?.body ?? typedCampaign.body
-    )
-  }
+
   const getHydratedTemplateBody = () => {
     return hydrateTemplate(
-      getTemplateBody(),
+      getLocalisedTemplateBody(typedCampaign, data.languageCode),
       Object.assign(
         {},
         data,
