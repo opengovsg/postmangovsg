@@ -26,6 +26,7 @@ import { LanguageChipGroup } from 'components/common/ChipGroup/LanguageChipGroup
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { getAvailableTemplates, pickTemplate } from 'services/govsg.service'
+import { getLocalisedTemplateBody } from 'utils/templateLocalisation'
 
 function GovsgPickTemplate({
   setActiveStep,
@@ -93,6 +94,7 @@ function GovsgPickTemplate({
           templateId,
           forSingleRecipient,
         })
+        console.log('updateCampaign', update)
         updateCampaign({
           body: update.template.body,
           params: update.template.params,
@@ -100,12 +102,7 @@ function GovsgPickTemplate({
           numRecipients: update.num_recipients,
           paramMetadata: update.template.param_metadata,
           forSingleRecipient,
-          multilingualSupport: update.template.multilingual_support.map(
-            (languageSupport) => ({
-              ...languageSupport,
-              languageCode: languageSupport.language_code,
-            })
-          ),
+          languages: update.template.languages,
         })
       }
       setActiveStep((s: GovsgProgress) => s + 1)
@@ -149,14 +146,21 @@ function GovsgPickTemplate({
                   label={t.name}
                 >
                   <RichTextEditor
-                    value={t.body}
+                    key={selectedLanguage}
+                    value={getLocalisedTemplateBody(
+                      t.languages,
+                      selectedLanguage,
+                      t.body
+                    )}
                     shouldHighlightVariables
                     preview
                   />
-                  <LanguageChipGroup
-                    selected={selectedLanguage}
-                    setSelection={setSelectedLanguage}
-                  />
+                  {t.languages.length > 0 && (
+                    <LanguageChipGroup
+                      selected={selectedLanguage}
+                      setSelection={setSelectedLanguage}
+                    />
+                  )}
                 </RadioChoice>
               </>
             ))

@@ -16,11 +16,26 @@ import { CampaignService, StatsService, UploadService } from '@core/services'
 import { GovsgTemplatesAccess } from '@govsg/models'
 import { CampaignGovsgTemplate } from '@govsg/models/campaign-govsg-template'
 import { GovsgMessage } from '@govsg/models/govsg-message'
-import { GovsgTemplate } from '@govsg/models/govsg-template'
+import {
+  GovsgTemplate,
+  GovsgTemplateLanguageMetadata,
+} from '@govsg/models/govsg-template'
 import { GovsgTemplateService } from '@govsg/services'
 import { NextFunction, Request, Response } from 'express'
 
 const logger = loggerWithLabel(module)
+
+const convertMultilingualSupportToResponse = (
+  multilingualSupport: Array<GovsgTemplateLanguageMetadata>
+) => {
+  return multilingualSupport.map((languageSupport) => ({
+    body: languageSupport.body,
+    language: languageSupport.language,
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    code: languageSupport.languageCode ?? languageSupport['language_code'],
+  }))
+}
 
 function convertGovsgTemplateToResponse(template: GovsgTemplate) {
   return {
@@ -29,7 +44,9 @@ function convertGovsgTemplateToResponse(template: GovsgTemplate) {
     params: template.params,
     param_metadata: template.paramMetadata,
     name: template.name,
-    multilingual_support: template.multilingualSupport,
+    languages: convertMultilingualSupportToResponse(
+      template.multilingualSupport
+    ),
   }
 }
 
@@ -135,7 +152,9 @@ export async function pickTemplateForCampaign(
       body: template.body,
       params: template.params,
       param_metadata: template.paramMetadata,
-      multilingual_support: template.multilingualSupport,
+      languages: convertMultilingualSupportToResponse(
+        template.multilingualSupport
+      ),
     },
     for_single_recipient: forSingleRecipient,
   })

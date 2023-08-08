@@ -12,9 +12,7 @@ export type GovsgTemplate = {
   name: string
   body: string
   params: Array<string>
-  multilingual_support: Array<
-    GovsgTemplateLanguageMetadata & { language_code: string }
-  >
+  languages: Array<GovsgTemplateLanguageMetadata>
 }
 
 export type GovsgTemplateParamMetadata = {
@@ -31,9 +29,7 @@ export class GovsgCampaign extends Campaign {
   progress: GovsgProgress = GovsgProgress.PickTemplate
   forSingleRecipient: boolean | null
   paramMetadata: Record<string, GovsgTemplateParamMetadata>
-  multilingualSupport: Array<
-    GovsgTemplateLanguageMetadata & { language_code: string }
-  >
+  languages: Array<GovsgTemplateLanguageMetadata>
 
   constructor(input: any) {
     super(input)
@@ -44,18 +40,7 @@ export class GovsgCampaign extends Campaign {
     this.numRecipients = input['num_recipients']
     this.forSingleRecipient = input['govsg_templates']?.for_single_recipient
     this.paramMetadata = input['govsg_templates']?.param_metadata
-    this.multilingualSupport = (
-      input['govsg_templates']?.multilingual_support ?? []
-    ).map(
-      (
-        languageSupport: GovsgTemplateLanguageMetadata & {
-          language_code: string
-        }
-      ) => ({
-        ...languageSupport,
-        languageCode: languageSupport['language_code'],
-      })
-    )
+    this.languages = input['govsg_templates']?.languages ?? []
     this.setProgress()
   }
   setProgress() {

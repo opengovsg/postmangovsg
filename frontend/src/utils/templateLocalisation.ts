@@ -4,14 +4,17 @@ import {
 } from '@shared/clients/whatsapp-client.class/types'
 
 export const getLocalisedTemplateBody = (
-  multilingualSupport: GovsgTemplateLanguageMetadata[],
+  languages: GovsgTemplateLanguageMetadata[],
   languageCode: WhatsAppLanguages | string,
   defaultBody: string
 ) => {
+  if (!languages) {
+    return defaultBody
+  }
   return (
-    multilingualSupport.find(
+    languages.find(
       (languageSupport: GovsgTemplateLanguageMetadata) =>
-        languageSupport.languageCode === languageCode.toString()
+        languageSupport.code === languageCode.toString()
     )?.body ?? defaultBody
   )
 }

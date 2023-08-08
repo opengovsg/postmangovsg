@@ -8,7 +8,7 @@ export type Message = {
 }
 
 export type GovsgTemplateLanguageMetadata = {
-  languageCode: string // WhatsApp-API-compatible language code
+  code: string // WhatsApp-API-compatible language code
   language: string // Human-readable name of the language
   body: string
 }

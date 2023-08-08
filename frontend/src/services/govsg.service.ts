@@ -9,9 +9,7 @@ type GovsgTemplate = {
   body: string
   params: Array<string>
   param_metadata: Record<string, GovsgTemplateParamMetadata>
-  multilingual_support: Array<
-    GovsgTemplateLanguageMetadata & { language_code: string }
-  >
+  languages: Array<GovsgTemplateLanguageMetadata>
 }
 
 export async function getAvailableTemplates(): Promise<Array<GovsgTemplate>> {
