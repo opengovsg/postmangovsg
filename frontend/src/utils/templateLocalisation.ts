@@ -3,16 +3,15 @@ import {
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/types'
 
-import { GovsgCampaign } from 'classes'
-
 export const getLocalisedTemplateBody = (
-  campaign: GovsgCampaign,
-  languageCode: WhatsAppLanguages | string
+  multilingualSupport: GovsgTemplateLanguageMetadata[],
+  languageCode: WhatsAppLanguages | string,
+  defaultBody: string
 ) => {
   return (
-    campaign.multilingualSupport.find(
+    multilingualSupport.find(
       (languageSupport: GovsgTemplateLanguageMetadata) =>
         languageSupport.languageCode === languageCode.toString()
-    )?.body ?? campaign.body
+    )?.body ?? defaultBody
   )
 }

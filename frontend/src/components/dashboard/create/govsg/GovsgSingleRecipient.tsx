@@ -66,7 +66,11 @@ const GovsgSingleRecipient = ({
 
   const getHydratedTemplateBody = () => {
     return hydrateTemplate(
-      getLocalisedTemplateBody(typedCampaign, data.languageCode),
+      getLocalisedTemplateBody(
+        typedCampaign.multilingualSupport,
+        data.languageCode,
+        typedCampaign.body
+      ),
       Object.assign(
         {},
         data,
