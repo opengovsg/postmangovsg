@@ -1,0 +1,15 @@
+@import 'styles/_mixins';
+@import 'styles/_variables';
+
+.tab {
+  margin-right: 1rem;
+}
+
+.tab:hover {
+  cursor: pointer;
+}
+
+.active {
+  font-weight: bold;
+  color: $blue-500;
+}
