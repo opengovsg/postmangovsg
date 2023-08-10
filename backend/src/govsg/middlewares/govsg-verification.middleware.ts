@@ -101,6 +101,8 @@ export const resendPasscodeCreationMessage = async (
   }
   const { recipient } = govsgMessage
   // flamingoDb has phone numbers prepended with +countrycode but phone numbers in govsgMessage don't always have that.
+  // In addition, phone numbers in govsgMessage are sometimes observed to have whitespaces inside them. Such is not observed
+  // in flamingoDb.
   const recipientWithCountryCode =
     removeWhitespacesAndPrependCountryCode(recipient)
   const apiClientIdMap = await whatsappService.flamingoDbClient.getApiClientId([
