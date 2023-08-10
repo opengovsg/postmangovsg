@@ -6,6 +6,7 @@ import { Dispatch, SetStateAction, useContext, useState } from 'react'
 
 import { useParams } from 'react-router-dom'
 
+import { getLocalisedTemplateBody } from '../../../../utils/templateLocalisation'
 import styles from '../Create.module.scss'
 
 import { ChannelType, GovsgCampaign, GovsgProgress, Status } from 'classes'
@@ -27,7 +28,6 @@ import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 import { sendSingleRecipientCampaign } from 'services/govsg.service'
 import { hydrateTemplate } from 'services/validate-csv.service'
-import { getLocalisedTemplateBody } from 'utils/templateLocalisation'
 
 const GovsgSingleRecipient = ({
   setActiveStep,

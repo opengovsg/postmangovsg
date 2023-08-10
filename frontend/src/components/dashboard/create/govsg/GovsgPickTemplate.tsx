@@ -11,6 +11,8 @@ import {
 
 import { useParams } from 'react-router-dom'
 
+import { getLocalisedTemplateBody } from '../../../../utils/templateLocalisation'
+
 import styles from './GovsgPickTemplate.module.scss'
 import RadioChoice from './RadioChoice'
 
@@ -27,7 +29,6 @@ import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { getAvailableTemplates, pickTemplate } from 'services/govsg.service'
-import { getLocalisedTemplateBody } from 'utils/templateLocalisation'
 
 function GovsgPickTemplate({
   setActiveStep,
@@ -96,7 +97,6 @@ function GovsgPickTemplate({
           templateId,
           forSingleRecipient,
         })
-        console.log('updateCampaign', update)
         updateCampaign({
           body: update.template.body,
           params: update.template.params,
