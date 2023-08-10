@@ -47,7 +47,7 @@ export interface CampaignDetails {
     params: Array<string> | null
     for_single_recipient: boolean
     param_metadata: Record<string, GovsgTemplateParamMetadata>
-    multilingual_support: GovsgTemplateLanguageMetadata[]
+    languages: GovsgTemplateLanguageMetadata[]
   }
   job_queue?: {
     status: string
