@@ -115,7 +115,10 @@ export function uploadCompleteOnPreview({
   }
 }
 
-const getLanguageCode = (language: string) => {
+const getLanguageCode = (language: string | undefined) => {
+  if (!language) {
+    return WhatsAppLanguages.english
+  }
   const languageInLowerCase = language.toLowerCase()
   const whatsAppLanguages = Object.keys(WhatsAppLanguages)
   const key = whatsAppLanguages.find(

@@ -29,13 +29,11 @@ export async function getFilledTemplate(
 
 const getLocalisedTemplateBody = (
   template: GovsgTemplate | null,
-  language: string
+  language: string | undefined
 ) => {
-  console.log(
-    'getLocalisedTemplateBody',
-    language,
-    template?.multilingualSupport
-  )
+  if (!language) {
+    return template?.body as string
+  }
   const languageInLowerCase = language.toLowerCase()
   return (template?.multilingualSupport.find(
     (languageSupport) =>
