@@ -29,12 +29,17 @@ export async function getFilledTemplate(
 
 const getLocalisedTemplateBody = (
   template: GovsgTemplate | null,
-  languageCode: string
+  language: string
 ) => {
+  console.log(
+    'getLocalisedTemplateBody',
+    language,
+    template?.multilingualSupport
+  )
+  const languageInLowerCase = language.toLowerCase()
   return (template?.multilingualSupport.find(
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    (languageSupport) => languageSupport.language_code === languageCode
+    (languageSupport) =>
+      languageSupport.language.toLowerCase() === languageInLowerCase
   )?.body ?? template?.body) as string
 }
 
@@ -55,8 +60,10 @@ export async function getHydratedMessage(
     return null
   }
 
-  const languageCode = params.language
-  const localisedTemplateBody = getLocalisedTemplateBody(template, languageCode)
+  const localisedTemplateBody = getLocalisedTemplateBody(
+    template,
+    params.language
+  )
   return { body: templateCli.template(localisedTemplateBody, params) }
 }
 
