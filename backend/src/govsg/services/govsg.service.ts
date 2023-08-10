@@ -143,6 +143,7 @@ export function uploadCompleteOnChunk({
         campaignId,
         recipient: recipient,
         params: entry,
+        languageCode: entry.language,
       }
     })
 
