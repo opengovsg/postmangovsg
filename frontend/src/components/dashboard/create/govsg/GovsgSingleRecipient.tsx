@@ -137,7 +137,8 @@ const GovsgSingleRecipient = ({
             <p>
               <label htmlFor="language">Language</label>{' '}
             </p>
-            {Object.keys(WhatsAppLanguages).map((language) => {
+            {typedCampaign.languages.map((languageSupport) => {
+              const language = languageSupport.language
               const label = capitalize(language)
               const languageCode =
                 WhatsAppLanguages[language as keyof typeof WhatsAppLanguages]

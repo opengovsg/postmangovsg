@@ -159,6 +159,9 @@ function GovsgPickTemplate({
                   />
                   {canAccessGovsgV && t.languages.length > 0 && (
                     <LanguageChipGroup
+                      options={t.languages.map((languageSupport) =>
+                        languageSupport.language.toLowerCase()
+                      )}
                       selected={selectedLanguage}
                       setSelection={setSelectedLanguage}
                     />

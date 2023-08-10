@@ -5,6 +5,7 @@ import { Dispatch, SetStateAction } from 'react'
 import { Chip } from './Chip'
 
 interface LanguageChipGroupProps {
+  options: string[]
   selected: WhatsAppLanguages
   setSelection: Dispatch<SetStateAction<WhatsAppLanguages>>
 }
@@ -15,12 +16,13 @@ const languageChipGroupStyle = {
 }
 
 export const LanguageChipGroup = ({
+  options,
   selected,
   setSelection,
 }: LanguageChipGroupProps) => {
   return (
     <div style={languageChipGroupStyle}>
-      {Object.keys(WhatsAppLanguages).map((language) => {
+      {options.map((language) => {
         const value =
           WhatsAppLanguages[language as keyof typeof WhatsAppLanguages]
         return (
