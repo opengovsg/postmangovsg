@@ -23,6 +23,7 @@ import {
   StepSection,
 } from 'components/common'
 import { LanguageChipGroup } from 'components/common/ChipGroup/LanguageChipGroup'
+import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { getAvailableTemplates, pickTemplate } from 'services/govsg.service'
@@ -33,6 +34,7 @@ function GovsgPickTemplate({
 }: {
   setActiveStep: Dispatch<SetStateAction<GovsgProgress>>
 }) {
+  const { canAccessGovsgV } = useGovsgV()
   const { campaign: campaign, updateCampaign } = useContext(CampaignContext)
   const typedCampaign = campaign as GovsgCampaign
   const [templateId, setTemplateId] = useState(typedCampaign.templateId)
@@ -155,7 +157,7 @@ function GovsgPickTemplate({
                     shouldHighlightVariables
                     preview
                   />
-                  {t.languages.length > 0 && (
+                  {canAccessGovsgV && t.languages.length > 0 && (
                     <LanguageChipGroup
                       selected={selectedLanguage}
                       setSelection={setSelectedLanguage}
