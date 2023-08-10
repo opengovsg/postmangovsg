@@ -27,6 +27,17 @@ export async function getFilledTemplate(
   return pivot.govsgTemplate
 }
 
+const getLocalisedTemplateBody = (
+  template: GovsgTemplate | null,
+  languageCode: string
+) => {
+  return (template?.multilingualSupport.find(
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    (languageSupport) => languageSupport.language_code === languageCode
+  )?.body ?? template?.body) as string
+}
+
 export async function getHydratedMessage(
   campaignId: number
 ): Promise<{ body: string } | null> {
@@ -44,7 +55,9 @@ export async function getHydratedMessage(
     return null
   }
 
-  return { body: templateCli.template(template?.body as string, params) }
+  const languageCode = params.language
+  const localisedTemplateBody = getLocalisedTemplateBody(template, languageCode)
+  return { body: templateCli.template(localisedTemplateBody, params) }
 }
 
 export function testHydration(
