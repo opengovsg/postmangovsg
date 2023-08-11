@@ -236,6 +236,14 @@ const parseTemplateMessageWebhook = async (
       return
     }
     case WhatsAppMessageStatus.sent: {
+      logger.info({
+        message: 'WhatsApp message Status: Sent',
+        meta: {
+          govsgMessage,
+          govsgMessageTransactional,
+          govsgOp,
+        },
+      })
       const fieldOpts = {
         status: shouldUpdateStatus(statusIfUpdated, prevStatus)
           ? statusIfUpdated
@@ -248,6 +256,14 @@ const parseTemplateMessageWebhook = async (
       return
     }
     case WhatsAppMessageStatus.delivered: {
+      logger.info({
+        message: 'WhatsApp message Status: Delivered',
+        meta: {
+          govsgMessage,
+          govsgMessageTransactional,
+          govsgOp,
+        },
+      })
       const fieldOpts = {
         status: shouldUpdateStatus(statusIfUpdated, prevStatus)
           ? statusIfUpdated
