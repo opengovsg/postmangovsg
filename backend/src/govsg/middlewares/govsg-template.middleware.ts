@@ -33,7 +33,7 @@ const convertMultilingualSupportToResponse = (
     language: languageSupport.language,
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
-    code: languageSupport.languageCode ?? languageSupport['language_code'],
+    code: languageSupport.language_code,
   }))
 }
 

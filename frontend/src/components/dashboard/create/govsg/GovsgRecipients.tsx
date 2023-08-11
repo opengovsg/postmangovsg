@@ -28,6 +28,7 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
+import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
@@ -43,6 +44,7 @@ const GovsgRecipients = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<GovsgProgress>>
 }) => {
+  const { canAccessGovsgV } = useGovsgV()
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const {
     isCsvProcessing: initialIsProcessing,
@@ -184,7 +186,7 @@ const GovsgRecipients = ({
           <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
           <p>or</p>
           <SampleCsv
-            params={params}
+            params={canAccessGovsgV ? ['language', ...params] : params}
             defaultRecipient="81234567"
             setErrorMsg={console.error}
           />

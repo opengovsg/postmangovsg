@@ -10,6 +10,7 @@ import { GovsgTemplateService } from '.'
 import { GovsgMessage } from '@govsg/models/govsg-message'
 import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 import { loggerWithLabel } from '@core/logger'
+import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 
 const logger = loggerWithLabel(module)
 
@@ -114,6 +115,21 @@ export function uploadCompleteOnPreview({
   }
 }
 
+const getLanguageCode = (language: string | undefined) => {
+  if (!language) {
+    return WhatsAppLanguages.english
+  }
+  const languageInLowerCase = language.toLowerCase()
+  const whatsAppLanguages = Object.keys(WhatsAppLanguages)
+  const key = whatsAppLanguages.find(
+    (whatsAppLanguage) => whatsAppLanguage.toLowerCase() === languageInLowerCase
+  )
+  if (!key) {
+    return WhatsAppLanguages.english
+  }
+  return WhatsAppLanguages[key as keyof typeof WhatsAppLanguages]
+}
+
 export function uploadCompleteOnChunk({
   transaction,
   campaignId,
@@ -143,6 +159,7 @@ export function uploadCompleteOnChunk({
         campaignId,
         recipient: recipient,
         params: entry,
+        languageCode: getLanguageCode(entry.language),
       }
     })
 
