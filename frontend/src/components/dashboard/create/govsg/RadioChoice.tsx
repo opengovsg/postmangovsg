@@ -25,7 +25,7 @@ function RadioChoice({
         <input type="radio" id={id} {...rest} onChange={onChange} />
         <label htmlFor={id}>{label}</label>
       </div>
-      {rest.checked && children && children.length > 0 && (
+      {rest.checked && children && (
         <div className={styles.body}>{children[0]}</div>
       )}
       {rest.checked && children && children.length > 1 && (

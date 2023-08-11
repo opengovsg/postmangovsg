@@ -39,14 +39,7 @@ export async function getCampaignDetails(
       ? {
           ...(pivot.govsgTemplate.toJSON() as any), // any to get around the snake vs camel casing difference between TS type and actual db table field
           for_single_recipient: pivot.forSingleRecipient,
-          languages: pivot.govsgTemplate.multilingualSupport.map(
-            (languageSupport) => ({
-              ...languageSupport,
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
-              code: languageSupport.language_code,
-            })
-          ),
+          languages: pivot.govsgTemplate.multilingualSupport,
         }
       : undefined,
   }

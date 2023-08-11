@@ -1,5 +1,7 @@
 import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 
+import { capitalize } from 'lodash'
+
 import { Dispatch, SetStateAction, useContext, useState } from 'react'
 
 import { useParams } from 'react-router-dom'
@@ -137,14 +139,12 @@ const GovsgSingleRecipient = ({
             </p>
             {typedCampaign.languages.map((languageSupport) => {
               const language = languageSupport.language
-              const languageInLowerCase = language.toLowerCase()
+              const label = capitalize(language)
               const languageCode =
-                WhatsAppLanguages[
-                  languageInLowerCase as keyof typeof WhatsAppLanguages
-                ]
+                WhatsAppLanguages[language as keyof typeof WhatsAppLanguages]
               return (
                 <SimpleRadioButton
-                  aria-label={language}
+                  aria-label={label}
                   id={`language-${language}`}
                   value={languageCode}
                   checked={data.languageCode === languageCode}
@@ -154,7 +154,7 @@ const GovsgSingleRecipient = ({
                       languageCode,
                     })
                   }
-                  label={language}
+                  label={label}
                   key={language}
                 />
               )
