@@ -130,7 +130,10 @@ const parseTemplateMessageWebhook = async (
     GovsgMessageTransactional.findOne({
       where: { serviceProviderMessageId: messageId },
     }),
-    GovsgOp.findOne({ where: { serviceProviderMessageId: messageId } }),
+    GovsgOp.findOne({
+      where: { serviceProviderMessageId: messageId },
+      include: Campaign,
+    }),
   ])
   if (!govsgMessage && !govsgOp && !govsgMessageTransactional) {
     logger.info({
