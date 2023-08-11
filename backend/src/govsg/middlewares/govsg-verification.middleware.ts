@@ -4,8 +4,8 @@ import { GovsgMessage } from '@govsg/models'
 import { GovsgVerification } from '@govsg/models/govsg-verification'
 import { WhatsAppApiClient } from '@shared/clients/whatsapp-client.class/types'
 import { sendPasscodeCreationMessage } from '@govsg/services/govsg-verification-service'
-import { removeWhitespacesAndPrependCountryCode } from '@govsg/utils/recipient'
 import { Op } from 'sequelize'
+import { PhoneNumberService } from '@shared/utils/phone-number.service'
 
 const generateSearchOptions = (search: string) => {
   // TODO: Use an OR operation
@@ -100,14 +100,11 @@ export const resendPasscodeCreationMessage = async (
     })
   }
   const { recipient } = govsgMessage
-  // flamingoDb has phone numbers prepended with +countrycode but phone numbers in govsgMessage don't always have that.
-  // In addition, phone numbers in govsgMessage are sometimes observed to have whitespaces inside them. Such is not observed
   // flamingoDb numbers are prepended with +countrycode and have no whitespaces.
   // recipient numbers of govsgMessage may not fulfil the above thus have to be preprocessed first.
-  const recipientWithCountryCode =
-    removeWhitespacesAndPrependCountryCode(recipient)
+  const normalisedRecipient = PhoneNumberService.normalisePhoneNumber(recipient)
   const apiClientIdMap = await whatsappService.flamingoDbClient.getApiClientId([
-    recipientWithCountryCode,
+    normalisedRecipient,
   ])
   // if recipient not in db, map.get(recipient) will return undefined
   // default to clientTwo in this case
