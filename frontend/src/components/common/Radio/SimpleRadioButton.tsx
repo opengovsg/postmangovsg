@@ -1,9 +1,9 @@
 import cx from 'classnames'
 import { ComponentProps, ReactNode } from 'react'
 
-import styles from './RadioChoice.module.scss'
+import styles from './SimpleRadioButton.module.scss'
 
-function RadioChoice({
+export const SimpleRadioButton = ({
   label,
   children,
   id,
@@ -13,8 +13,8 @@ function RadioChoice({
   onChange: () => void
   id: string
   label: string
-  children?: ReactNode[]
-}) {
+  children?: ReactNode
+}) => {
   return (
     <div
       className={
@@ -26,13 +26,8 @@ function RadioChoice({
         <label htmlFor={id}>{label}</label>
       </div>
       {rest.checked && children && (
-        <div className={styles.body}>{children[0]}</div>
-      )}
-      {rest.checked && children && children.length > 1 && (
-        <div className={styles.footer}>{children.slice(1)}</div>
+        <div className={styles.body}>{children}</div>
       )}
     </div>
   )
 }
-
-export default RadioChoice

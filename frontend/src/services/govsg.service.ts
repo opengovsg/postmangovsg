@@ -1,3 +1,4 @@
+import { GovsgTemplateLanguageMetadata } from '@shared/clients/whatsapp-client.class/types'
 import axios from 'axios'
 
 import { GovsgTemplateParamMetadata } from 'classes'
@@ -8,6 +9,7 @@ type GovsgTemplate = {
   body: string
   params: Array<string>
   param_metadata: Record<string, GovsgTemplateParamMetadata>
+  languages: Array<GovsgTemplateLanguageMetadata>
 }
 
 export async function getAvailableTemplates(): Promise<Array<GovsgTemplate>> {
@@ -56,6 +58,7 @@ export async function sendSingleRecipientCampaign(
 ): Promise<void> {
   await axios.post(`/campaign/${campaignId}/govsg/send-single`, {
     recipient: params.recipient,
+    language_code: params.languageCode,
     params,
   })
 }

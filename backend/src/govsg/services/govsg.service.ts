@@ -22,7 +22,13 @@ export async function getCampaignDetails(
       where: { campaignId },
       include: {
         model: GovsgTemplate,
-        attributes: ['id', 'body', 'params', 'param_metadata'],
+        attributes: [
+          'id',
+          'body',
+          'params',
+          'param_metadata',
+          'multilingualSupport',
+        ],
       },
     }),
   ])
@@ -32,6 +38,7 @@ export async function getCampaignDetails(
       ? {
           ...(pivot.govsgTemplate.toJSON() as any), // any to get around the snake vs camel casing difference between TS type and actual db table field
           for_single_recipient: pivot.forSingleRecipient,
+          languages: pivot.govsgTemplate.multilingualSupport,
         }
       : undefined,
   }
@@ -172,6 +179,7 @@ export async function setDefaultCredentials(
 
 export async function processSingleRecipientCampaign(
   data: Record<string, string>,
+  languageCode: string,
   campaignId: number
 ): Promise<void> {
   const transaction = await GovsgMessage.sequelize?.transaction()
@@ -183,6 +191,7 @@ export async function processSingleRecipientCampaign(
     await GovsgMessage.create({
       campaignId,
       recipient: data.recipient,
+      languageCode,
       params: data,
     } as GovsgMessage)
     await StatsService.setNumRecipients(campaignId, 1, transaction)

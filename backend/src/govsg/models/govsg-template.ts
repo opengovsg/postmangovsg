@@ -71,5 +71,5 @@ export class GovsgTemplate extends Model<GovsgTemplate> {
     allowNull: true,
     defaultValue: [],
   })
-  multilingualSupport: GovsgTemplateLanguageMetadata[]
+  multilingualSupport: Array<GovsgTemplateLanguageMetadata>
 }

@@ -1,0 +1,13 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.choice {
+  overflow: hidden;
+  margin-top: 1rem;
+
+  .head {
+    label {
+      margin-left: 1rem;
+    }
+  }
+}

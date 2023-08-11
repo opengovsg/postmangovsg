@@ -1,3 +1,4 @@
+import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 import {
   Dispatch,
   ReactNode,
@@ -10,6 +11,8 @@ import {
 
 import { useParams } from 'react-router-dom'
 
+import { getLocalisedTemplateBody } from '../../../../utils/templateLocalisation'
+
 import styles from './GovsgPickTemplate.module.scss'
 import RadioChoice from './RadioChoice'
 
@@ -21,6 +24,8 @@ import {
   StepHeader,
   StepSection,
 } from 'components/common'
+import { LanguageChipGroup } from 'components/common/ChipGroup/LanguageChipGroup'
+import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { getAvailableTemplates, pickTemplate } from 'services/govsg.service'
@@ -30,6 +35,7 @@ function GovsgPickTemplate({
 }: {
   setActiveStep: Dispatch<SetStateAction<GovsgProgress>>
 }) {
+  const { canAccessGovsgV } = useGovsgV()
   const { campaign: campaign, updateCampaign } = useContext(CampaignContext)
   const typedCampaign = campaign as GovsgCampaign
   const [templateId, setTemplateId] = useState(typedCampaign.templateId)
@@ -38,6 +44,9 @@ function GovsgPickTemplate({
   >(null)
   const [errorMsg, setErrorMsg] = useState<ReactNode>(null)
   const { id: campaignId } = useParams<{ id: string }>()
+  const [selectedLanguage, setSelectedLanguage] = useState<WhatsAppLanguages>(
+    WhatsAppLanguages.english
+  )
   const [forSingleRecipient, setForSingleRecipient] = useState<boolean | null>(
     typedCampaign.forSingleRecipient === true ||
       typedCampaign.forSingleRecipient === false
@@ -95,6 +104,7 @@ function GovsgPickTemplate({
           numRecipients: update.num_recipients,
           paramMetadata: update.template.param_metadata,
           forSingleRecipient,
+          languages: update.template.languages,
         })
       }
       setActiveStep((s: GovsgProgress) => s + 1)
@@ -127,21 +137,34 @@ function GovsgPickTemplate({
             </div>
           ) : (
             availableTemplates.map((t: GovsgTemplate) => (
-              <RadioChoice
-                key={t.id}
-                aria-label={`${t.id}`}
-                id={`${t.id}`}
-                value={`${t.id}`}
-                checked={templateId === t.id}
-                onChange={() => setTemplateId(t.id)}
-                label={t.name}
-              >
-                <RichTextEditor
-                  value={t.body}
-                  shouldHighlightVariables
-                  preview
-                />
-              </RadioChoice>
+              <>
+                <RadioChoice
+                  key={t.id}
+                  aria-label={`${t.id}`}
+                  id={`${t.id}`}
+                  value={`${t.id}`}
+                  checked={templateId === t.id}
+                  onChange={() => setTemplateId(t.id)}
+                  label={t.name}
+                >
+                  <RichTextEditor
+                    key={selectedLanguage}
+                    value={getLocalisedTemplateBody(
+                      t.languages,
+                      selectedLanguage,
+                      t.body
+                    )}
+                    shouldHighlightVariables
+                    preview
+                  />
+                  {canAccessGovsgV && t.languages.length > 0 && (
+                    <LanguageChipGroup
+                      selected={selectedLanguage}
+                      setSelection={setSelectedLanguage}
+                    />
+                  )}
+                </RadioChoice>
+              </>
             ))
           )}
           <p className={styles.italicSubtext} style={{ marginBottom: '3rem' }}>

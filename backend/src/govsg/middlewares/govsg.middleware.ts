@@ -77,7 +77,7 @@ export async function processSingleRecipientCampaign(
   next: NextFunction
 ): Promise<void> {
   const campaignId = +req.params.campaignId
-  const { params } = req.body
+  const { language_code: languageCode, params } = req.body
   const userId = req.session?.user?.id
   const [experimentalData, pivot] = await Promise.all([
     experimentService.getUserExperimentalData(userId),
@@ -113,6 +113,10 @@ export async function processSingleRecipientCampaign(
   }
 
   const data = Object.assign({}, params, defaultData)
-  await GovsgService.processSingleRecipientCampaign(data, campaignId)
+  await GovsgService.processSingleRecipientCampaign(
+    data,
+    languageCode,
+    campaignId
+  )
   return next()
 }
