@@ -157,7 +157,7 @@ function GovsgPickTemplate({
                     shouldHighlightVariables
                     preview
                   />
-                  {canAccessGovsgV && t.languages.length > 0 && (
+                  {canAccessGovsgV && (
                     <LanguageChipGroup
                       options={t.languages.map((languageSupport) =>
                         languageSupport.language.toLowerCase()
