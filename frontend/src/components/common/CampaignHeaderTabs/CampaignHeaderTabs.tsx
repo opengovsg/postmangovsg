@@ -1,4 +1,8 @@
+import cx from 'classnames'
+
 import { useContext } from 'react'
+
+import styles from './CampaignHeaderTabs.module.scss'
 
 import { GovsgDetailContext } from 'contexts/govsg-detail.context'
 
@@ -11,11 +15,9 @@ export const CampaignHeaderTabs = () => {
         <span
           key={tabLabel}
           onClick={() => setActiveTab(tabIndex)}
-          style={
-            activeTab === tabIndex
-              ? { marginRight: '1rem', fontWeight: 'bold', color: '#2C2CDC' }
-              : { marginRight: '1rem' }
-          }
+          className={cx(styles.tab, {
+            [styles.active]: activeTab === tabIndex,
+          })}
         >
           {tabLabel}
         </span>
