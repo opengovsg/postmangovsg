@@ -109,7 +109,7 @@ export const resendPasscodeCreationMessage = async (
   // if recipient not in db, map.get(recipient) will return undefined
   // default to clientTwo in this case
   const apiClientId =
-    apiClientIdMap.get(recipient) ?? WhatsAppApiClient.clientTwo
+    apiClientIdMap.get(normalisedRecipient) ?? WhatsAppApiClient.clientTwo
   const passcodeCreationWamid = await sendPasscodeCreationMessage(
     recipient,
     apiClientId
