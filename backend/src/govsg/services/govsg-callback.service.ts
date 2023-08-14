@@ -68,6 +68,7 @@ const parseWebhook = async (
   if ('statuses' in body) {
     logger.info({
       message: 'Received status webhook from WhatsApp',
+      body,
       action,
     })
     await parseTemplateMessageWebhook(
@@ -79,6 +80,7 @@ const parseWebhook = async (
   if ('messages' in body && 'contacts' in body) {
     logger.info({
       message: 'Received message webhook from WhatsApp',
+      body,
       action,
     })
     await parseUserMessageWebhook(body as UserMessageWebhook, clientId)
@@ -150,6 +152,9 @@ const parseTemplateMessageWebhook = async (
     if (statusesWhichRequireMessageId.has(whatsappStatus)) {
       logger.error({
         message: 'Message ID not found',
+        meta: {
+          messageId,
+        },
       })
       throw new MessageIdNotFoundWebhookError('Message ID not found')
     }
@@ -238,6 +243,9 @@ const parseTemplateMessageWebhook = async (
     case WhatsAppMessageStatus.sent: {
       logger.info({
         message: 'WhatsApp message Status: Sent',
+        meta: {
+          messageId,
+        },
       })
       const fieldOpts = {
         status: shouldUpdateStatus(statusIfUpdated, prevStatus)
@@ -253,6 +261,9 @@ const parseTemplateMessageWebhook = async (
     case WhatsAppMessageStatus.delivered: {
       logger.info({
         message: 'WhatsApp message Status: Delivered',
+        meta: {
+          messageId,
+        },
       })
       const fieldOpts = {
         status: shouldUpdateStatus(statusIfUpdated, prevStatus)
@@ -316,6 +327,12 @@ const parseTemplateMessageWebhook = async (
       return
     }
     case WhatsAppMessageStatus.read: {
+      logger.info({
+        message: 'WhatsApp message Status: Read',
+        meta: {
+          messageId,
+        },
+      })
       const fieldOpts = {
         status: shouldUpdateStatus(statusIfUpdated, prevStatus)
           ? statusIfUpdated
@@ -328,6 +345,12 @@ const parseTemplateMessageWebhook = async (
       return
     }
     case WhatsAppMessageStatus.deleted: {
+      logger.info({
+        message: 'WhatsApp message Status: Deleted',
+        meta: {
+          messageId,
+        },
+      })
       const fieldOpts = {
         status: shouldUpdateStatus(statusIfUpdated, prevStatus)
           ? statusIfUpdated
