@@ -1,5 +1,5 @@
 import download from 'downloadjs'
-import { without, times, constant } from 'lodash'
+import { without } from 'lodash'
 
 import TextButton from '../text-button'
 
@@ -14,12 +14,14 @@ import {
 const SampleCsv = ({
   defaultRecipient,
   params,
+  defaultParams,
   template,
   protect = false,
   setErrorMsg,
 }: {
   defaultRecipient: string
   params?: Array<string>
+  defaultParams?: Record<string, string>
   template?: string
   protect?: boolean
   setErrorMsg?: (message: string | null) => void
@@ -39,11 +41,19 @@ const SampleCsv = ({
         ...without(variableHeaders, ...fixedHeaders),
       ]
 
+      const variableRow = Array(headers.length - 1).fill('abc')
+      if (params && defaultParams) {
+        for (const key in defaultParams) {
+          const indexInVariableRow = params.findIndex((param) => param === key)
+          if (indexInVariableRow < 0) {
+            continue
+          }
+          variableRow[indexInVariableRow] = defaultParams[key]
+        }
+      }
+
       // Set default recipient as first value and pad with placeholder
-      const body = [
-        defaultRecipient,
-        ...times(headers.length - 1, constant('abc')),
-      ]
+      const body = [defaultRecipient, ...variableRow]
 
       const content = [`${headers.join(',')}`, `${body.join(',')}`].join('\r\n')
 
