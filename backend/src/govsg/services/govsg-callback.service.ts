@@ -482,7 +482,7 @@ async function sendAutoReply(
   const textMessageToSend: WhatsAppTextMessageToSend = {
     recipient: whatsappId,
     apiClient: clientId,
-    body: 'We are unable to receive replies at the moment.\n\nIf you are inquiring about COVID-19 updates, the COVID-19 infobot is temporarily unavailable due to maintenance work. For more COVID-19 related information, please visit the Ministry of Health’s website at moh.gov.sg. Thank you',
+    body: 'We are unable to receive replies at the moment.',
   }
   // can substitute this with template message if we get such a template approved
   await whatsappService.whatsappClient.sendTextMessage(textMessageToSend)
