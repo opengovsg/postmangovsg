@@ -51,7 +51,7 @@ const GovsgSingleRecipient = ({
   const [data, setData] = useState<Record<string, string>>(
     fieldsToRender.reduce((cul, f) => ({ [f.id]: '', ...cul }), {
       recipient: '',
-      languageCode: WhatsAppLanguages.english,
+      language: WhatsAppLanguages.english,
     })
   )
   const { id: campaignId } = useParams<{ id: string }>()
@@ -66,7 +66,7 @@ const GovsgSingleRecipient = ({
     return hydrateTemplate(
       getLocalisedTemplateBody(
         typedCampaign.languages,
-        data.languageCode,
+        data.language,
         typedCampaign.body
       ),
       Object.assign(
@@ -147,11 +147,11 @@ const GovsgSingleRecipient = ({
                   aria-label={language}
                   id={`language-${language}`}
                   value={languageCode}
-                  checked={data.languageCode === languageCode}
+                  checked={data.language === languageCode}
                   onChange={() =>
                     setData({
                       ...data,
-                      languageCode,
+                      language: languageCode,
                     })
                   }
                   label={language}

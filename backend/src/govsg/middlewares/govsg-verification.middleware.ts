@@ -58,6 +58,8 @@ export const listMessages = async (
       recipient_name,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       officer_designation,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      language,
       ...remainingParams
     } = row.params as Record<string, string>
     return {
