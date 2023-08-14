@@ -58,7 +58,7 @@ export async function sendSingleRecipientCampaign(
 ): Promise<void> {
   await axios.post(`/campaign/${campaignId}/govsg/send-single`, {
     recipient: params.recipient,
-    language_code: params.languageCode,
+    language_code: params.language,
     params,
   })
 }
