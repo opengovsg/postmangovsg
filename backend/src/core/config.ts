@@ -168,6 +168,7 @@ interface ConfigSchema {
     authTokenTwo: string
     authTokenTwoExpiry: string
     callbackVerifyToken: string
+    precallTemplateLabel: string
   }
   flamingo: {
     dbUri: string
