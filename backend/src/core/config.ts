@@ -790,6 +790,12 @@ const config: Config<ConfigSchema> = convict({
       env: 'WHATSAPP_CALLBACK_VERIFY_TOKEN',
       default: '',
     },
+    precallTemplateLabel: {
+      doc: 'WhatsApp template name for pre-call notification',
+      env: 'WA_PRECALL_TEMPLATE_LABEL',
+      format: 'required-string',
+      default: '',
+    },
   },
   flamingo: {
     dbUri: {
