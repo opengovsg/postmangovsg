@@ -4,6 +4,7 @@ import config from '@core/config'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
 import {
+  ApiAttachmentFormatError,
   ApiAttachmentLimitError,
   ApiAuthorizationError,
   ApiNotFoundError,
@@ -58,6 +59,10 @@ async function checkAttachmentValidity(
   _res: Response,
   next: NextFunction
 ): Promise<void> {
+  if (!req.files?.attachments && req.body.attachments) {
+    // this means attachments are sent via JSON, which is inconsistent with our OpenAPI spec
+    throw new ApiAttachmentFormatError('Attachments must be sent via form-data')
+  }
   // return early if no attachments
   if (!req.files?.attachments) {
     next()
