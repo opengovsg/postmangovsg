@@ -54,8 +54,10 @@ const getStatsFromArchive = async (
  * @param campaignId
  */
 const getNumRecipients = async (campaignId: number): Promise<number> => {
-  const { error, unsent, sent, invalid } = await getStatsFromArchive(campaignId)
-  return error + unsent + sent + invalid
+  const { error, unsent, sent, invalid, delivered } = await getStatsFromArchive(
+    campaignId
+  )
+  return error + unsent + sent + invalid + (delivered ?? 0)
 }
 
 /**
