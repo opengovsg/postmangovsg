@@ -271,9 +271,47 @@ const parseTemplateMessageWebhook = async (
           : undefined,
         deliveredAt: timestamp,
       }
-      void govsgMessage?.update(fieldOpts, whereOpts)
+      void govsgMessage
+        ?.update(fieldOpts, whereOpts)
+        .then((value) => {
+          logger.info({
+            message: 'Updated govsgMessage',
+            meta: {
+              govsgMessage: value,
+            },
+          })
+        })
+        .catch((reason) => {
+          logger.warning({
+            message: 'Did not update govsgMessage',
+            meta: {
+              reason,
+              fieldOpts,
+              whereOpts,
+            },
+          })
+        })
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
-      void govsgOp?.update(fieldOpts, whereOpts)
+      void govsgOp
+        ?.update(fieldOpts, whereOpts)
+        .then((value) => {
+          logger.info({
+            message: 'Updated govsgOp',
+            meta: {
+              govsgOp: value,
+            },
+          })
+        })
+        .catch((reason) => {
+          logger.warning({
+            message: 'Did not update govsgOp',
+            meta: {
+              reason,
+              fieldOpts,
+              whereOpts,
+            },
+          })
+        })
       if (!govsgMessage && !govsgOp) {
         return
       }
