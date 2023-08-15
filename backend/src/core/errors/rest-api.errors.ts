@@ -103,6 +103,11 @@ export class ApiRateLimitError extends RestApiError {
   }
 }
 
+export class ApiAttachmentFormatError extends RestApiError {
+  constructor(message: string) {
+    super(400, 'attachment_format', message)
+  }
+}
 export class ApiAttachmentLimitError extends RestApiError {
   constructor(message: string) {
     super(413, 'attachment_limit', message)
