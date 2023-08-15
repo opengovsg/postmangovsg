@@ -1,7 +1,8 @@
 import axios from 'axios'
 
 import cx from 'classnames'
-import { useContext, useEffect, useState } from 'react'
+import { debounce } from 'lodash'
+import { useCallback, useContext, useEffect, useState } from 'react'
 
 import Moment from 'react-moment'
 
@@ -72,6 +73,14 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     setSelectedPage(selectedPage)
   }
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const searchGovsgMessages = useCallback(
+    debounce(async (search: string, selectedPage: number) => {
+      await fetchGovsgMessages(search, selectedPage)
+    }, 300),
+    []
+  )
+
   const onModalConfirm = async (govsgMessage: GovsgMessage) => {
     await axios.post(`/campaign/${campaignId}/govsg/resend-passcode-creation`, {
       govsg_message_id: govsgMessage.id,
@@ -102,7 +111,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
 
   const handleSearch = async (newSearch: string) => {
     setSearch(newSearch)
-    await fetchGovsgMessages(newSearch, 0)
+    await searchGovsgMessages(newSearch, 0)
   }
 
   const statusesWhichAllowResend = new Set(['DELIVERED', 'READ'])
