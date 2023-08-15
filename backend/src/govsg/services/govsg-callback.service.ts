@@ -289,7 +289,7 @@ const parseTemplateMessageWebhook = async (
       }).then((campaignGovsgTemplate) => {
         if (
           campaignGovsgTemplate?.govsgTemplate.whatsappTemplateLabel ===
-          'sgc_notify_upcoming_call_1' // TODO: Un-hardcode this
+          config.get('whatsapp.precallTemplateLabel')
         ) {
           logger.info({
             message: 'Sending passcode creation message',

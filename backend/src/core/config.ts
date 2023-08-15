@@ -168,6 +168,7 @@ interface ConfigSchema {
     authTokenTwo: string
     authTokenTwoExpiry: string
     callbackVerifyToken: string
+    precallTemplateLabel: string
   }
   flamingo: {
     dbUri: string
@@ -788,6 +789,12 @@ const config: Config<ConfigSchema> = convict({
     callbackVerifyToken: {
       doc: 'Callback verify token for WhatsApp On Prem Client',
       env: 'WHATSAPP_CALLBACK_VERIFY_TOKEN',
+      default: '',
+    },
+    precallTemplateLabel: {
+      doc: 'WhatsApp template name for pre-call notification',
+      env: 'WA_PRECALL_TEMPLATE_LABEL',
+      format: 'required-string',
       default: '',
     },
   },
