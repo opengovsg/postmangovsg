@@ -187,6 +187,7 @@ const GovsgRecipients = ({
           <p>or</p>
           <SampleCsv
             params={canAccessGovsgV ? ['language', ...params] : params}
+            defaultParams={{ language: 'English' }}
             defaultRecipient="81234567"
             setErrorMsg={console.error}
           />
