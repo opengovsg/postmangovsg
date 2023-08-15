@@ -105,6 +105,11 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     await fetchGovsgMessages(newSearch, 0)
   }
 
+  const statusesWhichAllowResend = new Set(['DELIVERED', 'READ'])
+  const shouldDisableResend = (status: string) => {
+    return !statusesWhichAllowResend.has(status)
+  }
+
   const columns = [
     {
       name: 'RECIPIENT NAME',
@@ -198,7 +203,12 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     {
       name: 'ACTION',
       render: (govsgMessage: GovsgMessage) => {
-        return <ResendButton onClick={() => openModal(govsgMessage)} />
+        return (
+          <ResendButton
+            onClick={() => openModal(govsgMessage)}
+            disabled={shouldDisableResend(govsgMessage.status)}
+          />
+        )
       },
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
