@@ -353,7 +353,10 @@ const getCampaignDetails = async (
       ],
       [
         literal(
-          'Statistic.unsent + Statistic.sent + Statistic.errored + Statistic.invalid'
+          // 'Statistic.unsent + Statistic.sent + Statistic.errored + Statistic.invalid'
+          `CASE WHEN Statistic.delivered IS NOT NULL ` +
+            `THEN Statistic.unsent + Statistic.sent + Statistic.errored + Statistic.invalid + Statistic.delivered ` +
+            `ELSE Statistic.unsent + Statistic.sent + Statistic.errored + Statistic.invalid END`
         ),
         'num_recipients',
       ],
