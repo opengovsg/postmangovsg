@@ -271,7 +271,7 @@ const parseTemplateMessageWebhook = async (
           : undefined,
         deliveredAt: timestamp,
       }
-      void govsgMessage
+      const govsgMessagePromise = govsgMessage
         ?.update(fieldOpts, whereOpts)
         .then((value) => {
           logger.info({
@@ -291,8 +291,7 @@ const parseTemplateMessageWebhook = async (
             },
           })
         })
-      void govsgMessageTransactional?.update(fieldOpts, whereOpts)
-      void govsgOp
+      const govsgOpPromise = govsgOp
         ?.update(fieldOpts, whereOpts)
         .then((value) => {
           logger.info({
@@ -312,6 +311,11 @@ const parseTemplateMessageWebhook = async (
             },
           })
         })
+      void Promise.any([
+        govsgMessagePromise,
+        govsgMessageTransactional?.update(fieldOpts, whereOpts),
+        govsgOpPromise,
+      ])
       if (!govsgMessage && !govsgOp) {
         return
       }
