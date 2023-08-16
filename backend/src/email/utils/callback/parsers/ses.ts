@@ -199,7 +199,7 @@ const validateRecord = async (
   }
 }
 const blacklistIfNeeded = async (message: any): Promise<void> => {
-  const notificationType = message?.notificationType // should this be message?.notificationType || message?.eventType?
+  const notificationType = message?.notificationType || message?.eventType
   const bounceType = message?.bounce?.bounceType
   const complaintType = message?.complaint?.complaintFeedbackType
 
