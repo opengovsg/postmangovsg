@@ -271,9 +271,21 @@ const parseTemplateMessageWebhook = async (
           : undefined,
         deliveredAt: timestamp,
       }
-      void govsgMessage?.update(fieldOpts, whereOpts)
-      void govsgMessageTransactional?.update(fieldOpts, whereOpts)
-      void govsgOp?.update(fieldOpts, whereOpts)
+      const govsgMessageStatusUpdate = await govsgMessage?.update(
+        fieldOpts,
+        whereOpts
+      )
+      const govsgMessageTransactionalStatusUpdate =
+        await govsgMessageTransactional?.update(fieldOpts, whereOpts)
+      const govsgOpStatusUpdate = await govsgOp?.update(fieldOpts, whereOpts)
+      logger.info({
+        message: '',
+        meta: {
+          govsgMessageStatusUpdate,
+          govsgMessageTransactionalStatusUpdate,
+          govsgOpStatusUpdate,
+        },
+      })
       if (!govsgMessage && !govsgOp) {
         return
       }
