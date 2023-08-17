@@ -1,6 +1,7 @@
 import config from '@core/config'
 import { whatsappService } from '@core/services'
 import { GovsgMessage, GovsgVerification } from '@govsg/models'
+import { createPasscode } from '@govsg/utils/passcode'
 import {
   WhatsAppId,
   WhatsAppApiClient,
@@ -8,8 +9,6 @@ import {
   WhatsAppTemplateMessageToSend,
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/types'
-
-import { randomInt } from 'node:crypto'
 
 export const sendPasscodeCreationMessage = async (
   whatsappId: WhatsAppId,
@@ -31,10 +30,6 @@ export const sendPasscodeCreationMessage = async (
   return passcodeCreationWamid
 }
 
-const createPasscode = () => {
-  return randomInt(0, Math.pow(10, 4)).toString().padStart(4, '0')
-}
-
 export const storePrecreatedPasscode = async (
   govsgMessageId: GovsgMessage['id'],
   passcodeCreationWamid: MessageId
@@ -43,11 +38,10 @@ export const storePrecreatedPasscode = async (
     where: { govsgMessageId },
   })
   if (!govsgVerification) {
-    const passcode = createPasscode()
     return await GovsgVerification.create({
       govsgMessageId,
       passcodeCreationWamid,
-      passcode,
+      passcode: createPasscode(),
     } as GovsgVerification)
   }
   return await govsgVerification?.update({

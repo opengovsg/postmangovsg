@@ -12,6 +12,7 @@ import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 import { loggerWithLabel } from '@core/logger'
 import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 import { GovsgVerification } from '@govsg/models'
+import { createPasscode } from '@govsg/utils/passcode'
 
 const logger = loggerWithLabel(module)
 
@@ -194,7 +195,7 @@ export function uploadCompleteOnChunk({
         GovsgVerification.create(
           {
             govsgMessageId: message.id,
-            passcode: '1111', // TODO: Generate passcode
+            passcode: createPasscode(),
           } as GovsgVerification,
           { transaction }
         )
@@ -240,7 +241,7 @@ export async function processSingleRecipientCampaign(
     await GovsgVerification.create(
       {
         govsgMessageId: govsgMessage.id,
-        passcode: '0000', // TODO: Generate passcode
+        passcode: createPasscode(),
       } as GovsgVerification,
       { transaction }
     )
