@@ -44,7 +44,7 @@ export const storePrecreatedPasscode = async (
       passcode: createPasscode(),
     } as GovsgVerification)
   }
-  return await govsgVerification?.update({
+  return await govsgVerification.update({
     passcodeCreationWamid,
   })
 }
