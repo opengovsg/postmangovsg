@@ -190,16 +190,15 @@ export function uploadCompleteOnChunk({
         returning: true,
       }
     )
-    await Promise.all(
-      govsgMessages.map((message) =>
-        GovsgVerification.create(
-          {
+    await GovsgVerification.bulkCreate(
+      govsgMessages.map(
+        (message) =>
+          ({
             govsgMessageId: message.id,
             passcode: createPasscode(),
-          } as GovsgVerification,
-          { transaction }
-        )
-      )
+          } as GovsgVerification)
+      ),
+      { transaction }
     )
   }
 }
