@@ -21,3 +21,9 @@ export class MessageIdNotFoundWebhookError extends Error {
     super(message)
   }
 }
+
+export class StatusUpdateError extends Error {
+  constructor(message: string) {
+    super(message)
+  }
+}

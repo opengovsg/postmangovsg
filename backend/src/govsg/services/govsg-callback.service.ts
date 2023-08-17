@@ -15,7 +15,10 @@ import {
   WhatsAppWebhookTextMessage,
   WhatsappWebhookMessageType,
 } from '@shared/clients/whatsapp-client.class/types'
-import { MessageIdNotFoundWebhookError } from '@shared/clients/whatsapp-client.class/errors'
+import {
+  MessageIdNotFoundWebhookError,
+  StatusUpdateError,
+} from '@shared/clients/whatsapp-client.class/errors'
 import {
   CampaignGovsgTemplate,
   GovsgMessage,
@@ -271,51 +274,23 @@ const parseTemplateMessageWebhook = async (
           : undefined,
         deliveredAt: timestamp,
       }
-      const govsgMessagePromise = govsgMessage
-        ?.update(fieldOpts, whereOpts)
-        .then((value) => {
-          logger.info({
-            message: 'Updated govsgMessage',
-            meta: {
-              govsgMessage: value,
-            },
-          })
-        })
-        .catch((reason) => {
-          logger.warning({
-            message: 'Did not update govsgMessage',
-            meta: {
-              reason,
-              fieldOpts,
-              whereOpts,
-            },
-          })
-        })
-      const govsgOpPromise = govsgOp
-        ?.update(fieldOpts, whereOpts)
-        .then((value) => {
-          logger.info({
-            message: 'Updated govsgOp',
-            meta: {
-              govsgOp: value,
-            },
-          })
-        })
-        .catch((reason) => {
-          logger.warning({
-            message: 'Did not update govsgOp',
-            meta: {
-              reason,
-              fieldOpts,
-              whereOpts,
-            },
-          })
-        })
       await Promise.any([
-        govsgMessagePromise,
+        govsgMessage?.update(fieldOpts, whereOpts),
         govsgMessageTransactional?.update(fieldOpts, whereOpts),
-        govsgOpPromise,
-      ])
+        govsgOp?.update(fieldOpts, whereOpts),
+      ]).catch((reason) => {
+        logger.error({
+          message: 'Status update failed',
+          meta: {
+            whereOpts,
+            fieldOpts,
+            reason,
+          },
+        })
+        throw new StatusUpdateError(
+          'Unable to update the status of govsgMessage/govsgMessageTransactional/govsgOp'
+        )
+      })
       if (!govsgMessage && !govsgOp) {
         return
       }
