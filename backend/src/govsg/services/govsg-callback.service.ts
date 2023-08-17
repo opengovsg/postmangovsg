@@ -279,7 +279,7 @@ const parseTemplateMessageWebhook = async (
         await govsgMessageTransactional?.update(fieldOpts, whereOpts)
       const govsgOpStatusUpdate = await govsgOp?.update(fieldOpts, whereOpts)
       logger.info({
-        message: '',
+        message: 'Logging status updates to db',
         meta: {
           govsgMessageStatusUpdate,
           govsgMessageTransactionalStatusUpdate,
