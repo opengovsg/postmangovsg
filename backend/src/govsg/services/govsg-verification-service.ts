@@ -39,12 +39,20 @@ export const storePrecreatedPasscode = async (
   govsgMessageId: GovsgMessage['id'],
   passcodeCreationWamid: MessageId
 ): Promise<GovsgVerification> => {
-  const passcode = createPasscode()
-  return await GovsgVerification.create({
-    govsgMessageId,
+  const govsgVerification = await GovsgVerification.findOne({
+    where: { govsgMessageId },
+  })
+  if (!govsgVerification) {
+    const passcode = createPasscode()
+    return await GovsgVerification.create({
+      govsgMessageId,
+      passcodeCreationWamid,
+      passcode,
+    } as GovsgVerification)
+  }
+  return await govsgVerification?.update({
     passcodeCreationWamid,
-    passcode,
-  } as GovsgVerification)
+  })
 }
 
 export const sendPasscodeMessage = async (
