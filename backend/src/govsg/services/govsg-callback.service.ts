@@ -311,7 +311,7 @@ const parseTemplateMessageWebhook = async (
             },
           })
         })
-      void Promise.any([
+      await Promise.any([
         govsgMessagePromise,
         govsgMessageTransactional?.update(fieldOpts, whereOpts),
         govsgOpPromise,
