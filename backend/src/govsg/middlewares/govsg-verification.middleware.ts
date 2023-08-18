@@ -137,7 +137,14 @@ export const trackPasscodeReveal = async (
   const userClickedAt = new Date()
   await GovsgVerification.update(
     { userClickedAt },
-    { where: { govsgMessageId } }
+    {
+      where: {
+        govsgMessageId,
+        userClickedAt: {
+          [Op.eq]: null,
+        },
+      },
+    }
   )
   return res.json({
     user_clicked_at: userClickedAt,
