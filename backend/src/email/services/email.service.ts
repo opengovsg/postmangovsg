@@ -299,14 +299,19 @@ const uploadCompleteOnChunk = ({
       },
       include: User,
     })) as Campaign
-    const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
-      const { recipient } = entry
-      return {
-        campaignId,
-        recipient: recipient.trim().toLowerCase(),
-        params: shouldBccToMe ? { ...entry, bcc: user.email } : entry,
+    const records: Array<MessageBulkInsertInterface> = data.map(
+      (entry, index) => {
+        const { recipient } = entry
+        if (!recipient) {
+          throw new Error(`Missing recipient on row ${index + 2}.`)
+        }
+        return {
+          campaignId,
+          recipient: recipient.trim().toLowerCase(),
+          params: shouldBccToMe ? { ...entry, bcc: user.email } : entry,
+        }
       }
-    })
+    )
     // START populate template
     await EmailMessage.bulkCreate(records as Array<EmailMessage>, {
       transaction,
