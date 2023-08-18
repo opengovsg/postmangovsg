@@ -1,6 +1,14 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
+details > summary {
+  list-style: none;
+}
+
+details[open] > summary {
+  display: none;
+}
+
 .positive {
   background-color: $grey-300;
   border-radius: 8px;
