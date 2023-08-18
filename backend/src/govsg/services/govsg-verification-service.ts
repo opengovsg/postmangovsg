@@ -10,6 +10,18 @@ import {
   WhatsAppLanguages,
 } from '@shared/clients/whatsapp-client.class/types'
 
+export const sendMessage = async (
+  templateMessageToSend: WhatsAppTemplateMessageToSend
+): Promise<MessageId> => {
+  const isLocal = config.get('env') === 'development'
+  const wamid = await whatsappService.whatsappClient.sendTemplateMessage(
+    templateMessageToSend,
+    isLocal
+  )
+  return wamid
+}
+
+// TODO: Remove
 export const sendPasscodeCreationMessage = async (
   whatsappId: WhatsAppId,
   clientId: WhatsAppApiClient
@@ -30,6 +42,7 @@ export const sendPasscodeCreationMessage = async (
   return passcodeCreationWamid
 }
 
+// TODO: Remove
 export const storePrecreatedPasscode = async (
   govsgMessageId: GovsgMessage['id'],
   passcodeCreationWamid: MessageId
@@ -49,6 +62,7 @@ export const storePrecreatedPasscode = async (
   })
 }
 
+// TODO: Remove
 export const sendPasscodeMessage = async (
   whatsappId: WhatsAppId,
   clientId: WhatsAppApiClient,
