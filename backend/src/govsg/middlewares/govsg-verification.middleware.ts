@@ -128,3 +128,18 @@ export const resendPasscodeCreationMessage = async (
     passcode_creation_wamid: passcodeCreationWamid,
   })
 }
+
+export const trackPasscodeReveal = async (
+  req: Request,
+  res: Response
+): Promise<Response | void> => {
+  const { govsg_message_id: govsgMessageId } = req.body
+  const userClickedAt = new Date()
+  await GovsgVerification.update(
+    { userClickedAt },
+    { where: { govsgMessageId } }
+  )
+  return res.json({
+    user_clicked_at: userClickedAt,
+  })
+}
