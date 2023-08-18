@@ -53,6 +53,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   const [search, setSearch] = useState('')
   const [selectedPage, setSelectedPage] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [shouldHavePasscode, setShouldHavePasscode] = useState(false)
   const modalContext = useContext(ModalContext)
 
   const fetchGovsgMessages = async (search: string, selectedPage: number) => {
@@ -67,10 +68,15 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         ...options,
       },
     })
-    const { messages: govsgMessages, total_count: totalCount } = response.data
+    const {
+      messages: govsgMessages,
+      total_count: totalCount,
+      has_passcode: hasPasscode,
+    } = response.data
     setGovsgMessageCount(totalCount)
     setGovsgMessagesDisplayed(govsgMessages)
     setSelectedPage(selectedPage)
+    setShouldHavePasscode(hasPasscode)
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -118,6 +124,25 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     return !govsgMessage.passcode
   }
 
+  const passcodeColumn = shouldHavePasscode
+    ? [
+        {
+          name: 'PASSCODE',
+          render: (govsgMessage: GovsgMessage) => {
+            return (
+              <PasscodeBadge label={govsgMessage.passcode} placeholder="N/A" />
+            )
+          },
+          width: 'xs',
+          renderHeader: (name: string, width: string, key: number) => (
+            <th className={width} key={key}>
+              {name}
+            </th>
+          ),
+        },
+      ]
+    : []
+
   const columns = [
     {
       name: 'RECIPIENT NAME',
@@ -152,18 +177,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         </th>
       ),
     },
-    {
-      name: 'PASSCODE',
-      render: (govsgMessage: GovsgMessage) => {
-        return <PasscodeBadge label={govsgMessage.passcode} placeholder="N/A" />
-      },
-      width: 'xs',
-      renderHeader: (name: string, width: string, key: number) => (
-        <th className={width} key={key}>
-          {name}
-        </th>
-      ),
-    },
+    ...passcodeColumn,
     {
       name: 'STATUS',
       render: (govsgMessage: GovsgMessage) => {
