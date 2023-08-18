@@ -11,8 +11,6 @@ import { GovsgMessage } from '@govsg/models/govsg-message'
 import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 import { loggerWithLabel } from '@core/logger'
 import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
-import { GovsgVerification } from '@govsg/models'
-import { createPasscode } from '@govsg/utils/passcode'
 
 const logger = loggerWithLabel(module)
 
@@ -172,34 +170,20 @@ export function uploadCompleteOnChunk({
       }
     })
 
-    const govsgMessages = await GovsgMessage.bulkCreate(
-      records as Array<GovsgMessage>,
-      {
-        transaction,
-        logging: (_message, benchmark) => {
-          if (benchmark) {
-            logger.info({
-              message: 'uploadCompleteOnChunk: ElapsedTime in ms',
-              benchmark,
-              campaignId,
-              action: 'uploadCompleteOnChunk',
-            })
-          }
-        },
-        benchmark: true,
-        returning: true,
-      }
-    )
-    await GovsgVerification.bulkCreate(
-      govsgMessages.map(
-        (message) =>
-          ({
-            govsgMessageId: message.id,
-            passcode: createPasscode(),
-          } as GovsgVerification)
-      ),
-      { transaction }
-    )
+    await GovsgMessage.bulkCreate(records as Array<GovsgMessage>, {
+      transaction,
+      logging: (_message, benchmark) => {
+        if (benchmark) {
+          logger.info({
+            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+            benchmark,
+            campaignId,
+            action: 'uploadCompleteOnChunk',
+          })
+        }
+      },
+      benchmark: true,
+    })
   }
 }
 
@@ -228,22 +212,12 @@ export async function processSingleRecipientCampaign(
       where: { campaignId },
       transaction,
     })
-    const govsgMessage = await GovsgMessage.create(
-      {
-        campaignId,
-        recipient: data.recipient,
-        languageCode,
-        params: data,
-      } as GovsgMessage,
-      { transaction, returning: true }
-    )
-    await GovsgVerification.create(
-      {
-        govsgMessageId: govsgMessage.id,
-        passcode: createPasscode(),
-      } as GovsgVerification,
-      { transaction }
-    )
+    await GovsgMessage.create({
+      campaignId,
+      recipient: data.recipient,
+      languageCode,
+      params: data,
+    } as GovsgMessage)
     await StatsService.setNumRecipients(campaignId, 1, transaction)
     await CampaignService.setValid(campaignId, transaction)
     await transaction?.commit()

@@ -25,7 +25,7 @@ export class GovsgVerification extends Model<GovsgVerification> {
   @Column({ type: DataType.BIGINT, allowNull: false })
   govsgMessageId: number
 
-  @Column({ type: DataType.STRING })
+  @Column({ type: DataType.STRING, allowNull: false })
   passcodeCreationWamid: string
 
   @Column({ type: DataType.STRING, allowNull: false })
