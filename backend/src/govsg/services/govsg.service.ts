@@ -13,6 +13,7 @@ import { loggerWithLabel } from '@core/logger'
 import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 import { GovsgVerification } from '@govsg/models'
 import { createPasscode } from '@govsg/utils/passcode'
+import config from '@core/config'
 
 const logger = loggerWithLabel(module)
 
@@ -139,6 +140,20 @@ const getLanguageCode = (language: string | undefined) => {
   return WhatsAppLanguages[key as keyof typeof WhatsAppLanguages]
 }
 
+const isUsingPrecallTemplate = async (govsgMessage: GovsgMessage) => {
+  const campaignId = govsgMessage.campaignId
+  const campaignGovsgTemplate = await CampaignGovsgTemplate.findOne({
+    where: {
+      campaignId,
+    },
+    include: [Campaign, GovsgTemplate],
+  })
+  return (
+    campaignGovsgTemplate?.govsgTemplate.whatsappTemplateLabel ===
+    config.get('whatsapp.precallTemplateLabel')
+  )
+}
+
 export function uploadCompleteOnChunk({
   transaction,
   campaignId,
@@ -190,16 +205,24 @@ export function uploadCompleteOnChunk({
         returning: true,
       }
     )
-    await GovsgVerification.bulkCreate(
-      govsgMessages.map(
-        (message) =>
-          ({
-            govsgMessageId: message.id,
-            passcode: createPasscode(),
-          } as GovsgVerification)
-      ),
-      { transaction }
-    )
+    if (!govsgMessages.length) {
+      return
+    }
+    // All govsg messages grouped in bulk-send use the same message template, so it is enough to check isUsingPrecallTemplate on any one message.
+    const govsgMessage = govsgMessages[0]
+    const shouldHavePasscode = await isUsingPrecallTemplate(govsgMessage)
+    if (shouldHavePasscode) {
+      await GovsgVerification.bulkCreate(
+        govsgMessages.map(
+          (message) =>
+            ({
+              govsgMessageId: message.id,
+              passcode: createPasscode(),
+            } as GovsgVerification)
+        ),
+        { transaction }
+      )
+    }
   }
 }
 
@@ -237,13 +260,16 @@ export async function processSingleRecipientCampaign(
       } as GovsgMessage,
       { transaction, returning: true }
     )
-    await GovsgVerification.create(
-      {
-        govsgMessageId: govsgMessage.id,
-        passcode: createPasscode(),
-      } as GovsgVerification,
-      { transaction }
-    )
+    const shouldHavePasscode = await isUsingPrecallTemplate(govsgMessage)
+    if (shouldHavePasscode) {
+      await GovsgVerification.create(
+        {
+          govsgMessageId: govsgMessage.id,
+          passcode: createPasscode(),
+        } as GovsgVerification,
+        { transaction }
+      )
+    }
     await StatsService.setNumRecipients(campaignId, 1, transaction)
     await CampaignService.setValid(campaignId, transaction)
     await transaction?.commit()
