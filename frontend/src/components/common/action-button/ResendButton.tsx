@@ -17,7 +17,7 @@ export const ResendButton = ({ onClick, disabled }: ResendButtonProps) => {
   const renderTooltip = () => {
     return (
       <div style={{ visibility: disabled ? 'visible' : 'hidden' }}>
-        <Tooltip text="Unable to resend passcode creation because the initial message has not reached the recipient's phone. Contact us if this problem persists.">
+        <Tooltip text="Resend is not applicable to this message template.">
           <i className="bx bxs-help-circle"></i>
         </Tooltip>
       </div>

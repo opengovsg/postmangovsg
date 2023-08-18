@@ -114,9 +114,8 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     await searchGovsgMessages(newSearch, 0)
   }
 
-  const statusesWhichAllowResend = new Set(['DELIVERED', 'READ'])
-  const shouldDisableResend = (status: string) => {
-    return !statusesWhichAllowResend.has(status)
+  const shouldDisableResend = (govsgMessage: GovsgMessage) => {
+    return !govsgMessage.passcode
   }
 
   const columns = [
@@ -156,12 +155,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     {
       name: 'PASSCODE',
       render: (govsgMessage: GovsgMessage) => {
-        return (
-          <PasscodeBadge
-            label={govsgMessage.passcode}
-            placeholder="Not created yet"
-          />
-        )
+        return <PasscodeBadge label={govsgMessage.passcode} placeholder="N/A" />
       },
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
@@ -215,7 +209,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         return (
           <ResendButton
             onClick={() => openModal(govsgMessage)}
-            disabled={shouldDisableResend(govsgMessage.status)}
+            disabled={shouldDisableResend(govsgMessage)}
           />
         )
       },
