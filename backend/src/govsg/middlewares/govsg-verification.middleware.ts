@@ -65,9 +65,7 @@ export const listMessages = async (
       name: recipient_name,
       mobile: recipient,
       data: JSON.stringify(remainingParams),
-      passcode: row.govsgVerification?.userClickedAt
-        ? row.govsgVerification.passcode
-        : '',
+      passcode: row.govsgVerification.passcode,
       sent: row.sentAt,
       officer: officer_name,
     }
