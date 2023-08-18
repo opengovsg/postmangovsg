@@ -140,8 +140,7 @@ const getLanguageCode = (language: string | undefined) => {
   return WhatsAppLanguages[key as keyof typeof WhatsAppLanguages]
 }
 
-const isUsingPrecallTemplate = async (govsgMessage: GovsgMessage) => {
-  const campaignId = govsgMessage.campaignId
+const isUsingPrecallTemplate = async (campaignId: number) => {
   const campaignGovsgTemplate = await CampaignGovsgTemplate.findOne({
     where: {
       campaignId,
@@ -210,7 +209,9 @@ export function uploadCompleteOnChunk({
     }
     // All govsg messages grouped in bulk-send use the same message template, so it is enough to check isUsingPrecallTemplate on any one message.
     const govsgMessage = govsgMessages[0]
-    const shouldHavePasscode = await isUsingPrecallTemplate(govsgMessage)
+    const shouldHavePasscode = await isUsingPrecallTemplate(
+      govsgMessage.campaignId
+    )
     if (shouldHavePasscode) {
       await GovsgVerification.bulkCreate(
         govsgMessages.map(
@@ -251,23 +252,35 @@ export async function processSingleRecipientCampaign(
       where: { campaignId },
       transaction,
     })
-    const govsgMessage = await GovsgMessage.create(
-      {
-        campaignId,
-        recipient: data.recipient,
-        languageCode,
-        params: data,
-      } as GovsgMessage,
-      { transaction, returning: true }
-    )
-    const shouldHavePasscode = await isUsingPrecallTemplate(govsgMessage)
+    const shouldHavePasscode = await isUsingPrecallTemplate(campaignId)
     if (shouldHavePasscode) {
+      const passcode = createPasscode()
+      const dataWithPasscode = { ...data, passcode }
+      const govsgMessage = await GovsgMessage.create(
+        {
+          campaignId,
+          recipient: data.recipient,
+          languageCode,
+          params: dataWithPasscode,
+        } as GovsgMessage,
+        { transaction, returning: true }
+      )
       await GovsgVerification.create(
         {
           govsgMessageId: govsgMessage.id,
-          passcode: createPasscode(),
+          passcode,
         } as GovsgVerification,
         { transaction }
+      )
+    } else {
+      await GovsgMessage.create(
+        {
+          campaignId,
+          recipient: data.recipient,
+          languageCode,
+          params: data,
+        } as GovsgMessage,
+        { transaction, returning: true }
       )
     }
     await StatsService.setNumRecipients(campaignId, 1, transaction)
