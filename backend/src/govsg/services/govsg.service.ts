@@ -262,12 +262,33 @@ export async function processSingleRecipientCampaign(
     )
     const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
     if (shouldHavePasscode) {
+      const passcode = createPasscode()
+      const dataWithPasscode = { ...data, passcode }
+      const govsgMessage = await GovsgMessage.create(
+        {
+          campaignId,
+          recipient: data.recipient,
+          languageCode,
+          params: dataWithPasscode,
+        } as GovsgMessage,
+        { transaction, returning: true }
+      )
       await GovsgVerification.create(
         {
           govsgMessageId: govsgMessage.id,
-          passcode: createPasscode(),
+          passcode,
         } as GovsgVerification,
         { transaction }
+      )
+    } else {
+      await GovsgMessage.create(
+        {
+          campaignId,
+          recipient: data.recipient,
+          languageCode,
+          params: data,
+        } as GovsgMessage,
+        { transaction, returning: true }
       )
     }
     await StatsService.setNumRecipients(campaignId, 1, transaction)
