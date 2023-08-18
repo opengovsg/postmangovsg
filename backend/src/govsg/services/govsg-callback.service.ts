@@ -385,16 +385,11 @@ const parseUserMessageWebhook = async (
   clientId: WhatsAppApiClient
 ): Promise<void> => {
   const { wa_id: whatsappId } = body.contacts[0]
-  const { id: messageId, type, timestamp } = body.messages[0]
-  const timestampAsDate = new Date(parseInt(timestamp, 10) * 1000) // convert to milliseconds
+  const { id: messageId, type } = body.messages[0]
   if (type === WhatsappWebhookMessageType.button) {
     const message = body.messages[0] as WhatsAppWebhookButtonMessage
     if (message.button.text === 'Create passcode') {
       const passcodeCreationWamid = message.context.id
-      await GovsgVerification.update(
-        { userClickedAt: timestampAsDate },
-        { where: { passcodeCreationWamid } }
-      )
       const govsgVerification = await GovsgVerification.findOne({
         where: { passcodeCreationWamid },
         include: [GovsgMessage],
