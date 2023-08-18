@@ -170,7 +170,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         const json = JSON.parse(govsgMessage.data)
         return <PrettyJson json={json} />
       },
-      width: 'md',
+      width: 'sm',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
           {name}
@@ -200,7 +200,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         ) : (
           <span></span>
         ),
-      width: 'sm',
+      width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
           {name}
