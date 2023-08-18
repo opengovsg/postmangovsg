@@ -147,6 +147,6 @@ export const trackPasscodeReveal = async (
     }
   )
   return res.json({
-    user_clicked_at: userClickedAt,
+    govsg_message_id: govsgMessageId,
   })
 }
