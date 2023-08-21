@@ -208,7 +208,7 @@ export function uploadCompleteOnChunk({
     if (!govsgMessages.length) {
       return
     }
-    // All govsg messages grouped in bulk-send use the same message template, so it is enough to check isUsingPrecallTemplate on any one message.
+    // All govsg messages grouped in bulk-send use the same message template, so it is enough to check isTemplateWithPasscode on any one message.
     const govsgMessage = govsgMessages[0]
     const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
     if (shouldHavePasscode) {
