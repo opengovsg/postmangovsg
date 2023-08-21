@@ -147,8 +147,7 @@ const getLanguageCode = (language: string | undefined) => {
   return WhatsAppLanguages[key as keyof typeof WhatsAppLanguages]
 }
 
-const isTemplateWithPasscode = async (govsgMessage: GovsgMessage) => {
-  const campaignId = govsgMessage.campaignId
+const isTemplateWithPasscode = async (campaignId: number) => {
   const campaignGovsgTemplate = await CampaignGovsgTemplate.findOne({
     where: {
       campaignId,
@@ -219,9 +218,7 @@ export function uploadCompleteOnChunk({
     if (!govsgMessages.length) {
       return
     }
-    // All govsg messages grouped in bulk-send use the same message template, so it is enough to check isTemplateWithPasscode on any one message.
-    const govsgMessage = govsgMessages[0]
-    const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
+    const shouldHavePasscode = await isTemplateWithPasscode(campaignId)
     if (shouldHavePasscode) {
       await GovsgVerification.bulkCreate(
         govsgMessages.map(
@@ -264,16 +261,7 @@ export async function processSingleRecipientCampaign(
       where: { campaignId },
       transaction,
     })
-    const govsgMessage = await GovsgMessage.create(
-      {
-        campaignId,
-        recipient: data.recipient,
-        languageCode,
-        params: data,
-      } as GovsgMessage,
-      { transaction, returning: true }
-    )
-    const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
+    const shouldHavePasscode = await isTemplateWithPasscode(campaignId)
     if (shouldHavePasscode) {
       const passcode = createPasscode()
       const dataWithPasscode = { ...data, passcode }
