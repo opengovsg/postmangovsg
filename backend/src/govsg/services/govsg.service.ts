@@ -111,11 +111,18 @@ export function uploadCompleteOnPreview({
   campaignId: number
 }): (data: CSVParams[]) => Promise<void> {
   return async function (data: CSVParams[]): Promise<void> {
+    const paramsWithoutPasscode = template.params!.filter(
+      (param) => param !== 'passcode'
+    ) // TODO: Un-hardcode this
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    UploadService.checkTemplateKeysMatch(data, template.params!)
+    UploadService.checkTemplateKeysMatch(data, paramsWithoutPasscode)
 
+    const testDataWithPasscodePlaceholder = {
+      ...data[0],
+      ['passcode' as string]: '(random 4-digit passcode)',
+    }
     GovsgTemplateService.testHydration(
-      [{ params: data[0] }],
+      [{ params: testDataWithPasscodePlaceholder }],
       template.body as string
     )
     await GovsgMessage.destroy({
@@ -179,10 +186,14 @@ export function uploadCompleteOnChunk({
         )
       }
       recipients.add(recipient)
+      const paramsWithPasscode = {
+        ...entry,
+        passcode: createPasscode(),
+      }
       return {
         campaignId,
         recipient: recipient,
-        params: entry,
+        params: paramsWithPasscode,
         languageCode: getLanguageCode(entry.language),
       }
     })
@@ -217,7 +228,9 @@ export function uploadCompleteOnChunk({
           (message) =>
             ({
               govsgMessageId: message.id,
-              passcode: createPasscode(),
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              passcode: message.params.passcode,
             } as GovsgVerification)
         ),
         { transaction }
