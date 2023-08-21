@@ -9,6 +9,10 @@ details[open] > summary {
   display: none;
 }
 
+summary:hover {
+  cursor: pointer;
+}
+
 .positive {
   background-color: $grey-300;
   border-radius: 8px;
