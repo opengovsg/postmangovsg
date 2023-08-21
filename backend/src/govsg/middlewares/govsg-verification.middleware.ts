@@ -65,9 +65,7 @@ export const listMessages = async (
       name: recipient_name,
       mobile: recipient,
       data: JSON.stringify(remainingParams),
-      passcode: row.govsgVerification?.userClickedAt
-        ? row.govsgVerification.passcode
-        : '',
+      passcode: row.govsgVerification?.passcode,
       sent: row.sentAt,
       officer: officer_name,
     }
@@ -75,6 +73,7 @@ export const listMessages = async (
   return res.json({
     messages,
     total_count: count,
+    has_passcode: !!rows[0]?.govsgVerification?.passcode,
   })
 }
 

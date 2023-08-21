@@ -11,6 +11,9 @@ import { GovsgMessage } from '@govsg/models/govsg-message'
 import { MessageBulkInsertInterface } from '@core/interfaces/message.interface'
 import { loggerWithLabel } from '@core/logger'
 import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
+import { GovsgVerification } from '@govsg/models'
+import { createPasscode } from '@govsg/utils/passcode'
+import config from '@core/config'
 
 const logger = loggerWithLabel(module)
 
@@ -137,6 +140,20 @@ const getLanguageCode = (language: string | undefined) => {
   return WhatsAppLanguages[key as keyof typeof WhatsAppLanguages]
 }
 
+const isTemplateWithPasscode = async (govsgMessage: GovsgMessage) => {
+  const campaignId = govsgMessage.campaignId
+  const campaignGovsgTemplate = await CampaignGovsgTemplate.findOne({
+    where: {
+      campaignId,
+    },
+    include: [Campaign, GovsgTemplate],
+  })
+  return (
+    campaignGovsgTemplate?.govsgTemplate.whatsappTemplateLabel ===
+    config.get('whatsapp.precallTemplateLabel')
+  )
+}
+
 export function uploadCompleteOnChunk({
   transaction,
   campaignId,
@@ -170,20 +187,42 @@ export function uploadCompleteOnChunk({
       }
     })
 
-    await GovsgMessage.bulkCreate(records as Array<GovsgMessage>, {
-      transaction,
-      logging: (_message, benchmark) => {
-        if (benchmark) {
-          logger.info({
-            message: 'uploadCompleteOnChunk: ElapsedTime in ms',
-            benchmark,
-            campaignId,
-            action: 'uploadCompleteOnChunk',
-          })
-        }
-      },
-      benchmark: true,
-    })
+    const govsgMessages = await GovsgMessage.bulkCreate(
+      records as Array<GovsgMessage>,
+      {
+        transaction,
+        logging: (_message, benchmark) => {
+          if (benchmark) {
+            logger.info({
+              message: 'uploadCompleteOnChunk: ElapsedTime in ms',
+              benchmark,
+              campaignId,
+              action: 'uploadCompleteOnChunk',
+            })
+          }
+        },
+        benchmark: true,
+        returning: true,
+      }
+    )
+    if (!govsgMessages.length) {
+      return
+    }
+    // All govsg messages grouped in bulk-send use the same message template, so it is enough to check isTemplateWithPasscode on any one message.
+    const govsgMessage = govsgMessages[0]
+    const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
+    if (shouldHavePasscode) {
+      await GovsgVerification.bulkCreate(
+        govsgMessages.map(
+          (message) =>
+            ({
+              govsgMessageId: message.id,
+              passcode: createPasscode(),
+            } as GovsgVerification)
+        ),
+        { transaction }
+      )
+    }
   }
 }
 
@@ -212,12 +251,25 @@ export async function processSingleRecipientCampaign(
       where: { campaignId },
       transaction,
     })
-    await GovsgMessage.create({
-      campaignId,
-      recipient: data.recipient,
-      languageCode,
-      params: data,
-    } as GovsgMessage)
+    const govsgMessage = await GovsgMessage.create(
+      {
+        campaignId,
+        recipient: data.recipient,
+        languageCode,
+        params: data,
+      } as GovsgMessage,
+      { transaction, returning: true }
+    )
+    const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
+    if (shouldHavePasscode) {
+      await GovsgVerification.create(
+        {
+          govsgMessageId: govsgMessage.id,
+          passcode: createPasscode(),
+        } as GovsgVerification,
+        { transaction }
+      )
+    }
     await StatsService.setNumRecipients(campaignId, 1, transaction)
     await CampaignService.setValid(campaignId, transaction)
     await transaction?.commit()

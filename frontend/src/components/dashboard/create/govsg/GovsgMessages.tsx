@@ -53,6 +53,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   const [search, setSearch] = useState('')
   const [selectedPage, setSelectedPage] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [shouldHavePasscode, setShouldHavePasscode] = useState(false)
   const modalContext = useContext(ModalContext)
 
   const fetchGovsgMessages = async (search: string, selectedPage: number) => {
@@ -67,10 +68,15 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         ...options,
       },
     })
-    const { messages: govsgMessages, total_count: totalCount } = response.data
+    const {
+      messages: govsgMessages,
+      total_count: totalCount,
+      has_passcode: hasPasscode,
+    } = response.data
     setGovsgMessageCount(totalCount)
     setGovsgMessagesDisplayed(govsgMessages)
     setSelectedPage(selectedPage)
+    setShouldHavePasscode(hasPasscode)
   }
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -114,10 +120,28 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     await searchGovsgMessages(newSearch, 0)
   }
 
-  const statusesWhichAllowResend = new Set(['DELIVERED', 'READ'])
-  const shouldDisableResend = (status: string) => {
-    return !statusesWhichAllowResend.has(status)
+  const shouldDisableResend = (govsgMessage: GovsgMessage) => {
+    return !govsgMessage.passcode
   }
+
+  const passcodeColumn = shouldHavePasscode
+    ? [
+        {
+          name: 'PASSCODE',
+          render: (govsgMessage: GovsgMessage) => {
+            return (
+              <PasscodeBadge label={govsgMessage.passcode} placeholder="N/A" />
+            )
+          },
+          width: 'xs',
+          renderHeader: (name: string, width: string, key: number) => (
+            <th className={width} key={key}>
+              {name}
+            </th>
+          ),
+        },
+      ]
+    : []
 
   const columns = [
     {
@@ -146,30 +170,14 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         const json = JSON.parse(govsgMessage.data)
         return <PrettyJson json={json} />
       },
-      width: 'md',
+      width: 'sm',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
           {name}
         </th>
       ),
     },
-    {
-      name: 'PASSCODE',
-      render: (govsgMessage: GovsgMessage) => {
-        return (
-          <PasscodeBadge
-            label={govsgMessage.passcode}
-            placeholder="Not created yet"
-          />
-        )
-      },
-      width: 'xs',
-      renderHeader: (name: string, width: string, key: number) => (
-        <th className={width} key={key}>
-          {name}
-        </th>
-      ),
-    },
+    ...passcodeColumn,
     {
       name: 'STATUS',
       render: (govsgMessage: GovsgMessage) => {
@@ -192,7 +200,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         ) : (
           <span></span>
         ),
-      width: 'sm',
+      width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (
         <th className={width} key={key}>
           {name}
@@ -215,7 +223,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
         return (
           <ResendButton
             onClick={() => openModal(govsgMessage)}
-            disabled={shouldDisableResend(govsgMessage.status)}
+            disabled={shouldDisableResend(govsgMessage)}
           />
         )
       },

@@ -114,7 +114,7 @@ table {
   tr {
     @include flex-horizontal;
     border-bottom: 1px solid adjust-color($primary-light, $alpha: -0.5);
-    height: $height-3;
+    min-height: $height-3;
 
     td,
     th {
