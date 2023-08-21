@@ -11,7 +11,6 @@ import {
   WhatsAppTemplateMessageToSend,
   WhatsAppTemplateMessageWebhook,
   WhatsAppTextMessageToSend,
-  WhatsAppWebhookButtonMessage,
   WhatsAppWebhookTextMessage,
   WhatsappWebhookMessageType,
 } from '@shared/clients/whatsapp-client.class/types'
@@ -23,7 +22,6 @@ import {
   shouldUpdateStatus,
 } from '@core/constants'
 import { whatsappService } from '@core/services'
-import { GovsgVerification } from '@govsg/models/govsg-verification'
 
 const logger = loggerWithLabel(module)
 
@@ -320,43 +318,6 @@ const parseUserMessageWebhook = async (
 ): Promise<void> => {
   const { wa_id: whatsappId } = body.contacts[0]
   const { id: messageId, type } = body.messages[0]
-  if (type === WhatsappWebhookMessageType.button) {
-    const message = body.messages[0] as WhatsAppWebhookButtonMessage
-    if (message.button.text === 'Create passcode') {
-      const passcodeCreationWamid = message.context.id
-      const govsgVerification = await GovsgVerification.findOne({
-        where: { passcodeCreationWamid },
-        include: [GovsgMessage],
-      })
-      if (!govsgVerification) {
-        logger.error({
-          message: `govsgVerification for an expected button reply was not found.`,
-          meta: {
-            whatsappId,
-            messageId,
-            type,
-          },
-        })
-        return
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const { officer_name: officerName, agency: officerAgency } =
-        govsgVerification.govsgMessage.params
-      const passcode = govsgVerification.passcode
-      // We don't check canAccessGovsgV here because users without canAccessGovsgV
-      // do not even get to send the passcode creation message and thus no replies
-      // of this sort should exist for those users.
-      await sendPasscodeMessage(
-        whatsappId,
-        clientId,
-        officerName,
-        officerAgency,
-        passcode
-      )
-    }
-    return
-  }
   if (type !== WhatsappWebhookMessageType.text) {
     // not text message, log and ignore
     logger.info({
