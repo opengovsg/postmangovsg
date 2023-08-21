@@ -70,18 +70,10 @@ export const listMessages = async (
       officer: officer_name,
     }
   })
-  if (count > 0) {
-    const row = rows[0]
-    return res.json({
-      messages,
-      total_count: count,
-      has_passcode: !!row.govsgVerification?.passcode,
-    })
-  }
   return res.json({
     messages,
     total_count: count,
-    has_passcode: false,
+    has_passcode: !!rows[0]?.govsgVerification?.passcode,
   })
 }
 

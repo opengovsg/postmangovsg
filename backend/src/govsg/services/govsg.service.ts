@@ -140,7 +140,7 @@ const getLanguageCode = (language: string | undefined) => {
   return WhatsAppLanguages[key as keyof typeof WhatsAppLanguages]
 }
 
-const isUsingPrecallTemplate = async (govsgMessage: GovsgMessage) => {
+const isTemplateWithPasscode = async (govsgMessage: GovsgMessage) => {
   const campaignId = govsgMessage.campaignId
   const campaignGovsgTemplate = await CampaignGovsgTemplate.findOne({
     where: {
@@ -210,7 +210,7 @@ export function uploadCompleteOnChunk({
     }
     // All govsg messages grouped in bulk-send use the same message template, so it is enough to check isUsingPrecallTemplate on any one message.
     const govsgMessage = govsgMessages[0]
-    const shouldHavePasscode = await isUsingPrecallTemplate(govsgMessage)
+    const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
     if (shouldHavePasscode) {
       await GovsgVerification.bulkCreate(
         govsgMessages.map(
@@ -260,7 +260,7 @@ export async function processSingleRecipientCampaign(
       } as GovsgMessage,
       { transaction, returning: true }
     )
-    const shouldHavePasscode = await isUsingPrecallTemplate(govsgMessage)
+    const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
     if (shouldHavePasscode) {
       await GovsgVerification.create(
         {
