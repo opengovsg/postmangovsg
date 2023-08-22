@@ -1,3 +1,4 @@
+import { i18n } from '@lingui/core'
 import {
   Dispatch,
   SetStateAction,
@@ -5,6 +6,7 @@ import {
   useEffect,
   useState,
 } from 'react'
+import { OutboundLink } from 'react-ga'
 
 import { useParams } from 'react-router-dom'
 
@@ -29,6 +31,7 @@ import {
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { useGovsgV } from 'components/custom-hooks/useGovsgV'
+import { LINKS } from 'config'
 
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
@@ -174,8 +177,19 @@ const GovsgRecipients = ({
           </p>
         </StepHeader>
         {!csvFilename && (
-          <WarningBlock title="We do not allow duplicate recipients in Gov.sg campaigns">
-            Each recipient may only receive one message per campaign.
+          <WarningBlock title={'We do not remove duplicate recipients'}>
+            This is because some use cases intend to send multiple messages to
+            the same recipient. If this is not intended, please remove the
+            duplicates. Learn how{' '}
+            <OutboundLink
+              className={styles.warningHelpLink}
+              eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              target="_blank"
+            >
+              from our guide
+            </OutboundLink>
+            .
           </WarningBlock>
         )}
 

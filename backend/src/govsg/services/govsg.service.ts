@@ -168,7 +168,6 @@ export function uploadCompleteOnChunk({
   campaignId: number
 }): (data: CSVParams[]) => Promise<void> {
   return async function (data: CSVParams[]): Promise<void> {
-    const recipients = new Set<string>([])
     const records: Array<MessageBulkInsertInterface> = data.map((entry) => {
       const keysWithMissingValues = Object.keys(entry).filter((k) => !entry[k])
       if (keysWithMissingValues.length > 0) {
@@ -178,20 +177,13 @@ export function uploadCompleteOnChunk({
           )}`
         )
       }
-      const recipient = entry.recipient.trim()
-      if (recipients.has(recipient)) {
-        throw new Error(
-          `Duplicate recipient: ${recipient}. Duplicate recipients are not acceptable in Gov.sg campaigns.`
-        )
-      }
-      recipients.add(recipient)
       const paramsWithPasscode = {
         ...entry,
         passcode: createPasscode(),
       }
       return {
         campaignId,
-        recipient: recipient,
+        recipient: entry.recipient.trim(),
         params: paramsWithPasscode,
         languageCode: getLanguageCode(entry.language),
       }
