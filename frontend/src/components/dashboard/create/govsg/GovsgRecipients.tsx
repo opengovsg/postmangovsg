@@ -55,7 +55,9 @@ const GovsgRecipients = ({
     csvFilename: initialCsvFilename,
     params,
   } = campaign
-  const paramsWithoutPasscode = params.filter((value) => value !== 'passcode')
+  const paramsWithoutPasscode = (params ?? []).filter(
+    (value) => value !== 'passcode'
+  )
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({ numRecipients: initialNumRecipients, csvFilename: initialCsvFilename })
