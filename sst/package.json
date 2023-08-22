@@ -32,6 +32,7 @@
   ],
   "dependencies": {
     "aws-cdk": "^2.87.0",
+    "axios": "^1.4.0",
     "cronitor": "^2.3.3"
   },
   "lint-staged": {

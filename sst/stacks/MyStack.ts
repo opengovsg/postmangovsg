@@ -89,6 +89,30 @@ export function MyStack({ app, stack }: StackContext) {
     new Config.Secret(stack, 'CRONITOR_CODE_UNSUB_DIGEST'),
   ]
   unsubDigestCron.bind(unsubDigestCronResources)
+
+  // Cron job #4: monitor for govsg messages not getting any webhooks
+  const govsgWebhookMonitorCron = new Cron(stack, 'govsg-webhook-monitor', {
+    schedule: 'cron(*/10 * ? * * *)',
+    job: {
+      function: {
+        handler:
+          'packages/functions/src/cron-jobs/govsg-webhook-monitor/cron.handler',
+        timeout: '10 minutes',
+        vpc: existingVpc,
+        securityGroups: [existingSg],
+        vpcSubnets: {
+          subnets: existingVpc.privateSubnets,
+        },
+      },
+    },
+  })
+  const govsgWebhookMonitorCronResources = [
+    postmanDbUri,
+    cronitorUrlSuffix,
+    new Config.Secret(stack, 'CRONITOR_CODE_GOVSG_WEBHOOK_MONITOR'),
+    new Config.Secret(stack, 'SGC_ALERT_WEBHOOK'),
+  ]
+  govsgWebhookMonitorCron.bind(govsgWebhookMonitorCronResources)
 }
 
 function getResourceIdentifiers(stage: string) {
