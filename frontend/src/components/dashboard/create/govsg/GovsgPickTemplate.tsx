@@ -1,4 +1,5 @@
 import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
+import { sortBy } from 'lodash'
 import {
   Dispatch,
   ReactNode,
@@ -136,7 +137,7 @@ function GovsgPickTemplate({
               <i className="bx bx-loader-alt bx-spin" />
             </div>
           ) : (
-            availableTemplates.map((t: GovsgTemplate) => (
+            sortBy(availableTemplates, 'name').map((t: GovsgTemplate) => (
               <>
                 <RadioChoice
                   key={t.id}
