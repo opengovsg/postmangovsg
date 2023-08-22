@@ -93,6 +93,7 @@ export interface ConfigSchema {
     authTokenTwo: string
     authTokenTwoExpiry: string
   }
+  sgcCampaignAlertChannelWebhookUrl: string
 
   phonebook: {
     enabled: boolean
@@ -418,6 +419,11 @@ const config: Config<ConfigSchema> = convict({
       env: 'WA_AUTH_TOKEN_2_EXPIRY',
       default: '',
     },
+  },
+  sgcCampaignAlertChannelWebhookUrl: {
+    doc: 'Slack webhook URL to post Gov.sg campaign alerts',
+    env: 'SGC_CAMPAIGN_ALERT_WEBHOOK',
+    default: '',
   },
   phonebook: {
     enabled: {
