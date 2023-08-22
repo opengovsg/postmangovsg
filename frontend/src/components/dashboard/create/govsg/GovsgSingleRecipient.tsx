@@ -52,6 +52,7 @@ const GovsgSingleRecipient = ({
     fieldsToRender.reduce((cul, f) => ({ [f.id]: '', ...cul }), {
       recipient: '',
       language: WhatsAppLanguages.english,
+      passcode: '(random 4-digit passcode)',
     })
   )
   const { id: campaignId } = useParams<{ id: string }>()
@@ -86,8 +87,13 @@ const GovsgSingleRecipient = ({
 
   const onModalConfirm = async () => {
     if (!campaignId) return
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { passcode, ...dataWithoutPasscodePlaceholder } = data
     try {
-      await sendSingleRecipientCampaign(+campaignId, data)
+      await sendSingleRecipientCampaign(
+        +campaignId,
+        dataWithoutPasscodePlaceholder
+      )
       updateCampaign({ status: Status.Sending, numRecipients: 1 })
     } catch (e) {
       console.error(e)

@@ -88,7 +88,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
   )
 
   const onModalConfirm = async (govsgMessage: GovsgMessage) => {
-    await axios.post(`/campaign/${campaignId}/govsg/resend-passcode-creation`, {
+    await axios.post(`/campaign/${campaignId}/govsg/resend`, {
       govsg_message_id: govsgMessage.id,
     })
   }
@@ -128,10 +128,6 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     },
     []
   )
-
-  const shouldDisableResend = (govsgMessage: GovsgMessage) => {
-    return !govsgMessage.passcode
-  }
 
   const passcodeColumn = shouldHavePasscode
     ? [
@@ -233,12 +229,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     {
       name: 'ACTION',
       render: (govsgMessage: GovsgMessage) => {
-        return (
-          <ResendButton
-            onClick={() => openModal(govsgMessage)}
-            disabled={shouldDisableResend(govsgMessage)}
-          />
-        )
+        return <ResendButton onClick={() => openModal(govsgMessage)} />
       },
       width: 'xs',
       renderHeader: (name: string, width: string, key: number) => (

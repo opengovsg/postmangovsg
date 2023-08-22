@@ -111,11 +111,18 @@ export function uploadCompleteOnPreview({
   campaignId: number
 }): (data: CSVParams[]) => Promise<void> {
   return async function (data: CSVParams[]): Promise<void> {
+    const paramsWithoutPasscode = template.params!.filter(
+      (param) => param !== 'passcode'
+    ) // TODO: Un-hardcode this
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    UploadService.checkTemplateKeysMatch(data, template.params!)
+    UploadService.checkTemplateKeysMatch(data, paramsWithoutPasscode)
 
+    const testDataWithPasscodePlaceholder = {
+      ...data[0],
+      ['passcode' as string]: '(random 4-digit passcode)',
+    }
     GovsgTemplateService.testHydration(
-      [{ params: data[0] }],
+      [{ params: testDataWithPasscodePlaceholder }],
       template.body as string
     )
     await GovsgMessage.destroy({
@@ -140,8 +147,7 @@ const getLanguageCode = (language: string | undefined) => {
   return WhatsAppLanguages[key as keyof typeof WhatsAppLanguages]
 }
 
-const isTemplateWithPasscode = async (govsgMessage: GovsgMessage) => {
-  const campaignId = govsgMessage.campaignId
+const isTemplateWithPasscode = async (campaignId: number) => {
   const campaignGovsgTemplate = await CampaignGovsgTemplate.findOne({
     where: {
       campaignId,
@@ -179,10 +185,14 @@ export function uploadCompleteOnChunk({
         )
       }
       recipients.add(recipient)
+      const paramsWithPasscode = {
+        ...entry,
+        passcode: createPasscode(),
+      }
       return {
         campaignId,
         recipient: recipient,
-        params: entry,
+        params: paramsWithPasscode,
         languageCode: getLanguageCode(entry.language),
       }
     })
@@ -208,16 +218,16 @@ export function uploadCompleteOnChunk({
     if (!govsgMessages.length) {
       return
     }
-    // All govsg messages grouped in bulk-send use the same message template, so it is enough to check isTemplateWithPasscode on any one message.
-    const govsgMessage = govsgMessages[0]
-    const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
+    const shouldHavePasscode = await isTemplateWithPasscode(campaignId)
     if (shouldHavePasscode) {
       await GovsgVerification.bulkCreate(
         govsgMessages.map(
           (message) =>
             ({
               govsgMessageId: message.id,
-              passcode: createPasscode(),
+              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // @ts-ignore
+              passcode: message.params.passcode,
             } as GovsgVerification)
         ),
         { transaction }
@@ -251,23 +261,35 @@ export async function processSingleRecipientCampaign(
       where: { campaignId },
       transaction,
     })
-    const govsgMessage = await GovsgMessage.create(
-      {
-        campaignId,
-        recipient: data.recipient,
-        languageCode,
-        params: data,
-      } as GovsgMessage,
-      { transaction, returning: true }
-    )
-    const shouldHavePasscode = await isTemplateWithPasscode(govsgMessage)
+    const shouldHavePasscode = await isTemplateWithPasscode(campaignId)
     if (shouldHavePasscode) {
+      const passcode = createPasscode()
+      const dataWithPasscode = { ...data, passcode }
+      const govsgMessage = await GovsgMessage.create(
+        {
+          campaignId,
+          recipient: data.recipient,
+          languageCode,
+          params: dataWithPasscode,
+        } as GovsgMessage,
+        { transaction, returning: true }
+      )
       await GovsgVerification.create(
         {
           govsgMessageId: govsgMessage.id,
-          passcode: createPasscode(),
+          passcode,
         } as GovsgVerification,
         { transaction }
+      )
+    } else {
+      await GovsgMessage.create(
+        {
+          campaignId,
+          recipient: data.recipient,
+          languageCode,
+          params: data,
+        } as GovsgMessage,
+        { transaction, returning: true }
       )
     }
     await StatsService.setNumRecipients(campaignId, 1, transaction)
