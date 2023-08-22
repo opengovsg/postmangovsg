@@ -143,13 +143,13 @@ router.get(
 )
 
 router.post(
-  '/resend-passcode-creation',
+  '/resend',
   celebrate({
     [Segments.BODY]: {
       govsg_message_id: Joi.string().required(),
     },
   }),
-  GovsgVerificationMiddleware.resendPasscodeCreationMessage
+  GovsgVerificationMiddleware.resendMessage
 )
 
 router.post(

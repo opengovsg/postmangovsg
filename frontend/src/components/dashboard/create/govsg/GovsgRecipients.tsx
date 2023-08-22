@@ -55,6 +55,7 @@ const GovsgRecipients = ({
     csvFilename: initialCsvFilename,
     params,
   } = campaign
+  const paramsWithoutPasscode = params.filter((value) => value !== 'passcode')
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({ numRecipients: initialNumRecipients, csvFilename: initialCsvFilename })
@@ -200,7 +201,11 @@ const GovsgRecipients = ({
           <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
           <p>or</p>
           <SampleCsv
-            params={canAccessGovsgV ? ['language', ...params] : params}
+            params={
+              canAccessGovsgV
+                ? ['language', ...paramsWithoutPasscode]
+                : paramsWithoutPasscode
+            }
             defaultParams={{ language: 'English' }}
             defaultRecipient="81234567"
             setErrorMsg={console.error}

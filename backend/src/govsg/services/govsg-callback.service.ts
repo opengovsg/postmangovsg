@@ -11,31 +11,17 @@ import {
   WhatsAppTemplateMessageToSend,
   WhatsAppTemplateMessageWebhook,
   WhatsAppTextMessageToSend,
-  WhatsAppWebhookButtonMessage,
   WhatsAppWebhookTextMessage,
   WhatsappWebhookMessageType,
 } from '@shared/clients/whatsapp-client.class/types'
 import { MessageIdNotFoundWebhookError } from '@shared/clients/whatsapp-client.class/errors'
+import { GovsgMessage, GovsgMessageTransactional, GovsgOp } from '@govsg/models'
 import {
-  CampaignGovsgTemplate,
-  GovsgMessage,
-  GovsgMessageTransactional,
-  GovsgOp,
-  GovsgTemplate,
-} from '@govsg/models'
-import {
-  ChannelType,
   GovsgMessageStatus,
   govsgMessageStatusMapper,
   shouldUpdateStatus,
 } from '@core/constants'
-import { whatsappService, experimentService } from '@core/services'
-import { GovsgVerification } from '@govsg/models/govsg-verification'
-import {
-  sendPasscodeCreationMessage,
-  sendPasscodeMessage,
-  storePrecreatedPasscode,
-} from './govsg-verification-service'
+import { whatsappService } from '@core/services'
 
 const logger = loggerWithLabel(module)
 
@@ -71,10 +57,7 @@ const parseWebhook = async (
       body,
       action,
     })
-    await parseTemplateMessageWebhook(
-      body as WhatsAppTemplateMessageWebhook,
-      clientId
-    )
+    await parseTemplateMessageWebhook(body as WhatsAppTemplateMessageWebhook)
     return
   }
   if ('messages' in body && 'contacts' in body) {
@@ -109,8 +92,7 @@ const statusesWhichRequireMessageId = new Set([
 ])
 
 const parseTemplateMessageWebhook = async (
-  body: WhatsAppTemplateMessageWebhook,
-  clientId: WhatsAppApiClient
+  body: WhatsAppTemplateMessageWebhook
 ): Promise<void> => {
   logger.info({
     message: 'Logging status update(s) from WhatsApp...',
@@ -282,56 +264,6 @@ const parseTemplateMessageWebhook = async (
       void govsgMessage?.update(fieldOpts, whereOpts)
       void govsgMessageTransactional?.update(fieldOpts, whereOpts)
       void govsgOp?.update(fieldOpts, whereOpts)
-      if (!govsgMessage && !govsgOp) {
-        return
-      }
-      const message = (govsgMessage ?? govsgOp) as GovsgMessage
-      const experimentalData = await experimentService.getUserExperimentalData(
-        message.campaign.userId
-      )
-      const canAccessGovsgV = `${ChannelType.Govsg}V` in experimentalData
-      if (!canAccessGovsgV) {
-        return
-      }
-      logger.info({
-        message: 'User has access to GOVSGV',
-        meta: {
-          govsgMessage: message,
-        },
-      })
-      const { campaignId, recipient } = message
-      void CampaignGovsgTemplate.findOne({
-        where: {
-          campaignId,
-        },
-        include: [Campaign, GovsgTemplate],
-      }).then((campaignGovsgTemplate) => {
-        if (
-          campaignGovsgTemplate?.govsgTemplate.whatsappTemplateLabel ===
-          config.get('whatsapp.precallTemplateLabel')
-        ) {
-          logger.info({
-            message: 'Sending passcode creation message',
-            meta: {
-              campaignGovsgTemplate,
-              recipient,
-              clientId,
-            },
-          })
-          void sendPasscodeCreationMessage(recipient, clientId).then(
-            (passcodeCreationWamid) => {
-              logger.info({
-                message: 'Storing precreated passcode',
-                meta: {
-                  govsgMessageId: message.id,
-                  passcodeCreationWamid,
-                },
-              })
-              void storePrecreatedPasscode(message.id, passcodeCreationWamid)
-            }
-          )
-        }
-      })
       return
     }
     case WhatsAppMessageStatus.read: {
@@ -386,43 +318,6 @@ const parseUserMessageWebhook = async (
 ): Promise<void> => {
   const { wa_id: whatsappId } = body.contacts[0]
   const { id: messageId, type } = body.messages[0]
-  if (type === WhatsappWebhookMessageType.button) {
-    const message = body.messages[0] as WhatsAppWebhookButtonMessage
-    if (message.button.text === 'Create passcode') {
-      const passcodeCreationWamid = message.context.id
-      const govsgVerification = await GovsgVerification.findOne({
-        where: { passcodeCreationWamid },
-        include: [GovsgMessage],
-      })
-      if (!govsgVerification) {
-        logger.error({
-          message: `govsgVerification for an expected button reply was not found.`,
-          meta: {
-            whatsappId,
-            messageId,
-            type,
-          },
-        })
-        return
-      }
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      const { officer_name: officerName, agency: officerAgency } =
-        govsgVerification.govsgMessage.params
-      const passcode = govsgVerification.passcode
-      // We don't check canAccessGovsgV here because users without canAccessGovsgV
-      // do not even get to send the passcode creation message and thus no replies
-      // of this sort should exist for those users.
-      await sendPasscodeMessage(
-        whatsappId,
-        clientId,
-        officerName,
-        officerAgency,
-        passcode
-      )
-    }
-    return
-  }
   if (type !== WhatsappWebhookMessageType.text) {
     // not text message, log and ignore
     logger.info({
