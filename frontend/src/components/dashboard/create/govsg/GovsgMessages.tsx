@@ -136,6 +136,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
           render: (govsgMessage: GovsgMessage) => {
             return (
               <PasscodeBadge
+                key={govsgMessage.id}
                 label={govsgMessage.passcode}
                 placeholder="N/A"
                 onClick={async () => await trackPasscodeReveal(govsgMessage)}
