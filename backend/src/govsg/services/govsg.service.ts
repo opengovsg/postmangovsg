@@ -45,8 +45,6 @@ export async function getCampaignDetails(
           languages: pivot.govsgTemplate.multilingualSupport.map(
             (languageSupport) => ({
               ...languageSupport,
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-              // @ts-ignore
               code: languageSupport.language_code,
             })
           ),

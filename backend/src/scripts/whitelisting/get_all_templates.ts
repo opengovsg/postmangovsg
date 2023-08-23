@@ -34,7 +34,9 @@ void (async function main() {
       templateId: t.id,
       templateLabel: t.whatsappTemplateLabel,
       templateName: t.name,
-      multilingualSupport: t.multilingualSupport.map((mts) => mts.languageCode),
+      multilingualSupport: t.multilingualSupport.map(
+        (mts) => mts.language_code
+      ),
     }))
     console.log(csvData)
     const parser = new Parser(opts)

@@ -89,7 +89,7 @@ export const InitGovsgTransactionalMiddleware =
       }
       const isLanguageAvailable =
         govsgTemplate.multilingualSupport.findIndex(
-          (v) => v.languageCode === languageCode
+          (v) => v.language_code === languageCode
         ) > -1
       if (!isLanguageAvailable && languageCode !== WhatsAppLanguages.english) {
         throw new ApiValidationError(
