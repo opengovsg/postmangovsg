@@ -89,8 +89,6 @@ export const InitGovsgTransactionalMiddleware =
       }
       const isLanguageAvailable =
         govsgTemplate.multilingualSupport.findIndex(
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-ignore
           (v) => v.language_code === languageCode
         ) > -1
       if (!isLanguageAvailable && languageCode !== WhatsAppLanguages.english) {

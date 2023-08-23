@@ -17,7 +17,7 @@ export type GovsgTemplateParamMetadata = {
 }
 
 export type GovsgTemplateLanguageMetadata = {
-  languageCode: string // WhatsApp-API-compatible language code
+  language_code: string // WhatsApp-API-compatible language code
   language: string // Human-readable name of the language
   body: string
 }

@@ -31,8 +31,6 @@ const convertMultilingualSupportToResponse = (
   return multilingualSupport.map((languageSupport) => ({
     body: languageSupport.body,
     language: languageSupport.language,
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
     code: languageSupport.language_code,
   }))
 }
