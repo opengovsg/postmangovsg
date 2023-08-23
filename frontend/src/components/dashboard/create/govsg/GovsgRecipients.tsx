@@ -1,4 +1,5 @@
 import { i18n } from '@lingui/core'
+import { filter } from 'lodash'
 import {
   Dispatch,
   SetStateAction,
@@ -55,7 +56,7 @@ const GovsgRecipients = ({
     csvFilename: initialCsvFilename,
     params,
   } = campaign
-  const paramsWithoutPasscode = params.filter((value) => value !== 'passcode')
+  const paramsWithoutPasscode = filter(params, (value) => value !== 'passcode')
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({ numRecipients: initialNumRecipients, csvFilename: initialCsvFilename })
