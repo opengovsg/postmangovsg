@@ -134,7 +134,7 @@ export function uploadCompleteOnPreview({
 
 const getLanguageCode = (language: string | undefined) => {
   if (!language) {
-    return WhatsAppLanguages.english
+    return WhatsAppLanguages.english // So that we remain backward compatible with current users who don't have access to multi-lingual support
   }
   const languageInLowerCase = language.toLowerCase()
   const whatsAppLanguages = Object.keys(WhatsAppLanguages)
@@ -142,7 +142,9 @@ const getLanguageCode = (language: string | undefined) => {
     (whatsAppLanguage) => whatsAppLanguage.toLowerCase() === languageInLowerCase
   )
   if (!key) {
-    return WhatsAppLanguages.english
+    throw new Error(
+      `Invalid language: ${language}. The supported languages are: English, Chinese, Malay, and Tamil.`
+    )
   }
   return WhatsAppLanguages[key as keyof typeof WhatsAppLanguages]
 }
