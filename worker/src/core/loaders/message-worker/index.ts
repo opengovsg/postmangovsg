@@ -16,6 +16,7 @@ import { NotificationService } from '@core/services/notification.service'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import MailClient, { MailToSend } from '@shared/clients/mail-client.class'
 import Govsg from './govsg.class'
+import axios from 'axios'
 
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 
@@ -169,6 +170,45 @@ const finalize = tracer.wrap(
     const logGovsgJob = postmanConnection
       .query('SELECT log_next_job_govsg();')
       .then(([result]) => get(result, '[0].log_next_job_govsg', ''))
+      .then(async (campaignId: number) => {
+        const rawMessages = await postmanConnection.query(
+          "SELECT * FROM govsg_messages WHERE status = 'ERROR' AND campaign_id = :campaignId",
+          { type: QueryTypes.SELECT, replacements: { campaignId } }
+        )
+        if (!rawMessages) {
+          return campaignId
+        }
+
+        const messagesWithErr = rawMessages as Array<{
+          id: number
+          error_code: string
+          error_description: string
+        }>
+        if (
+          messagesWithErr.length === 0 ||
+          !config.get('sgcCampaignAlertChannelWebhookUrl')
+        ) {
+          return campaignId
+        }
+        let text = `*****NEW ALERT******\n*Campaign ${campaignId} has some errors*\n=====\n| Message ID | Error Code | Error Description |\n=====\n`
+        messagesWithErr.forEach((m) => {
+          text += `| ${m.id} | ${m.error_code} | ${m.error_description} |\n`
+        })
+        text += '***********'
+        await axios
+          .post(config.get('sgcCampaignAlertChannelWebhookUrl'), {
+            text: text,
+          })
+          .catch((e) => {
+            logger.error({
+              message: 'Failed to report errors to #sgc-campaign-alerts',
+              error: e,
+              action: 'finalize',
+            })
+          })
+
+        return campaignId
+      })
       .catch((err) => {
         logger.error({
           message: 'Log govsg job',
