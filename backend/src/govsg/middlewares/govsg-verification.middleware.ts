@@ -52,6 +52,7 @@ export const listMessages = async (
     },
     offset: +(offset as string),
     limit: +(limit as string),
+    order: [['createdAt', 'ASC']],
     include: [
       {
         model: GovsgVerification,
