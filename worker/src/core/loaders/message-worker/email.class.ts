@@ -10,7 +10,6 @@ import MailClient from '@shared/clients/mail-client.class'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import { ThemeClient } from '@shared/theme'
 import { EmailResultRow, Message } from './interface'
-import { PhonebookService } from '@core/services/phonebook.service'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 const logger = loggerWithLabel(module)
@@ -81,6 +80,14 @@ class Email {
     campaignId: number
   ): Promise<Message[]> {
     const showMastheadDomain = config.get('showMastheadDomain')
+    // This function was refactored to no longer use campaignId in a meaningful way.
+    // I've left it as a param to avoid cascading changes upstream.
+    logger.info({
+      message: 'Get email message',
+      workerId: this.workerId,
+      campaignId,
+      action: 'getMessages',
+    })
     const result = await this.connection.query<EmailResultRow>(
       'SELECT get_messages_to_send_email_with_agency(:job_id, :rate) AS message;',
       {
@@ -88,22 +95,6 @@ class Email {
         type: QueryTypes.SELECT,
       }
     )
-    const phonebookFeatureFlag = config.get('phonebook.enabled')
-    if (phonebookFeatureFlag && result.length > 0) {
-      try {
-        const managedListId = await this.fetchManagedListIdOfCampaign(
-          campaignId
-        )
-        return await PhonebookService.appendLinkForEmail(result, managedListId)
-      } catch (error) {
-        logger.error({
-          message: 'Unable to append links',
-          error,
-          workerId: this.workerId,
-        })
-        // If phonebook is down, we still want to continue sending the messages
-      }
-    }
     return map(result, (row) => {
       const { senderEmail } = row.message
       const showMasthead = senderEmail.endsWith(showMastheadDomain)
