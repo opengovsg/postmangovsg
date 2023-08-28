@@ -77,9 +77,15 @@ class Email {
   async getMessages(
     jobId: number,
     rate: number,
-    _campaignId: number
+    campaignId: number
   ): Promise<Message[]> {
     const showMastheadDomain = config.get('showMastheadDomain')
+    logger.info({
+      message: 'Get email message',
+      workerId: this.workerId,
+      campaignId,
+      action: 'getMessages',
+    })
     const result = await this.connection.query<EmailResultRow>(
       'SELECT get_messages_to_send_email_with_agency(:job_id, :rate) AS message;',
       {
