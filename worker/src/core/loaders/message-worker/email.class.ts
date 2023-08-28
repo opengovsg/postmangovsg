@@ -80,6 +80,8 @@ class Email {
     campaignId: number
   ): Promise<Message[]> {
     const showMastheadDomain = config.get('showMastheadDomain')
+    // This function was refactored to no longer use campaignId in a meaningful way.
+    // I've left it as a param to avoid cascading changes upstream.
     logger.info({
       message: 'Get email message',
       workerId: this.workerId,
