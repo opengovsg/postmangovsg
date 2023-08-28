@@ -8,7 +8,6 @@ import { PhoneNumberService } from '@shared/utils/phone-number.service'
 import { TemplateClient, XSS_SMS_OPTION } from '@shared/templating'
 import TwilioClient from '@sms/services/twilio-client.class'
 import SnsSmsClient from '@sms/services/sns-sms-client.class'
-import { PhonebookService } from '@core/services/phonebook.service'
 
 const templateClient = new TemplateClient({ xssOptions: XSS_SMS_OPTION })
 const logger = loggerWithLabel(module)
@@ -69,20 +68,6 @@ class SMS {
       }
     )
     const result = map(dbResults, 'get_messages_to_send_sms')
-
-    const phonebookFeatureFlag = config.get('phonebook.enabled')
-    if (phonebookFeatureFlag && result.length > 0) {
-      try {
-        return await PhonebookService.appendLinkForSms(result)
-      } catch (error) {
-        logger.error({
-          message: 'Unable to append links',
-          error,
-          workerId: this.workerId,
-        })
-        // If phonebook is down, we still want to continue sending the messages
-      }
-    }
     return result
   }
 
