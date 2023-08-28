@@ -29,31 +29,54 @@ void (async function main() {
     templateLabelToId.set(t.whatsappTemplateLabel, t.id)
   })
 
-  const usersToUpdate = await User.findAll({
-    where: {
-      email: {
-        [Op.or]: [
-          {
-            [Op.endsWith]: '@open.gov.sg',
-          },
-          {
-            [Op.endsWith]: '@mci.gov.sg',
-          },
-        ],
+  const agencyUsersToUpdate = (await GovsgTemplatesAccess.findAll({
+    include: {
+      model: User,
+      where: {
+        email: {
+          [Op.or]: [
+            {
+              [Op.endsWith]: '@open.gov.sg',
+            },
+            {
+              [Op.endsWith]: '@mci.gov.sg',
+            },
+          ],
+        },
       },
+      attributes: ['id', 'email'],
     },
-  })
+  })) as Array<GovsgTemplatesAccess & { id: number; email: string }>
+  const usersToUpdate = (await GovsgTemplatesAccess.findAll({
+    include: {
+      model: User,
+      where: {
+        email: {
+          [Op.or]: [
+            {
+              [Op.notLike]: '%@open.gov.sg',
+            },
+            {
+              [Op.notLike]: '%@mci.gov.sg',
+            },
+          ],
+        },
+      },
+      attributes: ['id', 'email'],
+    },
+  })) as Array<GovsgTemplatesAccess & { id: number; email: string }>
+
   console.log(SECTION_DIVIDER)
-  console.log(`Number of users to update: ${usersToUpdate.length}`)
-  const ogpOfficers = usersToUpdate.filter(
-    (u) => u.email.split('@')[1] === 'open.gov.sg'
+  console.log(`Number of users to update: ${agencyUsersToUpdate.length}`)
+  const ogpOfficers = agencyUsersToUpdate.filter(
+    (u) => u.user.email.split('@')[1] === 'open.gov.sg'
   )
   const ogpAccessRule = await GovsgTemplatesAccess.bulkCreate(
     ogpOfficers.flatMap((u) =>
       OGP_TEMPLATE_ACCESS.map(
         (t) =>
           ({
-            userId: u.id,
+            userId: u.user.id,
             templateId: templateLabelToId.get(t),
           } as unknown as GovsgTemplatesAccess)
       )
@@ -62,15 +85,15 @@ void (async function main() {
       ignoreDuplicates: true,
     }
   )
-  const mciOfficers = usersToUpdate.filter(
-    (u) => u.email.split('@')[1] === 'mci.gov.sg'
+  const mciOfficers = agencyUsersToUpdate.filter(
+    (u) => u.user.email.split('@')[1] === 'mci.gov.sg'
   )
   const mciAccessRule = await GovsgTemplatesAccess.bulkCreate(
     mciOfficers.flatMap((u) =>
       MCI_TEMPLATE_ACCESS.map(
         (t) =>
           ({
-            userId: u.id,
+            userId: u.user.id,
             templateId: templateLabelToId.get(t),
           } as unknown as GovsgTemplatesAccess)
       )
@@ -80,12 +103,13 @@ void (async function main() {
     }
   )
 
+  const allUsers = [...agencyUsersToUpdate, ...usersToUpdate]
   const allAccessRule = await GovsgTemplatesAccess.bulkCreate(
-    usersToUpdate.flatMap((u) =>
+    allUsers.flatMap((u) =>
       ALL_TEMPLATE_ACCESS.map(
         (t) =>
           ({
-            userId: u.id,
+            userId: u.user.id,
             templateId: templateLabelToId.get(t),
           } as unknown as GovsgTemplatesAccess)
       )

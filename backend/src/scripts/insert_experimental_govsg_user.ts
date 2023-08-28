@@ -29,7 +29,7 @@ void (async function main() {
       'temp/Agency Whitelist - Whitelist.csv'
     )
   )
-    .filter((r) => r[4] === 'N')
+    .filter((r) => r[4] === 'N' && r[5] !== 'Y')
     .map(
       (r) =>
         ({
