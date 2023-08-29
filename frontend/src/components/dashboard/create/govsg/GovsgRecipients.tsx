@@ -69,6 +69,11 @@ const GovsgRecipients = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const modalContext = useContext(ModalContext)
 
+  // Scroll window to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
+
   // Poll csv status
   useEffect(() => {
     if (!campaignId) return
