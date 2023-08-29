@@ -9,6 +9,12 @@ details[open] > summary {
   display: none;
 }
 
+summary {
+  @extend %body-2;
+  color: $primary;
+  text-decoration: underline;
+}
+
 summary:hover {
   cursor: pointer;
 }
