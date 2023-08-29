@@ -1,6 +1,12 @@
 import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
 
-import { Dispatch, SetStateAction, useContext, useState } from 'react'
+import {
+  Dispatch,
+  SetStateAction,
+  useContext,
+  useState,
+  useEffect,
+} from 'react'
 
 import { useParams } from 'react-router-dom'
 
@@ -58,6 +64,11 @@ const GovsgSingleRecipient = ({
   const { id: campaignId } = useParams<{ id: string }>()
   const modalContext = useContext(ModalContext)
   const [errMessage, setErrMessage] = useState<string>('')
+
+  // Scroll window to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0)
+  }, [])
 
   const getUpdateData = (field: string) => (value: string) => {
     setData(Object.assign({}, data, { [field]: value }))
