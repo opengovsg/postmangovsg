@@ -205,11 +205,7 @@ const GovsgRecipients = ({
           <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
           <p>or</p>
           <SampleCsv
-            params={
-              canAccessGovsgV
-                ? ['language', ...paramsWithoutPasscode]
-                : paramsWithoutPasscode
-            }
+            params={['language', ...paramsWithoutPasscode]}
             defaultParams={{ language: 'English' }}
             defaultRecipient="81234567"
             setErrorMsg={console.error}
