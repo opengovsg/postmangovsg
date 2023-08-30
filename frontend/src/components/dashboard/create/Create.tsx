@@ -19,7 +19,6 @@ import { ChannelType, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
 import { CampaignHeaderTabs } from 'components/common/CampaignHeaderTabs/CampaignHeaderTabs'
 import { TitleBarWithTabs } from 'components/common/title-bar/TitleBarWithTabs'
-import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import Error from 'components/error'
 import { CampaignContext } from 'contexts/campaign.context'
@@ -37,7 +36,6 @@ const Create = () => {
   const { campaign, setCampaign } = useContext(CampaignContext)
   const { handleFinishLater: finishLaterContextHandler, finishLaterContent } =
     useContext(FinishLaterModalContext)
-  const { canAccessGovsgV } = useGovsgV()
   const [isLoading, setLoading] = useState(true)
   const [isInvalid, setIsInvalid] = useState(false)
 
@@ -71,7 +69,6 @@ const Create = () => {
 
   const renderTitleBar = () => {
     if (
-      canAccessGovsgV &&
       campaign.type === ChannelType.Govsg &&
       campaign.status !== Status.Draft
     ) {

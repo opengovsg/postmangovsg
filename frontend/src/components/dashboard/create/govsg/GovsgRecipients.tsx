@@ -31,7 +31,6 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import { LINKS } from 'config'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -48,7 +47,6 @@ const GovsgRecipients = ({
 }: {
   setActiveStep: Dispatch<SetStateAction<GovsgProgress>>
 }) => {
-  const { canAccessGovsgV } = useGovsgV()
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const {
     isCsvProcessing: initialIsProcessing,
