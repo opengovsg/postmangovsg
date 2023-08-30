@@ -184,21 +184,52 @@ const finalize = tracer.wrap(
           error_code: string
           error_description: string
         }>
-        if (
-          messagesWithErr.length === 0 ||
-          !config.get('sgcCampaignAlertChannelWebhookUrl')
-        ) {
+        if (messagesWithErr.length === 0 || !config.get('sgcAlert')) {
           return campaignId
         }
-        let text = `*****NEW ALERT******\n*Campaign ${campaignId} has some errors*\n=====\n| Message ID | Error Code | Error Description |\n=====\n`
-        messagesWithErr.forEach((m) => {
-          text += `| ${m.id} | ${m.error_code} | ${m.error_description} |\n`
-        })
-        text += '***********'
+        const firstText = `*****NEW ALERT******\n*Campaign ${campaignId} has some errors*\n=====\n| Message ID | Error Code | Error Description |\n=====\n`
+        const subsequentMessages = messagesWithErr.map(
+          (m) => `| ${m.id} | ${m.error_code} | ${m.error_description} |`
+        )
+        console.log(firstText, subsequentMessages, config.get('sgcAlert'))
         await axios
-          .post(config.get('sgcCampaignAlertChannelWebhookUrl'), {
-            text: text,
+          .post(
+            'https://slack.com/api/chat.postMessage',
+            {
+              text: firstText,
+              channel: config.get('sgcAlert.channel'),
+            },
+            {
+              headers: {
+                Authorization: `Bearer ${config.get('sgcAlert.apiToken')}`,
+              },
+            }
+          )
+          .then(({ data }) => {
+            console.log(data)
+            return { data }
           })
+          .then(({ data }) =>
+            Promise.all(
+              subsequentMessages.map((m) =>
+                axios.post(
+                  'https://slack.com/api/chat.postMessage',
+                  {
+                    text: m,
+                    channel: config.get('sgcAlert.channel'),
+                    thread_ts: data.ts,
+                  },
+                  {
+                    headers: {
+                      Authorization: `Bearer ${config.get(
+                        'sgcAlert.apiToken'
+                      )}`,
+                    },
+                  }
+                )
+              )
+            )
+          )
           .catch((e) => {
             logger.error({
               message: 'Failed to report errors to #sgc-campaign-alerts',

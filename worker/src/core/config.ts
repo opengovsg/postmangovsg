@@ -93,7 +93,10 @@ export interface ConfigSchema {
     authTokenTwo: string
     authTokenTwoExpiry: string
   }
-  sgcCampaignAlertChannelWebhookUrl: string
+  sgcAlert: {
+    apiToken: string
+    channel: string
+  }
 
   phonebook: {
     enabled: boolean
@@ -420,10 +423,19 @@ const config: Config<ConfigSchema> = convict({
       default: '',
     },
   },
-  sgcCampaignAlertChannelWebhookUrl: {
-    doc: 'Slack webhook URL to post Gov.sg campaign alerts',
-    env: 'SGC_CAMPAIGN_ALERT_WEBHOOK',
-    default: '',
+  sgcAlert: {
+    apiToken: {
+      doc: 'API Token for Bob the Post Office Builder',
+      env: 'SGC_ALERT_API_TOKEN',
+      format: 'required-string',
+      default: '',
+    },
+    channel: {
+      doc: 'Slack alert channel for SGC',
+      env: 'SGC_ALERT_CHANNEL',
+      format: 'required-string',
+      default: '',
+    },
   },
   phonebook: {
     enabled: {
