@@ -44,8 +44,10 @@ import {
 
 const GovsgRecipients = ({
   setActiveStep,
+  hasLanguages,
 }: {
   setActiveStep: Dispatch<SetStateAction<GovsgProgress>>
+  hasLanguages: boolean
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const {
@@ -205,7 +207,11 @@ const GovsgRecipients = ({
           <FileInput isProcessing={isUploading} onFileSelected={uploadFile} />
           <p>or</p>
           <SampleCsv
-            params={['language', ...paramsWithoutPasscode]}
+            params={
+              hasLanguages
+                ? ['language', ...paramsWithoutPasscode]
+                : paramsWithoutPasscode
+            }
             defaultParams={{ language: 'English' }}
             defaultRecipient="81234567"
             setErrorMsg={console.error}
