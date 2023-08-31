@@ -191,7 +191,6 @@ const finalize = tracer.wrap(
         const subsequentMessages = messagesWithErr.map(
           (m) => `| ${m.id} | ${m.error_code} | ${m.error_description} |`
         )
-        console.log(firstText, subsequentMessages, config.get('sgcAlert'))
         await axios
           .post(
             'https://slack.com/api/chat.postMessage',
@@ -205,10 +204,6 @@ const finalize = tracer.wrap(
               },
             }
           )
-          .then(({ data }) => {
-            console.log(data)
-            return { data }
-          })
           .then(({ data }) =>
             Promise.all(
               subsequentMessages.map((m) =>
