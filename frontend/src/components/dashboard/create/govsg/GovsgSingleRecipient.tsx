@@ -26,7 +26,6 @@ import {
   TextInput,
 } from 'components/common'
 import { SimpleRadioButton } from 'components/common/Radio/SimpleRadioButton'
-import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
@@ -40,7 +39,6 @@ const GovsgSingleRecipient = ({
 }) => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { experimentalData } = useContext(AuthContext)
-  const { canAccessGovsgV } = useGovsgV()
   const typedCampaign = campaign as GovsgCampaign
   const fieldsToRender: { id: string; name: string }[] = typedCampaign.params
     .filter((p) => !!typedCampaign.paramMetadata[p].displayName)
@@ -147,37 +145,35 @@ const GovsgSingleRecipient = ({
             value={data.recipient}
           />
         </div>
-        {canAccessGovsgV && (
-          <div>
-            <p>
-              <label htmlFor="language">Language</label>{' '}
-            </p>
-            {typedCampaign.languages.map((languageSupport) => {
-              const language = languageSupport.language
-              const languageInLowerCase = language.toLowerCase()
-              const languageCode =
-                WhatsAppLanguages[
-                  languageInLowerCase as keyof typeof WhatsAppLanguages
-                ]
-              return (
-                <SimpleRadioButton
-                  aria-label={language}
-                  id={`language-${language}`}
-                  value={languageCode}
-                  checked={data.language === languageCode}
-                  onChange={() =>
-                    setData({
-                      ...data,
-                      language: languageCode,
-                    })
-                  }
-                  label={language}
-                  key={language}
-                />
-              )
-            })}
-          </div>
-        )}
+        <div>
+          <p>
+            <label htmlFor="language">Language</label>{' '}
+          </p>
+          {typedCampaign.languages.map((languageSupport) => {
+            const language = languageSupport.language
+            const languageInLowerCase = language.toLowerCase()
+            const languageCode =
+              WhatsAppLanguages[
+                languageInLowerCase as keyof typeof WhatsAppLanguages
+              ]
+            return (
+              <SimpleRadioButton
+                aria-label={language}
+                id={`language-${language}`}
+                value={languageCode}
+                checked={data.language === languageCode}
+                onChange={() =>
+                  setData({
+                    ...data,
+                    language: languageCode,
+                  })
+                }
+                label={language}
+                key={language}
+              />
+            )
+          })}
+        </div>
         {fieldsToRender.map((f) => (
           <div key={f.id}>
             <p>

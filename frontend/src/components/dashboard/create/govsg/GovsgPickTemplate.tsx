@@ -26,7 +26,6 @@ import {
   StepSection,
 } from 'components/common'
 import { LanguageChipGroup } from 'components/common/ChipGroup/LanguageChipGroup'
-import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import { CampaignContext } from 'contexts/campaign.context'
 
 import { getAvailableTemplates, pickTemplate } from 'services/govsg.service'
@@ -36,7 +35,6 @@ function GovsgPickTemplate({
 }: {
   setActiveStep: Dispatch<SetStateAction<GovsgProgress>>
 }) {
-  const { canAccessGovsgV } = useGovsgV()
   const { campaign: campaign, updateCampaign } = useContext(CampaignContext)
   const typedCampaign = campaign as GovsgCampaign
   const [templateId, setTemplateId] = useState(typedCampaign.templateId)
@@ -158,15 +156,13 @@ function GovsgPickTemplate({
                     shouldHighlightVariables
                     preview
                   />
-                  {canAccessGovsgV && (
-                    <LanguageChipGroup
-                      options={t.languages.map((languageSupport) =>
-                        languageSupport.language.toLowerCase()
-                      )}
-                      selected={selectedLanguage}
-                      setSelection={setSelectedLanguage}
-                    />
-                  )}
+                  <LanguageChipGroup
+                    options={t.languages.map((languageSupport) =>
+                      languageSupport.language.toLowerCase()
+                    )}
+                    selected={selectedLanguage}
+                    setSelection={setSelectedLanguage}
+                  />
                 </RadioChoice>
               </>
             ))

@@ -35,7 +35,12 @@ const CreateGovsg = () => {
         if ((campaign as GovsgCampaign).forSingleRecipient) {
           return <GovsgSingleRecipient setActiveStep={setActiveStep} />
         }
-        return <GovsgRecipients setActiveStep={setActiveStep} />
+        return (
+          <GovsgRecipients
+            setActiveStep={setActiveStep}
+            hasLanguages={(campaign as GovsgCampaign).languages.length > 0}
+          />
+        )
       default:
         return <p>Invalid step</p>
     }

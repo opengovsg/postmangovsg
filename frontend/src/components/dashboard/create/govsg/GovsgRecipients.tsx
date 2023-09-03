@@ -31,7 +31,6 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import { useGovsgV } from 'components/custom-hooks/useGovsgV'
 import { LINKS } from 'config'
 
 import { CampaignContext } from 'contexts/campaign.context'
@@ -45,10 +44,11 @@ import {
 
 const GovsgRecipients = ({
   setActiveStep,
+  hasLanguages,
 }: {
   setActiveStep: Dispatch<SetStateAction<GovsgProgress>>
+  hasLanguages: boolean
 }) => {
-  const { canAccessGovsgV } = useGovsgV()
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const {
     isCsvProcessing: initialIsProcessing,
@@ -208,7 +208,7 @@ const GovsgRecipients = ({
           <p>or</p>
           <SampleCsv
             params={
-              canAccessGovsgV
+              hasLanguages
                 ? ['language', ...paramsWithoutPasscode]
                 : paramsWithoutPasscode
             }
