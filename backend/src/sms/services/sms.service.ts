@@ -1,4 +1,3 @@
-import bcrypt from 'bcrypt'
 import { Transaction } from 'sequelize'
 
 import config from '@core/config'
@@ -181,18 +180,6 @@ const getCampaignDetails = async (
   return { ...campaignDetails, cost_per_message: costPerSms }
 }
 
-/**
- * Returns a base 64 encoded hash for secrets manager
- * @param secret
- */
-const getEncodedHash = async (secret: string): Promise<string> => {
-  const secretHash = await bcrypt.hash(
-    secret,
-    config.get('aws.secretManagerSalt')
-  )
-  return Buffer.from(secretHash).toString('base64')
-}
-
 const uploadCompleteOnPreview = ({
   transaction,
   template,
@@ -309,7 +296,6 @@ const getTwilioCostPerOutgoingSMSSegmentUSD = async (
 }
 
 export const SmsService = {
-  getEncodedHash,
   findCampaign,
   getCampaignDetails,
   getHydratedMessage,
