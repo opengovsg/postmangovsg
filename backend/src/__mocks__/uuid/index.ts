@@ -1,8 +1,8 @@
 // Defining these in global scope so tests can mock their implementation
-export const HASHED_CREDS = 'HASHED_CREDS'
+export const MOCK_UUID = 'MOCKED_UUID'
 
 const v4 = jest.fn()
 
-v4.mockReturnValue(HASHED_CREDS)
+v4.mockReturnValue(MOCK_UUID)
 
 export { v4 }

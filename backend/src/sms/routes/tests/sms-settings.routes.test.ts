@@ -59,7 +59,7 @@ describe('POST /settings/sms/credentials', () => {
     const mockSendValidationMessage = jest
       .spyOn(SmsService, 'sendValidationMessage')
       .mockResolvedValue()
-    const EXPECTED_CRED_NAME = 'HASHED_CREDS'
+    const EXPECTED_CRED_NAME = 'MOCKED_UUID'
 
     const res = await request(app).post('/settings/sms/credentials').send({
       label: CREDENTIAL_LABEL,

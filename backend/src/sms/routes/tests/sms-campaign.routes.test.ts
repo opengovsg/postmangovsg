@@ -226,7 +226,7 @@ describe('POST /campaign/{campaignId}/sms/new-credentials', () => {
       .spyOn(SmsService, 'sendCampaignMessage')
       .mockResolvedValue()
 
-    const EXPECTED_CRED_NAME = 'HASHED_CREDS'
+    const EXPECTED_CRED_NAME = 'MOCKED_UUID'
 
     const res = await request(app)
       .post(`/campaign/${nonDemoCampaign.id}/sms/new-credentials`)
