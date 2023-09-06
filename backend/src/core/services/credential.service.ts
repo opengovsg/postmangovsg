@@ -76,18 +76,18 @@ export const InitCredentialService = (redisService: RedisService) => {
   const logger = loggerWithLabel(module)
 
   /**
-   * Upserts credential into AWS SecretsManager
+   * Adds credential into AWS SecretsManager
    * @param name
    * @param secret
    * @param restrictEnvironment
-   * @throws error if update fails
+   * @throws error if creation fails
    */
-  const upsertCredential = async (
+  const addCredential = async (
     name: string,
     secret: string,
     restrictEnvironment: boolean
   ): Promise<void> => {
-    const logMeta = { name, action: 'upsertCredential' }
+    const logMeta = { name, action: 'addCredential' }
     // If credential doesn't exist, upload credential to secret manager
     try {
       await secretsManager.createSecret({
@@ -102,24 +102,12 @@ export const InitCredentialService = (redisService: RedisService) => {
         ...logMeta,
       })
     } catch (err) {
-      if ((err as Error).name === 'ResourceExistsException') {
-        await secretsManager.putSecretValue({
-          SecretId: name,
-          SecretString: secret,
-        })
-        logger.info({
-          message: 'Successfully updated credential in AWS secrets manager',
-          error: err,
-          ...logMeta,
-        })
-      } else {
-        logger.error({
-          message: 'Failed to store credential in AWS secrets manager',
-          error: err,
-          ...logMeta,
-        })
-        throw err
-      }
+      logger.error({
+        message: 'Failed to store credential in AWS secrets manager',
+        error: err,
+        ...logMeta,
+      })
+      throw err
     }
     return
   }
@@ -139,7 +127,7 @@ export const InitCredentialService = (redisService: RedisService) => {
     // If adding a credential to secrets manager throws an error, db will not be updated
     // If adding a credential to secrets manager succeeds, but the db call fails, it is ok because the credential will not be associated with a campaign
     // It results in orphan secrets manager credentials, which is acceptable.
-    await upsertCredential(name, secret, restrictEnvironment)
+    await addCredential(name, secret, restrictEnvironment)
     await Credential.findCreateFind({
       where: { name },
     })
