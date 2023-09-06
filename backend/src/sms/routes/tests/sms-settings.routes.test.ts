@@ -59,12 +59,7 @@ describe('POST /settings/sms/credentials', () => {
     const mockSendValidationMessage = jest
       .spyOn(SmsService, 'sendValidationMessage')
       .mockResolvedValue()
-
-    // getEncodedHash is used as the stored name in AWS SecretsManager
-    const HASHED_CREDS = 'HASHED_CREDS'
-    const mockGetEncodedHash = jest
-      .spyOn(SmsService, 'getEncodedHash')
-      .mockResolvedValue(HASHED_CREDS)
+    const EXPECTED_CRED_NAME = 'MOCKED_UUID'
 
     const res = await request(app).post('/settings/sms/credentials').send({
       label: CREDENTIAL_LABEL,
@@ -79,7 +74,7 @@ describe('POST /settings/sms/credentials', () => {
 
     expect(mockSecretsManager.createSecret).toHaveBeenCalledWith(
       expect.objectContaining({
-        Name: HASHED_CREDS,
+        Name: EXPECTED_CRED_NAME,
         SecretString: JSON.stringify({
           accountSid: 'twilio_account_sid',
           apiKey: 'twilio_api_key',
@@ -92,7 +87,7 @@ describe('POST /settings/sms/credentials', () => {
     // Ensure credential was added into DB
     const dbCredential = await Credential.findOne({
       where: {
-        name: HASHED_CREDS,
+        name: EXPECTED_CRED_NAME,
       },
     })
     expect(dbCredential).not.toBe(null)
@@ -101,12 +96,11 @@ describe('POST /settings/sms/credentials', () => {
       where: {
         label: CREDENTIAL_LABEL,
         type: ChannelType.SMS,
-        credName: HASHED_CREDS,
+        credName: EXPECTED_CRED_NAME,
         userId: 1,
       },
     })
     expect(dbUserCredential).not.toBe(null)
     mockSendValidationMessage.mockRestore()
-    mockGetEncodedHash.mockRestore()
   })
 })

@@ -10,6 +10,7 @@ import {
   ApiInvalidCredentialsError,
   ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
+import { v4 as uuid } from 'uuid'
 
 export interface SmsMiddleware {
   getCredentialsFromBody: Handler
@@ -241,9 +242,7 @@ export const InitSmsMiddleware = (
     try {
       // Store credentials in AWS secrets manager
       const stringifiedCredential = JSON.stringify(credentials)
-      const credentialName = await SmsService.getEncodedHash(
-        stringifiedCredential
-      )
+      const credentialName = uuid()
 
       // We only want to tag Twilio credentials with the environment tag in SecretsManager
       // when env is development. This allows us to quickly identify and clean up dev secrets.
