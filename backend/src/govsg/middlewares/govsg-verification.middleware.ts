@@ -155,7 +155,7 @@ export const resendMessage = async (
   )
   const language = getWhatsAppLanguageFromLanguageCode(govsgMessage)
   const templateMessageToSend: WhatsAppTemplateMessageToSend = {
-    recipient,
+    recipient: normalisedRecipient,
     apiClient,
     templateName: campaignGovsgTemplate.govsgTemplate.whatsappTemplateLabel,
     params: normalisedParams,
