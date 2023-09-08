@@ -261,7 +261,7 @@ export const InitSmsMiddleware = (
         error: err,
         ...logMeta,
       })
-      return res.status(500).json({ message: `${(err as Error).message}` })
+      return res.status(400).json({ message: `${(err as Error).message}` })
     }
   }
 
