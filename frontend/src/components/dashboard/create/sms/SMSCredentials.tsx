@@ -25,7 +25,6 @@ import {
   StepHeader,
   StepSection,
   CredLabelInput,
-  Checkbox,
   InfoBlock,
 } from 'components/common'
 import { LINKS } from 'config'
@@ -55,7 +54,6 @@ const SMSCredentials = ({
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as TwilioCredentials | null)
   const [label, setLabel] = useState('')
-  const [saveCredentialWithLabel, setSaveCredentialWithLabel] = useState(false)
   const [showCredentialFields, setShowCredentialFields] = useState(
     !hasCredential
   )
@@ -86,7 +84,6 @@ const SMSCredentials = ({
     setIsManual((m) => !m)
     setCreds(null)
     setLabel('')
-    setSaveCredentialWithLabel(false)
     setSelectedCredential('')
   }
 
@@ -101,7 +98,7 @@ const SMSCredentials = ({
           campaignId: +campaignId,
           ...creds,
           recipient,
-          ...(saveCredentialWithLabel && { label }),
+          ...{ label },
         })
       } else if (!isManual && selectedCredential) {
         await validateStoredCredentials({
@@ -134,25 +131,17 @@ const SMSCredentials = ({
               <div>
                 <CredLabelInput
                   className={{
-                    [styles.credentialLabelInputError]:
-                      saveCredentialWithLabel && !label,
+                    [styles.credentialLabelInputError]: !label,
                   }}
                   value={label}
                   onChange={setLabel}
                   labels={credLabels}
                 />
-                {saveCredentialWithLabel && !label && (
+                {!label && (
                   <span className={styles.credentialLabelError}>
                     Please enter a credential name
                   </span>
                 )}
-                <Checkbox
-                  checked={saveCredentialWithLabel}
-                  onChange={setSaveCredentialWithLabel}
-                >
-                  Save this credential for future use. If unchecked, nothing is
-                  saved.
-                </Checkbox>
               </div>
               <div>
                 <TwilioCredentialsInput onFilled={setCreds} />
@@ -220,11 +209,7 @@ const SMSCredentials = ({
           </StepHeader>
           <SMSValidationInput
             onClick={handleValidateCredentials}
-            buttonDisabled={
-              isManual
-                ? !creds || (saveCredentialWithLabel && !label)
-                : !selectedCredential
-            }
+            buttonDisabled={isManual ? !creds || !label : !selectedCredential}
           />
           <ErrorBlock>{errorMessage}</ErrorBlock>
         </StepSection>

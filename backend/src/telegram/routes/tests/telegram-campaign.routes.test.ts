@@ -34,6 +34,7 @@ beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
   const campaign = await createCampaign({ isDemo: false })
+  await Credential.create({ name: '12345' } as Credential)
   campaignId = campaign.id
 })
 
@@ -119,7 +120,6 @@ describe('POST /campaign/{campaignId}/telegram/credentials', () => {
       })
 
     expect(res.status).toBe(200)
-
     expect(mockSecretsManager.getSecretValue).toHaveBeenCalledWith({
       SecretId: formatDefaultCredentialName(DefaultCredentialName.Telegram),
     })

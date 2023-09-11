@@ -24,7 +24,6 @@ import {
   StepHeader,
   StepSection,
   CredLabelInput,
-  Checkbox,
   InfoBlock,
 } from 'components/common'
 import { LINKS } from 'config'
@@ -55,7 +54,6 @@ const TelegramCredentials = ({
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as any)
   const [label, setLabel] = useState('')
-  const [saveCredentialWithLabel, setSaveCredentialWithLabel] = useState(false)
   const [showCredentialFields, setShowCredentialFields] = useState(
     !hasCredential
   )
@@ -88,7 +86,6 @@ const TelegramCredentials = ({
     setIsManual((m) => !m)
     setCreds(null)
     setLabel('')
-    setSaveCredentialWithLabel(false)
     setSelectedCredential('')
   }
 
@@ -111,7 +108,7 @@ const TelegramCredentials = ({
         await validateNewCredentials({
           campaignId: +campaignId,
           ...creds,
-          ...(saveCredentialWithLabel && { label }),
+          ...{ label },
         })
       } else if (!isManual && selectedCredential) {
         await validateStoredCredentials({
@@ -195,25 +192,17 @@ const TelegramCredentials = ({
               <div>
                 <CredLabelInput
                   className={{
-                    [styles.credentialLabelInputError]:
-                      saveCredentialWithLabel && !label,
+                    [styles.credentialLabelInputError]: !label,
                   }}
                   value={label}
                   onChange={setLabel}
                   labels={credLabels}
                 />
-                {saveCredentialWithLabel && !label && (
+                {!label && (
                   <span className={styles.credentialLabelError}>
                     Please enter a credential name
                   </span>
                 )}
-                <Checkbox
-                  checked={saveCredentialWithLabel}
-                  onChange={setSaveCredentialWithLabel}
-                >
-                  Save this credential for future use. If unchecked, nothing is
-                  saved.
-                </Checkbox>
               </div>
               <div className={styles.validateCredentialsInfo}>
                 <TelegramCredentialsInput onFilled={setCreds} />

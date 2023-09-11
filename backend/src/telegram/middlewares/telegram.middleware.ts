@@ -20,6 +20,7 @@ export interface TelegramMiddleware {
   getCampaignDetails: Handler
   previewFirstMessage: Handler
   validateAndStoreCredentials: Handler
+  validateCredentials: Handler
   setCampaignCredential: Handler
   sendValidationMessage: Handler
   disabledForDemoCampaign: Handler
@@ -184,6 +185,33 @@ export const InitTelegramMiddleware = (
 
     res.locals.credentials = { telegramBotToken }
     res.locals.credentialName = botId(telegramBotToken)
+    next()
+  }
+
+  const validateCredentials = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const { telegramBotToken } = res.locals.credentials
+    const { credentialName } = res.locals
+    const logMeta = {
+      credentialName,
+      action: 'validateCredentials',
+    }
+    try {
+      await TelegramService.validateAndConfigureBot(telegramBotToken)
+    } catch (err) {
+      logger.error({
+        message: 'Failed to validate and store credentials',
+        error: err,
+        ...logMeta,
+      })
+      throw new ApiInvalidCredentialsError((err as Error).message)
+    }
+
+    // Pass on to next middleware/handler
+    res.locals.channelType = ChannelType.Telegram
     next()
   }
 
@@ -407,6 +435,7 @@ export const InitTelegramMiddleware = (
     getCampaignDetails,
     previewFirstMessage,
     validateAndStoreCredentials,
+    validateCredentials,
     setCampaignCredential,
     sendValidationMessage,
     disabledForDemoCampaign,
