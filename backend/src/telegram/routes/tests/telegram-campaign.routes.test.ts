@@ -4,11 +4,13 @@ import initialiseServer from '@test-utils/server'
 import { Campaign, User, Credential } from '@core/models'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { DefaultCredentialName } from '@core/constants'
+
 import { UploadService } from '@core/services'
 import { TelegramMessage } from '@telegram/models'
 import { ChannelType } from '@core/constants'
 import { mockSecretsManager } from '@mocks/@aws-sdk/client-secrets-manager'
 import { mockTelegram, Telegram } from '@mocks/telegraf'
+import { formatDefaultCredentialName } from '@core/utils'
 
 const app = initialiseServer(true)
 let sequelize: Sequelize
@@ -107,6 +109,9 @@ describe('POST /campaign/{campaignId}/telegram/credentials', () => {
     const demoCampaign = await createCampaign({ isDemo: true })
 
     const DEFAULT_TELEGRAM_CREDENTIAL = '12345'
+    mockSecretsManager.getSecretValue.mockResolvedValue({
+      SecretString: DEFAULT_TELEGRAM_CREDENTIAL,
+    })
 
     const res = await request(app)
       .post(`/campaign/${demoCampaign.id}/telegram/credentials`)
@@ -115,6 +120,9 @@ describe('POST /campaign/{campaignId}/telegram/credentials', () => {
       })
 
     expect(res.status).toBe(200)
+    expect(mockSecretsManager.getSecretValue).toHaveBeenCalledWith({
+      SecretId: formatDefaultCredentialName(DefaultCredentialName.Telegram),
+    })
     expect(Telegram).toHaveBeenCalledWith(DEFAULT_TELEGRAM_CREDENTIAL)
 
     mockSecretsManager.getSecretValue.mockReset()
