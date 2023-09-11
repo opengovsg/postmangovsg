@@ -141,7 +141,7 @@ export const InitTelegramMiddleware = (
         credentialName
       )
       res.locals.credentials = { telegramBotToken }
-      res.locals.credentialName = credentialName
+      res.locals.credentialName = botId(telegramBotToken)
       return next()
     } catch (err) {
       const errAsError = err as Error
@@ -184,7 +184,7 @@ export const InitTelegramMiddleware = (
     )
 
     res.locals.credentials = { telegramBotToken }
-    res.locals.credentialName = credName
+    res.locals.credentialName = botId(telegramBotToken)
     next()
   }
 
@@ -246,6 +246,11 @@ export const InitTelegramMiddleware = (
     }
 
     try {
+      // Credential name will be raw botId. The botId will not be hashed as we
+      // want to preserve the mapping between botId and token even in the event
+      // of a change in salt for future token revocations/updates for the given
+      // botId.
+
       await credentialService.storeCredential(
         credentialName,
         telegramBotToken,
