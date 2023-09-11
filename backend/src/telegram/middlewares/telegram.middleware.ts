@@ -11,7 +11,6 @@ import {
   ApiInvalidTemplateError,
   ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
-import { v4 as uuid } from 'uuid'
 
 export interface TelegramMiddleware {
   getCredentialsFromBody: Handler
@@ -32,6 +31,9 @@ export const InitTelegramMiddleware = (
   credentialService: CredentialService
 ): TelegramMiddleware => {
   const logger = loggerWithLabel(module)
+
+  const botId = (telegramBotToken: string): string =>
+    telegramBotToken.split(':')[0]
 
   /**
    * Disable a request made for a demo campaign
@@ -68,7 +70,9 @@ export const InitTelegramMiddleware = (
     const { telegram_bot_token: telegramBotToken } = req.body
 
     res.locals.credentials = { telegramBotToken }
-    res.locals.credentialName = uuid()
+    res.locals.credentialName = `${process.env.APP_ENV}-${botId(
+      telegramBotToken
+    )}`
     return next()
   }
 

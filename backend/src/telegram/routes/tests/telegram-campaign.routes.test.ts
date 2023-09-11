@@ -207,7 +207,7 @@ describe('POST /campaign/{campaignId}/telegram/new-credentials', () => {
 
     expect(res.status).toBe(200)
 
-    const secretName = 'MOCKED_UUID'
+    const secretName = `${process.env.APP_ENV}-12345`
     expect(mockSecretsManager.createSecret).toHaveBeenCalledWith(
       expect.objectContaining({
         Name: secretName,
