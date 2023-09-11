@@ -11,6 +11,7 @@ import {
   ApiInvalidTemplateError,
   ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
+import { v4 as uuid } from 'uuid'
 
 export interface TelegramMiddleware {
   getCredentialsFromBody: Handler
@@ -20,6 +21,7 @@ export interface TelegramMiddleware {
   getCampaignDetails: Handler
   previewFirstMessage: Handler
   validateAndStoreCredentials: Handler
+  validateCredentials: Handler
   setCampaignCredential: Handler
   sendValidationMessage: Handler
   disabledForDemoCampaign: Handler
@@ -30,9 +32,6 @@ export const InitTelegramMiddleware = (
   credentialService: CredentialService
 ): TelegramMiddleware => {
   const logger = loggerWithLabel(module)
-
-  const botId = (telegramBotToken: string): string =>
-    telegramBotToken.split(':')[0]
 
   /**
    * Disable a request made for a demo campaign
@@ -69,9 +68,7 @@ export const InitTelegramMiddleware = (
     const { telegram_bot_token: telegramBotToken } = req.body
 
     res.locals.credentials = { telegramBotToken }
-    res.locals.credentialName = `${process.env.APP_ENV}-${botId(
-      telegramBotToken
-    )}`
+    res.locals.credentialName = uuid()
     return next()
   }
 
@@ -140,7 +137,7 @@ export const InitTelegramMiddleware = (
         credentialName
       )
       res.locals.credentials = { telegramBotToken }
-      res.locals.credentialName = botId(telegramBotToken)
+      res.locals.credentialName = credentialName
       return next()
     } catch (err) {
       const errAsError = err as Error
@@ -183,7 +180,34 @@ export const InitTelegramMiddleware = (
     )
 
     res.locals.credentials = { telegramBotToken }
-    res.locals.credentialName = botId(telegramBotToken)
+    res.locals.credentialName = credName
+    next()
+  }
+
+  const validateCredentials = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const { telegramBotToken } = res.locals.credentials
+    const { credentialName } = res.locals
+    const logMeta = {
+      credentialName,
+      action: 'validateCredentials',
+    }
+    try {
+      await TelegramService.validateAndConfigureBot(telegramBotToken)
+    } catch (err) {
+      logger.error({
+        message: 'Failed to validate and store credentials',
+        error: err,
+        ...logMeta,
+      })
+      throw new ApiInvalidCredentialsError((err as Error).message)
+    }
+
+    // Pass on to next middleware/handler
+    res.locals.channelType = ChannelType.Telegram
     next()
   }
 
@@ -218,11 +242,6 @@ export const InitTelegramMiddleware = (
     }
 
     try {
-      // Credential name will be raw botId. The botId will not be hashed as we
-      // want to preserve the mapping between botId and token even in the event
-      // of a change in salt for future token revocations/updates for the given
-      // botId.
-
       await credentialService.storeCredential(
         credentialName,
         telegramBotToken,
@@ -407,6 +426,7 @@ export const InitTelegramMiddleware = (
     getCampaignDetails,
     previewFirstMessage,
     validateAndStoreCredentials,
+    validateCredentials,
     setCampaignCredential,
     sendValidationMessage,
     disabledForDemoCampaign,
