@@ -92,6 +92,7 @@ interface ConfigSchema {
   defaultCountryCode: string
   telegramOptions: {
     webhookUrl: string
+    disableNewCredentials: boolean
   }
   maxRatePerJob: number
   apiKey: {
@@ -506,6 +507,11 @@ const config: Config<ConfigSchema> = convict({
       doc: 'Webhook URL to configure for all Telegram bots',
       default: '',
       env: 'TELEGRAM_WEBHOOK_URL',
+    },
+    disableNewCredentials: {
+      doc: 'Disables the addition of new Telegram credentials',
+      default: false,
+      env: 'TELEGRAM_DISABLE_NEW_CREDENTIALS',
     },
   },
   maxRatePerJob: {

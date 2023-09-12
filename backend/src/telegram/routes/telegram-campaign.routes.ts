@@ -118,6 +118,7 @@ export const InitTelegramCampaignMiddleware = (
     '/new-credentials',
     celebrate(storeCredentialsValidator),
     CampaignMiddleware.canEditCampaign,
+    telegramMiddleware.canValidateCredentials,
     telegramMiddleware.disabledForDemoCampaign,
     telegramMiddleware.getCredentialsFromBody,
     telegramMiddleware.validateAndStoreCredentials,

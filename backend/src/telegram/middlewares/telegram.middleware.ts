@@ -11,6 +11,7 @@ import {
   ApiInvalidTemplateError,
   ApiNotFoundError,
 } from '@core/errors/rest-api.errors'
+import config from '@core/config'
 
 export interface TelegramMiddleware {
   getCredentialsFromBody: Handler
@@ -25,6 +26,7 @@ export interface TelegramMiddleware {
   sendValidationMessage: Handler
   disabledForDemoCampaign: Handler
   duplicateCampaign: Handler
+  canValidateCredentials: Handler
 }
 
 export const InitTelegramMiddleware = (
@@ -427,6 +429,26 @@ export const InitTelegramMiddleware = (
     }
   }
 
+  /**
+   * Determine if new credentials can be validated based on whether validation is disabled.
+   * @param _req
+   * @param res
+   * @param next
+   */
+  const canValidateCredentials = async (
+    _req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    if (config.get('telegramOptions.disableNewCredentials')) {
+      return res.status(400).json({
+        message:
+          'Postman no longer supports the addition of new Telegram credentials.',
+      })
+    }
+    next()
+  }
+
   return {
     getCredentialsFromBody,
     getCredentialsFromLabel,
@@ -440,5 +462,6 @@ export const InitTelegramMiddleware = (
     sendValidationMessage,
     disabledForDemoCampaign,
     duplicateCampaign,
+    canValidateCredentials,
   }
 }
