@@ -65,6 +65,7 @@ export const InitTelegramSettingsRoute = (
   router.post(
     '/credentials',
     celebrate(storeCredentialValidator),
+    telegramMiddleware.canValidateCredentials,
     settingsMiddleware.checkUserCredentialLabel,
     telegramMiddleware.getCredentialsFromBody,
     telegramMiddleware.validateAndStoreCredentials,

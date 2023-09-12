@@ -9,7 +9,7 @@ import VerifyCredentialModal from '../verify-credential-modal'
 import styles from './Credentials.module.scss'
 
 import EmptyCredentialsImage from 'assets/img/credentials.svg'
-import type { ChannelType } from 'classes'
+import { ChannelType } from 'classes'
 
 import { PrimaryButton, ConfirmModal } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'

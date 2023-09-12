@@ -1,0 +1,33 @@
+@import 'styles/_variables';
+@import 'styles/base/_colours';
+@import 'styles/_mixins';
+.container {
+  height: auto;
+  padding: 4px $site-padding;
+  color: white;
+  text-align: center;
+  @include flex-horizontal;
+  justify-content: center;
+  position: relative;
+  width: 100%;
+  z-index: 5;
+
+  .infoText {
+    max-width: $header-max-width;
+    font-size: 1rem;
+  }
+
+  @include mobile() {
+    padding: 4px $mobile-site-padding;
+    text-align: justify;
+  }
+}
+.primary {
+  background-color: $primary;
+}
+.danger {
+  background-color: $red-500;
+}
+.warning {
+  background-color: $yellow-700;
+}
