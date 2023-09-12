@@ -3,6 +3,8 @@ import cx from 'classnames'
 import { useContext, useState, useEffect } from 'react'
 import { Navigate, Route, Routes } from 'react-router-dom'
 
+import { TELEGRAM_CREDENTIAL_BANNER_MESSAGE } from '../../../constants'
+
 import styles from './Settings.module.scss'
 import AddApiKeyModal from './add-api-key-modal'
 import AddCredentialModal from './add-credential-modal'
@@ -13,6 +15,7 @@ import CustomFromAddress from './custom-from-address'
 import CredentialsImage from 'assets/img/credentials.svg'
 import { ChannelType, channelIcons } from 'classes'
 import { SideNav, TitleBar } from 'components/common'
+import Banner from 'components/common/banner'
 import { ModalContext } from 'contexts/modal.context'
 import type { UserCredential } from 'services/settings.service'
 import {
@@ -175,6 +178,10 @@ const Settings = () => {
   return (
     <>
       <TitleBar title="Settings"> </TitleBar>
+      <Banner
+        bannerContent={TELEGRAM_CREDENTIAL_BANNER_MESSAGE}
+        bannerColor="warning"
+      />
       {isLoading ? (
         <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')} />
       ) : !hasApiKey && creds.length < 1 && !hasCustomFromAddresses ? (
