@@ -191,24 +191,26 @@ async function handleStatusCallbacks(
       }
       break
     case SesEventType.Open:
+      // Cannot check that open applies to the main recipient
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Opened,
           openedAt: metadata.timestamp,
         },
         {
-          where: { id },
+          where: { id, errorCode: null },
         }
       )
       break
     case SesEventType.Send:
+      // Cannot check that send applies to the main recipient
       await EmailMessageTransactional.update(
         {
           status: TransactionalEmailMessageStatus.Sent,
           sentAt: metadata.timestamp,
         },
         {
-          where: { id },
+          where: { id, errorCode: null },
         }
       )
       break
