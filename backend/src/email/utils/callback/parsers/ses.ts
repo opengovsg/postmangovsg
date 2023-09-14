@@ -137,6 +137,14 @@ const parseNotificationAndEvent = async (
   message: any,
   metadata: Metadata
 ): Promise<void> => {
+  if (!isNotificationAndEventForMainRecipient(message, type)) {
+    logger.info({
+      message: 'SES notification or event is not for the main recipient',
+      action: 'filterNotification',
+      body: message,
+    })
+    return
+  }
   switch (type) {
     case SesEventType.Delivery:
       await updateDeliveredStatus(metadata)
@@ -248,6 +256,45 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
     }
     return parseNotificationAndEvent(type, message, metadata)
   }
+}
+
+// Checks whether the notification/event is meant for the main recipient of the email.
+function isNotificationAndEventForMainRecipient(
+  message: any,
+  type: SesEventType
+): boolean {
+  // We cannot filter "OPEN" and "SEND" events due to the response given by AWS SES
+  if (type === SesEventType.Open || type === SesEventType.Send) {
+    return true
+  }
+  // There must be atleast one recipient of an email
+  const mainRecipient: string = message?.mail?.commonHeaders?.to[0]
+  if (!mainRecipient) {
+    throw new Error('Failed to find main recipient in message')
+  }
+  const mainRecipientDelivered = message?.delivery?.recipients?.some(
+    (e: string) => e === mainRecipient
+  )
+  const mainRecipientBounced = message.bounce?.bouncedRecipients?.some(
+    (e: any) => e.emailAddress === mainRecipient
+  )
+  const mainRecipientComplained = message.complaint?.complainedRecipients?.some(
+    (e: any) => e.emailAddress === mainRecipient
+  )
+
+  logger.info({
+    message: 'SES notification filter result',
+    deliveryRecipients: message?.delivery?.recipients,
+    bouncedRecipients: message.bounce?.bouncedRecipients,
+    complainedRecipients: message.complaint?.complainedRecipients,
+    mainRecipient,
+    result:
+      mainRecipientBounced || mainRecipientDelivered || mainRecipientComplained,
+  })
+
+  return (
+    mainRecipientBounced || mainRecipientDelivered || mainRecipientComplained
+  )
 }
 
 export { HttpEvent, SesRecord, isEvent, parseRecord, validateSignature }

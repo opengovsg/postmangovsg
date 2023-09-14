@@ -126,7 +126,7 @@ export const updateMessageWithRead = async (
       status: 'READ',
     } as EmailMessage,
     {
-      where: { id: messageId },
+      where: { id: messageId, errorCode: null },
       returning: true,
     }
   )
