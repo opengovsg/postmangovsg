@@ -7,15 +7,16 @@ import React, { useState, useContext, useEffect } from 'react'
 
 import styles from './LoginInput.module.scss'
 
+import ErrorImage from 'assets/img/failure.png'
 import {
   TextInputWithButton,
   TextButton,
   PrimaryButton,
-  ErrorBlock,
-  InfoBlock,
+  ConfirmModal,
 } from 'components/common'
 import { AuthContext } from 'contexts/auth.context'
 
+import { ModalContext } from 'contexts/modal.context'
 import {
   getOtpWithEmail,
   loginWithOtp,
@@ -31,6 +32,8 @@ import {
 } from 'services/ga.service'
 
 const RESEND_WAIT_TIME = 30000
+const SGID_VALID_ORGANISATIONS_PAGE =
+  'https://docs.id.gov.sg/faq-users#as-a-government-officer-why-am-i-not-able-to-login-to-my-work-tool-using-sgid'
 
 const Login = () => {
   const {
@@ -45,22 +48,64 @@ const Login = () => {
   const [errorMsg, setErrorMsg] = useState('')
   const [canResend, setCanResend] = useState(false)
   const [isResending, setIsResending] = useState(false)
-  const [sgidErrorMsg, setSgidErrorMsg] = useState('')
+  const modalContext = useContext(ModalContext)
   let timeoutId: NodeJS.Timeout
 
   useEffect(() => {
     return () => timeoutId && clearTimeout(timeoutId)
   })
 
+  const SINGPASS_ERROR_CODE = 'SingpassError'
+  const NO_EMPLOYEE_PROFILE_ERROR_CODE = 'NoSingpassProfile'
+
   useEffect(() => {
     const params = new URL(window.location.href).searchParams
     const errorCode = params.get('errorCode')
-    if (errorCode) {
-      setSgidErrorMsg(errorCode)
-    } else {
-      setSgidErrorMsg('')
+    const openNoEmployeeProfileModal = () =>
+      modalContext.setModalContent(
+        <ConfirmModal
+          title={`Oops, we don't have your employee profile in the system`}
+          subtitleElement={
+            <h4 className={styles.subtitleElement}>
+              Please check{' '}
+              <a
+                style={{ textDecoration: 'underline' }}
+                href={SGID_VALID_ORGANISATIONS_PAGE}
+              >
+                here
+              </a>{' '}
+              if your government agency is supported. Meanwhile, login via your
+              email instead.
+            </h4>
+          }
+          buttonText="Use Email Login"
+          alternateImage={ErrorImage}
+          primary={true}
+          onConfirm={() => modalContext.close()}
+        />
+      )
+
+    const openSingpassErrorModal = () =>
+      modalContext.setModalContent(
+        <ConfirmModal
+          title={`An error occured while trying to log in via Singpass`}
+          buttonText="Use Email Login"
+          alternateImage={ErrorImage}
+          primary={true}
+          onConfirm={() => modalContext.close()}
+        />
+      )
+    switch (errorCode) {
+      case SINGPASS_ERROR_CODE:
+        void openSingpassErrorModal()
+        break
+      case NO_EMPLOYEE_PROFILE_ERROR_CODE:
+        void openNoEmployeeProfileModal()
+        break
+      default:
+        break
     }
-  }, [setSgidErrorMsg])
+  }, [])
 
   async function sendOtp() {
     resetButton()
@@ -123,7 +168,6 @@ const Login = () => {
 
   return (
     <div className={styles.container}>
-      {sgidErrorMsg && <ErrorBlock>{sgidErrorMsg}</ErrorBlock>}
       <h3 className={styles.text}>
         {!otpSent ? (
           <Trans>Sign in with your gov.sg email</Trans>
@@ -171,18 +215,23 @@ const Login = () => {
         />
       )}
       {/* This feature is experimental and should only be rendered on the demo URL (/sgid-login) */}
-      {window.location.pathname.includes('sgid-login') && !otpSent && (
+      {!otpSent && (
         <React.Fragment>
           <h4 className={styles.text}>
             <Trans>or</Trans>
           </h4>
-          <InfoBlock className={styles.info}>
-            This is an experimental service currently offered to whitelisted
-            users only.
-          </InfoBlock>
           <PrimaryButton onClick={sgidLogin}>
             Log in with Singpass
           </PrimaryButton>
+          <p>
+            Can my agency use this? Check{' '}
+            <a
+              style={{ textDecoration: 'underline' }}
+              href={SGID_VALID_ORGANISATIONS_PAGE}
+            >
+              here
+            </a>
+          </p>
         </React.Fragment>
       )}
     </div>

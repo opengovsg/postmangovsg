@@ -1,0 +1,59 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.mainBlock {
+  width: 640px;
+  height: 120px;
+  padding: 28 24 28 24;
+
+  h3 {
+    text-align: center;
+    font-size: 24px;
+  }
+
+  @include mobile() {
+    width: 327px;
+    justify-content: space-between;
+  }
+}
+
+.profileBlock {
+  width: 640px;
+  height: 120px;
+  padding: 28px 24px 28px 24px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid $primary-light;
+  border-bottom: 1px solid $primary-light;
+  cursor: pointer;
+
+  @include mobile() {
+    width: 327px;
+    justify-content: space-between;
+  }
+}
+
+// Every subsequent block only has border-bottom
+.profileBlock ~ .profileBlock {
+  border-bottom: 1px solid $primary-light;
+}
+
+.profileMainText {
+  font-size: 14.4px;
+
+  color: #040651;
+}
+
+.profileSubText {
+  font-size: 12px;
+  color: #64707d;
+}
+
+.bottomBlock {
+  width: 640px;
+  padding-top: 32px;
+  display: flex;
+  justify-content: center;
+  color: #2c2cdc;
+}

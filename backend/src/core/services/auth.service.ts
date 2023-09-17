@@ -4,7 +4,7 @@ import { Request } from 'express'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { User } from '@core/models'
-import { isValidDomain, validateDomain } from '@core/utils/validate-domain'
+import { validateDomain } from '@core/utils/validate-domain'
 import { ApiKeyService, MailService, RedisService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 import { Transaction } from 'sequelize/types'
@@ -13,6 +13,7 @@ import {
   UserInfoReturn,
   generatePkcePair,
 } from '@opengovsg/sgid-client'
+import { SgidPublicOfficerEmployment } from '@core/types'
 
 export interface AuthService {
   canSendOtp(email: string): Promise<void>
@@ -30,7 +31,7 @@ export interface AuthService {
     | { authenticated: true; data: UserInfoReturn }
     | { authenticated: false; reason: string }
   >
-  getSgidUserEmail(userInfo: UserInfoReturn): string
+  getSgidUserProfiles(userInfo: UserInfoReturn): SgidPublicOfficerEmployment[]
 }
 
 export const InitAuthService = (redisService: RedisService): AuthService => {
@@ -47,7 +48,6 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     clientSecret: SGID_CLIENT_SECRET,
     privateKey: SGID_PRIVATE_KEY,
     redirectUri: SGID_REDIRECT_URI,
-    validDomains: SGID_VALID_DOMAINS,
   } = config.get('sgid')
 
   const sgidClient = new SgidClient({
@@ -57,9 +57,9 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     redirectUri: SGID_REDIRECT_URI,
   })
 
-  const SGID_OGP_WORK_EMAIL_SCOPE = 'ogpofficerinfo.work_email'
-  const sgidDomainsToWhitelist =
-    SGID_VALID_DOMAINS.split(';').filter(isValidDomain)
+  const SGID_PUBLIC_OFFICER_EMPLOYMENT_SCOPE =
+    'pocdex.public_officer_employments'
+  const SGID_FIELD_EMPTY = 'NA'
   const otpCharset = '234567ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   /**
    * Generate a six digit otp
@@ -343,7 +343,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     const { codeChallenge, codeVerifier } = generatePkcePair()
 
     const { url, nonce } = sgidClient.authorizationUrl({
-      scope: ['openid', SGID_OGP_WORK_EMAIL_SCOPE].join(' '),
+      scope: ['openid', SGID_PUBLIC_OFFICER_EMPLOYMENT_SCOPE].join(' '),
       codeChallenge,
     })
 
@@ -405,22 +405,100 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   }
 
   /**
-   * Helper method to retrieve the user's email from their singpass info.
-   * User's email must be from the list of whitelisted domains.
+   * Helper method to retrieve the user's valid profiles from their singpass info.
    * @param userInfo
    */
-  const getSgidUserEmail = (userInfo: UserInfoReturn): string => {
-    const email = userInfo.data[SGID_OGP_WORK_EMAIL_SCOPE]
-    if (!email) {
-      throw new Error('No email found')
-    }
-    const isEmailDomainValid = sgidDomainsToWhitelist.some((domain: string) =>
-      email.endsWith(domain)
-    )
-    if (!isEmailDomainValid) {
-      throw new Error('Invalid email')
-    }
-    return email.toLowerCase()
+  const getSgidUserProfiles = (
+    userInfo: UserInfoReturn
+  ): SgidPublicOfficerEmployment[] => {
+    const profiles = JSON.parse(
+      userInfo.data[SGID_PUBLIC_OFFICER_EMPLOYMENT_SCOPE]
+    ) as SgidPublicOfficerEmployment[]
+    const validProfiles = validateSgidUserProfiles(profiles)
+    const cleanedProfiles = cleanSgidUserProfiles(validProfiles)
+    return cleanedProfiles
+  }
+
+  /**
+   * Helper method to validate the user's profiles returned by SGID.
+   * A profile is valid only if the user's work email exists and is whitelisted by Postman
+   * @param userProfiles
+   */
+  const validateSgidUserProfiles = (
+    userProfiles: SgidPublicOfficerEmployment[]
+  ): SgidPublicOfficerEmployment[] => {
+    const logMeta = { action: 'validateSgidUserProfiles' }
+    // Only the value of workEmail is important for access to Postman.
+    const validProfiles = userProfiles.filter((profile) => {
+      // We want to log the absence of workEmail to measure the data completeness from SGID.
+      if (profile.workEmail === SGID_FIELD_EMPTY) {
+        logger.warn({
+          message: 'Work email is missing from SGID data',
+          ...logMeta,
+          profile,
+        })
+        return false
+      }
+      if (!isWhitelistedEmail(profile.workEmail)) {
+        logger.warn({
+          message: 'Work email is not a whitelisted email',
+          ...logMeta,
+          profile,
+        })
+        return false
+      }
+      return true
+    })
+    return validProfiles
+  }
+
+  /**
+   * Helper method to clean the user's profiles returned by SGID
+   * @param userProfiles
+   */
+  const cleanSgidUserProfiles = (
+    userProfiles: SgidPublicOfficerEmployment[]
+  ): SgidPublicOfficerEmployment[] => {
+    const logMeta = { action: 'cleanSgidUserProfiles' }
+    const cleanedProfiles = userProfiles.map((profile) => {
+      // DB only accepts lowercase emails
+      profile.workEmail = profile.workEmail.toLowerCase()
+      // If SGID does not have the field, we want to log the missing value and return an empty string
+      if (profile.agencyName === SGID_FIELD_EMPTY) {
+        profile.agencyName = ''
+        logger.warn({
+          message: 'Agency name is missing from SGID data',
+          ...logMeta,
+          profile,
+        })
+      }
+      if (profile.departmentName === SGID_FIELD_EMPTY) {
+        profile.departmentName = ''
+        logger.warn({
+          message: 'Department name is missing from SGID data',
+          ...logMeta,
+          profile,
+        })
+      }
+      if (profile.employmentTitle === SGID_FIELD_EMPTY) {
+        profile.employmentTitle = ''
+        logger.warn({
+          message: 'Employment title is missing from SGID data',
+          ...logMeta,
+          profile,
+        })
+      }
+      if (profile.employmentType === SGID_FIELD_EMPTY) {
+        profile.employmentType = ''
+        logger.warn({
+          message: 'Employment type is missing from SGID data',
+          ...logMeta,
+          profile,
+        })
+      }
+      return profile
+    })
+    return cleanedProfiles
   }
 
   return {
@@ -433,6 +511,6 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     getUserForApiKey,
     getSgidUrl,
     verifySgidCode,
-    getSgidUserEmail,
+    getSgidUserProfiles,
   }
 }
