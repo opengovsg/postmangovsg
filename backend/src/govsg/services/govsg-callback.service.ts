@@ -316,8 +316,7 @@ const parseUserMessageWebhook = async (
   body: UserMessageWebhook,
   clientId: WhatsAppApiClient
 ): Promise<void> => {
-  const { wa_id: whatsappId } = body.contacts[0]
-  const { id: messageId, type } = body.messages[0]
+  const { id: messageId, from: whatsappId, type } = body.messages[0]
   if (type !== WhatsappWebhookMessageType.text) {
     // not text message, log and ignore
     logger.info({
