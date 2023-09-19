@@ -17,6 +17,7 @@ import TwilioClient, {
   TwilioCredentials,
 } from '@shared/clients/twilio-client.class'
 import { PhoneNumberService } from '@shared/utils/phone-number.service'
+import { ApiServiceUnavailableError } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
 
@@ -80,9 +81,14 @@ const sendMessage = (
   } catch (err) {
     throw new InvalidRecipientError('Invalid phone number')
   }
-
-  const client = new TwilioClient(credential)
-  return client.send(recipient, message)
+  try {
+    const client = new TwilioClient(credential)
+    return client.send(recipient, message)
+  } catch (err) {
+    throw new ApiServiceUnavailableError(
+      'Service is temporarily unavailable. Please try again later.'
+    )
+  }
 }
 
 /**
