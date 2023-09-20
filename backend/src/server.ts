@@ -4,7 +4,6 @@ import './setup'
 import 'source-map-support/register'
 import express from 'express'
 import { loaders } from '@core/loaders'
-import throng from 'throng'
 const port = Number(process.env.PORT) || 4000
 const app: express.Application = express()
 
@@ -25,8 +24,4 @@ const start = async (): Promise<void> => {
   }
 }
 
-// Use throng to create a cluster and make full use of all the cores in underlying
-// machine. The default counts is os.cpus().length
-void throng({
-  start,
-})
+void start()
