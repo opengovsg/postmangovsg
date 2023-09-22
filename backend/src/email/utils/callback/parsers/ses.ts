@@ -211,13 +211,15 @@ const blacklistIfNeeded = async (message: any): Promise<void> => {
   const bounceType = message?.bounce?.bounceType
   const complaintType = message?.complaint?.complaintFeedbackType
 
-  const recipients = message?.mail?.commonHeaders?.to
+  const recipientsToBlacklist = message.bounce?.bouncedRecipients?.map(
+    (e: any) => e.emailAddress
+  )
   if (
     notificationType &&
-    recipients &&
+    recipientsToBlacklist &&
     shouldBlacklist({ notificationType, bounceType, complaintType })
   ) {
-    await Promise.all(recipients.map(addToBlacklist))
+    await Promise.all(recipientsToBlacklist.map(addToBlacklist))
   }
 }
 const parseRecord = async (record: SesRecord): Promise<void> => {
