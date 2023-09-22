@@ -119,3 +119,9 @@ export class ApiInvalidCredentialLabelError extends RestApiError {
     super(400, 'invalid_credential_label', message)
   }
 }
+
+export class ApiServiceUnavailableError extends RestApiError {
+  constructor(message: string) {
+    super(503, 'service_unavailable', message)
+  }
+}
