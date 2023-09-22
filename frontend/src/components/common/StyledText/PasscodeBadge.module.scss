@@ -1,24 +1,6 @@
 @import 'styles/_variables';
 @import 'styles/_mixins';
 
-details > summary {
-  list-style: none;
-}
-
-details[open] > summary {
-  display: none;
-}
-
-summary {
-  @extend %body-2;
-  color: $primary;
-  text-decoration: underline;
-}
-
-summary:hover {
-  cursor: pointer;
-}
-
 .positive {
   background-color: $grey-300;
   border-radius: 8px;

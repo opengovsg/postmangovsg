@@ -120,15 +120,6 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     await searchGovsgMessages(newSearch, 0)
   }
 
-  const trackPasscodeReveal = useCallback(
-    async (govsgMessage: GovsgMessage) => {
-      await axios.post(`/campaign/${campaignId}/govsg/track-passcode-reveal`, {
-        govsg_message_id: govsgMessage.id,
-      })
-    },
-    []
-  )
-
   const passcodeColumn = shouldHavePasscode
     ? [
         {
@@ -139,7 +130,6 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
                 key={govsgMessage.id}
                 label={govsgMessage.passcode}
                 placeholder="N/A"
-                onClick={async () => await trackPasscodeReveal(govsgMessage)}
               />
             )
           },

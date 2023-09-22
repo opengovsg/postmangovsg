@@ -167,25 +167,3 @@ export const resendMessage = async (
     wamid: serviceProviderMessageId,
   })
 }
-
-export const trackPasscodeReveal = async (
-  req: Request,
-  res: Response
-): Promise<Response | void> => {
-  const { govsg_message_id: govsgMessageId } = req.body
-  const userClickedAt = new Date()
-  await GovsgVerification.update(
-    { userClickedAt },
-    {
-      where: {
-        govsgMessageId,
-        userClickedAt: {
-          [Op.eq]: null,
-        },
-      },
-    }
-  )
-  return res.json({
-    govsg_message_id: govsgMessageId,
-  })
-}

@@ -152,14 +152,4 @@ router.post(
   GovsgVerificationMiddleware.resendMessage
 )
 
-router.post(
-  '/track-passcode-reveal',
-  celebrate({
-    [Segments.BODY]: {
-      govsg_message_id: Joi.string().required(),
-    },
-  }),
-  GovsgVerificationMiddleware.trackPasscodeReveal
-)
-
 export default router
