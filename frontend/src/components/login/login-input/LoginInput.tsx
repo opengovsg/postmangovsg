@@ -45,7 +45,6 @@ const Login = () => {
   const [otpSent, setOtpSent] = useState(false)
   const [email, setEmail] = useState('')
   const [otp, setOtp] = useState('')
-  const [errorMsg, setErrorMsg] = useState('')
   const [canResend, setCanResend] = useState(false)
   const [isResending, setIsResending] = useState(false)
   const modalContext = useContext(ModalContext)
@@ -57,6 +56,20 @@ const Login = () => {
 
   const SINGPASS_ERROR_CODE = 'SingpassError'
   const NO_EMPLOYEE_PROFILE_ERROR_CODE = 'NoSingpassProfile'
+
+  const openErrorModal = (errorMessage: string) =>
+    modalContext.setModalContent(
+      <ConfirmModal
+        title={`Oops, something went wrong. Please try again later.`}
+        subtitleElement={
+          <h4 className={styles.subtitleElement}>{errorMessage}</h4>
+        }
+        buttonText="Okay"
+        alternateImage={ErrorImage}
+        primary={true}
+        onConfirm={() => modalContext.close()}
+      />
+    )
 
   useEffect(() => {
     const params = new URL(window.location.href).searchParams
@@ -71,6 +84,8 @@ const Login = () => {
               <a
                 style={{ textDecoration: 'underline' }}
                 href={SGID_VALID_ORGANISATIONS_PAGE}
+                target="_blank"
+                rel="noreferrer"
               >
                 here
               </a>{' '}
@@ -118,13 +133,12 @@ const Login = () => {
       }, RESEND_WAIT_TIME)
     } catch (err) {
       setCanResend(true)
-      setErrorMsg((err as Error).message)
+      openErrorModal((err as Error).message)
       sendException((err as Error).message)
     }
   }
 
   async function login() {
-    setErrorMsg('')
     try {
       await loginWithOtp(email, otp)
       setAuthenticated(true)
@@ -135,26 +149,24 @@ const Login = () => {
       )
       setUserAnalytics(user)
     } catch (err) {
-      setErrorMsg((err as Error).message)
+      openErrorModal((err as Error).message)
       sendException((err as Error).message)
     }
   }
 
   async function sgidLogin() {
-    setErrorMsg('')
     try {
       const authUrl = await getSgidUrl()
       if (authUrl) {
         window.location.assign(authUrl)
       }
     } catch (err) {
-      setErrorMsg((err as Error).message)
+      openErrorModal((err as Error).message)
       sendException((err as Error).message)
     }
   }
 
   function resetButton() {
-    setErrorMsg('')
     setCanResend(false)
     setOtp('')
   }
@@ -199,7 +211,6 @@ const Login = () => {
           onClick={sendOtp}
           buttonLabel={<Trans>Get OTP</Trans>}
           loadingButtonLabel={<Trans>Sending OTP...</Trans>}
-          errorMessage={errorMsg}
         />
       ) : (
         <TextInputWithButton
@@ -211,7 +222,6 @@ const Login = () => {
           onClick={login}
           buttonLabel={<Trans>Sign In</Trans>}
           loadingButtonLabel={<Trans>Verifying OTP...</Trans>}
-          errorMessage={errorMsg}
         />
       )}
       {/* This feature is experimental and should only be rendered on the demo URL (/sgid-login) */}
@@ -228,6 +238,8 @@ const Login = () => {
             <a
               style={{ textDecoration: 'underline' }}
               href={SGID_VALID_ORGANISATIONS_PAGE}
+              target="_blank"
+              rel="noreferrer"
             >
               here
             </a>

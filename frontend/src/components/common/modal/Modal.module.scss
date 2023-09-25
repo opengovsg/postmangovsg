@@ -42,8 +42,8 @@ $title-height: $height-4;
 
 .close {
   position: absolute;
-  top: 2rem;
-  right: $spacing-1;
+  top: 1rem;
+  right: 1rem;
   &.modalTitleClose {
     color: $green-900;
     top: calc(#{$title-height} / 2 - 1.5rem); // close button has height of 3rem

@@ -31,7 +31,9 @@ export interface AuthService {
     | { authenticated: true; data: UserInfoReturn }
     | { authenticated: false; reason: string }
   >
-  getSgidUserProfiles(userInfo: UserInfoReturn): SgidPublicOfficerEmployment[]
+  getSgidUserProfiles(
+    userInfo: UserInfoReturn
+  ): Promise<SgidPublicOfficerEmployment[]>
 }
 
 export const InitAuthService = (redisService: RedisService): AuthService => {
@@ -408,13 +410,13 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
    * Helper method to retrieve the user's valid profiles from their singpass info.
    * @param userInfo
    */
-  const getSgidUserProfiles = (
+  const getSgidUserProfiles = async (
     userInfo: UserInfoReturn
-  ): SgidPublicOfficerEmployment[] => {
+  ): Promise<SgidPublicOfficerEmployment[]> => {
     const profiles = JSON.parse(
       userInfo.data[SGID_PUBLIC_OFFICER_EMPLOYMENT_SCOPE]
     ) as SgidPublicOfficerEmployment[]
-    const validProfiles = validateSgidUserProfiles(profiles)
+    const validProfiles = await validateSgidUserProfiles(profiles)
     const cleanedProfiles = cleanSgidUserProfiles(validProfiles)
     return cleanedProfiles
   }
@@ -424,12 +426,13 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
    * A profile is valid only if the user's work email exists and is whitelisted by Postman
    * @param userProfiles
    */
-  const validateSgidUserProfiles = (
+  const validateSgidUserProfiles = async (
     userProfiles: SgidPublicOfficerEmployment[]
-  ): SgidPublicOfficerEmployment[] => {
+  ): Promise<SgidPublicOfficerEmployment[]> => {
     const logMeta = { action: 'validateSgidUserProfiles' }
     // Only the value of workEmail is important for access to Postman.
-    const validProfiles = userProfiles.filter((profile) => {
+    const validProfiles = []
+    for (const profile of userProfiles) {
       // We want to log the absence of workEmail to measure the data completeness from SGID.
       if (profile.workEmail === SGID_FIELD_EMPTY) {
         logger.warn({
@@ -437,18 +440,18 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
           ...logMeta,
           profile,
         })
-        return false
+        continue
       }
-      if (!isWhitelistedEmail(profile.workEmail)) {
+      if (!(await isWhitelistedEmail(profile.workEmail))) {
         logger.warn({
           message: 'Work email is not a whitelisted email',
           ...logMeta,
           profile,
         })
-        return false
+        continue
       }
-      return true
-    })
+      validProfiles.push(profile)
+    }
     return validProfiles
   }
 

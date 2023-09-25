@@ -262,7 +262,9 @@ export const InitAuthMiddleware = (authService: AuthService) => {
         logger.error({ message: sgidUserInfo.reason, ...logMeta })
         return res.status(401).json({ message: sgidUserInfo.reason })
       }
-      const userProfiles = authService.getSgidUserProfiles(sgidUserInfo.data)
+      const userProfiles = await authService.getSgidUserProfiles(
+        sgidUserInfo.data
+      )
       // Set user profiles in the session object so we can verify the profile selected by the user
       req.session.sgid = {
         ...req.session.sgid,

@@ -74,39 +74,41 @@ const ConfirmModal = ({
     }
   }
   return (
-    <div className={styles.confirm}>
-      {disableImage ? (
-        ''
-      ) : (
-        <div className={styles.modalImg}>
-          <img src={alternateImage ?? ConfirmImage} alt="Modal graphic"></img>
-        </div>
-      )}
-      <h2 className={styles.title}>{title}</h2>
-      {subtitle && <h4 className={styles.subtitle}>{subtitle}</h4>}
-      {subtitleElement}
-      <div className={styles.options}>
-        <PrimaryButton
-          className={
-            primary
-              ? styles.blueButton
-              : destructive
-              ? styles.redButton
-              : styles.greenButton
-          }
-          onClick={onConfirmedClicked}
-        >
-          {buttonText}
-          {buttonIcon && <i className={cx('bx', styles.icon, buttonIcon)}></i>}
-        </PrimaryButton>
-        {cancelText && (
-          <TextButton minButtonWidth onClick={onCancelClicked}>
-            {cancelText}
-          </TextButton>
+    <>
+      {buttonIcon && <i className={cx('bx', styles.icon, buttonIcon)}></i>}
+      <div className={styles.confirm}>
+        {disableImage ? (
+          ''
+        ) : (
+          <div className={styles.modalImg}>
+            <img src={alternateImage ?? ConfirmImage} alt="Modal graphic"></img>
+          </div>
         )}
+        <h2 className={styles.title}>{title}</h2>
+        {subtitle && <h4 className={styles.subtitle}>{subtitle}</h4>}
+        {subtitleElement}
+        <div className={styles.options}>
+          <PrimaryButton
+            className={
+              primary
+                ? styles.blueButton
+                : destructive
+                ? styles.redButton
+                : styles.greenButton
+            }
+            onClick={onConfirmedClicked}
+          >
+            {buttonText}
+          </PrimaryButton>
+          {cancelText && (
+            <TextButton minButtonWidth onClick={onCancelClicked}>
+              {cancelText}
+            </TextButton>
+          )}
+        </div>
+        <ErrorBlock>{errorMessage}</ErrorBlock>
       </div>
-      <ErrorBlock>{errorMessage}</ErrorBlock>
-    </div>
+    </>
   )
 }
 
