@@ -5,6 +5,7 @@ import { AuthService, experimentService } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
 import { DEFAULT_TX_EMAIL_RATE_LIMIT } from '@core/models'
 import { ApiAuthenticationError } from '@core/errors/rest-api.errors'
+import { SgidPublicOfficerEmployment } from '@core/types'
 
 export interface AuthMiddleware {
   getOtp: Handler
@@ -14,6 +15,7 @@ export interface AuthMiddleware {
   logout: Handler
   getSgidUrl: Handler
   verifySgidResponse: Handler
+  selectSgidProfile: Handler
 }
 
 export enum AuthType {
@@ -240,7 +242,7 @@ export const InitAuthMiddleware = (authService: AuthService) => {
   }
 
   /**
-   * Verifies that the sgID response is valid
+   * Verifies that the sgID response is valid and returns the user profiles to choose from
    * @param req
    * @param res
    */
@@ -257,10 +259,46 @@ export const InitAuthMiddleware = (authService: AuthService) => {
       }
       const sgidUserInfo = await authService.verifySgidCode(req, code)
       if (!sgidUserInfo.authenticated) {
+        logger.error({ message: sgidUserInfo.reason, ...logMeta })
         return res.status(401).json({ message: sgidUserInfo.reason })
       }
-      const userEmail = authService.getSgidUserEmail(sgidUserInfo.data)
-      const user = await authService.findOrCreateUser(userEmail)
+      const userProfiles = await authService.getSgidUserProfiles(
+        sgidUserInfo.data
+      )
+      // Set user profiles in the session object so we can verify the profile selected by the user
+      req.session.sgid = {
+        ...req.session.sgid,
+        profiles: [...userProfiles],
+      }
+      return res.status(200).json({ userProfiles })
+    } catch (e) {
+      const message = (e as Error).message
+      logger.error({ message, ...logMeta })
+      return res.status(500).json({ message })
+    }
+  }
+
+  const selectSgidProfile = async (
+    req: Request,
+    res: Response
+  ): Promise<Response> => {
+    const { workEmail } = req.body
+    const logMeta = { action: 'selectSgidProfile' }
+    try {
+      if (!req.session) {
+        logger.error({ message: 'Session object not found!', ...logMeta })
+        return res.sendStatus(401)
+      }
+      if (
+        !req.session.sgid?.profiles ||
+        !req.session.sgid.profiles.some(
+          (p: SgidPublicOfficerEmployment) => p.workEmail === workEmail
+        )
+      ) {
+        logger.error({ message: 'Selected profile is not valid', ...logMeta })
+        return res.sendStatus(401)
+      }
+      const user = await authService.findOrCreateUser(workEmail)
       req.session.user = {
         id: user.id,
         createdAt: user.createdAt,
@@ -283,5 +321,6 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     logout,
     getSgidUrl,
     verifySgidResponse,
+    selectSgidProfile,
   }
 }

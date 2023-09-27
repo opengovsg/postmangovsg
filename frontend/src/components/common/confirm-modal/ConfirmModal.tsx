@@ -1,6 +1,6 @@
 import cx from 'classnames'
 
-import { useContext, useState } from 'react'
+import { ReactNode, useContext, useState } from 'react'
 
 import styles from './ConfirmModal.module.scss'
 
@@ -14,24 +14,30 @@ import { ModalContext } from 'contexts/modal.context'
 const ConfirmModal = ({
   title,
   subtitle,
+  subtitleElement,
   buttonText,
   buttonIcon,
   cancelText,
+  primary,
   destructive,
   onConfirm,
   onCancel,
   disableImage,
+  alternateImage,
   feedbackUrl,
 }: {
   title: string
-  subtitle: string
+  subtitle?: string
+  subtitleElement?: ReactNode
   buttonText: string
   buttonIcon?: string
   cancelText?: string
+  primary?: boolean
   destructive?: boolean
   onConfirm: () => Promise<any> | any
   onCancel?: () => Promise<any> | any
   disableImage?: boolean
+  alternateImage?: string
   feedbackUrl?: string
 }) => {
   const modalContext = useContext(ModalContext)
@@ -68,32 +74,41 @@ const ConfirmModal = ({
     }
   }
   return (
-    <div className={styles.confirm}>
-      {disableImage ? (
-        ''
-      ) : (
-        <div className={styles.modalImg}>
-          <img src={ConfirmImage} alt="Modal graphic"></img>
-        </div>
-      )}
-      <h2 className={styles.title}>{title}</h2>
-      <h4 className={styles.subtitle}>{subtitle}</h4>
-      <div className={styles.options}>
-        <PrimaryButton
-          className={destructive ? styles.redButton : styles.greenButton}
-          onClick={onConfirmedClicked}
-        >
-          {buttonText}
-          {buttonIcon && <i className={cx('bx', styles.icon, buttonIcon)}></i>}
-        </PrimaryButton>
-        {cancelText && (
-          <TextButton minButtonWidth onClick={onCancelClicked}>
-            {cancelText}
-          </TextButton>
+    <>
+      {buttonIcon && <i className={cx('bx', styles.icon, buttonIcon)}></i>}
+      <div className={styles.confirm}>
+        {disableImage ? (
+          ''
+        ) : (
+          <div className={styles.modalImg}>
+            <img src={alternateImage ?? ConfirmImage} alt="Modal graphic"></img>
+          </div>
         )}
+        <h2 className={styles.title}>{title}</h2>
+        {subtitle && <h4 className={styles.subtitle}>{subtitle}</h4>}
+        {subtitleElement}
+        <div className={styles.options}>
+          <PrimaryButton
+            className={
+              primary
+                ? styles.blueButton
+                : destructive
+                ? styles.redButton
+                : styles.greenButton
+            }
+            onClick={onConfirmedClicked}
+          >
+            {buttonText}
+          </PrimaryButton>
+          {cancelText && (
+            <TextButton minButtonWidth onClick={onCancelClicked}>
+              {cancelText}
+            </TextButton>
+          )}
+        </div>
+        <ErrorBlock>{errorMessage}</ErrorBlock>
       </div>
-      <ErrorBlock>{errorMessage}</ErrorBlock>
-    </div>
+    </>
   )
 }
 

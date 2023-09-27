@@ -19,8 +19,14 @@
     background-color: $neutral-light;
   }
 
-  .info {
-    box-shadow: 1px 1px 1px 1px black;
+  p {
+    text-align: center;
+    padding-top: 8px;
+    font-size: 16px;
+
+    a {
+      font-size: 16px;
+    }
   }
 
   .resend {
@@ -32,5 +38,17 @@
       cursor: not-allowed;
       color: $neutral;
     }
+  }
+}
+
+.subtitleElement {
+  font-weight: normal;
+  margin-top: 0;
+  margin-bottom: 3rem;
+  text-align: center;
+  font-size: 14.4px;
+
+  a {
+    font-size: 14.4px;
   }
 }

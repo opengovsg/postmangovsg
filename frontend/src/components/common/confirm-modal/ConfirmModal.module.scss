@@ -23,6 +23,10 @@
   @extend %error-btn;
 }
 
+.blueButton {
+  @extend %primary-btn;
+}
+
 .title {
   font-weight: 500;
   margin-top: 0;

@@ -36,6 +36,12 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
     }),
   }
 
+  const selectSgidProfileValidator = {
+    [Segments.BODY]: Joi.object({
+      workEmail: Joi.string().required(),
+    }),
+  }
+
   // actual routes here
 
   /**
@@ -162,6 +168,45 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
     '/login/sgid',
     celebrate(verifySgidCodeValidator),
     authMiddleware.verifySgidResponse
+  )
+
+  /**
+   * paths:
+   *  /auth/login/sgid/profile:
+   *    post:
+   *      summary: Select sgid profile to login with
+   *      tags:
+   *        - Authentication
+   *      requestBody:
+   *        required: true
+   *        content:
+   *          application/json:
+   *            schema:
+   *              type: object
+   *              properties:
+   *                workEmail:
+   *                   type: string
+   *              required:
+   *              - workEmail
+   *
+   *      responses:
+   *        "200":
+   *          content:
+   *            application/json:
+   *              schema:
+   *                type: object
+   *        "401":
+   *          content:
+   *            application/json:
+   *              schema:
+   *                type: object
+   *        "500":
+   *           description: Internal Server Error
+   */
+  router.post(
+    '/login/sgid/profile',
+    celebrate(selectSgidProfileValidator),
+    authMiddleware.selectSgidProfile
   )
 
   /**

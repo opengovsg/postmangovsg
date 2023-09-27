@@ -3,6 +3,14 @@ import axios from 'axios'
 
 import { setGAUserId } from './ga.service'
 
+export type SgidUserProfile = {
+  workEmail: string
+  agencyName: string
+  departmentName: string
+  employmentType: string
+  employmentTitle: string
+}
+
 async function getOtpWithEmail(email: string): Promise<void> {
   try {
     await axios.post('/auth/otp', {
@@ -36,10 +44,23 @@ async function getSgidUrl(): Promise<string | undefined> {
   }
 }
 
-async function loginWithSgid(code: string): Promise<void> {
+async function loginWithSgid(
+  code: string
+): Promise<SgidUserProfile[] | undefined> {
   try {
-    await axios.post(`/auth/login/sgid`, {
+    const response = await axios.post(`/auth/login/sgid`, {
       code,
+    })
+    return response.data
+  } catch (e) {
+    errorHandler(e)
+  }
+}
+
+async function selectSgidProfile(workEmail: string): Promise<void> {
+  try {
+    await axios.post(`/auth/login/sgid/profile`, {
+      workEmail,
     })
   } catch (e) {
     errorHandler(e)
@@ -102,4 +123,5 @@ export {
   setUserAnalytics,
   getSgidUrl,
   loginWithSgid,
+  selectSgidProfile,
 }
