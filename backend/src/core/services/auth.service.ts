@@ -442,15 +442,23 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
         })
         continue
       }
-      if (!(await isWhitelistedEmail(profile.workEmail))) {
-        logger.warn({
-          message: 'Work email is not a whitelisted email',
+      try {
+        if (!(await isWhitelistedEmail(profile.workEmail))) {
+          logger.warn({
+            message: 'Work email is not a whitelisted email',
+            ...logMeta,
+            profile,
+          })
+          continue
+        }
+        validProfiles.push(profile)
+      } catch (err) {
+        logger.error({
+          message: 'Error occured while whitelisting email',
           ...logMeta,
           profile,
         })
-        continue
       }
-      validProfiles.push(profile)
     }
     return validProfiles
   }
