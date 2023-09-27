@@ -413,12 +413,19 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   const getSgidUserProfiles = async (
     userInfo: UserInfoReturn
   ): Promise<SgidPublicOfficerEmployment[]> => {
+    const logMeta = { action: 'getSgidUserProfiles' }
     const profiles = JSON.parse(
       userInfo.data[SGID_PUBLIC_OFFICER_EMPLOYMENT_SCOPE]
     ) as SgidPublicOfficerEmployment[]
-    const validProfiles = await validateSgidUserProfiles(profiles)
-    const cleanedProfiles = cleanSgidUserProfiles(validProfiles)
-    return cleanedProfiles
+    logger.info({
+      message: 'User attempting to log in with the following profiles',
+      ...logMeta,
+      profiles,
+    })
+    const cleanedProfiles = cleanSgidUserProfiles(profiles)
+    const validProfiles = await validateSgidUserProfiles(cleanedProfiles)
+
+    return validProfiles
   }
 
   /**
@@ -443,15 +450,16 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
         continue
       }
       try {
-        if (!(await isWhitelistedEmail(profile.workEmail))) {
+        const isWhitelisted = await isWhitelistedEmail(profile.workEmail)
+        if (isWhitelisted) {
+          validProfiles.push(profile)
+        } else {
           logger.warn({
             message: 'Work email is not a whitelisted email',
             ...logMeta,
             profile,
           })
-          continue
         }
-        validProfiles.push(profile)
       } catch (err) {
         logger.error({
           message: 'Error occured while whitelisting email',
@@ -473,7 +481,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     const logMeta = { action: 'cleanSgidUserProfiles' }
     const cleanedProfiles = userProfiles.map((profile) => {
       // DB only accepts lowercase emails
-      profile.workEmail = profile.workEmail.toLowerCase()
+      profile.workEmail = profile.workEmail.toLowerCase().trim()
       // If SGID does not have the field, we want to log the missing value and return an empty string
       if (profile.agencyName === SGID_FIELD_EMPTY) {
         profile.agencyName = ''
