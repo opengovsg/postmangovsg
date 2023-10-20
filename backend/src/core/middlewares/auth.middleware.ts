@@ -292,7 +292,7 @@ export const InitAuthMiddleware = (authService: AuthService) => {
       if (
         !req.session.sgid?.profiles ||
         !req.session.sgid.profiles.some(
-          (p: SgidPublicOfficerEmployment) => p.workEmail === workEmail
+          (p: SgidPublicOfficerEmployment) => p.work_email === workEmail
         )
       ) {
         logger.error({ message: 'Selected profile is not valid', ...logMeta })

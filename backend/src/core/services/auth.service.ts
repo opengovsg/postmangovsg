@@ -59,8 +59,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     redirectUri: SGID_REDIRECT_URI,
   })
 
-  const SGID_PUBLIC_OFFICER_EMPLOYMENT_SCOPE =
-    'pocdex.public_officer_employments'
+  const SGID_PUBLIC_OFFICER_DETAILS_SCOPE = 'pocdex.public_officer_details'
   const SGID_FIELD_EMPTY = 'NA'
   const otpCharset = '234567ABCDEFGHIJKLMNOPQRSTUVWXYZ'
   /**
@@ -345,7 +344,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     const { codeChallenge, codeVerifier } = generatePkcePair()
 
     const { url, nonce } = sgidClient.authorizationUrl({
-      scope: ['openid', SGID_PUBLIC_OFFICER_EMPLOYMENT_SCOPE].join(' '),
+      scope: ['openid', SGID_PUBLIC_OFFICER_DETAILS_SCOPE].join(' '),
       codeChallenge,
     })
 
@@ -415,7 +414,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   ): Promise<SgidPublicOfficerEmployment[]> => {
     const logMeta = { action: 'getSgidUserProfiles' }
     const profiles = JSON.parse(
-      userInfo.data[SGID_PUBLIC_OFFICER_EMPLOYMENT_SCOPE]
+      userInfo.data[SGID_PUBLIC_OFFICER_DETAILS_SCOPE]
     ) as SgidPublicOfficerEmployment[]
     logger.info({
       message: 'User attempting to log in with the following profiles',
@@ -441,7 +440,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     const validProfiles = []
     for (const profile of userProfiles) {
       // We want to log the absence of workEmail to measure the data completeness from SGID.
-      if (profile.workEmail === SGID_FIELD_EMPTY) {
+      if (profile.work_email === SGID_FIELD_EMPTY) {
         logger.warn({
           message: 'Work email is missing from SGID data',
           ...logMeta,
@@ -450,7 +449,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
         continue
       }
       try {
-        const isWhitelisted = await isWhitelistedEmail(profile.workEmail)
+        const isWhitelisted = await isWhitelistedEmail(profile.work_email)
         if (isWhitelisted) {
           validProfiles.push(profile)
         } else {
@@ -481,34 +480,34 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     const logMeta = { action: 'cleanSgidUserProfiles' }
     const cleanedProfiles = userProfiles.map((profile) => {
       // DB only accepts lowercase emails
-      profile.workEmail = profile.workEmail.toLowerCase().trim()
+      profile.work_email = profile.work_email.toLowerCase().trim()
       // If SGID does not have the field, we want to log the missing value and return an empty string
-      if (profile.agencyName === SGID_FIELD_EMPTY) {
-        profile.agencyName = ''
+      if (profile.agency_name === SGID_FIELD_EMPTY) {
+        profile.agency_name = ''
         logger.warn({
           message: 'Agency name is missing from SGID data',
           ...logMeta,
           profile,
         })
       }
-      if (profile.departmentName === SGID_FIELD_EMPTY) {
-        profile.departmentName = ''
+      if (profile.department_name === SGID_FIELD_EMPTY) {
+        profile.department_name = ''
         logger.warn({
           message: 'Department name is missing from SGID data',
           ...logMeta,
           profile,
         })
       }
-      if (profile.employmentTitle === SGID_FIELD_EMPTY) {
-        profile.employmentTitle = ''
+      if (profile.employment_title === SGID_FIELD_EMPTY) {
+        profile.employment_title = ''
         logger.warn({
           message: 'Employment title is missing from SGID data',
           ...logMeta,
           profile,
         })
       }
-      if (profile.employmentType === SGID_FIELD_EMPTY) {
-        profile.employmentType = ''
+      if (profile.employment_type === SGID_FIELD_EMPTY) {
+        profile.employment_type = ''
         logger.warn({
           message: 'Employment type is missing from SGID data',
           ...logMeta,

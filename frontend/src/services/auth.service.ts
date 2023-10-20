@@ -4,11 +4,11 @@ import axios from 'axios'
 import { setGAUserId } from './ga.service'
 
 export type SgidUserProfile = {
-  workEmail: string
-  agencyName: string
-  departmentName: string
-  employmentType: string
-  employmentTitle: string
+  work_email: string
+  agency_name: string
+  department_name: string
+  employment_type: string
+  employment_title: string
 }
 
 async function getOtpWithEmail(email: string): Promise<void> {

@@ -60,19 +60,19 @@ const LoginCallback = () => {
       {profiles.map((profile) => (
         <div
           className={styles.profileBlock}
-          key={profile.workEmail}
-          onClick={() => confirmSgidProfile(profile.workEmail)}
+          key={profile.work_email}
+          onClick={() => confirmSgidProfile(profile.work_email)}
         >
           <div>
-            <div className={styles.profileMainText}>{profile.workEmail}</div>
-            {!!profile.agencyName && (
+            <div className={styles.profileMainText}>{profile.work_email}</div>
+            {!!profile.agency_name && (
               <div className={styles.profileSubText}>
-                {profile.agencyName}
-                {!!profile.departmentName && `, ${profile.departmentName}`}
+                {profile.agency_name}
+                {!!profile.department_name && `, ${profile.department_name}`}
               </div>
             )}
             <div className={styles.profileSubText}>
-              {!!profile.employmentTitle && profile.employmentTitle}
+              {!!profile.employment_title && profile.employment_title}
             </div>
           </div>
           <img src={RightChevron} alt="Select profile" />
