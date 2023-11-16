@@ -9,7 +9,12 @@ import Moment from 'react-moment'
 import styles from './ProgressDetails.module.scss'
 
 import { CampaignStats, ChannelType, Status } from 'classes/Campaign'
-import { ProgressBar, PrimaryButton, ExportRecipients } from 'components/common'
+import {
+  ProgressBar,
+  PrimaryButton,
+  ExportRecipients,
+  InfoBlock,
+} from 'components/common'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
@@ -34,6 +39,7 @@ const ProgressDetails = ({
     delivered,
     updatedAt,
     halted,
+    unsubscribed,
   } = stats
 
   const isSent = status === Status.Sent
@@ -208,8 +214,34 @@ const ProgressDetails = ({
             <td className={'md'}>Recipient does not exist</td>
             <td className={'sm'}>{invalid}</td>
           </tr>
+          {type === ChannelType.Email && (
+            <tr>
+              <td className={cx(styles.status, 'md')}>
+                <i
+                  className={cx(styles.icon, styles.red, 'bx bx-error-circle')}
+                ></i>
+                Unsubscribers
+              </td>
+              <td className={'md'}>Recipient indicated to unsubscribe</td>
+              <td className={'sm'}>{unsubscribed}</td>
+            </tr>
+          )}
         </tbody>
       </table>
+      {type === ChannelType.Email && (
+        <InfoBlock className={styles.notice}>
+          <strong>Remove unsubscribers from your recipient list</strong>, to
+          avoid campaigns being marked as spam and affecting the reputation of
+          your agency.{' '}
+          <a
+            href="https://go.gov.sg/postman-unsubscribe-guide"
+            target="_blank"
+            rel="noreferrer"
+          >
+            Learn more
+          </a>
+        </InfoBlock>
+      )}
       {renderUpdateStats()}
     </div>
   )
