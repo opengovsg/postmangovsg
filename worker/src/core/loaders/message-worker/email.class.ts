@@ -58,22 +58,6 @@ class Email {
       })
   }
 
-  async fetchManagedListIdOfCampaign(campaignId: number) {
-    const result = await this.connection.query<{ managed_list_id: number }>(
-      'SELECT managed_list_id FROM managed_list_campaigns WHERE campaign_id = :campaign_id',
-      {
-        replacements: { campaign_id: campaignId },
-        type: QueryTypes.SELECT,
-      }
-    )
-
-    if (result.length > 0) {
-      return result[0].managed_list_id
-    }
-    // Current campaign is not using Phonebook
-    return undefined
-  }
-
   async getMessages(
     jobId: number,
     rate: number,

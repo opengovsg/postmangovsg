@@ -1,5 +1,5 @@
 // eslint-disable-next-line import/order
-import { useContext, useEffect, useState } from 'react'
+import { useContext } from 'react'
 
 import { EmailCampaign } from 'classes'
 
@@ -16,26 +16,13 @@ import { CampaignContext } from 'contexts/campaign.context'
 
 import { retryCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-import { getPhonebookListIdForCampaign } from 'services/phonebook.service'
 
 const EmailDetail = () => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
   const { id } = campaign
   const { stats, refreshCampaignStats } = usePollCampaignStats()
-  const [isUsingPhonebook, setIsUsingPhonebook] = useState(false)
 
   const emailCampaign = campaign as EmailCampaign
-
-  useEffect(() => {
-    const checkIfUsingPhonebook = async () => {
-      const phonebookListId = await getPhonebookListIdForCampaign(id)
-      if (phonebookListId) {
-        setIsUsingPhonebook(true)
-      }
-    }
-
-    void checkIfUsingPhonebook()
-  }, [id])
 
   async function handleRetry() {
     try {
@@ -111,7 +98,6 @@ const EmailDetail = () => {
             stats={stats}
             redacted={campaign.redacted}
             handleRetry={handleRetry}
-            isUsingPhonebook={isUsingPhonebook}
           />
         )}
         {campaign.status === Status.Scheduled && (

@@ -75,11 +75,6 @@ export interface ConfigSchema {
   smsFallback: { activate: boolean; senderId: string }
   emailFallback: { activate: boolean }
   showMastheadDomain: string
-  phonebookContactPref: {
-    enabled: boolean
-    url: string
-    apiKey: string
-  }
   whatsapp: {
     namespace: string
     adminCredentialsOne: string
@@ -94,13 +89,6 @@ export interface ConfigSchema {
     authTokenTwoExpiry: string
   }
   sgcCampaignAlertChannelWebhookUrl: string
-
-  phonebook: {
-    enabled: boolean
-    endpointUrl: string
-    apiKey: string
-    enableAutoUnsubscribe: boolean
-  }
 }
 
 const config: Config<ConfigSchema> = convict({
@@ -339,25 +327,6 @@ const config: Config<ConfigSchema> = convict({
     default: '.gov.sg',
     env: 'SHOW_MASTHEAD_DOMAIN',
   },
-  phonebookContactPref: {
-    enabled: {
-      doc: 'Enable display of phonebook contact preferences',
-      default: false,
-      env: 'SHOW_PHONEBOOK_CONTACT_PREF',
-    },
-    url: {
-      doc: 'Phonebook uri to fetch contact preferences',
-      default: 'phonebook.postman.gov.sg',
-      env: 'PHONEBOOK_URL',
-      format: 'required-string',
-    },
-    apiKey: {
-      doc: 'API key for Phonebook contact preferences api',
-      default: 'somekey',
-      env: 'PHONEBOOK_API_KEY',
-      format: 'required-string',
-    },
-  },
   whatsapp: {
     adminCredentialsOne: {
       doc: 'Admin credentials for retrieving WhatsApp tokens for client 1',
@@ -424,30 +393,6 @@ const config: Config<ConfigSchema> = convict({
     doc: 'Slack webhook URL to post Gov.sg campaign alerts',
     env: 'SGC_CAMPAIGN_ALERT_WEBHOOK',
     default: '',
-  },
-  phonebook: {
-    enabled: {
-      doc: 'Kill switch of phonebook related features',
-      default: false,
-      env: 'PHONEBOOK_FEATURE_ENABLE',
-    },
-    endpointUrl: {
-      doc: 'Endpoint url of phonebook server',
-      default: 'http://localhost:8080',
-      env: 'PHONEBOOK_URL',
-      format: 'required-string',
-    },
-    apiKey: {
-      doc: 'API key to make requests to Phonebook',
-      default: 'API_KEY',
-      env: 'PHONEBOOK_API_KEY',
-      format: 'required-string',
-    },
-    enableAutoUnsubscribe: {
-      doc: 'Use Phonebook unsubscribe URL to automatically remove unsubscribed users from the ManagedList',
-      default: true,
-      env: 'PHONEBOOK_ENABLE_AUTO_UNSUBSCRIBE',
-    },
   },
 })
 

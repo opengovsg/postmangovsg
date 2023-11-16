@@ -1,7 +1,7 @@
 import { i18n } from '@lingui/core'
 
 import type { Dispatch, SetStateAction } from 'react'
-import { useCallback, useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
@@ -10,7 +10,6 @@ import { useParams } from 'react-router-dom'
 import styles from '../Create.module.scss'
 
 import type { SMSCampaign, SMSPreview, SMSProgress } from 'classes'
-import { AgencyList } from 'classes'
 import {
   ButtonGroup,
   CsvUpload,
@@ -26,17 +25,9 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import { PhonebookListSection } from 'components/phonebook-list'
-import { LINKS, PHONEBOOK_FEATURE_ENABLE } from 'config'
+import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
-import {
-  deletePhonebookListForCampaign,
-  getPhonebookListIdForCampaign,
-  getPhonebookListsByChannel,
-  selectPhonebookList,
-  setPhonebookListForCampaign,
-} from 'services/phonebook.service'
 import type { CsvStatusResponse } from 'services/upload.service'
 import {
   deleteCsvStatus,
@@ -62,11 +53,6 @@ const SMSRecipients = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isCsvProcessing, setIsCsvProcessing] = useState(initialIsProcessing)
   const [isUploading, setIsUploading] = useState(false)
-  const [phonebookLists, setPhonebookLists] = useState<
-    { label: string; value: string }[]
-  >([])
-  const [selectedPhonebookListId, setSelectedPhonebookListId] =
-    useState<number>()
   const [csvInfo, setCsvInfo] = useState<
     Omit<CsvStatusResponse, 'isCsvProcessing' | 'preview'>
   >({
@@ -78,28 +64,6 @@ const SMSRecipients = ({
 
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
-
-  const onPhonebookListSelected = useCallback(
-    async (phonebookListId: number) => {
-      try {
-        // Upload phonebook list to s3
-        await selectPhonebookList({
-          campaignId: +(campaignId as string),
-          listId: phonebookListId,
-        })
-        // Associate current campaign with phonebook list
-        await setPhonebookListForCampaign({
-          campaignId: +(campaignId as string),
-          listId: phonebookListId,
-        })
-        setIsCsvProcessing(true)
-        setSelectedPhonebookListId(phonebookListId)
-      } catch (e) {
-        setErrorMessage((e as Error).message)
-      }
-    },
-    [campaignId]
-  )
 
   // Poll csv status
   useEffect(() => {
@@ -143,38 +107,6 @@ const SMSRecipients = ({
     })
   }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
 
-  const retrieveAndPopulatePhonebookLists = useCallback(async () => {
-    const lists = await getPhonebookListsByChannel({ channel: campaign.type })
-    if (lists) {
-      setPhonebookLists(
-        lists.map((l: AgencyList) => {
-          return { label: l.name, value: l.id.toString() }
-        })
-      )
-    }
-  }, [campaign.type])
-  // On load, retrieve the list of phonebook lists
-  useEffect(() => {
-    void retrieveAndPopulatePhonebookLists()
-  }, [campaignId, retrieveAndPopulatePhonebookLists])
-
-  // On load, check if user was already using Phonebook.
-  useEffect(() => {
-    if (!campaignId) {
-      return
-    }
-    const checkIfUsingPhonebook = async () => {
-      const defaultPhonebookListId = await getPhonebookListIdForCampaign(
-        +campaignId
-      )
-      if (defaultPhonebookListId) {
-        setSelectedPhonebookListId(defaultPhonebookListId)
-      }
-    }
-
-    void checkIfUsingPhonebook()
-  }, [campaignId])
-
   // Handle file upload
   async function uploadFile(files: FileList) {
     setIsUploading(true)
@@ -199,12 +131,6 @@ const SMSRecipients = ({
 
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename }))
-      if (selectedPhonebookListId) {
-        // dissociate current campaign with phonebook list
-        await deletePhonebookListForCampaign(+campaignId)
-        // clear phonebook selector
-        setSelectedPhonebookListId(undefined)
-      }
     } catch (err) {
       setErrorMessage((err as Error).message)
     }
@@ -221,25 +147,6 @@ const SMSRecipients = ({
 
   return (
     <>
-      <StepHeader
-        title="Select existing or upload new recipient list"
-        subtitle="Step 2"
-      ></StepHeader>
-      {PHONEBOOK_FEATURE_ENABLE === 'true' && (
-        <PhonebookListSection
-          phonebookLists={phonebookLists}
-          onPhonebookListSelected={onPhonebookListSelected}
-          retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
-          isProcessing={isCsvProcessing}
-          defaultLabel={
-            selectedPhonebookListId
-              ? phonebookLists.filter(
-                  (l) => +l.value === selectedPhonebookListId
-                )[0]?.label
-              : 'Select an option'
-          }
-        />
-      )}
       <StepSection>
         <StepHeader title="Upload CSV File">
           <p>
