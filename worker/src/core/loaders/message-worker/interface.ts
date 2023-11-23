@@ -23,12 +23,6 @@ export interface Message {
   unsubLink?: string // custom unsubscribe link
 }
 
-export interface ContactChannel {
-  channel: string
-  channelId: string
-  contactPrefLink?: string
-}
-
 export interface EmailResultRow {
   message: Message & { senderEmail: string }
 }

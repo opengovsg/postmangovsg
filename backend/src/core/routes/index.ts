@@ -53,7 +53,6 @@ import {
   InitGovsgMessageTransactionalRoute,
 } from '@govsg/routes'
 import { InitGovsgTransactionalMiddleware } from '@govsg/middlewares/govsg-transactional.middleware'
-import phonebookRoutes from '@core/routes/phonebook.routes'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -285,12 +284,6 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/callback/telegram', telegramCallbackRoutes)
 
   router.use('/callback/govsg', govsgCallbackRoutes)
-
-  router.use(
-    '/phonebook',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
-    phonebookRoutes
-  )
 
   router.use(
     '/api-key',

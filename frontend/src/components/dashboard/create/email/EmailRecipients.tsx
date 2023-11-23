@@ -3,7 +3,6 @@ import { i18n } from '@lingui/core'
 import {
   Dispatch,
   SetStateAction,
-  useCallback,
   useContext,
   useEffect,
   useState,
@@ -15,7 +14,7 @@ import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
-import { AgencyList, EmailPreview, EmailProgress } from 'classes'
+import { EmailPreview, EmailProgress } from 'classes'
 import {
   ButtonGroup,
   CsvUpload,
@@ -30,17 +29,9 @@ import {
   WarningBlock,
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
-import { PhonebookListSection } from 'components/phonebook-list'
-import { LINKS, PHONEBOOK_FEATURE_ENABLE } from 'config'
+import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 import { sendTiming } from 'services/ga.service'
-import {
-  deletePhonebookListForCampaign,
-  getPhonebookListIdForCampaign,
-  getPhonebookListsByChannel,
-  selectPhonebookList,
-  setPhonebookListForCampaign,
-} from 'services/phonebook.service'
 import {
   CsvStatusResponse,
   deleteCsvStatus,
@@ -81,12 +72,6 @@ const EmailRecipients = ({
   const { csvFilename, numRecipients = 0 } = csvInfo
   const isMounted = useIsMounted()
 
-  const [phonebookLists, setPhonebookLists] = useState<
-    { label: string; value: string }[]
-  >([])
-  const [selectedPhonebookListId, setSelectedPhonebookListId] =
-    useState<number>()
-
   // Poll csv status
   useEffect(() => {
     if (!campaignId) return
@@ -125,28 +110,6 @@ const EmailRecipients = ({
     return () => clearTimeout(timeoutId)
   }, [campaignId, csvFilename, forceReset, isCsvProcessing, isMounted])
 
-  const onPhonebookListSelected = useCallback(
-    async (phonebookListId: number) => {
-      try {
-        // Upload phonebook list to s3
-        await selectPhonebookList({
-          campaignId: +(campaignId as string),
-          listId: phonebookListId,
-        })
-        // Associate current campaign with phonebook list
-        await setPhonebookListForCampaign({
-          campaignId: +(campaignId as string),
-          listId: phonebookListId,
-        })
-        setIsCsvProcessing(true)
-        setSelectedPhonebookListId(phonebookListId)
-      } catch (e) {
-        setErrorMessage((e as Error).message)
-      }
-    },
-    [campaignId]
-  )
-
   // If campaign properties change, bubble up to root campaign object
   useEffect(() => {
     updateCampaign({
@@ -155,38 +118,6 @@ const EmailRecipients = ({
       numRecipients,
     })
   }, [isCsvProcessing, csvFilename, numRecipients, updateCampaign])
-
-  const retrieveAndPopulatePhonebookLists = useCallback(async () => {
-    const lists = await getPhonebookListsByChannel({ channel: campaign.type })
-    if (lists) {
-      setPhonebookLists(
-        lists.map((l: AgencyList) => {
-          return { label: l.name, value: l.id.toString() }
-        })
-      )
-    }
-  }, [campaign.type])
-  // On load, retrieve the list of phonebook lists
-  useEffect(() => {
-    void retrieveAndPopulatePhonebookLists()
-  }, [campaignId, retrieveAndPopulatePhonebookLists])
-
-  // On load, check if user was already using Phonebook.
-  useEffect(() => {
-    if (!campaignId) {
-      return
-    }
-    const checkIfUsingPhonebook = async () => {
-      const defaultPhonebookListId = await getPhonebookListIdForCampaign(
-        +campaignId
-      )
-      if (defaultPhonebookListId) {
-        setSelectedPhonebookListId(defaultPhonebookListId)
-      }
-    }
-
-    void checkIfUsingPhonebook()
-  }, [campaignId])
 
   // Handle file upload
   async function uploadFile(files: FileList) {
@@ -212,12 +143,6 @@ const EmailRecipients = ({
 
       setIsCsvProcessing(true)
       setCsvInfo((info) => ({ ...info, tempCsvFilename: files[0].name }))
-      if (selectedPhonebookListId) {
-        // dissociate current campaign with phonebook list
-        await deletePhonebookListForCampaign(+campaignId)
-        // clear phonebook selector
-        setSelectedPhonebookListId(undefined)
-      }
     } catch (err) {
       setErrorMessage((err as Error).message)
     }
@@ -234,25 +159,6 @@ const EmailRecipients = ({
 
   return (
     <>
-      <StepHeader
-        title="Select existing or upload new recipient list"
-        subtitle={protect ? '' : 'Step 2'}
-      ></StepHeader>
-      {!protect && PHONEBOOK_FEATURE_ENABLE === 'true' && (
-        <PhonebookListSection
-          phonebookLists={phonebookLists}
-          onPhonebookListSelected={onPhonebookListSelected}
-          retrieveAndPopulatePhonebookLists={retrieveAndPopulatePhonebookLists}
-          isProcessing={isCsvProcessing}
-          defaultLabel={
-            selectedPhonebookListId
-              ? phonebookLists.filter(
-                  (l) => +l.value === selectedPhonebookListId
-                )[0]?.label
-              : 'Select an option'
-          }
-        />
-      )}
       <StepSection>
         <StepHeader title="Upload CSV File">
           <p>
