@@ -148,7 +148,7 @@ const SMSRecipients = ({
   return (
     <>
       <StepSection>
-        <StepHeader title="Upload CSV File">
+        <StepHeader title="Upload CSV File" subtitle="Step 2">
           <p>
             Only CSV format files are allowed. If you have an Excel file, please
             convert it by going to File &gt; Save As &gt; CSV (Comma delimited).
