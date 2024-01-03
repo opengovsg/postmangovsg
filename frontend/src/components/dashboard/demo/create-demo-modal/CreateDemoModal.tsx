@@ -123,10 +123,10 @@ const CreateDemoModal = ({
             Choose the channel you want to send in
           </h2>
           <h5 className={styles.subtitle}>
-            Demo campaigns are for SMS and Telegram channels only, as the Email
-            channel is already free. You may send messages to at most 20
-            recipients in each campaign. One try will be used up only after a
-            demo campaign has been sent, otherwise, it will stay as a draft.
+            Demo campaigns are for SMS channels only, as the Email channel is
+            already free. You may send messages to at most 20 recipients in each
+            campaign. One try will be used up only after a demo campaign has
+            been sent, otherwise, it will stay as a draft.
           </h5>
         </div>
 
@@ -148,31 +148,6 @@ const CreateDemoModal = ({
               SMS
               <i
                 className={cx('bx', styles.icon, channelIcons[ChannelType.SMS])}
-              ></i>
-            </PrimaryButton>
-          </div>
-          <div className={styles.channelContainer}>
-            <PrimaryButton
-              className={cx(styles.button, {
-                [styles.active]: selectedChannel === ChannelType.Telegram,
-              })}
-              disabled={
-                duplicateCampaign &&
-                duplicateCampaign.type !== ChannelType.Telegram
-              }
-              onClick={
-                selectedChannel === ChannelType.Telegram
-                  ? undefined
-                  : () => setSelectedChannel(ChannelType.Telegram)
-              }
-            >
-              Telegram
-              <i
-                className={cx(
-                  'bx',
-                  styles.icon,
-                  channelIcons[ChannelType.Telegram]
-                )}
               ></i>
             </PrimaryButton>
           </div>
