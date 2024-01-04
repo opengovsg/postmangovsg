@@ -849,8 +849,8 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 switch (config.get('env')) {
   case 'staging':
     config.load({
-      protectedUrl: 'https://staging.postman.gov.sg/p',
-      unsubscribeUrl: 'https://staging.postman.gov.sg/unsubscribe',
+      protectedUrl: 'https://legacy-staging.postman.gov.sg/p',
+      unsubscribeUrl: 'https://legacy-staging.postman.gov.sg/unsubscribe',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-staging',
