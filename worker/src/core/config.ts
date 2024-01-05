@@ -419,7 +419,7 @@ if (config.get('env') === 'development') {
 
 if (config.get('env') === 'staging') {
   config.load({
-    unsubscribeUrl: 'https://staging.postman.gov.sg',
+    unsubscribeUrl: 'https://legacy-staging.postman.gov.sg',
   })
 }
 

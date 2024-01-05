@@ -18,7 +18,7 @@ export const NOTICE_PERIOD = 7
 // TODO switch based on stage
 const FRONTEND_URL =
   'https://postman.gov.sg' ||
-  'https://staging.postman.gov.sg' ||
+  'https://legacy-staging.postman.gov.sg' ||
   'http://localhost:3000'
 
 export const getUserRedactedCampaigns = async (
