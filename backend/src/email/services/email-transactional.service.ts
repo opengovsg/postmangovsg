@@ -41,6 +41,7 @@ async function sendMessage({
   cc,
   bcc,
   emailMessageTransactionalId,
+  disableTracking,
 }: {
   subject: string
   body: string
@@ -51,6 +52,7 @@ async function sendMessage({
   cc?: string[]
   bcc?: string[]
   emailMessageTransactionalId: string
+  disableTracking?: boolean
 }): Promise<void> {
   // TODO: flagging this coupling for future refactoring:
   // currently, we are using EmailTemplateService to sanitize both tx emails and campaign emails
@@ -99,6 +101,7 @@ async function sendMessage({
   // receive from SES, but not saving to DB
   const isEmailSent = await EmailService.sendEmail(mailToSend, {
     extraSmtpHeaders: { isTransactional: true },
+    disableTracking,
   })
   if (!isEmailSent) {
     throw new Error('Failed to send transactional email')

@@ -83,6 +83,7 @@ interface ConfigSchema {
   }
   mailFrom: string
   mailConfigurationSet: string
+  noTrackingMailConfigurationSet: string
   mailVia: string
   mailDefaultRate: number
   transactionalEmail: {
@@ -467,6 +468,11 @@ const config: Config<ConfigSchema> = convict({
     doc: 'The configuration set specified when sending an email',
     default: 'postman-email-open',
     env: 'BACKEND_SES_CONFIGURATION_SET',
+  },
+  noTrackingMailConfigurationSet: {
+    doc: 'AWS SES Configuration set that does not include open and read tracking',
+    default: 'postman-email-no-tracking',
+    env: 'BACKEND_SES_NO_TRACKING_CONFIGURATION_SET',
   },
   mailVia: {
     doc: 'Text to appended to custom sender name',

@@ -62,6 +62,7 @@ export const InitEmailTransactionalRoute = (
         .items(
           Joi.string().trim().email().options({ convert: true }).lowercase()
         ),
+      disable_tracking: Joi.boolean().optional(),
     }),
   }
   const getByIdValidator = {

@@ -10,19 +10,22 @@ export * from './interfaces'
 
 export type SendEmailOpts = {
   extraSmtpHeaders: Record<string, any>
+  disableTracking?: boolean
 }
 
 export default class MailClient {
   private mailer: nodemailer.Transporter
   private email: string
   private hashSecret: string
-  private configSet: string | undefined
+  private defaultConfigSet: string | undefined
+  private noTrackingConfigSet: string | undefined
 
   constructor(
     credentials: MailCredentials,
     hashSecret: string,
     email?: string,
-    configSet?: string
+    defaultConfigSet?: string,
+    noTrackingConfigSet?: string
   ) {
     const { host, port, auth } = credentials
     this.hashSecret = hashSecret
@@ -35,7 +38,8 @@ export default class MailClient {
         pass: auth.pass,
       },
     })
-    this.configSet = configSet
+    this.defaultConfigSet = defaultConfigSet
+    this.noTrackingConfigSet = noTrackingConfigSet
   }
 
   public sendMail(
@@ -61,14 +65,7 @@ export default class MailClient {
       let headers: any = {
         [REFERENCE_ID_HEADER]: JSON.stringify(xSmtpHeader),
       }
-      if (this.configSet) {
-        headers = {
-          ...headers,
-          // Specify this to configure callback endpoint for notifications other
-          // than delivery and bounce through SES configuration set
-          [CONFIGURATION_SET_HEADER]: this.configSet,
-        }
-      }
+      headers = this.setSesConfigurationHeader(headers, option?.disableTracking)
       if (input.unsubLink) {
         headers = {
           ...headers,
@@ -95,5 +92,29 @@ export default class MailClient {
         }
       })
     })
+  }
+
+  private setSesConfigurationHeader(
+    headers: object,
+    disableTracking: boolean | undefined
+  ): object {
+    // 1. If there is no default config set, we will not set any configuration header
+    if (!this.defaultConfigSet) {
+      return headers
+    }
+    // 2. If the user wants to disable tracking and there is a no tracking configuration, we set it
+    if (disableTracking && this.noTrackingConfigSet) {
+      return {
+        ...headers,
+        // Configuration header does not include open and read notification
+        [CONFIGURATION_SET_HEADER]: this.noTrackingConfigSet,
+      }
+    }
+    // 3. Otherwise, we will use the default tracking SES configuration set
+    return {
+      ...headers,
+      // Configuration header includes open and read notification
+      [CONFIGURATION_SET_HEADER]: this.defaultConfigSet,
+    }
   }
 }
