@@ -21,7 +21,7 @@ RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-
 
 RUN apk add jq
 
-RUN python3 -m pip install awscli
+RUN apk add --no-cache aws-cli
 
 RUN aws configure set default.region ap-southeast-1
 
