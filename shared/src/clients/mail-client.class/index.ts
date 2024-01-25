@@ -18,6 +18,13 @@ export default class MailClient {
   private email: string
   private hashSecret: string
   private defaultConfigSet: string | undefined
+  /*
+    The AWS SES events to be tracked are defined in configuration sets within the AWS console.
+    When an email is sent, we specify the configuration set to be used by setting "X-SES-CONFIGURATION-SET" in the API call header.
+
+    There is no option to turn off tracking via parameters in the API call, it can only be configured through a configuration set.
+    Thus, we need multiple configuration sets to toggle the tracking feature for read and open receipts.
+  */
   private noTrackingConfigSet: string | undefined
 
   constructor(
