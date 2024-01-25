@@ -165,33 +165,6 @@ const CreateModal = ({
                 </p>
               )}
             </div>
-
-            <div className={styles.channelContainer}>
-              <input
-                type="radio"
-                aria-label={ChannelType.Telegram}
-                id={ChannelType.Telegram}
-                value={ChannelType.Telegram}
-                checked={selectedChannel === ChannelType.Telegram}
-                onChange={() => setSelectedChannel(ChannelType.Telegram)}
-              />
-              <label htmlFor={ChannelType.Telegram} className={styles.subtext}>
-                Telegram
-              </label>
-              {selectedChannel === ChannelType.Telegram && (
-                <p className={styles.infotext}>
-                  Set up your Telegram Bot. &nbsp;
-                  <OutboundLink
-                    className={styles.link}
-                    eventLabel="https://go.gov.sg/postman-telegram"
-                    to="https://go.gov.sg/postman-telegram"
-                    target="_blank"
-                  >
-                    Learn more.
-                  </OutboundLink>
-                </p>
-              )}
-            </div>
             {canAccessGovsg && (
               <div className={styles.channelContainer}>
                 <input
