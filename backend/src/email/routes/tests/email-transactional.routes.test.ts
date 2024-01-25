@@ -368,7 +368,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         ).id.toString(),
         attachments: undefined,
       },
-      { extraSmtpHeaders: { isTransactional: true } }
+      { disableTracking: false, extraSmtpHeaders: { isTransactional: true } }
     )
   })
   test('Should throw a 400 error if the body size is too large (JSON payload)', async () => {
@@ -616,6 +616,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         ],
       },
       {
+        disableTracking: false,
         extraSmtpHeaders: { isTransactional: true },
       }
     )
@@ -692,6 +693,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         ],
       },
       {
+        disableTracking: false,
         extraSmtpHeaders: { isTransactional: true },
       }
     )
@@ -825,6 +827,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         ],
       },
       {
+        disableTracking: false,
         extraSmtpHeaders: { isTransactional: true },
       }
     )

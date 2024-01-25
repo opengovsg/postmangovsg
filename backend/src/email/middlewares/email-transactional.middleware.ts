@@ -67,6 +67,7 @@ export const InitEmailTransactionalMiddleware = (
     tag?: string
     cc?: string[]
     bcc?: string[]
+    disable_tracking?: boolean
   }
   type ReqBodyWithId = ReqBody & { emailMessageTransactionalId: string }
 
@@ -210,6 +211,7 @@ export const InitEmailTransactionalMiddleware = (
       cc,
       bcc,
       emailMessageTransactionalId, // added by saveMessage middleware
+      disable_tracking: disableTracking,
     } = req.body
 
     try {
@@ -275,6 +277,7 @@ export const InitEmailTransactionalMiddleware = (
             ? bcc.filter((c) => !blacklistedRecipients.includes(c))
             : undefined,
         emailMessageTransactionalId,
+        disableTracking,
       })
       emailMessageTransactional.set(
         'status',

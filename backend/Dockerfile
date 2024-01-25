@@ -21,7 +21,10 @@ RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-
 
 RUN apk add jq
 
-RUN python3 -m pip install awscli
+# There was a breaking change in the base image used that prevents us from installing via pip
+# Instead of activating a virtual env, this is a simpler workaround
+# https://github.com/python/cpython/issues/102134
+RUN apk add --no-cache aws-cli
 
 RUN aws configure set default.region ap-southeast-1
 
