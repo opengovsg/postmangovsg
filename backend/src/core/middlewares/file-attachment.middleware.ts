@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import fileUpload, { UploadedFile } from 'express-fileupload'
 import config from '@core/config'
-import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
+import {
+  ensureAttachmentsFieldIsArray,
+  removeFirstAndLastCharacter,
+} from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
 import {
   ApiAttachmentFormatError,
@@ -181,8 +184,9 @@ async function uploadFileToPresignedUrl(
       timeout: 30 * 1000, // 30 Seconds
     })
     // 4. Return the etag and transactionId to the FE
+    const formattedEtag = removeFirstAndLastCharacter(response.headers.etag)
     return res.json({
-      etag: response.headers.etag,
+      etag: formattedEtag,
       transactionId: signedKey,
     })
   } catch (err) {
