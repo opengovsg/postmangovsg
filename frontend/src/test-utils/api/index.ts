@@ -566,6 +566,9 @@ function mockCampaignUploadApis(state: State) {
         })
       )
     }),
+    rest.put(PRESIGNED_URL, (req, res, ctx) => {
+      return res(ctx.status(200), ctx.set('ETag', 'test_etag_value'))
+    }),
     rest.put('/attachments/csv-upload', (req, res, ctx) => {
       return res(ctx.status(200), ctx.set('ETag', 'test_etag_value'))
     }),
