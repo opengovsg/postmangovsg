@@ -176,12 +176,11 @@ async function uploadFileToPresignedUrl(
   )
   try {
     // 3. Upload file to presigned URL
-    const response = await axios.put(presignedUrl, uploadedFile, {
+    const response = await axios.put(presignedUrl, uploadedFile.data, {
       headers: {
         'Content-Type': uploadedFile.mimetype,
       },
       withCredentials: false,
-      timeout: 30 * 1000, // 30 Seconds
     })
     // 4. Return the etag and transactionId to the FE
     const formattedEtag = removeFirstAndLastCharacter(response.headers.etag)
