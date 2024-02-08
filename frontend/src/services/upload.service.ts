@@ -64,7 +64,7 @@ async function getMd5(blob: Blob): Promise<string> {
 export async function uploadFileWithPresignedUrl(
   uploadedFile: File,
   _presignedUrl: string // Making this unused because the endpoint below generates its own presignedUrl and uploads the file
-): Promise<string> {
+) {
   try {
     const formData = new FormData()
     formData.append('file', uploadedFile)
@@ -73,7 +73,10 @@ export async function uploadFileWithPresignedUrl(
         'Content-Type': 'multipart/form-data',
       },
     })
-    return response.data.etag
+    return {
+      etag: response.data.etag,
+      transactionId: response.data.transactionId,
+    }
   } catch (e) {
     errorHandler(
       e,
@@ -210,15 +213,15 @@ export async function uploadFileToS3(
     uploadedFile: file,
   })
   // Upload to presigned url
-  const etag = await uploadFileWithPresignedUrl(
+  const result = await uploadFileWithPresignedUrl(
     file,
     startUploadResponse.presignedUrl
   )
   await completeFileUpload({
     campaignId: +campaignId,
-    transactionId: startUploadResponse.transactionId,
+    transactionId: result.transactionId,
     filename: file.name,
-    etag,
+    etag: result.etag,
   })
   return file.name
 }
