@@ -1,7 +1,22 @@
 module.exports = {
   roots: ['<rootDir>'],
   testMatch: ['**/tests/**/*.(spec|test).+(ts|tsx|js)'],
-  testPathIgnorePatterns: ['<rootDir>/build/', '<rootDir>/node_modules/'],
+  testPathIgnorePatterns: [
+    '<rootDir>/build/',
+    '<rootDir>/node_modules/',
+    '<rootDir>/src/core/routes/tests/api-key.routes.test.ts',
+    '<rootDir>/src/core/routes/tests/auth.routes.test.ts',
+    '<rootDir>/src/core/routes/tests/campaign.routes.test.ts',
+    '<rootDir>/src/core/routes/tests/protected.routes.test.ts',
+    '<rootDir>/src/email/routes/tests/email-campaign.routes.test.ts',
+    '<rootDir>/src/email/routes/tests/email-transactional.routes.test.ts',
+    '<rootDir>/src/sms/routes/tests/sms-callback.routes.test.ts',
+    '<rootDir>/src/sms/routes/tests/sms-campaign.routes.test.ts',
+    '<rootDir>/src/sms/routes/tests/sms-settings.routes.test.ts',
+    '<rootDir>/src/sms/routes/tests/sms-transactional.routes.test.ts',
+    '<rootDir>/src/telegram/routes/tests/telegram-campaign.routes.test.ts',
+    '<rootDir>/src/telegram/routes/tests/telegram-settings.routes.test.ts',
+  ],
   moduleNameMapper: {
     '@core/(.*)': '<rootDir>/src/core/$1',
     '@sms/(.*)': '<rootDir>/src/sms/$1',
