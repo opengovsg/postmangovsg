@@ -35,15 +35,17 @@ module.exports.jest = (config) => {
     '^styles/?(.*)': '<rootDir>/src/styles/$1',
     '^@shared/?(.*)': '<rootDir>/../shared/src/$1',
   }
-  config.testPathIgnorePatterns.push(...[
-    'frontend/src/components/dashboard/create/email/tests/EmailRecipients.test.tsx',
-    'frontend/src/components/dashboard/create/sms/tests/SMSRecipients.test.tsx',
-    'frontend/src/components/dashboard/create/telegram/tests/TelegramRecipients.test.tsx',
-    'frontend/src/components/dashboard/tests/integration/email.test.tsx',
-    'frontend/src/components/dashboard/tests/integration/sms.test.tsx',
-    'frontend/src/components/dashboard/tests/integration/telegram.test.tsx',
-  ])
-  
+  if (!config.testPathIgnorePatterns) {
+    config.testPathIgnorePatterns = [
+      'frontend/src/components/dashboard/create/email/tests/EmailRecipients.test.tsx',
+      'frontend/src/components/dashboard/create/sms/tests/SMSRecipients.test.tsx',
+      'frontend/src/components/dashboard/create/telegram/tests/TelegramRecipients.test.tsx',
+      'frontend/src/components/dashboard/tests/integration/email.test.tsx',
+      'frontend/src/components/dashboard/tests/integration/sms.test.tsx',
+      'frontend/src/components/dashboard/tests/integration/telegram.test.tsx',
+    ];
+  }
+
   const moduleNameMapper = { ...config.moduleNameMapper, ...aliasMap }
   return {
     ...config,
