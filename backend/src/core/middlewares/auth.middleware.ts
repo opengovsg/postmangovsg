@@ -253,9 +253,15 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     const { code } = req.body
     const logMeta = { code, action: 'verifySgidCode' }
     try {
-      if (!req.session) {
+      /*
+        Since Feb 8 2024, this endpoint is called twice when users attempt to log in via SGID on GSIB machines.
+        This is most likely due to *.postman.gov.sg being whitelisted on SGProxy but the SGID url is not.
+        The additional API call is made without req.session.sgid set and thus we add a check here and return a HTTP 400
+        if this is the case.
+      */
+      if (!req.session || !req.session.sgid) {
         logger.error({ message: 'Session object not found!', ...logMeta })
-        return res.sendStatus(401)
+        return res.sendStatus(400)
       }
       const sgidUserInfo = await authService.verifySgidCode(req, code)
       if (!sgidUserInfo.authenticated) {
