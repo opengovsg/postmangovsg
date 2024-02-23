@@ -362,7 +362,8 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   }
 
   /**
-   * Checks the user's sgID code and returns their singpass info if valid
+   * Checks the user's sgID code and returns their singpass info if valid.
+   * This function assumes that req.session.sgid has already been validated by the calling function.
    * @param req
    * @param code
    */
@@ -373,10 +374,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     | { authenticated: true; data: UserInfoReturn }
     | { authenticated: false; reason: string }
   > => {
-    if (!req.session || !req.session.sgid) {
-      throw new Error('Unable to find user session')
-    }
-    const { codeVerifier, nonce } = req.session.sgid
+    const { codeVerifier, nonce } = req.session!.sgid
 
     if (typeof codeVerifier !== 'string' || typeof nonce !== 'string') {
       throw new Error('Invalid parameter types')
