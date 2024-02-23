@@ -40,6 +40,7 @@ if (APP_ENV === 'production' || APP_ENV === 'staging') {
     trackResources: true,
     trackLongTasks: true,
     defaultPrivacyLevel: 'mask-user-input',
+    proxy: `https://intake.postman.gov.sg`,
   })
 }
 
