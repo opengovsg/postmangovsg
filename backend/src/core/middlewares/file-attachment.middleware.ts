@@ -1,7 +1,10 @@
 import { Request, Response, NextFunction } from 'express'
 import fileUpload, { UploadedFile } from 'express-fileupload'
 import config from '@core/config'
-import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
+import {
+  ensureAttachmentsFieldIsArray,
+  removeFirstAndLastCharacter,
+} from '@core/utils/attachment'
 import { isDefaultFromAddress } from '@core/utils/from-address'
 import {
   ApiAttachmentFormatError,
@@ -14,6 +17,8 @@ import { configureEndpoint } from '@core/utils/aws-endpoint'
 import { CommonAttachment } from '@email/models/common-attachment'
 import { v4 as uuidv4 } from 'uuid'
 import { Readable } from 'stream'
+import axios from 'axios'
+import { UploadService } from '@core/services'
 
 const TOTAL_ATTACHMENT_SIZE_LIMIT = config.get(
   'file.maxCumulativeAttachmentsSize'
@@ -156,6 +161,38 @@ async function streamCampaignEmbed(
   return res
 }
 
+async function uploadFileToPresignedUrl(
+  req: Request,
+  res: Response
+): Promise<Response> {
+  // 1. Get uploaded file from request
+  const uploadedFile = req.files?.file as fileUpload.UploadedFile
+  if (!uploadedFile) {
+    return res
+  }
+  // 2. Get presigned URL for file upload
+  const { presignedUrl, signedKey } = await UploadService.getUploadParameters(
+    uploadedFile.mimetype
+  )
+  try {
+    // 3. Upload file to presigned URL
+    const response = await axios.put(presignedUrl, uploadedFile.data, {
+      headers: {
+        'Content-Type': uploadedFile.mimetype,
+      },
+      withCredentials: false,
+    })
+    // 4. Return the etag and transactionId to the FE
+    const formattedEtag = removeFirstAndLastCharacter(response.headers.etag)
+    return res.json({
+      etag: formattedEtag,
+      transactionId: signedKey,
+    })
+  } catch (err) {
+    return res.status(500).json({ error: err })
+  }
+}
+
 export const FileAttachmentMiddleware = {
   checkAttachmentValidity,
   getFileUploadHandler,
@@ -163,4 +200,5 @@ export const FileAttachmentMiddleware = {
   transformAttachmentsFieldToArray,
   storeCampaignEmbed,
   streamCampaignEmbed,
+  uploadFileToPresignedUrl,
 }
