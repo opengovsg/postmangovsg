@@ -5,7 +5,6 @@ import { AuthService, experimentService } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
 import { DEFAULT_TX_EMAIL_RATE_LIMIT } from '@core/models'
 import { ApiAuthenticationError } from '@core/errors/rest-api.errors'
-import { SgidPublicOfficerEmployment } from '@core/types'
 
 export interface AuthMiddleware {
   getOtp: Handler
@@ -13,9 +12,6 @@ export interface AuthMiddleware {
   getUser: Handler
   getAuthMiddleware: (authTypes: AuthType[]) => Handler
   logout: Handler
-  getSgidUrl: Handler
-  verifySgidResponse: Handler
-  selectSgidProfile: Handler
 }
 
 export enum AuthType {
@@ -223,110 +219,11 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     }).catch((err) => next(err))
   }
 
-  /**
-   * Fetches sgID authorisation URL
-   * @param req
-   * @param res
-   */
-  const getSgidUrl = async (req: Request, res: Response): Promise<Response> => {
-    try {
-      const url = authService.getSgidUrl(req)
-      return res.status(200).send(url)
-    } catch (e) {
-      logger.error({
-        message: 'Error fetching sgID auth url',
-        error: e,
-      })
-      return res.sendStatus(500)
-    }
-  }
-
-  /**
-   * Verifies that the sgID response is valid and returns the user profiles to choose from
-   * @param req
-   * @param res
-   */
-  const verifySgidResponse = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
-    const { code } = req.body
-    const logMeta = { code, action: 'verifySgidCode' }
-    try {
-      /*
-        Since Feb 8 2024, this endpoint is called twice when users attempt to log in via SGID on GSIB machines.
-        This is most likely due to *.postman.gov.sg being whitelisted on SGProxy but the SGID url is not.
-        The additional API call is made without req.session.sgid set and thus we add a check here and return a HTTP 400
-        if this is the case.
-      */
-      if (!req.session || !req.session.sgid) {
-        logger.error({ message: 'Session object not found!', ...logMeta })
-        return res.sendStatus(400)
-      }
-      const sgidUserInfo = await authService.verifySgidCode(req, code)
-      if (!sgidUserInfo.authenticated) {
-        logger.error({ message: sgidUserInfo.reason, ...logMeta })
-        return res.status(401).json({ message: sgidUserInfo.reason })
-      }
-      const userProfiles = await authService.getSgidUserProfiles(
-        sgidUserInfo.data
-      )
-      // Set user profiles in the session object so we can verify the profile selected by the user
-      req.session.sgid = {
-        ...req.session.sgid,
-        profiles: [...userProfiles],
-      }
-      return res.status(200).json({ userProfiles })
-    } catch (e) {
-      const message = (e as Error).message
-      logger.error({ message, ...logMeta })
-      return res.status(500).json({ message })
-    }
-  }
-
-  const selectSgidProfile = async (
-    req: Request,
-    res: Response
-  ): Promise<Response> => {
-    const { workEmail } = req.body
-    const logMeta = { action: 'selectSgidProfile' }
-    try {
-      if (!req.session) {
-        logger.error({ message: 'Session object not found!', ...logMeta })
-        return res.sendStatus(401)
-      }
-      if (
-        !req.session.sgid?.profiles ||
-        !req.session.sgid.profiles.some(
-          (p: SgidPublicOfficerEmployment) => p.workEmail === workEmail
-        )
-      ) {
-        logger.error({ message: 'Selected profile is not valid', ...logMeta })
-        return res.sendStatus(401)
-      }
-      const user = await authService.findOrCreateUser(workEmail)
-      req.session.user = {
-        id: user.id,
-        createdAt: user.createdAt,
-        updatedAt: user.updatedAt,
-        email: user.email,
-      }
-      return res.sendStatus(200)
-    } catch (e) {
-      const message = (e as Error).message
-      logger.error({ message, ...logMeta })
-      return res.status(500).json({ message })
-    }
-  }
-
   return {
     getOtp,
     verifyOtp,
     getUser,
     getAuthMiddleware,
     logout,
-    getSgidUrl,
-    verifySgidResponse,
-    selectSgidProfile,
   }
 }

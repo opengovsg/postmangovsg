@@ -30,18 +30,6 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
     }),
   }
 
-  const verifySgidCodeValidator = {
-    [Segments.BODY]: Joi.object({
-      code: Joi.string().required(),
-    }),
-  }
-
-  const selectSgidProfileValidator = {
-    [Segments.BODY]: Joi.object({
-      workEmail: Joi.string().required(),
-    }),
-  }
-
   // actual routes here
 
   /**
@@ -111,103 +99,6 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
    *           description: Internal Server Error
    */
   router.post('/login', celebrate(verifyOtpValidator), authMiddleware.verifyOtp)
-
-  /**
-   * paths:
-   *  /auth/login/sgid:
-   *    get:
-   *      summary: Get the authorisation url for sgID login
-   *      tags:
-   *        - Authentication
-   *
-   *      responses:
-   *        "200":
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *        "500":
-   *           description: Internal Server Error
-   */
-  router.get('/login/sgid', authMiddleware.getSgidUrl)
-
-  /**
-   * paths:
-   *  /auth/login/sgid:
-   *    post:
-   *      summary: Verify sgid authorisation code
-   *      tags:
-   *        - Authentication
-   *      requestBody:
-   *        required: true
-   *        content:
-   *          application/json:
-   *            schema:
-   *              type: object
-   *              properties:
-   *                code:
-   *                   type: string
-   *              required:
-   *              - code
-   *
-   *      responses:
-   *        "200":
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *        "401":
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *        "500":
-   *           description: Internal Server Error
-   */
-  router.post(
-    '/login/sgid',
-    celebrate(verifySgidCodeValidator),
-    authMiddleware.verifySgidResponse
-  )
-
-  /**
-   * paths:
-   *  /auth/login/sgid/profile:
-   *    post:
-   *      summary: Select sgid profile to login with
-   *      tags:
-   *        - Authentication
-   *      requestBody:
-   *        required: true
-   *        content:
-   *          application/json:
-   *            schema:
-   *              type: object
-   *              properties:
-   *                workEmail:
-   *                   type: string
-   *              required:
-   *              - workEmail
-   *
-   *      responses:
-   *        "200":
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *        "401":
-   *          content:
-   *            application/json:
-   *              schema:
-   *                type: object
-   *        "500":
-   *           description: Internal Server Error
-   */
-  router.post(
-    '/login/sgid/profile',
-    celebrate(selectSgidProfileValidator),
-    authMiddleware.selectSgidProfile
-  )
 
   /**
    * paths:

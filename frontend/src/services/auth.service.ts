@@ -3,14 +3,6 @@ import axios from 'axios'
 
 import { setGAUserId } from './ga.service'
 
-export type SgidUserProfile = {
-  workEmail: string
-  agencyName: string
-  departmentName: string
-  employmentType: string
-  employmentTitle: string
-}
-
 async function getOtpWithEmail(email: string): Promise<void> {
   try {
     await axios.post('/auth/otp', {
@@ -32,38 +24,6 @@ async function loginWithOtp(email: string, otp: string): Promise<void> {
       400: 'Invalid OTP format, enter 6 digits',
       401: 'Invalid OTP',
     })
-  }
-}
-
-async function getSgidUrl(): Promise<string | undefined> {
-  try {
-    const response = await axios.get('/auth/login/sgid')
-    return response.data
-  } catch (e) {
-    errorHandler(e)
-  }
-}
-
-async function loginWithSgid(
-  code: string
-): Promise<SgidUserProfile[] | undefined> {
-  try {
-    const response = await axios.post(`/auth/login/sgid`, {
-      code,
-    })
-    return response.data
-  } catch (e) {
-    errorHandler(e)
-  }
-}
-
-async function selectSgidProfile(workEmail: string): Promise<void> {
-  try {
-    await axios.post(`/auth/login/sgid/profile`, {
-      workEmail,
-    })
-  } catch (e) {
-    errorHandler(e)
   }
 }
 
@@ -115,13 +75,4 @@ function errorHandler(e: unknown, customHandlers: any = {}) {
   throw new Error(`${e}`)
 }
 
-export {
-  getOtpWithEmail,
-  loginWithOtp,
-  getUser,
-  logout,
-  setUserAnalytics,
-  getSgidUrl,
-  loginWithSgid,
-  selectSgidProfile,
-}
+export { getOtpWithEmail, loginWithOtp, getUser, logout, setUserAnalytics }
