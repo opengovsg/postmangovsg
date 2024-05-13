@@ -31,7 +31,7 @@
     "@aws-sdk/client-secrets-manager": "3.370.0",
     "@aws-sdk/client-ses": "3.370.0",
     "@aws-sdk/client-sns": "3.370.0",
-    "@aws-sdk/rds-signer": "3.370.0",
+    "@aws-sdk/rds-signer": "3.499.0",
     "@aws-sdk/s3-request-presigner": "3.370.0",
     "@datadog/browser-rum": "^4.43.0",
     "@sentry/node": "5.30.0",
