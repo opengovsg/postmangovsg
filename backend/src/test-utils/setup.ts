@@ -10,11 +10,3 @@ global.console = {
 
 // Mock services
 jest.mock('@shared/clients/mail-client.class')
-
-jest.mock('@opengovsg/sgid-client', () => {
-  return {
-    SgidClient: function () {
-      return {}
-    },
-  }
-})

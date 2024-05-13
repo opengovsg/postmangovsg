@@ -175,12 +175,6 @@ interface ConfigSchema {
   flamingo: {
     dbUri: string
   }
-  sgid: {
-    clientId: string
-    clientSecret: string
-    privateKey: string
-    redirectUri: string
-  }
 }
 
 convict.addFormats({
@@ -811,36 +805,6 @@ const config: Config<ConfigSchema> = convict({
       default: '',
       format: 'required-string',
       env: 'FLAMINGO_DB_URI',
-    },
-  },
-  sgid: {
-    clientId: {
-      doc: 'Client ID of application registered with sgID',
-      default: '',
-      env: 'SGID_CLIENT_ID',
-      format: 'required-string',
-      sensitive: true,
-    },
-    clientSecret: {
-      doc: 'Client secret of application registered with sgID',
-      default: '',
-      env: 'SGID_CLIENT_SECRET',
-      format: 'required-string',
-      sensitive: true,
-    },
-    privateKey: {
-      doc: 'Private key of application registered with sgID',
-      default: '',
-      env: 'SGID_PRIVATE_KEY',
-      format: 'required-string',
-      sensitive: true,
-    },
-    redirectUri: {
-      doc: 'Redirect URI of application registered with sgID',
-      default: '',
-      env: 'SGID_REDIRECT_URI',
-      format: 'required-string',
-      sensitive: true,
     },
   },
 })

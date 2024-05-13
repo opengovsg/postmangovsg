@@ -17,7 +17,7 @@ frontend:
         - if [ "${AWS_BRANCH}" = "master" ]; then
           export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION} &&
           export REACT_APP_ENVIRONMENT="production" &&
-          export REACT_APP_IMG_SERVER_URL="https://postman.gov.sg/v1";
+          export REACT_APP_IMG_SERVER_URL="https://legacy.postman.gov.sg/v1";
           elif [ "${AWS_BRANCH}" = "momgovsg" ]; then
           export REACT_APP_BACKEND_URL=${BACKEND_URL_PRODUCTION_MOM} &&
           export REACT_APP_ENVIRONMENT="production-02";

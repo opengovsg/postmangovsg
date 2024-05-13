@@ -22,7 +22,6 @@ import {
   loginWithOtp,
   getUser,
   setUserAnalytics,
-  getSgidUrl,
 } from 'services/auth.service'
 
 import {
@@ -32,8 +31,6 @@ import {
 } from 'services/ga.service'
 
 const RESEND_WAIT_TIME = 30000
-const SGID_VALID_ORGANISATIONS_PAGE =
-  'https://docs.id.gov.sg/faq-users#as-a-government-officer-why-am-i-not-able-to-login-to-my-work-tool-using-sgid'
 
 const Login = () => {
   const {
@@ -54,15 +51,12 @@ const Login = () => {
     return () => timeoutId && clearTimeout(timeoutId)
   })
 
-  const SINGPASS_ERROR_CODE = 'SingpassError'
-  const NO_EMPLOYEE_PROFILE_ERROR_CODE = 'NoSingpassProfile'
-
-  const openErrorModal = (errorMessage: string) =>
+  const openErrorModal = (errorString: string) =>
     modalContext.setModalContent(
       <ConfirmModal
-        title={`Oops, something went wrong. Please try again later.`}
+        title={`Singpass login is unavailable`}
         subtitleElement={
-          <h4 className={styles.subtitleElement}>{errorMessage}</h4>
+          <h4 className={styles.subtitleElement}>{errorString}</h4>
         }
         buttonText="Okay"
         alternateImage={ErrorImage}
@@ -71,56 +65,31 @@ const Login = () => {
       />
     )
 
-  useEffect(() => {
-    const params = new URL(window.location.href).searchParams
-    const errorCode = params.get('errorCode')
-    const openNoEmployeeProfileModal = () =>
-      modalContext.setModalContent(
-        <ConfirmModal
-          title={`Oops, we don't have your employee profile in the system`}
-          subtitleElement={
-            <h4 className={styles.subtitleElement}>
-              Please check{' '}
-              <a
-                style={{ textDecoration: 'underline' }}
-                href={SGID_VALID_ORGANISATIONS_PAGE}
-                target="_blank"
-                rel="noreferrer"
-              >
-                here
-              </a>{' '}
-              if your government agency is supported. Meanwhile, login via your
-              email instead.
-            </h4>
-          }
-          buttonText="Use Email Login"
-          alternateImage={ErrorImage}
-          primary={true}
-          onConfirm={() => modalContext.close()}
-        />
-      )
-
-    const openSingpassErrorModal = () =>
-      modalContext.setModalContent(
-        <ConfirmModal
-          title={`An error occured while trying to log in via Singpass`}
-          buttonText="Use Email Login"
-          alternateImage={ErrorImage}
-          primary={true}
-          onConfirm={() => modalContext.close()}
-        />
-      )
-    switch (errorCode) {
-      case SINGPASS_ERROR_CODE:
-        void openSingpassErrorModal()
-        break
-      case NO_EMPLOYEE_PROFILE_ERROR_CODE:
-        void openNoEmployeeProfileModal()
-        break
-      default:
-        break
-    }
-  }, [])
+  const openSgidUnavailableModal = () =>
+    modalContext.setModalContent(
+      <ConfirmModal
+        title={`Singpass login is unavailable`}
+        subtitleElement={
+          <h4 className={styles.subtitleElement}>
+            From 5pm, 3 May onwards, Singpass login will no longer be available.{' '}
+            Please log in using email OTP instead. If you’re unable to access{' '}
+            your email, refer to this{' '}
+            <a
+              href="https://docs.developer.tech.gov.sg/docs/postman-sgdp-guide/login-on-the-go"
+              target="_blank"
+              rel="noreferrer"
+            >
+              guide
+            </a>{' '}
+            to learn how you can forward the email OTP to your phone number
+          </h4>
+        }
+        buttonText="Okay"
+        alternateImage={ErrorImage}
+        primary={true}
+        onConfirm={() => modalContext.close()}
+      />
+    )
 
   async function sendOtp() {
     resetButton()
@@ -148,18 +117,6 @@ const Login = () => {
         user?.experimental_data as { [feature: string]: Record<string, string> }
       )
       setUserAnalytics(user)
-    } catch (err) {
-      openErrorModal((err as Error).message)
-      sendException((err as Error).message)
-    }
-  }
-
-  async function sgidLogin() {
-    try {
-      const authUrl = await getSgidUrl()
-      if (authUrl) {
-        window.location.assign(authUrl)
-      }
     } catch (err) {
       openErrorModal((err as Error).message)
       sendException((err as Error).message)
@@ -224,20 +181,19 @@ const Login = () => {
           loadingButtonLabel={<Trans>Verifying OTP...</Trans>}
         />
       )}
-      {/* This feature is experimental and should only be rendered on the demo URL (/sgid-login) */}
       {!otpSent && (
         <React.Fragment>
           <h4 className={styles.text}>
             <Trans>or</Trans>
           </h4>
-          <PrimaryButton onClick={sgidLogin}>
+          <PrimaryButton onClick={() => openSgidUnavailableModal()}>
             Log in with Singpass
           </PrimaryButton>
           <p>
             Can my agency use this? Check{' '}
             <a
               style={{ textDecoration: 'underline' }}
-              href={SGID_VALID_ORGANISATIONS_PAGE}
+              href={''}
               target="_blank"
               rel="noreferrer"
             >

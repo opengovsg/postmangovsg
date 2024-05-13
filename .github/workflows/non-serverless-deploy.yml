@@ -102,29 +102,29 @@ jobs:
     uses: ./.github/workflows/e2e.yml
     secrets: inherit
 
-  revert-on-e2e-failure:
-    runs-on: ubuntu-latest
-    needs:
-      - deploy-backend
-      - deploy-frontend
-      - deploy-worker
-      - e2e-test
-    if: always()
-    steps:
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ap-southeast-1
-      - run: |
-          if [ "${{ needs.e2e-test.outputs.e2e_result }}" = "failure" ] && [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            ${{ needs.deploy-worker.outputs.sending_revert_command }}
-            ${{ needs.deploy-worker.outputs.logging_revert_command }}
-            ${{ needs.deploy-frontend.outputs.revert_command }}
-            ${{ needs.deploy-backend.outputs.revert_command_backend }}
-            ${{ needs.deploy-backend.outputs.revert_command_callback }}
-          fi
+  # revert-on-e2e-failure:
+  #   runs-on: ubuntu-latest
+  #   needs:
+  #     - deploy-backend
+  #     - deploy-frontend
+  #     - deploy-worker
+  #     - e2e-test
+  #   if: always()
+  #   steps:
+  #     - name: Configure AWS credentials
+  #       uses: aws-actions/configure-aws-credentials@v2
+  #       with:
+  #         aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+  #         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+  #         aws-region: ap-southeast-1
+  #     - run: |
+  #         if [ "${{ needs.e2e-test.outputs.e2e_result }}" = "failure" ] && [ "${{ github.ref }}" = "refs/heads/master" ]; then
+  #           ${{ needs.deploy-worker.outputs.sending_revert_command }}
+  #           ${{ needs.deploy-worker.outputs.logging_revert_command }}
+  #           ${{ needs.deploy-frontend.outputs.revert_command }}
+  #           ${{ needs.deploy-backend.outputs.revert_command_backend }}
+  #           ${{ needs.deploy-backend.outputs.revert_command_callback }}
+  #         fi
 
   slack-success:
     needs:
