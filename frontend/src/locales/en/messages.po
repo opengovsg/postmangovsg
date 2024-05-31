@@ -253,7 +253,7 @@ msgstr "https://go.gov.sg/postman-telegram-bot"
 
 #: config.ts:65
 msgid "link.guideUrl"
-msgstr "https://guide.postman.gov.sg/"
+msgstr "https://postman-v1.guides.gov.sg/"
 
 #: config.ts:79
 msgid "link.privacyUrl"
