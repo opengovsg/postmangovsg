@@ -8,3 +8,7 @@ export const ensureAttachmentsFieldIsArray = (
   }
   return attachments
 }
+
+export const removeFirstAndLastCharacter = (str: string) => {
+  return str.slice(1, -1)
+}
