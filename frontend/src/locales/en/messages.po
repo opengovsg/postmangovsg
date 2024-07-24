@@ -120,7 +120,7 @@ msgstr "Want to send your campaigns through WhatsApp?"
 #: components/dashboard/settings/custom-from-address/CustomFromAddress.tsx:112
 #: config.ts:87
 msgid "defaultMailFrom"
-msgstr "donotreply@mail.postman.gov.sg"
+msgstr "acknowledgement@mail.postman.gov.sg"
 
 #: components/dashboard/demo/demo-info-banner/DemoInfoBanner.tsx:8
 msgid "demoMessage"

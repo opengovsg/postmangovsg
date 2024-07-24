@@ -397,7 +397,7 @@ const config: Config<ConfigSchema> = convict({
 })
 
 // If mailFrom was not set in an env var, set it using the app_name
-const defaultMailFrom = 'Postman.gov.sg <donotreply@mail.postman.gov.sg>'
+const defaultMailFrom = 'Postman.gov.sg <acknowledgement@mail.postman.gov.sg>'
 config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 
 // Only development is a non-production environment

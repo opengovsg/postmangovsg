@@ -575,7 +575,7 @@ paths:
                         nullable: true
                       from:
                         type: string
-                        example: 'Postman <donotreply@mail.postman.gov.sg>'
+                        example: 'Postman <acknowledgement@mail.postman.gov.sg>'
                       showMasthead:
                         type: boolean
                       agencyLogoURI:
@@ -746,7 +746,7 @@ paths:
                         nullable: true
                       from:
                         type: string
-                        example: 'Postman <donotreply@mail.postman.gov.sg>'
+                        example: 'Postman <acknowledgement@mail.postman.gov.sg>'
                       themed_body:
                         type: string
         '401':
@@ -4520,7 +4520,7 @@ components:
           example: 42
         from:
           type: string
-          example: Postman <donotreply@mail.postman.gov.sg>
+          example: Postman <acknowledgement@mail.postman.gov.sg>
         recipient:
           type: string
           example: hello@example.com
@@ -4532,7 +4532,7 @@ components:
               example: Hello World
             from:
               type: string
-              example: Postman <donotreply@mail.postman.gov.sg>
+              example: Postman <acknowledgement@mail.postman.gov.sg>
             subject:
               type: string
               example: Hello World
