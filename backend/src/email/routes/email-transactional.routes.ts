@@ -24,7 +24,9 @@ export const InitEmailTransactionalRoute = (
   const sendValidator = {
     [Segments.BODY]: Joi.object({
       recipient: Joi.string()
-        .email()
+        .email({
+          allowUnicode: false,
+        })
         .options({ convert: true })
         .lowercase()
         .required(),
