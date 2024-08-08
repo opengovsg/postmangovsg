@@ -95,7 +95,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       expect.objectContaining({
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
-          from: 'Postman <donotreply@mail.postman.gov.sg>',
+          from: 'Postman <info@mail.postman.gov.sg>',
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -106,7 +106,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({
-        from: 'Agency.gov.sg <donotreply@mail.postman.gov.sg>',
+        from: 'Agency.gov.sg <info@mail.postman.gov.sg>',
         subject: 'test',
         body: 'test',
         reply_to: 'user@agency.gov.sg',
@@ -116,7 +116,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       expect.objectContaining({
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
-          from: 'Agency.gov.sg via Postman <donotreply@mail.postman.gov.sg>',
+          from: 'Agency.gov.sg via Postman <info@mail.postman.gov.sg>',
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -127,7 +127,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({
-        from: 'Postman <donotreply@mail.postman.gov.sg>',
+        from: 'Postman <info@mail.postman.gov.sg>',
         subject: 'test',
         body: 'test',
         reply_to: 'user@agency.gov.sg',
@@ -137,7 +137,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       expect.objectContaining({
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
-          from: 'Postman <donotreply@mail.postman.gov.sg>',
+          from: 'Postman <info@mail.postman.gov.sg>',
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -194,7 +194,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({
-        from: 'Custom Name <donotreply@mail.postman.gov.sg>',
+        from: 'Custom Name <info@mail.postman.gov.sg>',
         subject: 'test',
         body: 'test',
         reply_to: 'user@agency.gov.sg',
@@ -205,7 +205,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       expect.objectContaining({
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
-          from: `Custom Name ${mailVia} <donotreply@mail.postman.gov.sg>`,
+          from: `Custom Name ${mailVia} <info@mail.postman.gov.sg>`,
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -266,7 +266,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     const res = await request(app)
       .put(`/campaign/${campaignId}/email/template`)
       .send({
-        from: `Custom Name ${mailVia} <donotreply@mail.postman.gov.sg>`,
+        from: `Custom Name ${mailVia} <info@mail.postman.gov.sg>`,
         subject: 'test',
         body: 'test',
         reply_to: 'user@agency.gov.sg',
@@ -277,7 +277,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       expect.objectContaining({
         message: `Template for campaign ${campaignId} updated`,
         template: expect.objectContaining({
-          from: `Custom Name ${mailVia} <donotreply@mail.postman.gov.sg>`,
+          from: `Custom Name ${mailVia} <info@mail.postman.gov.sg>`,
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -347,7 +347,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       expect.objectContaining({
         message: `Template for campaign ${protectedCampaignId} updated`,
         template: expect.objectContaining({
-          from: 'Postman <donotreply@mail.postman.gov.sg>',
+          from: 'Postman <info@mail.postman.gov.sg>',
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -391,7 +391,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
         message:
           'Please re-upload your recipient list as template has changed.',
         template: expect.objectContaining({
-          from: 'Postman <donotreply@mail.postman.gov.sg>',
+          from: 'Postman <info@mail.postman.gov.sg>',
           reply_to: 'user@agency.gov.sg',
         }),
       })
@@ -418,7 +418,7 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
       template: {
         subject: 'test',
         body: 'test {{name}}',
-        from: 'Postman <donotreply@mail.postman.gov.sg>',
+        from: 'Postman <info@mail.postman.gov.sg>',
         reply_to: 'user@agency.gov.sg',
         params: ['name'],
       },
