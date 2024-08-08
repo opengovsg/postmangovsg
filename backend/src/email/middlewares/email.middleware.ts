@@ -233,7 +233,7 @@ export const InitEmailMiddleware = (
     if (
       //  user enters an email that is neither their own nor info@mail.postman.gov.sg
       fromAddress !== userEmail &&
-      allowedDefaultAddresses.includes(fromAddress)
+      !allowedDefaultAddresses.includes(fromAddress)
     ) {
       logger.error({
         message: INVALID_FROM_ADDRESS_ERROR_MESSAGE,
