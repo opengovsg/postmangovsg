@@ -30,7 +30,7 @@ export interface EmailMiddleware {
 }
 
 export const INVALID_FROM_ADDRESS_ERROR_MESSAGE =
-  "Invalid 'from' email address, which must be either the default donotreply@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more."
+  "Invalid 'from' email address, which must be either the default info@mail.postman.gov.sg or the user's email (which requires setup with Postman team). Contact us to learn more."
 
 export const UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE =
   'From Address has not been verified. Contact us to learn more.'
@@ -223,10 +223,17 @@ export const InitEmailMiddleware = (
     const { fromName: defaultFromName, fromAddress: defaultFromAddress } =
       parseFromAddress(config.get('mailFrom'))
 
+    // As part of a PSD directive, we have changed the defaultFromAddress to info@mail.postman.gov.sg.
+    // To prevent any breaking changes, we must now support both the new and old default address
+    const allowedDefaultAddresses = [
+      defaultFromAddress,
+      'donotreply@mail.postman.gov.sg',
+    ]
+
     if (
-      //  user enters an email that is neither their own nor donotreply@mail.postman.gov.sg
+      //  user enters an email that is neither their own nor info@mail.postman.gov.sg
       fromAddress !== userEmail &&
-      fromAddress !== defaultFromAddress
+      allowedDefaultAddresses.includes(fromAddress)
     ) {
       logger.error({
         message: INVALID_FROM_ADDRESS_ERROR_MESSAGE,
@@ -304,7 +311,7 @@ export const InitEmailMiddleware = (
 
   /**
    * Verifies the user's email address to see if it can be used as custom 'from' address
-   * - if it is the default donotreply@mail.postman.gov.sg, return immediately
+   * - if it is the default info@mail.postman.gov.sg, return immediately
    * - else, make network calls to AWS SES and the user's domain to verify DNS settings are set up properly.
    */
   const verifyFromAddress = async (
