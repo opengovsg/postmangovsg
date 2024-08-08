@@ -74,7 +74,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
     recipient: 'recipient@agency.gov.sg',
     subject: 'subject',
     body: '<p>body</p>',
-    from: 'Postman <donotreply@mail.postman.gov.sg>',
+    from: 'Postman <info@mail.postman.gov.sg>',
     reply_to: 'user@agency.gov.sg',
   }
   const generateRandomSmallFile = () => {
@@ -150,7 +150,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .spyOn(EmailService, 'sendEmail')
       .mockResolvedValue(true)
 
-    const from = 'Hello <donotreply@mail.postman.gov.sg>'
+    const from = 'Hello <info@mail.postman.gov.sg>'
     const res = await request(app)
       .post(endpoint)
       .set('Authorization', `Bearer ${apiKey}`)
@@ -172,14 +172,14 @@ describe(`${emailTransactionalRoute}/send`, () => {
     expect(transactionalEmail).not.toBeNull()
     expect(transactionalEmail).toMatchObject({
       recipient: validApiCall.recipient,
-      from: 'Hello <donotreply@mail.postman.gov.sg>',
+      from: 'Hello <info@mail.postman.gov.sg>',
       status: TransactionalEmailMessageStatus.Accepted,
       errorCode: null,
     })
     expect(transactionalEmail?.params).toMatchObject({
       subject: validApiCall.subject,
       body: validApiCall.body,
-      from: 'Hello <donotreply@mail.postman.gov.sg>',
+      from: 'Hello <info@mail.postman.gov.sg>',
       reply_to: user.email,
     })
   })
@@ -479,7 +479,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .field('recipient', validApiCallAttachment.recipient)
       .field('subject', validApiCallAttachment.subject)
       .field('body', validApiCallAttachment.body)
-      .field('from', 'Postman <donotreply@mail.postman.gov.sg>')
+      .field('from', 'Postman <info@mail.postman.gov.sg>')
       .field('reply_to', validApiCallAttachment.reply_to)
       .attach('attachments', validAttachment, validAttachmentName)
     expect(res.status).toBe(403)
@@ -971,9 +971,9 @@ describe(`GET ${emailTransactionalRoute}`, () => {
   const endpoint = emailTransactionalRoute
   const acceptedMessage = {
     recipient: 'recipient@gmail.com',
-    from: 'Postman <donotreply@mail.postman.gov.sg>',
+    from: 'Postman <info@mail.postman.gov.sg>',
     params: {
-      from: 'Postman <donotreply@mail.postman.gov.sg>',
+      from: 'Postman <info@mail.postman.gov.sg>',
       subject: 'Test',
       body: 'Test Body',
     },
@@ -981,9 +981,9 @@ describe(`GET ${emailTransactionalRoute}`, () => {
   }
   const sentMessage = {
     recipient: 'recipient@agency.gov.sg',
-    from: 'Postman <donotreply@mail.postman.gov.sg>',
+    from: 'Postman <info@mail.postman.gov.sg>',
     params: {
-      from: 'Postman <donotreply@mail.postman.gov.sg>',
+      from: 'Postman <info@mail.postman.gov.sg>',
       subject: 'Test',
       body: 'Test Body',
     },
@@ -991,9 +991,9 @@ describe(`GET ${emailTransactionalRoute}`, () => {
   }
   const deliveredMessage = {
     recipient: 'recipient3@agency.gov.sg',
-    from: 'Postman <donotreply@mail.postman.gov.sg>',
+    from: 'Postman <info@mail.postman.gov.sg>',
     params: {
-      from: 'Postman <donotreply@mail.postman.gov.sg>',
+      from: 'Postman <info@mail.postman.gov.sg>',
       subject: 'Test',
       body: 'Test Body',
     },
@@ -1330,9 +1330,9 @@ describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
     const message = await EmailMessageTransactional.create({
       userId: user.id,
       recipient: 'recipient@agency.gov.sg',
-      from: 'Postman <donotreply@mail.postman.gov.sg>',
+      from: 'Postman <info@mail.postman.gov.sg>',
       params: {
-        from: 'Postman <donotreply@mail.postman.gov.sg>',
+        from: 'Postman <info@mail.postman.gov.sg>',
         subject: 'Test',
         body: 'Test Body',
       },
@@ -1368,9 +1368,9 @@ describe(`GET ${emailTransactionalRoute}/:emailId`, () => {
     const message = await EmailMessageTransactional.create({
       userId: user.id,
       recipient: 'recipient@agency.gov.sg',
-      from: 'Postman <donotreply@mail.postman.gov.sg>',
+      from: 'Postman <info@mail.postman.gov.sg>',
       params: {
-        from: 'Postman <donotreply@mail.postman.gov.sg>',
+        from: 'Postman <info@mail.postman.gov.sg>',
         subject: 'Test',
         body: 'Test Body',
       },

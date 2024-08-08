@@ -1,11 +1,11 @@
 export const API_URL =
-  process.env.API_URL || 'https://api-staging.postman.gov.sg';
+  process.env.API_URL || "https://api-staging.postman.gov.sg";
 export const API_KEY = process.env.API_KEY as string;
-export const MAILBOX = process.env.MAIL_BOX || 'internal-testing@open.gov.sg';
+export const MAILBOX = process.env.MAIL_BOX || "internal-testing@open.gov.sg";
 
 export const DASHBOARD_URL =
-  process.env.DASHBOARD_URL || 'https://staging.postman.gov.sg';
-export const POSTMAN_FROM = 'donotreply@mail.postman.gov.sg';
+  process.env.DASHBOARD_URL || "https://staging.postman.gov.sg";
+export const POSTMAN_FROM = "info@mail.postman.gov.sg";
 
 export const SMS_NUMBER = process.env.SMS_NUMBER as string;
 export const TWILIO_ACC_SID = process.env.TWILIO_ACC_SID as string;
