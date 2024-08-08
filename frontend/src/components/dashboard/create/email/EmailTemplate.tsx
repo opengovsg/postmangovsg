@@ -197,7 +197,7 @@ const EmailTemplate = ({
         parseFromAddress(selectedFrom)
 
       // Use custom from name if it has already been set. For e.g.,
-      // for "Custom <donotreply@mail.postman.gov.sg>"", we should
+      // for "Custom <info@mail.postman.gov.sg>"", we should
       // use "Custom" instead of the default "Postman.gov.sg".
       setFromName(
         selectedFromAddress === initialFromAddress
