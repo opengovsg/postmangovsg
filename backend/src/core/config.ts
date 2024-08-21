@@ -268,7 +268,7 @@ const config: Config<ConfigSchema> = convict({
           default: true,
           env: 'DB_REQUIRE_SSL',
         },
-        rejectUnauthorized: true,
+        rejectUnauthorized: false,
         ca: {
           doc: 'SSL cert to connect to database',
           default: [rdsCa],
@@ -850,7 +850,7 @@ switch (config.get('env')) {
         dialectOptions: {
           ssl: {
             require: false, // No ssl connection needed
-            rejectUnauthorized: true,
+            rejectUnauthorized: false,
             ca: false,
           },
         },
