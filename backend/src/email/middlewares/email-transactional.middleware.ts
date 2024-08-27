@@ -355,10 +355,6 @@ export const InitEmailTransactionalMiddleware = (
       filterByTimestamp: filter as TimestampFilter,
       tag: tag as string,
     })
-    logger.warn({
-      message: 'messagesmessages1',
-      messages: messages,
-    })
     res.status(200).json({
       has_more: hasMore,
       data: messages.map((m) =>
