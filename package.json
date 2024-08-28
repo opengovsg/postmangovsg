@@ -60,6 +60,7 @@
   "homepage": "https://github.com/opengovsg/postmangovsg#readme",
   "devDependencies": {
     "concurrently": "^7.2.1",
+    "enquirer": "^2.4.1",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.0",
     "prettier": "^2.6.2",
