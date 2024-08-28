@@ -146,7 +146,6 @@ You should find the
 
 - React frontend at [localhost:3000](http://localhost:3000)
 - Express backend at [localhost:4000](http://localhost:4000)
-- Swagger docs at [localhost:4000/docs](http://localhost:4000/docs)
 
 Alternatively, if you would like to develop locally against staging database and workers, ensure that you have set up the necessary variables in `./backend/.env` and run either:
 

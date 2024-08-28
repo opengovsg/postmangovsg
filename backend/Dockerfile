@@ -47,7 +47,6 @@ RUN npm install
 
 COPY --from=builder /usr/home/shared/build ../shared/build
 
-COPY openapi.yaml ./
 COPY --from=builder /usr/home/postmangovsg/build ./build
 
 ENTRYPOINT [ "tini", "--" ]
