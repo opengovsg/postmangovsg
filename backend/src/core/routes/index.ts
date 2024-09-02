@@ -184,16 +184,6 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/protect', protectedMailRoutes)
   router.use('/unsubscribe', unsubscriberRoutes)
 
-  /**
-   * @swagger
-   * components:
-   *   securitySchemes:
-   *     bearerAuth:
-   *       type: http
-   *       scheme: bearer
-   *       bearerFormat: username_versionNumber_apiKey
-   */
-
   router.use(
     '/campaigns',
     authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),

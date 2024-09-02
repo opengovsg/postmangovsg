@@ -1,7 +1,6 @@
 import { Application } from 'express'
 import securityHeadersLoader from './security-headers.loader'
 import expressLoader from './express.loader'
-import swaggerLoader from './swagger.loader'
 import sessionLoader from './session.loader'
 import sequelizeLoader from './sequelize.loader'
 import cloudwatchLoader from './cloudwatch.loader'
@@ -22,7 +21,6 @@ const loaders = async ({ app }: { app: Application }): Promise<void> => {
   await sequelizeLoader()
   await sessionLoader({ app })
   await expressLoader({ app })
-  await swaggerLoader({ app })
   await uploadQueueLoader()
   ;(app as any).cleanup = async function (): Promise<void> {
     await (app as any).redisService.shutdown()
