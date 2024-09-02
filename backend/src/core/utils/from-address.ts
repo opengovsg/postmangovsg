@@ -15,7 +15,13 @@ export const isDefaultFromAddress = (from: string): boolean => {
   const { fromAddress: defaultFromAddress } = parseFromAddress(
     config.get('mailFrom')
   )
-  return fromAddress === defaultFromAddress
+  // As part of a PSD directive, we have changed the defaultFromAddress to info@mail.postman.gov.sg.
+  // To prevent any breaking changes, we must now support both the new and old default address
+  const allowedDefaultAddresses = [
+    defaultFromAddress,
+    'donotreply@mail.postman.gov.sg',
+  ]
+  return allowedDefaultAddresses.includes(fromAddress)
 }
 
 export const fromAddressValidator = Joi.string()
