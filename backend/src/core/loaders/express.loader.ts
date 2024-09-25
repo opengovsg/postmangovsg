@@ -218,6 +218,11 @@ const expressApp = ({ app }: { app: express.Application }): void => {
             })
           )
         }
+        if (propName === 'body' && req.body.body) {
+          // An example of req.body.body is the email body of an email that a user wishes to send
+          // We should redact such content as it may contain sensitive information
+          req.body.body = '[REDACTED]'
+        }
         return (req as any)[propName]
       },
       metaField: null, // flatten this log to root instead of nesting under `meta`
