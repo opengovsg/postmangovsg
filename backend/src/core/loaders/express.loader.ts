@@ -195,7 +195,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       winstonInstance: logger,
       ignoredRoutes: ['/'],
       requestWhitelist: ['method', 'url', 'body', 'headers'],
-      responseWhitelist: ['body', 'statusCode'],
+      responseWhitelist: ['statusCode'],
       requestFilter: (req: Request, propName: string) => {
         if (propName === 'headers' && req.headers.authorization) {
           // we do this instead of adding it to `headerBlacklist`
