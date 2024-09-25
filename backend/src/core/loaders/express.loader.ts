@@ -195,7 +195,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       winstonInstance: logger,
       ignoredRoutes: ['/'],
       requestWhitelist: ['method', 'url', 'body', 'headers'],
-      responseWhitelist: ['body', 'statusCode'],
+      responseWhitelist: ['statusCode'],
       requestFilter: (req: Request, propName: string) => {
         if (propName === 'headers' && req.headers.authorization) {
           // we do this instead of adding it to `headerBlacklist`
@@ -217,6 +217,11 @@ const expressApp = ({ app }: { app: express.Application }): void => {
               data: '[REDACTED]',
             })
           )
+        }
+        if (propName === 'body' && req.body.body) {
+          // An example of req.body.body is the email body of an email that a user wishes to send
+          // We should redact such content as it may contain sensitive information
+          req.body.body = '[REDACTED]'
         }
         return (req as any)[propName]
       },
