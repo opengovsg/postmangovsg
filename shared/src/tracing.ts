@@ -5,7 +5,9 @@ import { Span } from 'opentracing'
 // Make it an init function so the code won't be evaluated and flagged as invalid
 // on frontend linting-in-background during development
 export function init() {
-  tracer.init()
+  tracer.init({
+    profiling: true,
+  })
   tracer.use('http', {
     client: {
       hooks: {
