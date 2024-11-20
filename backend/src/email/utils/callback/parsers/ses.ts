@@ -225,7 +225,6 @@ const blacklistIfNeeded = async (message: any): Promise<void> => {
 const parseRecord = async (record: SesRecord): Promise<void> => {
   logger.info({
     message: 'Parsing SES callback record',
-    record,
   })
   const message = JSON.parse(record.Message)
   const smtpApiHeader = getSmtpApiHeader(message)
