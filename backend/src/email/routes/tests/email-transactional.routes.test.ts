@@ -1,4 +1,5 @@
 import request from 'supertest'
+import { Op } from 'sequelize'
 import { Sequelize } from 'sequelize-typescript'
 
 import { User } from '@core/models'
@@ -15,6 +16,7 @@ import {
 import {
   EmailFromAddress,
   EmailMessageTransactional,
+  EmailMessageTransactionalCc,
   TransactionalEmailMessageStatus,
 } from '@email/models'
 import {
@@ -862,6 +864,161 @@ describe(`${emailTransactionalRoute}/send`, () => {
       },
     ])
   })
+
+  const ccValidTests = [
+    ['cc-recipient@agency.gov.sg', 'cc-recipient-2@agency.gov.sg'],
+    JSON.stringify([
+      'cc-recipient@agency.gov.sg',
+      'cc-recipient-2@agency.gov.sg',
+    ]),
+  ]
+  test.each(ccValidTests)(
+    'Should throw api validation error if cc is not valid array or stringified array - JSON payload',
+    async (cc) => {
+      mockSendEmail = jest
+        .spyOn(EmailService, 'sendEmail')
+        .mockResolvedValue(true)
+      const res = await request(app)
+        .post(endpoint)
+        .set('Authorization', `Bearer ${apiKey}`)
+        .send({
+          ...validApiCall,
+          cc,
+          reply_to: user.email,
+        })
+
+      const arrayToCheck = Array.isArray(cc) ? cc : JSON.parse(cc)
+
+      expect(res.status).toBe(201)
+      expect(res.body.cc.sort()).toStrictEqual(arrayToCheck.sort())
+      expect(mockSendEmail).toBeCalledTimes(1)
+      const transactionalEmail = await EmailMessageTransactional.findOne({
+        where: { id: res.body.id },
+      })
+      expect(transactionalEmail).not.toBeNull()
+      expect(transactionalEmail).toMatchObject({
+        recipient: validApiCall.recipient,
+        from: validApiCall.from,
+        status: TransactionalEmailMessageStatus.Accepted,
+        errorCode: null,
+      })
+    }
+  )
+
+  test.each(ccValidTests)(
+    'Should throw api validation error if cc is not valid array or stringified array - form-data',
+    async (cc) => {
+      mockSendEmail = jest
+        .spyOn(EmailService, 'sendEmail')
+        .mockResolvedValue(true)
+      const res = await request(app)
+        .post(endpoint)
+        .set('Authorization', `Bearer ${apiKey}`)
+        .field('recipient', validApiCall.recipient)
+        .field('subject', validApiCall.subject)
+        .field('body', validApiCall.body)
+        .field('from', 'Postman <info@mail.postman.gov.sg>')
+        .field('reply_to', validApiCall.reply_to)
+        .field('cc', cc)
+
+      const arrayToCheck = Array.isArray(cc) ? cc : JSON.parse(cc)
+
+      expect(res.status).toBe(201)
+      expect(res.body.cc.sort()).toStrictEqual(arrayToCheck.sort())
+      expect(mockSendEmail).toBeCalledTimes(1)
+      const transactionalEmail = await EmailMessageTransactional.findOne({
+        where: { id: res.body.id },
+        include: [
+          {
+            model: EmailMessageTransactionalCc,
+            attributes: ['email', 'ccType'],
+            where: { errorCode: { [Op.eq]: null } },
+            required: false,
+          },
+        ],
+      })
+
+      expect(transactionalEmail).not.toBeNull()
+      expect(transactionalEmail).toMatchObject({
+        recipient: validApiCall.recipient,
+        from: validApiCall.from,
+        status: TransactionalEmailMessageStatus.Accepted,
+        errorCode: null,
+      })
+      const transactionalCcEmails =
+        transactionalEmail?.emailMessageTransactionalCc.map(
+          (item) => item.email
+        )
+      expect(transactionalCcEmails?.sort()).toStrictEqual(arrayToCheck.sort())
+    }
+  )
+
+  const ccInvalidTests = [
+    {
+      cc: 'cc-recipient@agency.gov.sg',
+      errMsg:
+        '"cc" failed custom validation because cc must be a valid array or stringified array.',
+    },
+    {
+      cc: JSON.stringify('cc-recipient@agency.gov.sg'),
+      errMsg:
+        '"cc" failed custom validation because cc must be a valid stringified array',
+    },
+    {
+      cc: JSON.stringify({ key: 'cc', email: 'cc-recipient@agency.gov.sg' }),
+      errMsg:
+        '"cc" failed custom validation because cc must be a valid stringified array',
+    },
+  ]
+  test.each(ccInvalidTests)(
+    'Should throw api validation error if cc is not valid array or stringified array - JSON payload',
+    async ({ cc, errMsg }) => {
+      mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+
+      const res = await request(app)
+        .post(endpoint)
+        .set('Authorization', `Bearer ${apiKey}`)
+        .send({
+          ...validApiCall,
+          cc,
+          reply_to: user.email,
+        })
+
+      expect(res.status).toBe(400)
+      expect(mockSendEmail).not.toBeCalled()
+
+      expect(res.body).toStrictEqual({
+        code: 'api_validation',
+        message: errMsg,
+      })
+    }
+  )
+
+  test.each(ccInvalidTests)(
+    'Should throw api validation error if cc is not valid array or stringified array - JSON payload',
+    async ({ cc, errMsg }) => {
+      mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
+
+      const res = await request(app)
+        .post(endpoint)
+        .set('Authorization', `Bearer ${apiKey}`)
+        .set('Authorization', `Bearer ${apiKey}`)
+        .field('recipient', validApiCall.recipient)
+        .field('subject', validApiCall.subject)
+        .field('body', validApiCall.body)
+        .field('from', 'Postman <info@mail.postman.gov.sg>')
+        .field('reply_to', validApiCall.reply_to)
+        .field('cc', cc)
+
+      expect(res.status).toBe(400)
+      expect(mockSendEmail).not.toBeCalled()
+
+      expect(res.body).toStrictEqual({
+        code: 'api_validation',
+        message: errMsg,
+      })
+    }
+  )
 
   test('Requests should be rate limited and metadata and error code is saved correctly in db', async () => {
     mockSendEmail = jest
