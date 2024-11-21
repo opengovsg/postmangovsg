@@ -10,6 +10,7 @@ const ENABLE_PROFILING_FOR_20_PER_CENT = RANDOM_NUMBER_MAX_100 <= 20 // 20% chan
 export function init() {
   tracer.init({
     profiling: ENABLE_PROFILING_FOR_20_PER_CENT,
+    dbmPropagationMode: 'full',
   })
   tracer.use('http', {
     client: {
