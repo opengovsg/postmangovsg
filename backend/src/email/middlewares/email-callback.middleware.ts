@@ -48,25 +48,28 @@ const printConfirmSubscription = (
   res: Response,
   next: NextFunction
 ): Response | void => {
-  tracer.wrap('printConfirmSubscription', () => {
-    const { Type: type, SubscribeURL: subscribeUrl } = JSON.parse(req.body)
-    if (type === 'SubscriptionConfirmation') {
-      const parsed = new URL(subscribeUrl)
-      if (
-        parsed.protocol === 'https:' &&
-        /^sns\.[a-zA-Z0-9-]{3,}\.amazonaws\.com(\.cn)?$/.test(parsed.host)
-      ) {
-        logger.info({
-          message: 'Confirm the subscription',
-          type,
-          subscribeUrl,
-          action: 'printConfirmSubscription',
-        })
-        return res.sendStatus(202)
-      }
+  const printConfirmSubscriptionSpan = tracer.startSpan(
+    'printConfirmSubscription'
+  )
+  const { Type: type, SubscribeURL: subscribeUrl } = JSON.parse(req.body)
+  if (type === 'SubscriptionConfirmation') {
+    const parsed = new URL(subscribeUrl)
+    if (
+      parsed.protocol === 'https:' &&
+      /^sns\.[a-zA-Z0-9-]{3,}\.amazonaws\.com(\.cn)?$/.test(parsed.host)
+    ) {
+      logger.info({
+        message: 'Confirm the subscription',
+        type,
+        subscribeUrl,
+        action: 'printConfirmSubscription',
+      })
+
+      return res.sendStatus(202)
     }
-    return next()
-  })
+  }
+  printConfirmSubscriptionSpan.finish()
+  return next()
 }
 export const EmailCallbackMiddleware = {
   isAuthenticated,
