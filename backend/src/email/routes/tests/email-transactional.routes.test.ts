@@ -866,8 +866,13 @@ describe(`${emailTransactionalRoute}/send`, () => {
   })
 
   const ccValidTests = [
-    [['cc-recipient@agency.gov.sg']],
-    [['cc-recipient@agency.gov.sg', 'cc-recipient-2@agency.gov.sg']],
+    ['cc-recipient@agency.gov.sg'],
+    ['cc-recipient@agency.gov.sg', 'cc-recipient-2@agency.gov.sg'],
+    JSON.stringify(['cc-recipient@agency.gov.sg']),
+    JSON.stringify([
+      'cc-recipient@agency.gov.sg',
+      'cc-recipient-2@agency.gov.sg',
+    ]),
   ]
   test.each(ccValidTests)(
     'Should send email with cc from valid array or stringified array - JSON payload',
@@ -884,8 +889,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
           reply_to: user.email,
         })
 
+      const arrayToCheck = Array.isArray(cc) ? cc : JSON.parse(cc)
+
       expect(res.status).toBe(201)
-      expect(res.body.cc.sort()).toStrictEqual(cc.sort())
+      expect(res.body.cc.sort()).toStrictEqual(arrayToCheck.sort())
       expect(mockSendEmail).toBeCalledTimes(1)
       const transactionalEmail = await EmailMessageTransactional.findOne({
         where: { id: res.body.id },
@@ -907,7 +914,8 @@ describe(`${emailTransactionalRoute}/send`, () => {
         .spyOn(EmailService, 'sendEmail')
         .mockResolvedValue(true)
       // in the case where single cc is sent, stringify the cc list
-      const ccSend = cc.length === 1 ? JSON.stringify(cc) : cc
+      const ccSend =
+        Array.isArray(cc) && cc.length === 1 ? JSON.stringify(cc) : cc
 
       const res = await request(app)
         .post(endpoint)
@@ -919,8 +927,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
         .field('reply_to', validApiCall.reply_to)
         .field('cc', ccSend)
 
+      const arrayToCheck = Array.isArray(cc) ? cc : JSON.parse(cc)
+
       expect(res.status).toBe(201)
-      expect(res.body.cc.sort()).toStrictEqual(cc.sort())
+      expect(res.body.cc.sort()).toStrictEqual(arrayToCheck.sort())
       expect(mockSendEmail).toBeCalledTimes(1)
       const transactionalEmail = await EmailMessageTransactional.findOne({
         where: { id: res.body.id },
@@ -945,7 +955,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         transactionalEmail?.emailMessageTransactionalCc.map(
           (item) => item.email
         )
-      expect(transactionalCcEmails?.sort()).toStrictEqual(cc.sort())
+      expect(transactionalCcEmails?.sort()).toStrictEqual(arrayToCheck.sort())
     }
   )
 
