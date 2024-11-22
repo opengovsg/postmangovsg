@@ -21,8 +21,8 @@ router.post(
     'printConfirmSubscription',
     () => EmailCallbackMiddleware.printConfirmSubscription
   ),
-  tracer.wrap('isAuthenticated', () => EmailCallbackMiddleware.isAuthenticated),
-  tracer.wrap('parseEvent', () => EmailCallbackMiddleware.parseEvent)
+  EmailCallbackMiddleware.isAuthenticated,
+  EmailCallbackMiddleware.parseEvent
 )
 
 export default router
