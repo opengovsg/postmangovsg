@@ -21,14 +21,16 @@ export const InitEmailTransactionalRoute = (
   const router = Router({ mergeParams: true })
 
   // Validators
+  const emailValidator = Joi.string()
+    .trim()
+    .email()
+    .options({ convert: true })
+    .lowercase()
+
   const emailArrayValidation = (fieldName: 'cc' | 'bcc') => {
     return Joi.alternatives().try(
       // array
-      Joi.array()
-        .unique()
-        .items(
-          Joi.string().trim().email().options({ convert: true }).lowercase()
-        ),
+      Joi.array().unique().items(emailValidator),
 
       // stringified array (form-data)
       Joi.string().custom((value: string) => {
@@ -46,9 +48,7 @@ export const InitEmailTransactionalRoute = (
         }
         const { value: validatedEmails, error } = Joi.array()
           .unique()
-          .items(
-            Joi.string().email().trim().lowercase().options({ convert: true })
-          )
+          .items(emailValidator)
           .validate(parsed)
 
         if (error) {
@@ -82,11 +82,7 @@ export const InitEmailTransactionalRoute = (
           )
         ),
       from: fromAddressValidator,
-      reply_to: Joi.string()
-        .trim()
-        .email()
-        .options({ convert: true })
-        .lowercase(),
+      reply_to: emailValidator,
       attachments: Joi.array().items(Joi.object().keys().required()),
       classification: Joi.string()
         .uppercase()

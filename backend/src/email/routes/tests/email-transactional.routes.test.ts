@@ -866,14 +866,11 @@ describe(`${emailTransactionalRoute}/send`, () => {
   })
 
   const ccValidTests = [
-    ['cc-recipient@agency.gov.sg', 'cc-recipient-2@agency.gov.sg'],
-    JSON.stringify([
-      'cc-recipient@agency.gov.sg',
-      'cc-recipient-2@agency.gov.sg',
-    ]),
+    [['cc-recipient@agency.gov.sg']],
+    [['cc-recipient@agency.gov.sg', 'cc-recipient-2@agency.gov.sg']],
   ]
   test.each(ccValidTests)(
-    'Should throw api validation error if cc is not valid array or stringified array - JSON payload',
+    'Should send email with cc from valid array or stringified array - JSON payload',
     async (cc) => {
       mockSendEmail = jest
         .spyOn(EmailService, 'sendEmail')
@@ -887,10 +884,8 @@ describe(`${emailTransactionalRoute}/send`, () => {
           reply_to: user.email,
         })
 
-      const arrayToCheck = Array.isArray(cc) ? cc : JSON.parse(cc)
-
       expect(res.status).toBe(201)
-      expect(res.body.cc.sort()).toStrictEqual(arrayToCheck.sort())
+      expect(res.body.cc.sort()).toStrictEqual(cc.sort())
       expect(mockSendEmail).toBeCalledTimes(1)
       const transactionalEmail = await EmailMessageTransactional.findOne({
         where: { id: res.body.id },
@@ -906,11 +901,14 @@ describe(`${emailTransactionalRoute}/send`, () => {
   )
 
   test.each(ccValidTests)(
-    'Should throw api validation error if cc is not valid array or stringified array - form-data',
+    'Should send email with cc from valid array or stringified array - form-data',
     async (cc) => {
       mockSendEmail = jest
         .spyOn(EmailService, 'sendEmail')
         .mockResolvedValue(true)
+      // in the case where single cc is sent, stringify the cc list
+      const ccSend = cc.length === 1 ? JSON.stringify(cc) : cc
+
       const res = await request(app)
         .post(endpoint)
         .set('Authorization', `Bearer ${apiKey}`)
@@ -919,12 +917,10 @@ describe(`${emailTransactionalRoute}/send`, () => {
         .field('body', validApiCall.body)
         .field('from', 'Postman <info@mail.postman.gov.sg>')
         .field('reply_to', validApiCall.reply_to)
-        .field('cc', cc)
-
-      const arrayToCheck = Array.isArray(cc) ? cc : JSON.parse(cc)
+        .field('cc', ccSend)
 
       expect(res.status).toBe(201)
-      expect(res.body.cc.sort()).toStrictEqual(arrayToCheck.sort())
+      expect(res.body.cc.sort()).toStrictEqual(cc.sort())
       expect(mockSendEmail).toBeCalledTimes(1)
       const transactionalEmail = await EmailMessageTransactional.findOne({
         where: { id: res.body.id },
@@ -949,7 +945,7 @@ describe(`${emailTransactionalRoute}/send`, () => {
         transactionalEmail?.emailMessageTransactionalCc.map(
           (item) => item.email
         )
-      expect(transactionalCcEmails?.sort()).toStrictEqual(arrayToCheck.sort())
+      expect(transactionalCcEmails?.sort()).toStrictEqual(cc.sort())
     }
   )
 
@@ -995,13 +991,12 @@ describe(`${emailTransactionalRoute}/send`, () => {
   )
 
   test.each(ccInvalidTests)(
-    'Should throw api validation error if cc is not valid array or stringified array - JSON payload',
+    'Should throw api validation error if cc is not valid array or stringified array - form-data',
     async ({ cc, errMsg }) => {
       mockSendEmail = jest.spyOn(EmailService, 'sendEmail')
 
       const res = await request(app)
         .post(endpoint)
-        .set('Authorization', `Bearer ${apiKey}`)
         .set('Authorization', `Bearer ${apiKey}`)
         .field('recipient', validApiCall.recipient)
         .field('subject', validApiCall.subject)
