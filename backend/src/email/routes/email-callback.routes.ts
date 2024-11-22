@@ -1,5 +1,6 @@
 import { Router } from 'express'
 import { EmailCallbackMiddleware } from '@email/middlewares'
+import tracer from 'dd-trace'
 const router = Router()
 /**
  * paths:
@@ -16,9 +17,12 @@ const router = Router()
  */
 router.post(
   '/',
-  EmailCallbackMiddleware.printConfirmSubscription,
-  EmailCallbackMiddleware.isAuthenticated,
-  EmailCallbackMiddleware.parseEvent
+  tracer.wrap(
+    'printConfirmSubscription',
+    () => EmailCallbackMiddleware.printConfirmSubscription
+  ),
+  tracer.wrap('isAuthenticated', () => EmailCallbackMiddleware.isAuthenticated),
+  tracer.wrap('parseEvent', () => EmailCallbackMiddleware.parseEvent)
 )
 
 export default router
