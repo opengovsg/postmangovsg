@@ -138,47 +138,52 @@ const parseNotificationAndEvent = async (
   message: any,
   metadata: Metadata
 ): Promise<void> => {
-  tracer.wrap('parseNotificationAndEvent', async () => {
-    if (!isNotificationAndEventForMainRecipient(message, type)) {
-      logger.info({
-        message: 'SES notification or event is not for the main recipient',
-        action: 'filterNotification',
-        body: message,
+  const parseNotificationAndEventSpan = tracer.startSpan(
+    'parseNotificationAndEvent',
+    {
+      childOf: tracer.scope().active() || undefined,
+    }
+  )
+  if (!isNotificationAndEventForMainRecipient(message, type)) {
+    logger.info({
+      message: 'SES notification or event is not for the main recipient',
+      action: 'filterNotification',
+      body: message,
+    })
+    return
+  }
+  switch (type) {
+    case SesEventType.Delivery:
+      await updateDeliveredStatus(metadata)
+      break
+    case SesEventType.Bounce:
+      await updateBouncedStatus({
+        ...metadata,
+        bounceType: message?.bounce?.bounceType,
+        bounceSubType: message?.bounce?.bounceSubType,
+        to: message?.mail?.commonHeaders?.to,
+      })
+      break
+    case SesEventType.Complaint:
+      await updateComplaintStatus({
+        ...metadata,
+        complaintType: message?.complaint?.complaintFeedbackType,
+        complaintSubType: message?.complaint?.complaintSubType,
+        to: message?.mail?.commonHeaders?.to,
+      })
+      break
+    case SesEventType.Open:
+      await updateReadStatus(metadata)
+      break
+    default:
+      logger.warn({
+        message: 'Unable to handle messages with this type',
+        action: 'parseNotification',
+        type,
       })
       return
-    }
-    switch (type) {
-      case SesEventType.Delivery:
-        await updateDeliveredStatus(metadata)
-        break
-      case SesEventType.Bounce:
-        await updateBouncedStatus({
-          ...metadata,
-          bounceType: message?.bounce?.bounceType,
-          bounceSubType: message?.bounce?.bounceSubType,
-          to: message?.mail?.commonHeaders?.to,
-        })
-        break
-      case SesEventType.Complaint:
-        await updateComplaintStatus({
-          ...metadata,
-          complaintType: message?.complaint?.complaintFeedbackType,
-          complaintSubType: message?.complaint?.complaintSubType,
-          to: message?.mail?.commonHeaders?.to,
-        })
-        break
-      case SesEventType.Open:
-        await updateReadStatus(metadata)
-        break
-      default:
-        logger.warn({
-          message: 'Unable to handle messages with this type',
-          action: 'parseNotification',
-          type,
-        })
-        return
-    }
-  })
+  }
+  parseNotificationAndEventSpan.finish()
 }
 
 // Validate SES record hash, returns message ID if valid, otherwise throw errors
@@ -232,19 +237,21 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
   logger.info({
     message: 'Parsing SES callback record',
   })
-  const parseRecordJson = tracer.startSpan('parseRecordJson')
+  const parseRecordJson = tracer.startSpan('parseRecordJson', {
+    childOf: parseRecordSpan,
+  })
   const message = JSON.parse(record.Message)
   parseRecordJson.finish()
   const smtpApiHeader = getSmtpApiHeader(message)
   const validateRecordSpan = tracer.startSpan('validateRecord', {
-    childOf: tracer.scope().active() || undefined,
+    childOf: parseRecordSpan,
   })
   await validateRecord(record, smtpApiHeader)
   validateRecordSpan.finish()
   // Transactional emails don't have message IDs, so blacklist
   // relevant email addresses before everything else
   const blacklistIfNeededSpan = tracer.startSpan('blacklistIfNeeded', {
-    childOf: tracer.scope().active() || undefined,
+    childOf: parseRecordSpan,
   })
   await blacklistIfNeeded(message)
   blacklistIfNeededSpan.finish()
