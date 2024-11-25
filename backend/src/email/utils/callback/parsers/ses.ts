@@ -14,7 +14,7 @@ import config from '@core/config'
 import { compareSha256Hash } from '@shared/utils/crypto'
 import { EmailTransactionalService } from '@email/services/email-transactional.service'
 import { SesEventType, Metadata } from '@email/interfaces/callback.interface'
-import { tracer } from 'dd-trace'
+import tracer from 'dd-trace'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
@@ -136,12 +136,13 @@ const shouldBlacklist = ({
 const parseNotificationAndEvent = async (
   type: SesEventType,
   message: any,
-  metadata: Metadata
+  metadata: Metadata,
+  parentSpan?: tracer.Span
 ): Promise<void> => {
   const parseNotificationAndEventSpan = tracer.startSpan(
     'parseNotificationAndEvent',
     {
-      childOf: tracer.scope().active() || undefined,
+      childOf: parentSpan,
     }
   )
   if (!isNotificationAndEventForMainRecipient(message, type)) {
@@ -270,14 +271,19 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       type,
     })
     if (isTransactional) {
-      return EmailTransactionalService.handleStatusCallbacks(type, messageId, {
-        timestamp: new Date(record.Timestamp),
-        bounce: message.bounce,
-        complaint: message.complaint,
-        delivery: message.delivery,
-      })
+      return EmailTransactionalService.handleStatusCallbacks(
+        type,
+        messageId,
+        {
+          timestamp: new Date(record.Timestamp),
+          bounce: message.bounce,
+          complaint: message.complaint,
+          delivery: message.delivery,
+        },
+        parseRecordSpan
+      )
     }
-    return parseNotificationAndEvent(type, message, metadata)
+    return parseNotificationAndEvent(type, message, metadata, parseRecordSpan)
   }
   parseRecordSpan.finish()
 }

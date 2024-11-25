@@ -129,10 +129,11 @@ type CallbackMetaData = {
 async function handleStatusCallbacks(
   type: SesEventType,
   id: string,
-  metadata: CallbackMetaData
+  metadata: CallbackMetaData,
+  parentSpan?: tracer.Span
 ): Promise<void> {
   const handleStatusCallbacksSpan = tracer.startSpan('handleStatusCallbacks', {
-    childOf: tracer.scope().active() || undefined,
+    childOf: parentSpan,
   })
   const emailMessageTransactional = await EmailMessageTransactional.findByPk(id)
   if (!emailMessageTransactional) {
