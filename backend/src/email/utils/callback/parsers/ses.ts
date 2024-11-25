@@ -186,30 +186,28 @@ const validateRecord = async (
   record: SesRecord,
   smtpHeader: SmtpApiHeader | undefined
 ) => {
-  tracer.wrap('validateRecord', async () => {
-    const username = smtpHeader?.auth?.username
-    const hash = smtpHeader?.auth?.hash
-    if (
-      !username ||
-      !hash ||
-      !compareSha256Hash(config.get('emailCallback.hashSecret'), username, hash)
-    ) {
-      logger.info({
-        message: 'Incorrect email callback hash',
-        username,
-        timestamp: record.Timestamp,
-        hash,
-      })
+  const username = smtpHeader?.auth?.username
+  const hash = smtpHeader?.auth?.hash
+  if (
+    !username ||
+    !hash ||
+    !compareSha256Hash(config.get('emailCallback.hashSecret'), username, hash)
+  ) {
+    logger.info({
+      message: 'Incorrect email callback hash',
+      username,
+      timestamp: record.Timestamp,
+      hash,
+    })
 
-      // if not passed with the new hash, retry with the old way
-      // TODO: remove this after all campaigns sent with the old way have completed
-      if (
-        !(record.SignatureVersion === '1' && (await validateSignature(record)))
-      ) {
-        throw new Error('Invalid record')
-      }
+    // if not passed with the new hash, retry with the old way
+    // TODO: remove this after all campaigns sent with the old way have completed
+    if (
+      !(record.SignatureVersion === '1' && (await validateSignature(record)))
+    ) {
+      throw new Error('Invalid record')
     }
-  })
+  }
 }
 const blacklistIfNeeded = async (message: any): Promise<void> => {
   const notificationType = message?.notificationType || message?.eventType
@@ -228,48 +226,53 @@ const blacklistIfNeeded = async (message: any): Promise<void> => {
   }
 }
 const parseRecord = async (record: SesRecord): Promise<void> => {
-  tracer.wrap('parseRecord', async () => {
-    logger.info({
-      message: 'Parsing SES callback record',
-    })
-    const parseRecordJson = tracer.startSpan('parseRecordJson')
-    const message = JSON.parse(record.Message)
-    parseRecordJson.finish()
-    const smtpApiHeader = getSmtpApiHeader(message)
-    await validateRecord(record, smtpApiHeader)
-
-    // Transactional emails don't have message IDs, so blacklist
-    // relevant email addresses before everything else
-    await blacklistIfNeeded(message)
-
-    // primary key
-    const messageId = smtpApiHeader?.unique_args?.message_id
-    const isTransactional = smtpApiHeader?.isTransactional
-    const type = message?.notificationType || message?.eventType
-
-    if (messageId && type) {
-      const metadata = { messageId, timestamp: record.Timestamp }
-      logger.info({
-        message: 'Update for notification/event type',
-        action: 'parseRecord',
-        messageId,
-        type,
-      })
-      if (isTransactional) {
-        return EmailTransactionalService.handleStatusCallbacks(
-          type,
-          messageId,
-          {
-            timestamp: new Date(record.Timestamp),
-            bounce: message.bounce,
-            complaint: message.complaint,
-            delivery: message.delivery,
-          }
-        )
-      }
-      return parseNotificationAndEvent(type, message, metadata)
-    }
+  const parseRecordSpan = tracer.startSpan('parseRecord', {
+    childOf: tracer.scope().active() || undefined,
   })
+  logger.info({
+    message: 'Parsing SES callback record',
+  })
+  const parseRecordJson = tracer.startSpan('parseRecordJson')
+  const message = JSON.parse(record.Message)
+  parseRecordJson.finish()
+  const smtpApiHeader = getSmtpApiHeader(message)
+  const validateRecordSpan = tracer.startSpan('validateRecord', {
+    childOf: tracer.scope().active() || undefined,
+  })
+  await validateRecord(record, smtpApiHeader)
+  validateRecordSpan.finish()
+  // Transactional emails don't have message IDs, so blacklist
+  // relevant email addresses before everything else
+  const blacklistIfNeededSpan = tracer.startSpan('blacklistIfNeeded', {
+    childOf: tracer.scope().active() || undefined,
+  })
+  await blacklistIfNeeded(message)
+  blacklistIfNeededSpan.finish()
+
+  // primary key
+  const messageId = smtpApiHeader?.unique_args?.message_id
+  const isTransactional = smtpApiHeader?.isTransactional
+  const type = message?.notificationType || message?.eventType
+
+  if (messageId && type) {
+    const metadata = { messageId, timestamp: record.Timestamp }
+    logger.info({
+      message: 'Update for notification/event type',
+      action: 'parseRecord',
+      messageId,
+      type,
+    })
+    if (isTransactional) {
+      return EmailTransactionalService.handleStatusCallbacks(type, messageId, {
+        timestamp: new Date(record.Timestamp),
+        bounce: message.bounce,
+        complaint: message.complaint,
+        delivery: message.delivery,
+      })
+    }
+    return parseNotificationAndEvent(type, message, metadata)
+  }
+  parseRecordSpan.finish()
 }
 
 // Checks whether the notification/event is meant for the main recipient of the email.
