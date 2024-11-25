@@ -131,107 +131,107 @@ async function handleStatusCallbacks(
   id: string,
   metadata: CallbackMetaData
 ): Promise<void> {
-  tracer.wrap('handleStatusCallbacks', async () => {
-    const emailMessageTransactional = await EmailMessageTransactional.findByPk(
-      id
-    )
-    if (!emailMessageTransactional) {
-      throw new Error(`Failed to find emailMessageTransactional for id: ${id}`)
-    }
+  const handleStatusCallbacksSpan = tracer.startSpan('handleStatusCallbacks', {
+    childOf: tracer.scope().active() || undefined,
+  })
+  const emailMessageTransactional = await EmailMessageTransactional.findByPk(id)
+  if (!emailMessageTransactional) {
+    throw new Error(`Failed to find emailMessageTransactional for id: ${id}`)
+  }
 
-    const mainRecipientDelivered = metadata.delivery?.recipients?.find(
-      (e) => e === emailMessageTransactional.recipient
-    )
-    const mainRecipientBounced = metadata.bounce?.bouncedRecipients?.find(
+  const mainRecipientDelivered = metadata.delivery?.recipients?.find(
+    (e) => e === emailMessageTransactional.recipient
+  )
+  const mainRecipientBounced = metadata.bounce?.bouncedRecipients?.find(
+    (e) => e.emailAddress === emailMessageTransactional.recipient
+  )
+  const mainRecipientComplained =
+    metadata.complaint?.complainedRecipients?.find(
       (e) => e.emailAddress === emailMessageTransactional.recipient
     )
-    const mainRecipientComplained =
-      metadata.complaint?.complainedRecipients?.find(
-        (e) => e.emailAddress === emailMessageTransactional.recipient
-      )
 
-    switch (type) {
-      case SesEventType.Delivery:
-        if (mainRecipientDelivered) {
-          await EmailMessageTransactional.update(
-            {
-              status: TransactionalEmailMessageStatus.Delivered,
-              deliveredAt: metadata.timestamp,
-            },
-            {
-              where: { id },
-            }
-          )
-        }
-        break
-      case SesEventType.Bounce:
-        // check that bounce applies to the main recipient
-        if (mainRecipientBounced) {
-          await EmailMessageTransactional.update(
-            {
-              status: TransactionalEmailMessageStatus.Bounced,
-              errorCode:
-                metadata.bounce?.bounceType === 'Permanent'
-                  ? 'Hard bounce'
-                  : 'Soft bounce',
-              errorSubType: metadata.bounce?.bounceSubType,
-            },
-            {
-              where: { id },
-            }
-          )
-        }
-        break
-      case SesEventType.Complaint:
-        // check that complaint applies to the main recipient
-        if (mainRecipientComplained) {
-          await EmailMessageTransactional.update(
-            {
-              status: TransactionalEmailMessageStatus.Complaint,
-              errorCode: metadata.complaint?.complaintFeedbackType,
-              errorSubType: metadata.complaint?.complaintSubType,
-            },
-            {
-              where: { id },
-            }
-          )
-        }
-        break
-      case SesEventType.Open:
-        // Cannot check that open applies to the main recipient
-        // we only update the DB if there was no previous error
+  switch (type) {
+    case SesEventType.Delivery:
+      if (mainRecipientDelivered) {
         await EmailMessageTransactional.update(
           {
-            status: TransactionalEmailMessageStatus.Opened,
-            openedAt: metadata.timestamp,
+            status: TransactionalEmailMessageStatus.Delivered,
+            deliveredAt: metadata.timestamp,
           },
           {
-            where: { id, errorCode: null },
+            where: { id },
           }
         )
-        break
-      case SesEventType.Send:
-        // Cannot check that send applies to the main recipient
-        // we only update the DB if there was no previous error
+      }
+      break
+    case SesEventType.Bounce:
+      // check that bounce applies to the main recipient
+      if (mainRecipientBounced) {
         await EmailMessageTransactional.update(
           {
-            status: TransactionalEmailMessageStatus.Sent,
-            sentAt: metadata.timestamp,
+            status: TransactionalEmailMessageStatus.Bounced,
+            errorCode:
+              metadata.bounce?.bounceType === 'Permanent'
+                ? 'Hard bounce'
+                : 'Soft bounce',
+            errorSubType: metadata.bounce?.bounceSubType,
           },
           {
-            where: { id, errorCode: null },
+            where: { id },
           }
         )
-        break
-      default:
-        logger.warn({
-          message: 'Unable to handle messages with this type',
-          type,
-          id,
-          metadata,
-        })
-    }
-  })
+      }
+      break
+    case SesEventType.Complaint:
+      // check that complaint applies to the main recipient
+      if (mainRecipientComplained) {
+        await EmailMessageTransactional.update(
+          {
+            status: TransactionalEmailMessageStatus.Complaint,
+            errorCode: metadata.complaint?.complaintFeedbackType,
+            errorSubType: metadata.complaint?.complaintSubType,
+          },
+          {
+            where: { id },
+          }
+        )
+      }
+      break
+    case SesEventType.Open:
+      // Cannot check that open applies to the main recipient
+      // we only update the DB if there was no previous error
+      await EmailMessageTransactional.update(
+        {
+          status: TransactionalEmailMessageStatus.Opened,
+          openedAt: metadata.timestamp,
+        },
+        {
+          where: { id, errorCode: null },
+        }
+      )
+      break
+    case SesEventType.Send:
+      // Cannot check that send applies to the main recipient
+      // we only update the DB if there was no previous error
+      await EmailMessageTransactional.update(
+        {
+          status: TransactionalEmailMessageStatus.Sent,
+          sentAt: metadata.timestamp,
+        },
+        {
+          where: { id, errorCode: null },
+        }
+      )
+      break
+    default:
+      logger.warn({
+        message: 'Unable to handle messages with this type',
+        type,
+        id,
+        metadata,
+      })
+  }
+  handleStatusCallbacksSpan.finish()
 }
 
 async function listMessages({
