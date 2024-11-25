@@ -43,6 +43,11 @@ const parseEvent = async (req: Request): Promise<void> => {
   } else {
     throw new Error('Unable to handle this event')
   }
+  const parseNotificationAndEventSpan = tracer.startSpan(
+    'parseNotificationAndEvent',
+    { childOf: parseJsonSpan }
+  )
   await Promise.all(records)
+  parseNotificationAndEventSpan.finish()
 }
 export const EmailCallbackService = { isAuthenticated, parseEvent }
