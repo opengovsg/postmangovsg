@@ -21,6 +21,45 @@ export const InitEmailTransactionalRoute = (
   const router = Router({ mergeParams: true })
 
   // Validators
+  const emailValidator = Joi.string()
+    .trim()
+    .email()
+    .options({ convert: true })
+    .lowercase()
+
+  const emailArrayValidation = (fieldName: 'cc' | 'bcc') => {
+    return Joi.alternatives().try(
+      // array
+      Joi.array().unique().items(emailValidator),
+
+      // stringified array (form-data)
+      Joi.string().custom((value: string) => {
+        let parsed
+        try {
+          parsed = JSON.parse(value)
+        } catch {
+          throw new Error(
+            `${fieldName} must be a valid array or stringified array.`
+          )
+        }
+
+        if (!Array.isArray(parsed)) {
+          throw new Error(`${fieldName} must be a valid stringified array`)
+        }
+        const { value: validatedEmails, error } = Joi.array()
+          .unique()
+          .items(emailValidator)
+          .validate(parsed)
+
+        if (error) {
+          throw new Error(`${fieldName} ${error.message}`)
+        }
+
+        return validatedEmails
+      })
+    )
+  }
+
   const sendValidator = {
     [Segments.BODY]: Joi.object({
       recipient: Joi.string()
@@ -43,27 +82,15 @@ export const InitEmailTransactionalRoute = (
           )
         ),
       from: fromAddressValidator,
-      reply_to: Joi.string()
-        .trim()
-        .email()
-        .options({ convert: true })
-        .lowercase(),
+      reply_to: emailValidator,
       attachments: Joi.array().items(Joi.object().keys().required()),
       classification: Joi.string()
         .uppercase()
         .valid(...Object.values(TransactionalEmailClassification))
         .optional(),
       tag: Joi.string().max(255).optional(),
-      cc: Joi.array()
-        .unique()
-        .items(
-          Joi.string().trim().email().options({ convert: true }).lowercase()
-        ),
-      bcc: Joi.array()
-        .unique()
-        .items(
-          Joi.string().trim().email().options({ convert: true }).lowercase()
-        ),
+      cc: emailArrayValidation('cc'),
+      bcc: emailArrayValidation('bcc'),
       disable_tracking: Joi.boolean().default(false),
     }),
   }
