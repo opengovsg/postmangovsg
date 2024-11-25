@@ -136,15 +136,8 @@ const shouldBlacklist = ({
 const parseNotificationAndEvent = async (
   type: SesEventType,
   message: any,
-  metadata: Metadata,
-  parentSpan?: tracer.Span
+  metadata: Metadata
 ): Promise<void> => {
-  const parseNotificationAndEventSpan = tracer.startSpan(
-    'parseNotificationAndEvent',
-    {
-      childOf: parentSpan,
-    }
-  )
   if (!isNotificationAndEventForMainRecipient(message, type)) {
     logger.info({
       message: 'SES notification or event is not for the main recipient',
@@ -184,7 +177,6 @@ const parseNotificationAndEvent = async (
       })
       return
   }
-  parseNotificationAndEventSpan.finish()
 }
 
 // Validate SES record hash, returns message ID if valid, otherwise throw errors
@@ -283,7 +275,9 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
         parseRecordSpan
       )
     }
-    return parseNotificationAndEvent(type, message, metadata, parseRecordSpan)
+    return tracer.wrap('parseNotificationAndEvent', () =>
+      parseNotificationAndEvent(type, message, metadata)
+    )()
   }
   parseRecordSpan.finish()
 }
