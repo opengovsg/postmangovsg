@@ -25,7 +25,8 @@ const isAuthenticated = (authHeader?: string): boolean => {
 }
 
 const parseEvent = async (req: Request): Promise<void> => {
-  const parseJsonSpan = tracer.startSpan('parseJson')
+  const parentSpan = tracer.scope().active() || undefined
+  const parseJsonSpan = tracer.startSpan('parseJson', { childOf: parentSpan })
   const parsed = JSON.parse(req.body)
   parseJsonSpan.finish()
   let records: Promise<void>[] = []
