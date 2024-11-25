@@ -45,7 +45,7 @@ const parseEvent = async (req: Request): Promise<void> => {
   }
   const parseNotificationAndEventSpan = tracer.startSpan(
     'parseNotificationAndEvent',
-    { childOf: parseJsonSpan }
+    { childOf: tracer.scope().active() || undefined }
   )
   await Promise.all(records)
   parseNotificationAndEventSpan.finish()
