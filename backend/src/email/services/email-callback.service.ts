@@ -35,7 +35,11 @@ const parseEvent = async (req: Request): Promise<void> => {
     // body could be one record or an array of records, hence we concat
     const body: ses.SesRecord[] = []
     const sesHttpEvent = body.concat(parsed)
+    const parseAllRecordsSpan = tracer.startSpan('parseAllRecords', {
+      childOf: tracer.scope().active() || undefined,
+    })
     records = sesHttpEvent.map(ses.parseRecord)
+    parseAllRecordsSpan.finish()
   } else if (sendgrid.isEvent(req)) {
     // body is always an array
     const sgEvent = parsed
@@ -44,7 +48,7 @@ const parseEvent = async (req: Request): Promise<void> => {
     throw new Error('Unable to handle this event')
   }
   const parseNotificationAndEventSpan = tracer.startSpan(
-    'parseNotificationAndEvent',
+    'parseAllNotificationAndEvents',
     { childOf: tracer.scope().active() || undefined }
   )
   await Promise.all(records)
