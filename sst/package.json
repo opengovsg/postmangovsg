@@ -32,7 +32,7 @@
   ],
   "dependencies": {
     "aws-cdk": "^2.87.0",
-    "cronitor": "^2.3.3"
+    "cronitor": "2.4.1"
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix"
