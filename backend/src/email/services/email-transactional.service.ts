@@ -16,6 +16,7 @@ import {
 } from '@core/constants'
 import { Order } from 'sequelize/types/model'
 import { Op, WhereOptions } from 'sequelize'
+import tracer from 'dd-trace'
 
 const logger = loggerWithLabel(module)
 
@@ -128,8 +129,12 @@ type CallbackMetaData = {
 async function handleStatusCallbacks(
   type: SesEventType,
   id: string,
-  metadata: CallbackMetaData
+  metadata: CallbackMetaData,
+  parentSpan?: tracer.Span
 ): Promise<void> {
+  const handleStatusCallbacksSpan = tracer.startSpan('handleStatusCallbacks', {
+    childOf: parentSpan,
+  })
   const emailMessageTransactional = await EmailMessageTransactional.findByPk(id)
   if (!emailMessageTransactional) {
     throw new Error(`Failed to find emailMessageTransactional for id: ${id}`)
@@ -227,6 +232,7 @@ async function handleStatusCallbacks(
         metadata,
       })
   }
+  handleStatusCallbacksSpan.finish()
 }
 
 async function listMessages({

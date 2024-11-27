@@ -2,6 +2,7 @@ import { Request } from 'express'
 import { ses, sendgrid } from '@email/utils/callback/parsers'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
+import { tracer } from 'dd-trace'
 
 const logger = loggerWithLabel(module)
 
@@ -24,13 +25,21 @@ const isAuthenticated = (authHeader?: string): boolean => {
 }
 
 const parseEvent = async (req: Request): Promise<void> => {
+  const parseJsonSpan = tracer.startSpan('parseJson', {
+    childOf: tracer.scope().active() || undefined,
+  })
   const parsed = JSON.parse(req.body)
+  parseJsonSpan.finish()
   let records: Promise<void>[] = []
   if (ses.isEvent(req)) {
     // body could be one record or an array of records, hence we concat
     const body: ses.SesRecord[] = []
     const sesHttpEvent = body.concat(parsed)
+    const parseAllRecordsSpan = tracer.startSpan('parseAllRecords', {
+      childOf: tracer.scope().active() || undefined,
+    })
     records = sesHttpEvent.map(ses.parseRecord)
+    parseAllRecordsSpan.finish()
   } else if (sendgrid.isEvent(req)) {
     // body is always an array
     const sgEvent = parsed
@@ -38,6 +47,11 @@ const parseEvent = async (req: Request): Promise<void> => {
   } else {
     throw new Error('Unable to handle this event')
   }
+  const parseNotificationAndEventSpan = tracer.startSpan(
+    'parseAllNotificationAndEvents',
+    { childOf: tracer.scope().active() || undefined }
+  )
   await Promise.all(records)
+  parseNotificationAndEventSpan.finish()
 }
 export const EmailCallbackService = { isAuthenticated, parseEvent }

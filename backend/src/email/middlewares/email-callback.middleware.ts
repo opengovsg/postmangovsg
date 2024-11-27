@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express'
 import { EmailCallbackService } from '@email/services'
 import { loggerWithLabel } from '@core/logger'
-
 const logger = loggerWithLabel(module)
 
 const isAuthenticated = (
@@ -58,6 +57,7 @@ const printConfirmSubscription = (
         subscribeUrl,
         action: 'printConfirmSubscription',
       })
+
       return res.sendStatus(202)
     }
   }

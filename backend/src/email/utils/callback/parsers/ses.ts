@@ -14,6 +14,7 @@ import config from '@core/config'
 import { compareSha256Hash } from '@shared/utils/crypto'
 import { EmailTransactionalService } from '@email/services/email-transactional.service'
 import { SesEventType, Metadata } from '@email/interfaces/callback.interface'
+import tracer from 'dd-trace'
 
 const logger = loggerWithLabel(module)
 const REFERENCE_ID_HEADER_V2 = 'X-SMTPAPI' // Case sensitive
@@ -135,8 +136,13 @@ const shouldBlacklist = ({
 const parseNotificationAndEvent = async (
   type: SesEventType,
   message: any,
-  metadata: Metadata
+  metadata: Metadata,
+  parentSpan?: tracer.Span
 ): Promise<void> => {
+  const parseNotificationAndEventSpan = tracer.startSpan(
+    'parseNotificationAndEvent',
+    { childOf: parentSpan }
+  )
   if (!isNotificationAndEventForMainRecipient(message, type)) {
     logger.info({
       message: 'SES notification or event is not for the main recipient',
@@ -176,6 +182,7 @@ const parseNotificationAndEvent = async (
       })
       return
   }
+  parseNotificationAndEventSpan.finish()
 }
 
 // Validate SES record hash, returns message ID if valid, otherwise throw errors
@@ -223,16 +230,30 @@ const blacklistIfNeeded = async (message: any): Promise<void> => {
   }
 }
 const parseRecord = async (record: SesRecord): Promise<void> => {
+  const parseRecordSpan = tracer.startSpan('parseRecord', {
+    childOf: tracer.scope().active() || undefined,
+  })
   logger.info({
     message: 'Parsing SES callback record',
   })
+  const parseRecordJson = tracer.startSpan('parseRecordJson', {
+    childOf: parseRecordSpan,
+  })
   const message = JSON.parse(record.Message)
+  parseRecordJson.finish()
   const smtpApiHeader = getSmtpApiHeader(message)
+  const validateRecordSpan = tracer.startSpan('validateRecord', {
+    childOf: parseRecordSpan,
+  })
   await validateRecord(record, smtpApiHeader)
-
+  validateRecordSpan.finish()
   // Transactional emails don't have message IDs, so blacklist
   // relevant email addresses before everything else
+  const blacklistIfNeededSpan = tracer.startSpan('blacklistIfNeeded', {
+    childOf: parseRecordSpan,
+  })
   await blacklistIfNeeded(message)
+  blacklistIfNeededSpan.finish()
 
   // primary key
   const messageId = smtpApiHeader?.unique_args?.message_id
@@ -248,15 +269,21 @@ const parseRecord = async (record: SesRecord): Promise<void> => {
       type,
     })
     if (isTransactional) {
-      return EmailTransactionalService.handleStatusCallbacks(type, messageId, {
-        timestamp: new Date(record.Timestamp),
-        bounce: message.bounce,
-        complaint: message.complaint,
-        delivery: message.delivery,
-      })
+      return EmailTransactionalService.handleStatusCallbacks(
+        type,
+        messageId,
+        {
+          timestamp: new Date(record.Timestamp),
+          bounce: message.bounce,
+          complaint: message.complaint,
+          delivery: message.delivery,
+        },
+        parseRecordSpan
+      )
     }
-    return parseNotificationAndEvent(type, message, metadata)
+    return parseNotificationAndEvent(type, message, metadata, parseRecordSpan)
   }
+  parseRecordSpan.finish()
 }
 
 // Checks whether the notification/event is meant for the main recipient of the email.
