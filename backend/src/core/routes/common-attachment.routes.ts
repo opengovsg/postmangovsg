@@ -6,6 +6,7 @@ import {
 } from '@core/middlewares'
 import { Joi, Segments, celebrate } from 'celebrate'
 import { Router } from 'express'
+import fileUpload from 'express-fileupload'
 
 export const InitCommonAttachmentRoute = (
   authMiddleware: AuthMiddleware
@@ -33,6 +34,13 @@ export const InitCommonAttachmentRoute = (
       }),
     }),
     FileAttachmentMiddleware.storeCampaignEmbed
+  )
+
+  router.post(
+    '/csv-upload',
+    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
+    fileUpload(),
+    FileAttachmentMiddleware.uploadFileToPresignedUrl
   )
 
   router.get(

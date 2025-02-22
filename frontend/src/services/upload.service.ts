@@ -63,19 +63,20 @@ async function getMd5(blob: Blob): Promise<string> {
 
 export async function uploadFileWithPresignedUrl(
   uploadedFile: File,
-  presignedUrl: string
-): Promise<string> {
+  _presignedUrl: string // Making this unused because the endpoint below generates its own presignedUrl and uploads the file
+) {
   try {
-    const md5 = await getMd5(uploadedFile)
-    const response = await axios.put(presignedUrl, uploadedFile, {
+    const formData = new FormData()
+    formData.append('file', uploadedFile)
+    const response = await axios.post(`/attachments/csv-upload`, formData, {
       headers: {
-        'Content-Type': uploadedFile.type,
-        'Content-MD5': md5,
+        'Content-Type': 'multipart/form-data',
       },
-      withCredentials: false,
-      timeout: 0,
     })
-    return response.headers.etag
+    return {
+      etag: response.data.etag,
+      transactionId: response.data.transactionId,
+    }
   } catch (e) {
     errorHandler(
       e,
@@ -212,15 +213,15 @@ export async function uploadFileToS3(
     uploadedFile: file,
   })
   // Upload to presigned url
-  const etag = await uploadFileWithPresignedUrl(
+  const result = await uploadFileWithPresignedUrl(
     file,
     startUploadResponse.presignedUrl
   )
   await completeFileUpload({
     campaignId: +campaignId,
-    transactionId: startUploadResponse.transactionId,
+    transactionId: result.transactionId,
     filename: file.name,
-    etag,
+    etag: result.etag,
   })
   return file.name
 }
