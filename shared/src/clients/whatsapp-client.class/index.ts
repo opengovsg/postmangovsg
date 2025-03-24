@@ -124,6 +124,7 @@ export default class WhatsAppClient {
         client === '1'
           ? this.credentials['onPremClientOneUrl']
           : this.credentials['onPremClientTwoUrl'],
+      allowAbsoluteUrls: false,
       headers: {
         Authorization: `Basic ${
           client === '1'
@@ -165,6 +166,7 @@ export default class WhatsAppClient {
         method: 'post',
         url: MESSAGE_ENDPOINT,
         baseURL,
+        allowAbsoluteUrls: false,
         headers,
         data: {
           to: input.recipient,
@@ -235,6 +237,7 @@ export default class WhatsAppClient {
         method: 'post',
         url: MESSAGE_ENDPOINT,
         baseURL: url,
+        allowAbsoluteUrls: false,
         headers: {
           Authorization: `Bearer ${token}`,
         },
