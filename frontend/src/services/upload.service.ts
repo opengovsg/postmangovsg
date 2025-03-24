@@ -75,7 +75,7 @@ export async function uploadFileWithPresignedUrl(
       withCredentials: false,
       timeout: 0,
     })
-    return response.headers.etag
+    return response.headers.etag as string
   } catch (e) {
     errorHandler(
       e,
@@ -284,7 +284,7 @@ export async function uploadPartWithPresignedUrl({
       withCredentials: false,
       timeout: 0,
     })
-    return response.headers.etag
+    return response.headers.etag as string
   } catch (e) {
     errorHandler(e, 'Error uploading part with presigned url')
   }
