@@ -50,7 +50,7 @@
     "express": "4.21.1",
     "express-fileupload": "^1.4.0",
     "express-rate-limit": "5.5.1",
-    "express-session": "1.17.0",
+    "express-session": "1.18.1",
     "express-winston": "4.2.0",
     "file-type": "^16.5.4",
     "helmet": "3.23.3",
