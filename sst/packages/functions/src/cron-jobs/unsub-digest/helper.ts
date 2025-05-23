@@ -15,7 +15,7 @@ export interface UserUnsubscribeDigest {
 }
 
 const GUIDE_URL =
-  'https://guide.postman.gov.sg/quick-start/email/weekly-digest-of-unsubscription'
+  'https://postman-v1.guides.gov.sg/quick-start/email/weekly-digest-of-unsubscription'
 
 /**
  * Gets list of unsubscribing recipients grouped by campaign and user email
