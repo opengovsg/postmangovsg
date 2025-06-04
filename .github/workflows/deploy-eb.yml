@@ -171,7 +171,7 @@ jobs:
           CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
           echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
       - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@18e5b85bd914cabf00fccabe72f60b8757dcd3cb
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -204,7 +204,7 @@ jobs:
           CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
           echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
       - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@v21
+        uses: einaregilsson/beanstalk-deploy@18e5b85bd914cabf00fccabe72f60b8757dcd3cb
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
