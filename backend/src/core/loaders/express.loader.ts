@@ -197,6 +197,8 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       requestWhitelist: ['method', 'url', 'body', 'headers'],
       responseWhitelist: ['statusCode'],
       requestFilter: (req: Request, propName: string) => {
+        // If body is undefined or null, normalize to empty object for safe access
+        req.body = req.body || {}
         if (propName === 'headers' && req.headers.authorization) {
           // we do this instead of adding it to `headerBlacklist`
           // so we can distinguish if an API call is made via API key
