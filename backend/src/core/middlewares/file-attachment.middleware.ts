@@ -139,7 +139,7 @@ async function streamCampaignEmbed(
   const attachment = await CommonAttachment.findOne({
     where: { id },
   })
-  if (!attachment) {
+  if (!attachment || attachment.id !== id) {
     throw new ApiNotFoundError(`Attachment with ID ${id} doesn't exist`)
   }
 
