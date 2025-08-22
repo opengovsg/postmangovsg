@@ -397,42 +397,42 @@ describe('POST /campaigns', () => {
     )
   })
 
-  test('Successfully create demo SMS campaign', async () => {
+  test('Fail to create demo SMS campaign', async () => {
     const campaign = {
       name: 'demo',
       type: ChannelType.SMS,
       demo_message_limit: 10,
     }
     const res = await request(app).post('/campaigns').send(campaign)
-    expect(res.status).toBe(201)
+    expect(res.status).toBe(400)
     expect(res.body).toEqual(
       expect.objectContaining({
-        ...campaign,
-        demo_message_limit: 10,
+        code: 'api_validation',
+        message: '"demo_message_limit" must be less than or equal to 0',
       })
     )
 
     const demo = await UserDemo.findOne({ where: { userId: 1 } })
-    expect(demo?.numDemosSms).toEqual(2)
+    expect(demo?.numDemosSms).toEqual(3)
   })
 
-  test('Successfully create demo Telegram campaign', async () => {
+  test('Fail to create demo Telegram campaign', async () => {
     const campaign = {
       name: 'demo',
       type: ChannelType.Telegram,
       demo_message_limit: 10,
     }
     const res = await request(app).post('/campaigns').send(campaign)
-    expect(res.status).toBe(201)
+    expect(res.status).toBe(400)
     expect(res.body).toEqual(
       expect.objectContaining({
-        ...campaign,
-        demo_message_limit: 10,
+        code: 'api_validation',
+        message: '"demo_message_limit" must be less than or equal to 0',
       })
     )
 
     const demo = await UserDemo.findOne({ where: { userId: 1 } })
-    expect(demo?.numDemosTelegram).toEqual(2)
+    expect(demo?.numDemosTelegram).toEqual(3)
   })
 
   test('Unable to create demo Telegram campaign after user has no demos left', async () => {
