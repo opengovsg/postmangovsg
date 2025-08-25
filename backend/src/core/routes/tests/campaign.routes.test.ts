@@ -408,7 +408,7 @@ describe('POST /campaigns', () => {
     expect(res.body).toEqual(
       expect.objectContaining({
         code: 'api_validation',
-        message: '"demo_message_limit" must be less than or equal to 0',
+        message: '"demo_message_limit" must be [0]',
       })
     )
 
@@ -427,7 +427,7 @@ describe('POST /campaigns', () => {
     expect(res.body).toEqual(
       expect.objectContaining({
         code: 'api_validation',
-        message: '"demo_message_limit" must be less than or equal to 0',
+        message: '"demo_message_limit" must be [0]',
       })
     )
 
