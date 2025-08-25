@@ -9,6 +9,7 @@
 - [Postman.gov.sg](#postmangovsg)
   - [Table of Contents](#table-of-contents)
   - [Features](#features)
+  - [GitHub Copilot Instructions](#github-copilot-instructions)
   - [Development](#development)
     - [Install and run required services](#install-and-run-required-services)
       - [Starting all services using Docker](#starting-all-services-using-docker)
@@ -49,6 +50,18 @@
 - **Send emails**: Just click send and Postman will send those messages out to your intended audience via email
 - **Send SMSes**: Enter your twilio credentials, and Postman will send those messages via SMS. No integration with twilio is necessary
 - **View stats**: Keep track of your campaign's progress as it's sending, and check back when it's done.
+
+## GitHub Copilot Instructions
+
+For comprehensive setup instructions, architecture overview, and development guidelines for GitHub Copilot coding agents, see [.github/copilot-instructions.md](.github/copilot-instructions.md).
+
+This includes detailed information about:
+
+- Repository architecture and technology stack
+- Development environment setup
+- Code organization patterns and conventions
+- Testing strategies and build processes
+- Security considerations and best practices
 
 ## Development
 
