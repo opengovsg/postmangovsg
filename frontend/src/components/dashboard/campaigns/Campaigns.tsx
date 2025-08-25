@@ -572,7 +572,7 @@ const Campaigns = () => {
                 modalContext.setModalContent(<CreateCampaign />)
               }}
             >
-              Try email campaign
+              Create new campaign
             </PrimaryButton>
           </div>
         </div>
