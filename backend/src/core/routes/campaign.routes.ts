@@ -30,6 +30,11 @@ const createCampaignValidator = {
       .required(),
     name: Joi.string().max(255).trim().required(),
     protect: Joi.boolean().default(false),
+    // NOTE: demo_message_limit is no longer used since demo campaigns were removed from the FE.
+    // Instead of allowing arbitrary values, we restrict it to null or 0 to gracefully fail requests
+    // that still attempt to set this field. The column still exists in the DB, so we can't simply
+    // drop it here without further pruning. If/when we clean up the DB schema, this validation can
+    // be removed entirely.
     demo_message_limit: Joi.number().default(null).min(0).max(0),
   }),
 }
