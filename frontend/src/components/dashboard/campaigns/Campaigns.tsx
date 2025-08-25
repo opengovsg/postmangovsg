@@ -59,7 +59,6 @@ import {
   getCampaigns,
   updateCampaign,
 } from 'services/campaign.service'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 import { getUserSettings } from 'services/settings.service'
 
@@ -565,16 +564,6 @@ const Campaigns = () => {
           <h2>We are excited to have you here!</h2>
           <p>There are 3 channels for you to try: Email, SMS and Telegram.</p>
           <p>Email is always free and no set up is required.</p>
-          <div className={styles.actions}>
-            <PrimaryButton
-              onClick={() => {
-                sendUserEvent(GA_USER_EVENTS.NEW_USER_TRY_EMAIL)
-                modalContext.setModalContent(<CreateCampaign />)
-              }}
-            >
-              Create new campaign
-            </PrimaryButton>
-          </div>
         </div>
       </div>
     )
