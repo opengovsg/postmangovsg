@@ -35,7 +35,7 @@ const createCampaignValidator = {
     // that still attempt to set this field. The column still exists in the DB, so we can't simply
     // drop it here without further pruning. If/when we clean up the DB schema, this validation can
     // be removed entirely.
-    demo_message_limit: Joi.number().default(null).min(0).max(0),
+    demo_message_limit: Joi.number().default(null).valid(0),
   }),
 }
 

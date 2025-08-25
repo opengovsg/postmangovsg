@@ -4,13 +4,7 @@ import { useEffect, useState } from 'react'
 
 import styles from './DemoBar.module.scss'
 
-const DemoBar = ({
-  isDisplayed,
-}: {
-  numDemosSms: number
-  numDemosTelegram: number
-  isDisplayed: boolean
-}) => {
+const DemoBar = ({ isDisplayed }: { isDisplayed: boolean }) => {
   const [isMenuVisible, setIsMenuVisible] = useState(isDisplayed)
   useEffect(() => {
     setIsMenuVisible(isDisplayed)

@@ -49,7 +49,6 @@ import {
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import CreateCampaign from 'components/dashboard/create/create-modal'
-import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
 import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 import { AuthContext } from 'contexts/auth.context'
@@ -565,11 +564,7 @@ const Campaigns = () => {
           />
           <h2>We are excited to have you here!</h2>
           <p>There are 3 channels for you to try: Email, SMS and Telegram.</p>
-          <p>
-            Email is always free and no set up is required. Since Telegram and
-            SMS requires more set-up, you can now try them out using demo
-            campaigns to see how they work.
-          </p>
+          <p>Email is always free and no set up is required.</p>
           <div className={styles.actions}>
             <PrimaryButton
               onClick={() => {
@@ -578,20 +573,6 @@ const Campaigns = () => {
               }}
             >
               Try email campaign
-            </PrimaryButton>
-            <PrimaryButton
-              className={styles.darkGreenButton}
-              onClick={() => {
-                sendUserEvent(GA_USER_EVENTS.NEW_USER_TRY_SMS_TELEGRAM)
-                modalContext.setModalContent(
-                  <CreateDemoModal
-                    numDemosSms={numDemosSms}
-                    numDemosTelegram={numDemosTelegram}
-                  />
-                )
-              }}
-            >
-              Try demo SMS/Telegram
             </PrimaryButton>
           </div>
         </div>
@@ -655,11 +636,7 @@ const Campaigns = () => {
   function renderCampaign() {
     return (
       <>
-        <DemoBar
-          numDemosSms={numDemosSms}
-          numDemosTelegram={numDemosTelegram}
-          isDisplayed={isDemoDisplayed}
-        />
+        <DemoBar isDisplayed={isDemoDisplayed} />
         <div className={styles.content}>
           <TitleBar
             title={campaignCount + ' past campaigns'}
