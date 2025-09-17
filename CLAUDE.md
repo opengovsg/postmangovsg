@@ -121,6 +121,60 @@ Migrations are in `backend/src/database/migrations/` and use Sequelize CLI.
 - Test complete user workflows
 - Run against local development environment
 
+## Debugging & Production Issues
+
+**Infrastructure Overview:**
+- **AWS Account:** 454894717801
+- **Regions:** 
+  - `us-east-1` - Campaign sending infrastructure
+  - `ap-southeast-2` - Transactional sending infrastructure
+  - `ap-southeast-1` - Frontend hosting (Amplify), secrets management
+- **Database Access:** Requires OGP VPN connection
+- **Load Balancers:**
+  - `awseb-AWSEB-RG610LWY9ST0` - Callback server
+  - `awseb-AWSEB-QD6QA6L4PNGK` - App server
+
+**Secrets Management:**
+- Staging: `env/eb/postmangovsg-staging-amz2` (Secrets Manager, ap-southeast-1)
+- Production: `env/eb/postmangovsg-production-amz2` (Secrets Manager, ap-southeast-1)
+- API Keys: Parameter Store `/sst/postmangovsg-sst/prod/Secret/POSTMAN_API_KEY/value`
+
+**Common Issues:**
+
+1. **Blacklisted Emails**
+   - Check `email_blacklist` table in database
+   - Use whitelisting form: https://opengovproducts.slack.com/archives/C06JRRJPY3D
+   - Manual fix: Delete from `email_blacklist` table
+   - Debug cause by searching logs for "Unexpected Error Occurred"
+
+2. **ELB 5XX Errors**
+   - Check AWS EC2 → Load Balancers for error spikes
+   - Usually callback server issues during large campaigns
+   - SNS retries for 7 minutes, so brief spikes are acceptable
+
+3. **Stuck Campaigns**
+   - Alert via `#postman-alarms-channel`
+   - Check if unsent count is changing over time
+   - Follow notion guide: "Campaigns stuck on unsent"
+   - Usually campaigns are still processing, just slower
+
+4. **API Key Rotation**
+   - Renew in legacy UI with `postman@open.gov.sg`
+   - Update in Parameter Store: `/sst/postmangovsg-sst/prod/Secret/POSTMAN_API_KEY/value`
+
+5. **Halted Campaigns**
+   - Automatic halting on high bounce rate (via `#postman-info-channel`)
+   - Manual halt: Set `halted=TRUE` in `campaigns` table
+   - Manual unhalt: Set `halted=FALSE` in `campaigns` table
+
+**Monitoring Channels:**
+- `#postman-alarms-channel` - Critical alerts
+- `#postman-info-channel` - Campaign status updates
+
+**Deployment Notes:**
+- CI will show failures on staging/master - these can be ignored
+- Failed components are not critical to deployment success
+
 ## Important Notes
 
 - **Package Manager:** Uses `npm` (not pnpm) - follow existing patterns
