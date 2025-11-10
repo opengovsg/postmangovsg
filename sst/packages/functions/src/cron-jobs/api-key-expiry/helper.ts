@@ -29,7 +29,7 @@ const reminderEmailBodyGenerator = (
           : ''
       }
       <br><br>
-      For more info on how to renew your API key, please refer to our <a href="https://guide.postman.gov.sg/api-guide/api-key-management/rotate-your-api-key">documentation</a>.
+      For more info on how to renew your API key, please refer to our <a href="https://postman-v1.guides.gov.sg/api-guide/api-key-management/rotate-your-api-key">documentation</a>.
       <br><br>
       Thank you,<br>
       <a href="https://postman.gov.sg">Postman.gov.sg</a> &bull; Open Government Products &bull; <a href="https://open.gov.sg">open.gov.sg</a>`
