@@ -317,12 +317,12 @@ const config: Config<ConfigSchema> = convict({
   },
   protectedUrl: {
     doc: 'Url domain and path for password-protected messages',
-    default: 'https://postman.gov.sg/p', // prod only
+    default: 'https://legacy.postman.gov.sg/p', // prod only
     env: 'PROTECTED_URL',
   },
   unsubscribeUrl: {
     doc: 'Url domain and path for unsubscribe page',
-    default: 'https://postman.gov.sg/unsubscribe', // prod only
+    default: 'https://legacy.postman.gov.sg/unsubscribe', // prod only
     env: 'UNSUBSCRIBE_URL',
   },
   session: {
