@@ -156,18 +156,35 @@ const sendEmail = async (
   opts?: SendEmailOpts
 ): Promise<boolean> => {
   try {
-    const serviceProviderMessageId = await MailService.mailClient.sendMail(
-      mail,
-      opts
-    )
+    const smtpResponse = await MailService.mailClient.sendMail(mail, opts)
+
+    // Extract AWS SES message ID from SMTP response
+    // Response format: "250 Ok 010201909b71b5ae-17c92edb-44d9-4523-a028-0db7b88f32e3-000000"
+    let awsSesMessageId = smtpResponse
+    if (smtpResponse) {
+      const match = smtpResponse.match(/250 Ok ([^\s]+)/)
+      if (match && match[1]) {
+        awsSesMessageId = match[1]
+      }
+    }
+
     logger.info({
       message: 'Message sent to channel provider.',
       nativeMessageId: mail.messageId,
-      serviceProviderMessageId,
+      recipient: mail.recipients?.[0],
+      awsSesMessageId, // AWS SES message ID for tracking with AWS Support
+      smtpResponse, // Full SMTP response
+      serviceProviderMessageId: awsSesMessageId, // kept for backward compatibility
     })
   } catch (e) {
+    const error = e as any
     logger.error({
-      message: 'Error while sending test email',
+      message: 'Error while sending email',
+      nativeMessageId: mail.messageId,
+      recipient: mail.recipients?.[0],
+      smtpResponse: error.response, // Full SMTP response from nodemailer error
+      smtpResponseCode: error.responseCode, // SMTP code (e.g., 451, 550, 554)
+      smtpCommand: error.command, // SMTP command that failed (e.g., DATA, RCPT)
       error: e,
       action: 'sendEmail',
     })
