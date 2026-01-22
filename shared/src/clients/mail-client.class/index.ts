@@ -93,9 +93,16 @@ export default class MailClient {
 
       this.mailer.sendMail(options, (err, info) => {
         if (err !== null) {
-          reject(new Error(`${err}`))
+          // Reject with original error to preserve all SMTP response properties
+          // (response, responseCode, command, etc.)
+          reject(err)
         } else {
-          resolve(info.messageId)
+          // Return full info object with all SMTP response details
+          // info.messageId: email Message-ID header
+          // info.response: SMTP response (e.g., "250 Ok <AWS_SES_MESSAGE_ID>")
+          // info.envelope: from/to addresses
+          // info.accepted/rejected: recipient status
+          resolve(info.response || info.messageId)
         }
       })
     })
