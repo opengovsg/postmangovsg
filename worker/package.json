@@ -24,7 +24,7 @@
     "@types/bcrypt": "3.0.0",
     "@types/cheerio": "^0.22.31",
     "@types/validator": "13.1.3",
-    "axios": "0.30.0",
+    "axios": "0.30.3",
     "bcrypt": "5.0.1",
     "cheerio": "1.0.0-rc.10",
     "convict": "6.2.4",
