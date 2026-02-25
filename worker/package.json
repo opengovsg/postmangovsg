@@ -33,7 +33,7 @@
     "jest": "27.5.1",
     "lodash": "4.17.21",
     "module-alias": "2.2.2",
-    "nodemailer": "6.6.2",
+    "nodemailer": "7.0.11",
     "opossum": "^7.1.0",
     "pg": "8.5.1",
     "reflect-metadata": "0.1.13",
