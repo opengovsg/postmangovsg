@@ -15,3 +15,7 @@ const formatDefaultCredentialName = (name: DefaultCredentialName): string =>
   `demo/${config.get('env')}/${name}`
 
 export { isSuperSet, formatDefaultCredentialName }
+export {
+  findOrCreateWithTransaction,
+  FindOrCreateOptions,
+} from './find-or-create'

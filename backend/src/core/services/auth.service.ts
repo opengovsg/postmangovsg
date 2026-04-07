@@ -5,9 +5,9 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { User } from '@core/models'
 import { validateDomain } from '@core/utils/validate-domain'
+import { findOrCreateWithTransaction } from '@core/utils'
 import { ApiKeyService, MailService, RedisService } from '@core/services'
 import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
-import { Transaction } from 'sequelize/types'
 
 export interface AuthService {
   canSendOtp(email: string): Promise<void>
@@ -281,16 +281,10 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
    * @param email
    */
   const findOrCreateUser = async (email: string): Promise<User> => {
-    const result = await User.sequelize?.transaction(async (t: Transaction) => {
-      const [user] = await User.findOrCreate({
-        where: { email: email },
-        transaction: t,
-      })
-      return user
+    const [user] = await findOrCreateWithTransaction(User, {
+      where: { email: email },
     })
-    if (!result) throw new Error('Unable to find or create user')
-
-    return result
+    return user
   }
 
   /**

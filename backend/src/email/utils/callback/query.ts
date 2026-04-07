@@ -7,6 +7,7 @@ import { EmailBlacklist, EmailMessage } from '@email/models'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import { Campaign } from '@core/models'
+import { findOrCreateWithTransaction } from '@core/utils'
 
 const logger = loggerWithLabel(module)
 
@@ -16,13 +17,15 @@ const logger = loggerWithLabel(module)
  */
 export const addToBlacklist = (
   recipientEmail: string
-): Promise<any> | undefined => {
+): Promise<[EmailBlacklist, boolean]> => {
   logger.info({
     message: 'Updating blacklist table',
     recipientEmail,
     action: 'addToBlacklist',
   })
-  return EmailBlacklist.findOrCreate({ where: { recipient: recipientEmail } })
+  return findOrCreateWithTransaction(EmailBlacklist, {
+    where: { recipient: recipientEmail },
+  })
 }
 
 /**

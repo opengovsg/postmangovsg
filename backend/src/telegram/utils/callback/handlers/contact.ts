@@ -3,6 +3,7 @@ import { Message, ExtraReplyMessage } from 'telegraf/typings/telegram-types'
 import { QueryTypes } from 'sequelize'
 
 import { loggerWithLabel } from '@core/logger'
+import { findOrCreateWithTransaction } from '@core/utils'
 import { PostmanTelegramError } from '../PostmanTelegramError'
 import { TelegramSubscriber, BotSubscriber } from '@telegram/models'
 
@@ -80,7 +81,7 @@ const addBotSubscriber = async (
   telegramId: number
 ): Promise<boolean> => {
   const logMeta = { botId, telegramId, action: 'addBotSubscriber' }
-  const [, created] = await BotSubscriber.findOrCreate({
+  const [, created] = await findOrCreateWithTransaction(BotSubscriber, {
     where: { botId, telegramId },
   })
   logger.info({

@@ -14,6 +14,7 @@ import {
 import { UserCredential, UserFeature } from '@core/models'
 import { UserDemo } from './user-demo'
 import { validateDomain } from '@core/utils/validate-domain'
+import { findOrCreateWithTransaction } from '@core/utils'
 import { CreateOptions } from 'sequelize/types'
 import { Domain } from '../domain'
 import { Agency } from '../agency'
@@ -115,7 +116,7 @@ export class User extends Model<User> {
         domain: emailDomain,
       })
 
-      const [defaultAgency] = await Agency.findOrCreate({
+      const [defaultAgency] = await findOrCreateWithTransaction(Agency, {
         where: {
           name: config.get('defaultAgency.name'),
         },
@@ -138,7 +139,7 @@ export class User extends Model<User> {
     instance: User,
     options: CreateOptions
   ): Promise<[UserDemo, boolean]> {
-    return UserDemo.findOrCreate({
+    return findOrCreateWithTransaction(UserDemo, {
       where: { userId: instance.id },
       transaction: options.transaction,
     })
