@@ -36,5 +36,8 @@
   },
   "lint-staged": {
     "*.{js,ts}": "eslint --cache --fix"
+  },
+  "overrides": {
+    "axios": "1.15.0"
   }
 }

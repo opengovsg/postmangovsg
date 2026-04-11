@@ -71,5 +71,8 @@
   },
   "dependencies": {
     "@datadog/browser-rum": "^5.9.0"
+  },
+  "overrides": {
+    "axios": "1.15.0"
   }
 }
