@@ -16,6 +16,12 @@ const initDatabaseConnection = async (): Promise<void> => {
     },
     dialectModule: pg,
     models: [EmailBlacklist],
+    dialectOptions: {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    },
   });
 
   try {
@@ -23,7 +29,7 @@ const initDatabaseConnection = async (): Promise<void> => {
     console.log("Database connection successfully initialised");
   } catch (error) {
     console.log(
-      `An error occurred while initializing the database connection. Error: ${error}`
+      `An error occurred while initializing the database connection. Error: ${error}`,
     );
   }
 };
