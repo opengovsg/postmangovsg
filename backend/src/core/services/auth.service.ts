@@ -29,7 +29,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
   } = config.get('otp')
 
   // Crockford Base32-style alphabet without ambiguous characters (I, O, 0, 1).
-  const otpCharset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // pragma: allowlist secret
+  const otpCharset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
   /**
    * Generate an 8-character alphanumeric otp
    */
