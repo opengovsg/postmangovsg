@@ -54,7 +54,7 @@ const Login = () => {
   const openErrorModal = (errorString: string) =>
     modalContext.setModalContent(
       <ConfirmModal
-        title={`Singpass login is unavailable`}
+        title={`Unable to sign in`}
         subtitleElement={
           <h4 className={styles.subtitleElement}>{errorString}</h4>
         }

@@ -28,11 +28,12 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
     resendTimeout: OTP_RESEND_TIMEOUT,
   } = config.get('otp')
 
-  const otpCharset = '234567ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+  // Crockford Base32-style alphabet without ambiguous characters (I, O, 0, 1).
+  const otpCharset = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789' // pragma: allowlist secret
   /**
-   * Generate a six digit otp
+   * Generate an 8-character alphanumeric otp
    */
-  const generateOtp = customAlphabet(otpCharset, 6)
+  const generateOtp = customAlphabet(otpCharset, 8)
 
   /**
    * Save hashed otp against the user's email

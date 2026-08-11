@@ -49,7 +49,7 @@ describe('POST /auth/otp', () => {
 
     expect(MailService.mailClient.sendMail).toHaveBeenCalledWith(
       expect.objectContaining({
-        body: expect.stringMatching(/Your OTP is <b>[A-Z0-9]{6}<\/b>/),
+        body: expect.stringMatching(/Your OTP is <b>[A-Z0-9]{8}<\/b>/),
       })
     )
   })
@@ -66,7 +66,7 @@ describe('POST /auth/login', () => {
   test('Invalid otp provided', async () => {
     const res = await request(app)
       .post('/auth/login')
-      .send({ email: 'user@agency.gov.sg', otp: '000000' })
+      .send({ email: 'user@agency.gov.sg', otp: '00000000' })
     expect(res.status).toBe(401)
   })
 
@@ -74,7 +74,7 @@ describe('POST /auth/login', () => {
     const email = 'user@agency.gov.sg'
     const otp = JSON.stringify({
       retries: 1,
-      hash: await bcrypt.hash('123456', 10),
+      hash: await bcrypt.hash('ABCDEFGH', 10),
       createdAt: 123,
     })
     await new Promise((resolve) =>
@@ -83,7 +83,7 @@ describe('POST /auth/login', () => {
 
     const res = await request(app)
       .post('/auth/login')
-      .send({ email, otp: '000000' })
+      .send({ email, otp: '00000000' })
     expect(res.status).toBe(401)
     // OTP should be deleted after exceeding retries
     ;(app as any).redisService.otpClient.get(email, (_err: any, value: any) => {
@@ -95,7 +95,7 @@ describe('POST /auth/login', () => {
     const email = 'user@agency.gov.sg'
     const otp = JSON.stringify({
       retries: 1,
-      hash: await bcrypt.hash('123456', 10),
+      hash: await bcrypt.hash('ABCDEFGH', 10),
       createdAt: 123,
     })
     await new Promise((resolve) =>
@@ -104,7 +104,7 @@ describe('POST /auth/login', () => {
 
     const res = await request(app)
       .post('/auth/login')
-      .send({ email, otp: '123456' })
+      .send({ email, otp: 'ABCDEFGH' })
     expect(res.status).toBe(200)
   })
 })

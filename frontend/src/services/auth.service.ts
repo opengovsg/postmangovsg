@@ -21,7 +21,7 @@ async function loginWithOtp(email: string, otp: string): Promise<void> {
     })
   } catch (e) {
     errorHandler(e, {
-      400: 'Invalid OTP format, enter 6 digits',
+      400: 'Invalid OTP format, enter an 8-character code',
       401: 'Invalid OTP',
     })
   }
