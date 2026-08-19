@@ -2,7 +2,7 @@
 
 # Postman.gov.sg
 
-> Postman.gov.sg enables public officers to send templated messages to many recipients.
+> Postman.gov.sg enables public officers to send templated messages to many recipients :D
 
 ## Table of Contents
 
