@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "axios": "^1.15.0",
-    "drizzle-orm": "^0.27.2",
+    "drizzle-orm": "^0.45.2",
     "lodash": "^4.17.21",
     "moment": "^2.29.4",
     "pg": "^8.11.1",
