@@ -37,7 +37,7 @@
     "opossum": "^7.1.0",
     "pg": "8.5.1",
     "reflect-metadata": "0.1.13",
-    "sequelize": "6.29.1",
+    "sequelize": "6.37.8",
     "sequelize-typescript": "2.1.3",
     "source-map-support": "0.5.19",
     "telegraf": "3.38.0",
