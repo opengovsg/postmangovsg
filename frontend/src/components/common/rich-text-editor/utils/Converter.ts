@@ -279,7 +279,7 @@ const renderContent = (
 
     const entities = blockEntities[i]
     if (entities.length > 0) {
-      tags = entities.map(renderTag).join('')
+      tags = `${entities.map(renderTag).join('')}${tags}`
     }
 
     if (tags) {
