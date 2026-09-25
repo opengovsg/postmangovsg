@@ -27,7 +27,7 @@
     "pg": "^8.11.1",
     "pg-hstore": "^2.3.4",
     "postgres": "^3.3.5",
-    "sequelize": "^6.29.1",
+    "sequelize": "^6.37.8",
     "sequelize-typescript": "^2.1.3"
   }
 }
