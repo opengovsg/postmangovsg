@@ -7,6 +7,7 @@ import cloudwatchLoader from './cloudwatch.loader'
 import uploadQueueLoader from './upload-queue.loader'
 import {
   InitAuthService,
+  InitOneGovSgService,
   InitCredentialService,
   RedisService,
 } from '@core/services'
@@ -15,6 +16,7 @@ const loaders = async ({ app }: { app: Application }): Promise<void> => {
   const redisService = new RedisService()
   ;(app as any).redisService = redisService
   ;(app as any).authService = InitAuthService(redisService)
+  ;(app as any).oneGovSgService = InitOneGovSgService(redisService)
   ;(app as any).credentialService = InitCredentialService(redisService)
   securityHeadersLoader({ app })
   await cloudwatchLoader()

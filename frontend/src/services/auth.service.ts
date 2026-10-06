@@ -27,6 +27,17 @@ async function loginWithOtp(email: string, otp: string): Promise<void> {
   }
 }
 
+// Hands one.gov.sg's redirect params (code, state, iss or error) to the backend
+async function loginWithOneGovSg(
+  params: Record<string, string>
+): Promise<void> {
+  try {
+    await axios.post('/auth/one-gov-sg/callback', params)
+  } catch (e) {
+    errorHandler(e)
+  }
+}
+
 async function getUser(): Promise<
   | {
       email: string
@@ -43,10 +54,11 @@ async function getUser(): Promise<
   }
 }
 
-async function logout(): Promise<void> {
-  return axios.get('/auth/logout').then(() => {
-    setUserAnalytics(null)
-  })
+// Resolves true if the session was a one.gov.sg login
+async function logout(): Promise<boolean> {
+  const response = await axios.get('/auth/logout')
+  setUserAnalytics(null)
+  return !!response.data?.oneGovSg
 }
 
 function setUserAnalytics(user?: { email: string; id: number } | null) {
@@ -75,4 +87,11 @@ function errorHandler(e: unknown, customHandlers: any = {}) {
   throw new Error(`${e}`)
 }
 
-export { getOtpWithEmail, loginWithOtp, getUser, logout, setUserAnalytics }
+export {
+  getOtpWithEmail,
+  loginWithOtp,
+  loginWithOneGovSg,
+  getUser,
+  logout,
+  setUserAnalytics,
+}

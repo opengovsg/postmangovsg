@@ -1,8 +1,16 @@
 import { Router } from 'express'
+import expressRateLimit from 'express-rate-limit'
+import RedisStore from 'rate-limit-redis'
 import { celebrate, Joi, Segments } from 'celebrate'
+import config from '@core/config'
 import { AuthMiddleware } from '@core/middlewares'
+import { RedisService } from '@core/services'
+import { getRequestIp } from '@core/utils/request'
 
-export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
+export const InitAuthRoutes = (
+  authMiddleware: AuthMiddleware,
+  redisService: RedisService
+): Router => {
   const router = Router()
 
   // validators
@@ -139,6 +147,25 @@ export const InitAuthRoutes = (authMiddleware: AuthMiddleware): Router => {
    *           description: Internal Server Error
    */
   router.get('/logout', authMiddleware.logout)
+
+  // one.gov.sg login
+  if (config.get('oneGovSg.clientId')) {
+    router.get(
+      '/one-gov-sg/login',
+      expressRateLimit({
+        store: new RedisStore({
+          prefix: 'oneGovSgLogin:',
+          client: redisService.rateLimitClient,
+          expiry: 1,
+        }),
+        windowMs: 1000,
+        max: 5,
+        keyGenerator: getRequestIp,
+      }),
+      authMiddleware.oneGovSgLogin
+    )
+    router.post('/one-gov-sg/callback', authMiddleware.oneGovSgCallback)
+  }
 
   return router
 }

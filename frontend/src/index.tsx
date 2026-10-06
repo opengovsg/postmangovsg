@@ -16,9 +16,16 @@ import { BrowserRouter } from 'react-router-dom'
 
 import App from './App'
 
-import { SENTRY_DSN, SENTRY_RELEASE, APP_ENV } from 'config'
+import { captureOneGovSgCallback } from 'components/login/one-gov-sg-callback'
+import {
+  SENTRY_DSN,
+  SENTRY_RELEASE,
+  APP_ENV,
+  ONE_GOV_SG_CALLBACK_PATH,
+} from 'config'
 import AuthContextProvider from 'contexts/auth.context'
 
+captureOneGovSgCallback()
 Sentry.init({
   dsn: SENTRY_DSN,
   release: SENTRY_RELEASE,
@@ -40,6 +47,16 @@ if (APP_ENV === 'production' || APP_ENV === 'staging') {
     trackResources: true,
     trackLongTasks: true,
     defaultPrivacyLevel: 'mask-user-input',
+    // The navigation timing entry keeps the original callback URL despite replaceState
+    beforeSend: (event) => {
+      if (event.type === 'resource') {
+        const url = new URL(event.resource.url, window.location.origin)
+        if (url.pathname === ONE_GOV_SG_CALLBACK_PATH) {
+          event.resource.url = `${url.origin}${url.pathname}`
+        }
+      }
+      return true
+    },
   })
 }
 
