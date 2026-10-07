@@ -9,6 +9,10 @@ import config from '@core/config'
 import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
+import {
+  isOneGovSgCallbackPath,
+  redactOneGovSgSentryEvent,
+} from '@core/utils/one-gov-sg-logging'
 import helmet from 'helmet'
 import {
   ApiMalformError,
@@ -118,6 +122,7 @@ export function restApiErrorMiddleware(
 Sentry.init({
   dsn: config.get('sentryDsn'),
   environment: config.get('env'),
+  beforeSend: redactOneGovSgSentryEvent,
 })
 
 /**
@@ -194,6 +199,9 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       msg: `Incoming HTTP Request {{req.method}} {{req.url}}`,
       winstonInstance: logger,
       ignoredRoutes: ['/'],
+      // The callback carries a single-use code and state in its body. Ignore
+      // the whole request, including any query string in req.url or the log message.
+      ignoreRoute: (req: Request) => isOneGovSgCallbackPath(req.path),
       requestWhitelist: ['method', 'url', 'body', 'headers'],
       responseWhitelist: ['statusCode'],
       requestFilter: (req: Request, propName: string) => {

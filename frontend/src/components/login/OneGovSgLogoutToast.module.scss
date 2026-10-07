@@ -1,0 +1,44 @@
+@import 'styles/_variables';
+@import 'styles/_mixins';
+
+.toast {
+  position: fixed;
+  top: 1.5rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 100;
+  width: max-content;
+  max-width: calc(100% - 2rem);
+}
+
+// Same block style as InfoBlock/WarningBlock/ErrorBlock, in the success palette
+.success {
+  @include block($success-light, $success-dark, $success);
+  margin: 0;
+}
+
+// div.success outranks MessageBlock's .relativeContainer .content padding
+.toast div.success {
+  padding-block: $spacing-2;
+}
+
+.success h4 {
+  margin: 0 0 0.25rem;
+  font-size: 1rem;
+  line-height: 1.5rem;
+}
+
+.success div {
+  font-size: 0.9rem;
+  line-height: 1.5rem;
+}
+
+// Centre the icon and close button on the title line (padding 0.75rem + half of 1.5rem line-height)
+.toast .success :global(i.bx-check-circle) {
+  margin-top: 0.1rem;
+}
+
+// button[title] outranks MessageBlock's .relativeContainer .content .close
+.toast .success button[title] {
+  top: 0.25rem;
+}

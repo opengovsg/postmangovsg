@@ -11,6 +11,7 @@ import { HashedOtp, VerifyOtpInput } from '@core/interfaces'
 
 export interface AuthService {
   canSendOtp(email: string): Promise<void>
+  isWhitelistedEmail(email: string): Promise<boolean>
   sendOtp(email: string, ipAddress: string): Promise<void>
   verifyOtp(input: VerifyOtpInput): Promise<boolean>
   findOrCreateUser(email: string): Promise<User>
@@ -145,12 +146,10 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
    */
   const isWhitelistedEmail = async (email: string): Promise<boolean> => {
     const endsInWhitelistedDomain = await validateDomain(email)
-    if (!endsInWhitelistedDomain) {
-      // If the email does not end in a whitelisted domain, check that it was  whitelisted by us manually
-      const user = await User.findOne({ where: { email: email } })
-      if (user === null) throw new Error('User is not authorized')
-    }
-    return true
+    if (endsInWhitelistedDomain) return true
+    // If the email does not end in a whitelisted domain, check that it was  whitelisted by us manually
+    const user = await User.findOne({ where: { email: email } })
+    return user !== null
   }
 
   /**
@@ -206,7 +205,9 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
    * @throws error if email is not whitelisted, or user has to wait for some time before requesting an otp
    */
   const canSendOtp = async (email: string): Promise<void> => {
-    await isWhitelistedEmail(email)
+    if (!(await isWhitelistedEmail(email))) {
+      throw new Error('User is not authorized')
+    }
     await hasWaitTimeElapsed(email)
   }
 
@@ -300,6 +301,7 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
 
   return {
     canSendOtp,
+    isWhitelistedEmail,
     sendOtp,
     verifyOtp,
     findOrCreateUser,
