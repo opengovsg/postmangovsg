@@ -72,7 +72,8 @@ export const InitOneGovSgService = (
             keys: [
               {
                 ...crypto
-                  .createPrivateKey(privateKey)
+                  // Deployed env vars often carry the PEM with literal "\n"
+                  .createPrivateKey(privateKey.replace(/\\n/g, '\n'))
                   .export({ format: 'jwk' }),
                 alg: 'RS256',
                 use: 'sig',
