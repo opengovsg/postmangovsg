@@ -42,4 +42,6 @@ jobs:
         shell: bash
         env:
           BRANCH: ${{ steps.extract_branch.outputs.branch }}
-        run: ./scripts/amplify-deploy.sh $APP_ID $BRANCH
+          # Amplify builds its connected git branch by default; on a manual deploy, build the dispatched commit instead
+          COMMIT_ID: ${{ github.event_name == 'workflow_dispatch' && github.sha || '' }}
+        run: ./scripts/amplify-deploy.sh $APP_ID $BRANCH $COMMIT_ID

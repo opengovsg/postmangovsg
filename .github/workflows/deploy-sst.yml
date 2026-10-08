@@ -4,13 +4,26 @@ on:
     branches:
       - master
       - staging
+  # Ad hoc staging deploy of any branch: Actions -> this workflow -> Run workflow
+  workflow_dispatch:
 
-concurrency: deploy-sst-functions-${{ github.ref }}
+# Keyed by environment, not branch, so a manual deploy and a push to staging queue instead of racing
+concurrency: deploy-sst-functions-${{ github.ref == 'refs/heads/master' && 'prod' || 'stg' }}
 env:
   DIRECTORY: sst
 
 jobs:
+  guard:
+    name: Block manual deploys to production
+    runs-on: ubuntu-latest
+    steps:
+      - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'
+        run: |
+          echo "::error::Manual deploys from master would go to production. Release via a staging -> master PR instead."
+          exit 1
+
   lint-test:
+    needs: guard
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3

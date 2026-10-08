@@ -10,15 +10,28 @@ on:
     branches:
       - staging
       - master
+  # Ad hoc staging deploy of any branch: Actions -> this workflow -> Run workflow
+  workflow_dispatch:
 
 env:
   SLACK_CHANNEL_ID: C04H0FTGS5P # postman-deploys
 
-concurrency: deploy-non-serverless-${{ github.ref }}
+# Keyed by environment, not branch, so a manual deploy and a push to staging queue instead of racing
+concurrency: deploy-non-serverless-${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
 
 jobs:
+  guard:
+    name: Block manual deploys to production
+    runs-on: ubuntu-latest
+    steps:
+      - if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/master'
+        run: |
+          echo "::error::Manual deploys from master would go to production. Release via a staging -> master PR instead."
+          exit 1
+
   slack-prepare:
     name: Escape commit message to send in slack
+    needs: guard
     runs-on: ubuntu-latest
     outputs:
       commit_message: ${{ steps.extract-message.outputs.commit_message }}
@@ -31,7 +44,7 @@ jobs:
           echo $message
           echo "commit_message=$message" >> $GITHUB_OUTPUT
         env:
-          MESSAGE: ${{ toJSON(github.event.head_commit.message) }}
+          MESSAGE: ${{ github.event_name == 'workflow_dispatch' && toJSON(format('Manual deploy of {0} by {1}', github.ref_name, github.actor)) || toJSON(github.event.head_commit.message) }}
 
   slack-started:
     name: Send slack message when deployment starts
@@ -82,14 +95,17 @@ jobs:
 
   deploy-backend:
     name: Deploy backend to AWS Elastic Beanstalk
+    needs: guard
     uses: ./.github/workflows/deploy-eb.yml
     secrets: inherit
   deploy-worker:
     name: Deploy worker to AWS Elastic Container Service
+    needs: guard
     uses: ./.github/workflows/deploy-worker.yml
     secrets: inherit
   deploy-frontend:
     name: Deploy frontend to AWS Amplify
+    needs: guard
     uses: ./.github/workflows/deploy-frontend.yml
     secrets: inherit
 
@@ -184,7 +200,8 @@ jobs:
       - deploy-frontend
       - deploy-worker
       - e2e-test
-    if: failure()
+    # Skip when the guard blocked the run: nothing was deployed and there is no message to update
+    if: failure() && needs.slack-started.result == 'success'
     name: Send Slack message about failed build and tag engineers if it's prod
     runs-on: ubuntu-latest
     steps:
