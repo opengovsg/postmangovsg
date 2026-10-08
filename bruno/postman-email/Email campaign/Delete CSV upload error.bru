@@ -1,0 +1,11 @@
+meta {
+  name: Delete CSV upload error
+  type: http
+  seq: 6
+}
+
+delete {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/upload/status
+  body: none
+  auth: inherit
+}

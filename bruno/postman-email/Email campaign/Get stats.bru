@@ -1,0 +1,11 @@
+meta {
+  name: Get stats
+  type: http
+  seq: 11
+}
+
+get {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/stats
+  body: none
+  auth: inherit
+}

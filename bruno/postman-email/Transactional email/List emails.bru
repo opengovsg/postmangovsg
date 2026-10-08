@@ -1,0 +1,25 @@
+meta {
+  name: List emails
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/transactional/email?limit=10&offset=0
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 10
+  offset: 0
+  ~tag: test
+  ~status: DELIVERED
+  ~created_at[gte]: 2026-01-01T00:00:00Z
+  ~sort_by: -created_at
+  ~exclude_params: true
+}
+
+docs {
+  `status`: `UNSENT`, `ACCEPTED`, `SENT`, `BOUNCED`, `DELIVERED`, `OPENED`, `COMPLAINT`. `sort_by`: `created_at` or `updated_at`, prefix `-` for descending. `created_at` takes `gt`, `gte`, `lt`, `lte` with ISO dates.
+}
