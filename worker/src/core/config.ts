@@ -300,7 +300,7 @@ const config: Config<ConfigSchema> = convict({
   },
   unsubscribeUrl: {
     doc: 'Used to generate unsubscribe url',
-    default: 'https://postman.gov.sg', // prod only
+    default: 'https://legacy.postman.gov.sg', // prod only
     env: 'UNSUBSCRIBE_URL',
   },
   smsFallback: {
