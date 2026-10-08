@@ -1,0 +1,20 @@
+name: Deploy production
+on:
+  push:
+    branches:
+      - master
+
+concurrency:
+  group: deploy-production
+
+jobs:
+  non-serverless:
+    uses: ./.github/workflows/non-serverless-deploy.yml
+    with:
+      environment: production
+    secrets: inherit
+  sst:
+    uses: ./.github/workflows/deploy-sst.yml
+    with:
+      environment: production
+    secrets: inherit

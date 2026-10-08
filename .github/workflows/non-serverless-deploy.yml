@@ -6,15 +6,15 @@
 # Side note: we need to follow .github/workflows convention https://docs.github.com/en/actions/using-workflows/reusing-workflows
 name: Deploy and E2E test non-serverless stuffs
 on:
-  push:
-    branches:
-      - staging
-      - master
+  workflow_call:
+    inputs:
+      environment:
+        description: "staging or production"
+        required: true
+        type: string
 
 env:
   SLACK_CHANNEL_ID: C04H0FTGS5P # postman-deploys
-
-concurrency: deploy-non-serverless-${{ github.ref }}
 
 jobs:
   slack-prepare:
@@ -31,7 +31,7 @@ jobs:
           echo $message
           echo "commit_message=$message" >> $GITHUB_OUTPUT
         env:
-          MESSAGE: ${{ toJSON(github.event.head_commit.message) }}
+          MESSAGE: ${{ github.event_name == 'workflow_dispatch' && toJSON(format('Manual deploy of {0} by {1}', github.ref_name, github.actor)) || toJSON(github.event.head_commit.message) }}
 
   slack-started:
     name: Send slack message when deployment starts
@@ -68,7 +68,7 @@ jobs:
                       },
                       {
                         "title": "Environment",
-                        "value": "${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}",
+                        "value": "${{ inputs.environment }}",
                         "short": true
                       }
                   ],
@@ -83,14 +83,20 @@ jobs:
   deploy-backend:
     name: Deploy backend to AWS Elastic Beanstalk
     uses: ./.github/workflows/deploy-eb.yml
+    with:
+      environment: ${{ inputs.environment }}
     secrets: inherit
   deploy-worker:
     name: Deploy worker to AWS Elastic Container Service
     uses: ./.github/workflows/deploy-worker.yml
+    with:
+      environment: ${{ inputs.environment }}
     secrets: inherit
   deploy-frontend:
     name: Deploy frontend to AWS Amplify
     uses: ./.github/workflows/deploy-frontend.yml
+    with:
+      environment: ${{ inputs.environment }}
     secrets: inherit
 
   e2e-test:
@@ -100,6 +106,8 @@ jobs:
       - deploy-worker
     name: End-to-end Test
     uses: ./.github/workflows/e2e.yml
+    with:
+      environment: ${{ inputs.environment }}
     secrets: inherit
 
   # revert-on-e2e-failure:
@@ -162,7 +170,7 @@ jobs:
                       },
                       {
                         "title": "Environment",
-                        "value": "${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}",
+                        "value": "${{ inputs.environment }}",
                         "short": true
                       }
                   ],
@@ -191,7 +199,7 @@ jobs:
       - uses: slackapi/slack-github-action@v1.23.0
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
-          DEPLOY_ENV: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
+          DEPLOY_ENV: ${{ inputs.environment }}
         with:
           channel-id: ${{ env.SLACK_CHANNEL_ID }}
           update-ts: ${{ needs.slack-started.outputs.message_id }}

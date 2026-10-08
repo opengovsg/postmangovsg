@@ -1,0 +1,22 @@
+name: Deploy staging
+on:
+  push:
+    branches:
+      - staging
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-staging
+  cancel-in-progress: true
+
+jobs:
+  non-serverless:
+    uses: ./.github/workflows/non-serverless-deploy.yml
+    with:
+      environment: staging
+    secrets: inherit
+  sst:
+    uses: ./.github/workflows/deploy-sst.yml
+    with:
+      environment: staging
+    secrets: inherit

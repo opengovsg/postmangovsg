@@ -1,6 +1,11 @@
 name: Deploy worker to AWS Elastic Container Service
 on:
   workflow_call:
+    inputs:
+      environment:
+        description: "staging or production"
+        required: true
+        type: string
     outputs:
       sending_revert_command:
         description: "Command to revert sending worker"
@@ -13,20 +18,6 @@ env:
   DIRECTORY: worker
 
 jobs:
-  set_environment:
-    outputs:
-      current_env: ${{ steps.set-environment.outputs.current_env }}
-    runs-on: ubuntu-latest
-    steps:
-      - id: set-environment
-        run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            echo "current_env=production" >> $GITHUB_OUTPUT
-          else
-            echo "current_env=staging" >> $GITHUB_OUTPUT
-          fi
-
   lint:
     runs-on: ubuntu-latest
     steps:
@@ -47,12 +38,12 @@ jobs:
           npm run lint-no-fix
 
   build_application:
-    needs: [set_environment, lint]
+    needs: [lint]
     environment:
-      name: ${{ needs.set_environment.outputs.current_env }}
+      name: ${{ inputs.environment }}
     env:
       IMAGE_TAG: "github-actions-worker-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
-      BRANCH: ${{ needs.set_environment.outputs.current_env }}
+      BRANCH: ${{ inputs.environment }}
     outputs:
       image: ${{ steps.set-image-tag.outputs.image_tag }}
     runs-on: ubuntu-latest
@@ -101,9 +92,9 @@ jobs:
         run: echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   deploy_sending:
-    needs: [set_environment, build_application]
+    needs: [build_application]
     environment:
-      name: ${{ needs.set_environment.outputs.current_env }}
+      name: ${{ inputs.environment }}
     outputs:
       revert_cmd: ${{ steps.get-task-definition-sending.outputs.revert_cmd }}
       test_value: ${{ steps.get-task-definition-sending.outputs.test_value }}
@@ -146,9 +137,9 @@ jobs:
           wait-for-service-stability: true
 
   deploy_logging:
-    needs: [set_environment, build_application]
+    needs: [build_application]
     environment:
-      name: ${{ needs.set_environment.outputs.current_env }}
+      name: ${{ inputs.environment }}
     outputs:
       revert_cmd: ${{ steps.get-task-definition-logging.outputs.revert_cmd }}
     runs-on: ubuntu-latest
