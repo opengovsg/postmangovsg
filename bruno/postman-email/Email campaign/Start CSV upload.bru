@@ -1,0 +1,20 @@
+meta {
+  name: Start CSV upload
+  type: http
+  seq: 3
+}
+
+get {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/upload/start?mime_type=text/csv&md5=<base64-md5-of-csv>
+  body: none
+  auth: inherit
+}
+
+params:query {
+  mime_type: text/csv
+  md5: <base64-md5-of-csv>
+}
+
+docs {
+  Returns `presigned_url` and `transaction_id`. PUT the CSV to `presigned_url` (outside this collection), then call `Complete CSV upload`.
+}

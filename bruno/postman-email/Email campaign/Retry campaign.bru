@@ -1,0 +1,11 @@
+meta {
+  name: Retry campaign
+  type: http
+  seq: 10
+}
+
+post {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/retry
+  body: none
+  auth: inherit
+}

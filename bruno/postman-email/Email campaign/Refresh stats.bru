@@ -1,0 +1,11 @@
+meta {
+  name: Refresh stats
+  type: http
+  seq: 12
+}
+
+post {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/refresh-stats
+  body: none
+  auth: inherit
+}

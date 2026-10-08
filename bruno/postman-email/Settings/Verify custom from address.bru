@@ -1,0 +1,22 @@
+meta {
+  name: Verify custom from address
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/settings/email/from/verify
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "from": "Agency Name <noreply@agency.example.gov.sg>",
+    "recipient": "recipient@example.com"
+  }
+}
+
+docs {
+  Checks DKIM for the custom domain and sends a confirmation email to `recipient`. Fails unless the address's identity or domain is already set up in SES. The default `info@mail.postman.gov.sg` needs no verification.
+}

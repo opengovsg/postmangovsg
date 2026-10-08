@@ -1,0 +1,21 @@
+meta {
+  name: Send test email
+  type: http
+  seq: 7
+}
+
+post {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/credentials
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "recipient": "recipient@example.com"
+  }
+}
+
+docs {
+  Sends the first message to `recipient` to validate the campaign before sending.
+}

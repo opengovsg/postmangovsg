@@ -1,0 +1,18 @@
+auth {
+  mode: bearer
+}
+
+auth:bearer {
+  token: {{apiKey}}
+}
+
+docs {
+  Postman Email API (`/v1`). Requests authenticate with either:
+
+  - **API key**: set the `apiKey` secret in your environment (Bruno keeps secret values out of the `.bru` files). Sent as `Authorization: Bearer <apiKey>`.
+  - **Cookie session**: run `Auth/Request OTP`, then `Auth/Verify OTP and log in`. Bruno stores the session cookie. Some routes (API keys, settings, attachments) only accept the cookie.
+
+  The backend checks the cookie before the API key. Once you're logged in, API-key requests run as the logged-in user, so log out (or clear Bruno's cookies) before testing an API key.
+
+  Never commit real API keys, OTPs, recipient addresses or campaign data.
+}

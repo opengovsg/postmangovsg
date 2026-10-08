@@ -1,0 +1,11 @@
+meta {
+  name: Delete campaign
+  type: http
+  seq: 4
+}
+
+delete {
+  url: {{baseUrl}}/campaigns/{{campaignId}}
+  body: none
+  auth: inherit
+}

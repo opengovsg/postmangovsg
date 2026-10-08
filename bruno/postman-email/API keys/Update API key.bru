@@ -1,0 +1,19 @@
+meta {
+  name: Update API key
+  type: http
+  seq: 3
+}
+
+put {
+  url: {{baseUrl}}/api-key/{{apiKeyId}}
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "notification_contacts": [
+      "owner@example.com"
+    ]
+  }
+}
