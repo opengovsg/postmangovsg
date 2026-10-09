@@ -269,38 +269,58 @@ const renderContent = (
   blockEntities: HTMLTag[][]
 ): string => {
   const characters = text.split('').map((c) => (c === '\n' ? '<br />' : c))
-  for (let i = 0; i < characters.length; i++) {
-    const styles = inlineStyles[i]
+  // Tags currently open, outermost first. Links and styles can start and end on the same
+  // character in any combination, so tags are closed and reopened through this stack to keep
+  // the stored HTML properly nested for every parser, not only for the editor's DOMParser.
+  const openTags: HTMLTag[] = []
+  const output: string[] = []
+
+  for (let i = 0; i <= characters.length; i++) {
+    const here = [...blockEntities[i], ...sortTags(inlineStyles[i])]
     let tags = ''
 
-    if (styles.length > 0) {
-      tags = sortTags(styles).map(renderTag).join('')
+    // Close first: unwind the stack down to the deepest tag that ends here, then reopen the
+    // tags above it that are still running.
+    const closing = here.filter((t) => t.type === 'close')
+    if (closing.length > 0) {
+      const ending: number[] = []
+      for (const { tag } of closing) {
+        for (let j = openTags.length - 1; j >= 0; j--) {
+          if (openTags[j].tag === tag && !ending.includes(j)) {
+            ending.push(j)
+            break
+          }
+        }
+      }
+      if (ending.length > 0) {
+        const reopen: HTMLTag[] = []
+        const lowest = Math.min(...ending)
+        while (openTags.length > lowest) {
+          const top = openTags.pop() as HTMLTag
+          tags += renderTag({ ...top, type: 'close' })
+          if (!ending.includes(openTags.length)) reopen.unshift(top)
+        }
+        for (const t of reopen) {
+          tags += renderTag(t)
+          openTags.push(t)
+        }
+      }
     }
 
-    const entities = blockEntities[i]
-    if (entities.length > 0) {
-      tags = entities.map(renderTag).join('')
+    // Then open: links before styles, so a link wraps the styles that start with it.
+    for (const t of here.filter((t) => t.type === 'open')) {
+      tags += renderTag(t)
+      if (t.tag !== 'img') openTags.push(t)
     }
 
-    if (tags) {
-      characters[i] = `${tags}${characters[i]}`
-    }
+    output.push(i < characters.length ? `${tags}${characters[i]}` : tags)
   }
 
-  // Append closing tags for end of text
-  const endStyle = inlineStyles[inlineStyles.length - 1]
-  if (endStyle.length > 0) {
-    const tags = sortTags(endStyle).map(renderTag).join('')
-    characters.push(tags)
+  while (openTags.length > 0) {
+    output.push(renderTag({ ...(openTags.pop() as HTMLTag), type: 'close' }))
   }
 
-  const endEntities = blockEntities[blockEntities.length - 1]
-  if (endEntities.length > 0) {
-    const tags = endEntities.map(renderTag).join('')
-    characters.push(tags)
-  }
-
-  return characters.join('')
+  return output.join('')
 }
 
 const getBlockContent = (
