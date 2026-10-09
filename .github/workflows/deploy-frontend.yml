@@ -1,11 +1,6 @@
 name: Deploy frontend to AWS Amplify
 on:
   workflow_call:
-    inputs:
-      environment:
-        description: "staging or production"
-        required: true
-        type: string
     outputs:
       revert_command:
         description: "Command to revert frontend deployment"
@@ -15,8 +10,6 @@ env:
 jobs:
   deploy-frontend:
     runs-on: ubuntu-latest
-    env:
-      BRANCH: ${{ inputs.environment == 'production' && 'master' || 'staging' }}
     outputs:
       revert_cmd: ${{ steps.generate-revert-command.outputs.revert_cmd }}
     steps:
@@ -27,8 +20,20 @@ jobs:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws-region: ${{ vars.AWS_DEFAULT_REGION }}
+      - name: Extract branch name
+        shell: bash
+        run: |
+          echo "Running on branch ${{ github.ref }}"
+          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+            echo "branch=master" >> $GITHUB_OUTPUT
+          else
+            echo "branch=staging" >> $GITHUB_OUTPUT
+          fi
+        id: extract_branch
       - name: Generate revert command
         id: generate-revert-command
+        env:
+          BRANCH: ${{ steps.extract_branch.outputs.branch }}
         run: |
           aws amplify list-jobs --app-id $APP_ID --branch-name $BRANCH --max-items 1 | jq '.jobSummaries[0]' | echo
           JOB_ID=$(aws amplify list-jobs --app-id $APP_ID --branch-name $BRANCH --max-items 1 | jq '.jobSummaries[0].jobId')
@@ -36,5 +41,5 @@ jobs:
       - name: Deploy
         shell: bash
         env:
-          COMMIT_ID: ${{ github.sha }}
-        run: ./scripts/amplify-deploy.sh $APP_ID $BRANCH $COMMIT_ID
+          BRANCH: ${{ steps.extract_branch.outputs.branch }}
+        run: ./scripts/amplify-deploy.sh $APP_ID $BRANCH
