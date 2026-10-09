@@ -64,9 +64,14 @@ test('exchanges captured params and replaces the callback history entry', async 
   })
   expect(window.location.search).toBe('')
 
-  fireEvent.click(
-    await screen.findByRole('button', { name: 'Back from campaigns' })
-  )
-  expect(await screen.findByText('Prior page')).toBeInTheDocument()
+  const back = await screen.findByRole('button', {
+    name: 'Back from campaigns',
+  })
+  // react-router 6.3 ignores navigate() until the component's useEffect runs,
+  // which can be after the button is already in the DOM.
+  await waitFor(() => {
+    fireEvent.click(back)
+    expect(screen.getByText('Prior page')).toBeInTheDocument()
+  })
   window.history.replaceState(null, '', '/')
 })
