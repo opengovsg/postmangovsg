@@ -5,7 +5,7 @@ import { createRef, useEffect, useContext } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation } from 'react-router-dom'
 
 import styles from './LoginTemplate.module.scss'
 
@@ -13,7 +13,7 @@ import appLogo from 'assets/img/brand/app-logo.svg'
 import companyLogo from 'assets/img/brand/company-logo-dark.svg'
 import loginImg from 'assets/img/landing/login.png'
 import { InfoBanner } from 'components/common'
-import { LINKS } from 'config'
+import { LINKS, ONE_GOV_SG_CALLBACK_PATH } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 
 interface LoginTemplateProps {
@@ -28,6 +28,7 @@ const LoginTemplate: React.FC<LoginTemplateProps> = ({
   children,
 }) => {
   const authContext = useContext(AuthContext)
+  const { pathname } = useLocation()
   const infoBannerRef = createRef<HTMLDivElement>()
 
   useEffect(() => {
@@ -49,9 +50,12 @@ const LoginTemplate: React.FC<LoginTemplateProps> = ({
     }
   })
 
-  if (authContext.isAuthenticated) {
+  if (authContext.isAuthenticated && pathname !== ONE_GOV_SG_CALLBACK_PATH) {
     return <Navigate to="/campaigns" />
   }
+
+  // Skip the login page chrome while the callback is being exchanged
+  if (pathname === ONE_GOV_SG_CALLBACK_PATH) return <>{children}</>
 
   return (
     <>

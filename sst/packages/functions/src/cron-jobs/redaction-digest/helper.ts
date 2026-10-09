@@ -17,8 +17,8 @@ export const RETENTION_PERIOD = 30
 export const NOTICE_PERIOD = 7
 // TODO switch based on stage
 const FRONTEND_URL =
-  'https://postman.gov.sg' ||
-  'https://staging.postman.gov.sg' ||
+  'https://legacy.postman.gov.sg' ||
+  'https://legacy-staging.postman.gov.sg' ||
   'http://localhost:3000'
 
 export const getUserRedactedCampaigns = async (
@@ -137,13 +137,13 @@ export const createEmailBody = (
     </p>
 
     <p>
-      Please log in to <a href="https://postman.gov.sg">postman.gov.sg</a> and navigate to your campaign
+      Please log in to <a href="https://legacy.postman.gov.sg">postman.gov.sg</a> and navigate to your campaign
       landing page to download your report if you wish to keep it for audit purpose.
     </p>
 
     <p>
       Thank you,<br>
-      <a href="https://postman.gov.sg">Postman.gov.sg</a> &bull; Open Government Products &bull; <a href="https://open.gov.sg">open.gov.sg</a>
+      <a href="https://legacy.postman.gov.sg">Postman.gov.sg</a> &bull; Open Government Products &bull; <a href="https://open.gov.sg">open.gov.sg</a>
     </p>
   `
 

@@ -63,6 +63,12 @@ interface ConfigSchema {
       path: string
     }
   }
+  oneGovSg: {
+    issuer: string
+    clientId: string
+    privateKey: string
+    redirectUri: string
+  }
   otp: {
     retries: number
     expiry: number
@@ -317,12 +323,12 @@ const config: Config<ConfigSchema> = convict({
   },
   protectedUrl: {
     doc: 'Url domain and path for password-protected messages',
-    default: 'https://postman.gov.sg/p', // prod only
+    default: 'https://legacy.postman.gov.sg/p', // prod only
     env: 'PROTECTED_URL',
   },
   unsubscribeUrl: {
     doc: 'Url domain and path for unsubscribe page',
-    default: 'https://postman.gov.sg/unsubscribe', // prod only
+    default: 'https://legacy.postman.gov.sg/unsubscribe', // prod only
     env: 'UNSUBSCRIBE_URL',
   },
   session: {
@@ -370,6 +376,29 @@ const config: Config<ConfigSchema> = convict({
         default: '/',
         env: 'COOKIE_PATH',
       },
+    },
+  },
+  oneGovSg: {
+    issuer: {
+      doc: 'one.gov.sg OIDC issuer. Must be the full issuer including /api/auth',
+      default: 'https://one.gov.sg/api/auth',
+      env: 'ONE_GOV_SG_ISSUER',
+    },
+    clientId: {
+      doc: 'one.gov.sg client_id. one.gov.sg login is disabled if empty',
+      default: '',
+      env: 'ONE_GOV_SG_CLIENT_ID',
+    },
+    privateKey: {
+      doc: 'PKCS#8 PEM private key used to sign private_key_jwt client assertions',
+      default: '',
+      env: 'ONE_GOV_SG_PRIVATE_KEY',
+      sensitive: true,
+    },
+    redirectUri: {
+      doc: 'Frontend callback page registered with one.gov.sg, e.g. https://postman.gov.sg/login/one-gov-sg/callback',
+      default: '',
+      env: 'ONE_GOV_SG_REDIRECT_URI',
     },
   },
   otp: {

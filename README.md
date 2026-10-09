@@ -217,7 +217,7 @@ We use Github Actions to simplify our deployment process:
 
 ## Releasing
 
-When a pull request is merged to `master`, it will be deployed automatically.
+When a pull request is merged to `staging`, it is deployed to staging automatically. To release to production, open a pull request from `staging` to `master`; it is deployed to production when merged.
 
 ## Serverless
 
@@ -296,14 +296,14 @@ The URLs of the Grafana dashboards are:
 
 ## Contributions
 
-The production branch is `master` and each PR is deployed when it is merged into `master`.
+The default branch is `staging`. PRs merged into `staging` are deployed to staging, and changes reach production when `staging` is merged into `master`.
 
 **If you have write access to this repository**
 
-- Check out your feature branch from `master`
+- Check out your feature branch from `staging`
 - Make changes, and commit those changes
 - Push these changes to Github
-- Submit a pull request against `master`, filling in the standard template
+- Submit a pull request against `staging`, filling in the standard template
 
 **If you do not have write access to this repository**
 
@@ -311,7 +311,7 @@ The production branch is `master` and each PR is deployed when it is merged into
 - Clone the forked repository to your machine
 - Create a branch, make changes and commit those changes.
 - Push these changes to Github
-- Submit a pull request against `basefork/master` (that's us!)
+- Submit a pull request against `basefork/staging` (that's us!)
 - Describe the issue as thoroughly as possible, and with screenshots if applicable. A picture speaks a thousand words!
 
 For more information, see [CONTRIBUTING.md](docs/CONTRIBUTING.md)

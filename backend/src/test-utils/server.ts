@@ -6,6 +6,7 @@ import sessionLoader from '@core/loaders/session.loader'
 import { InitV1Route } from '@core/routes'
 import {
   InitAuthService,
+  InitOneGovSgService,
   InitCredentialService,
   RedisService,
 } from '@core/services'
@@ -21,6 +22,7 @@ const initialiseServer = (session?: boolean): express.Application => {
   const redisService = new RedisService()
   ;(app as any).redisService = redisService
   ;(app as any).authService = InitAuthService(redisService)
+  ;(app as any).oneGovSgService = InitOneGovSgService(redisService)
   ;(app as any).credentialService = InitCredentialService(redisService)
   sessionLoader({ app })
   app.use(

@@ -1,7 +1,13 @@
 import { Request, Response, NextFunction, Handler } from 'express'
 import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
-import { AuthService, experimentService } from '@core/services'
+import {
+  AuthService,
+  experimentService,
+  OneGovSgCallbackError,
+  OneGovSgIdentity,
+  OneGovSgService,
+} from '@core/services'
 import { getRequestIp } from '@core/utils/request'
 import { DEFAULT_TX_EMAIL_RATE_LIMIT } from '@core/models'
 import { ApiAuthenticationError } from '@core/errors/rest-api.errors'
@@ -12,6 +18,8 @@ export interface AuthMiddleware {
   getUser: Handler
   getAuthMiddleware: (authTypes: AuthType[]) => Handler
   logout: Handler
+  oneGovSgLogin: Handler
+  oneGovSgCallback: Handler
 }
 
 export enum AuthType {
@@ -20,7 +28,10 @@ export enum AuthType {
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
-export const InitAuthMiddleware = (authService: AuthService) => {
+export const InitAuthMiddleware = (
+  authService: AuthService,
+  oneGovSgService: OneGovSgService
+) => {
   const logger = loggerWithLabel(module)
 
   /**
@@ -201,13 +212,15 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     res: Response,
     next: NextFunction
   ): Promise<Response | void> => {
+    // Read before destroy so the frontend can tell the user they're still signed in to one.gov.sg
+    const oneGovSg = !!req.session?.oneGovSgSid
     return new Promise<Response | void>((resolve, reject) => {
       req.session?.destroy((err) => {
         res.cookie(config.get('session.cookieName'), '', {
           expires: new Date(),
         }) // Makes cookie expire immediately
         if (!err) {
-          return resolve(res.sendStatus(200))
+          return resolve(res.status(200).json({ oneGovSg }))
         }
         logger.error({
           message: 'Failed to destroy session',
@@ -219,7 +232,98 @@ export const InitAuthMiddleware = (authService: AuthService) => {
     }).catch((err) => next(err))
   }
 
+  // Binds the IdP round-trip to this browser. Strict is fine: the frontend posts the callback same-site.
+  const ONE_GOV_SG_TX_COOKIE = 'onegovsg_tx'
+  const oneGovSgTxCookieOptions = (req: Request) => ({
+    httpOnly: true,
+    secure: config.get('session.cookieSettings.secure'),
+    sameSite: 'strict' as const,
+    path: `${req.baseUrl}/one-gov-sg/callback`,
+  })
+
+  /**
+   * Starts a one.gov.sg login: stores state/nonce/PKCE verifier server-side and redirects to the IdP.
+   */
+  const oneGovSgLogin = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    try {
+      const { txId, url } = await oneGovSgService.startLogin()
+      res.cookie(ONE_GOV_SG_TX_COOKIE, txId, {
+        ...oneGovSgTxCookieOptions(req),
+        maxAge: 10 * 60 * 1000,
+      })
+      return res.redirect(url)
+    } catch (e) {
+      return next(e)
+    }
+  }
+
+  /**
+   * The frontend redirect_uri page posts the IdP's callback params here: validates them, verifies the
+   * id_token, gates access, then creates a session
+   */
+  const oneGovSgCallback = async (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Promise<Response | void> => {
+    const txId = req
+      .get('cookie')
+      ?.match(new RegExp(`(?:^|;\\s*)${ONE_GOV_SG_TX_COOKIE}=([\\w-]+)`))?.[1]
+    res.clearCookie(ONE_GOV_SG_TX_COOKIE, oneGovSgTxCookieOptions(req))
+
+    let identity: OneGovSgIdentity
+    try {
+      identity = await oneGovSgService.completeLogin(txId, req.body ?? {})
+    } catch (e) {
+      if (e instanceof OneGovSgCallbackError) {
+        logger.warn({
+          message: 'Rejected one.gov.sg callback',
+          reason: e.message,
+          action: 'oneGovSgCallback',
+        })
+        return res.status(400).json({ message: e.message })
+      }
+      return next(e)
+    }
+
+    // Authorization gate before provisioning
+    // ponytail: one.gov.sg spec says gate on `sub` allowlist, not email domain. Kept Postman's
+    // existing domain + manual-user whitelist by product decision; swap for a sub allowlist if that changes.
+    try {
+      if (!(await authService.isWhitelistedEmail(identity.email))) {
+        logger.info({
+          message: 'one.gov.sg user not authorized',
+          action: 'oneGovSgCallback',
+        })
+        return res
+          .status(403)
+          .json({ message: 'Your account is not authorised to use Postman.' })
+      }
+      const user = await authService.findOrCreateUser(identity.email)
+      if (!req.session) return next(new Error('Session object not found!'))
+      await new Promise<void>((resolve, reject) =>
+        req.session?.regenerate((err) => (err ? reject(err) : resolve()))
+      )
+      req.session.user = {
+        id: user.id,
+        createdAt: user.createdAt,
+        updatedAt: user.updatedAt,
+        email: user.email,
+      }
+      req.session.oneGovSgSid = identity.sid // for future central logout
+      return res.sendStatus(200)
+    } catch (e) {
+      return next(e)
+    }
+  }
+
   return {
+    oneGovSgLogin,
+    oneGovSgCallback,
     getOtp,
     verifyOtp,
     getUser,

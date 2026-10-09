@@ -96,6 +96,12 @@ export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
 export const APP_ENV =
   (process.env.REACT_APP_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string
+// Must match the backend having ONE_GOV_SG_CLIENT_ID set, else the login route 404s
+export const ONE_GOV_SG_ENABLED =
+  process.env.REACT_APP_ONE_GOV_SG_ENABLED === 'true'
+export const ONE_GOV_SG_START_PATH = '/login/one-gov-sg/start'
+// redirect_uri registered with one.gov.sg, for each frontend origin
+export const ONE_GOV_SG_CALLBACK_PATH = '/login/one-gov-sg/callback'
 export const INFO_BANNER_COLOR = process.env
   .REACT_APP_INFO_BANNER_COLOR as string
 

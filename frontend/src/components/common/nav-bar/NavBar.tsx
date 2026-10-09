@@ -6,7 +6,7 @@ import { useState, useContext } from 'react'
 
 import { OutboundLink } from 'react-ga'
 
-import { NavLink, useLocation } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 import styles from './NavBar.module.scss'
 
@@ -24,6 +24,7 @@ const NavBar = () => {
   const modalContext = useContext(ModalContext)
   const [menuOpen, setMenuOpen] = useState(false)
   const location = useLocation()
+  const navigate = useNavigate()
 
   function handleCreateCampaign() {
     modalContext.setModalContent(<CreateModal></CreateModal>)
@@ -31,8 +32,9 @@ const NavBar = () => {
 
   async function handleLogout() {
     try {
-      await logout()
+      const oneGovSg = await logout()
       setAuthenticated(false)
+      if (oneGovSg) navigate('/', { state: { oneGovSgLoggedOut: true } })
     } catch (err) {
       console.error(err)
     }

@@ -4,6 +4,7 @@ import cx from 'classnames'
 import { noop } from 'lodash'
 
 import React, { useState, useContext, useEffect } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 
 import styles from './LoginInput.module.scss'
 
@@ -14,12 +15,19 @@ import {
   PrimaryButton,
   ConfirmModal,
 } from 'components/common'
+import { takeOneGovSgCallbackParams } from 'components/login/one-gov-sg-callback'
+import {
+  ONE_GOV_SG_CALLBACK_PATH,
+  ONE_GOV_SG_ENABLED,
+  ONE_GOV_SG_START_PATH,
+} from 'config'
 import { AuthContext } from 'contexts/auth.context'
 
 import { ModalContext } from 'contexts/modal.context'
 import {
   getOtpWithEmail,
   loginWithOtp,
+  loginWithOneGovSg,
   getUser,
   setUserAnalytics,
 } from 'services/auth.service'
@@ -45,6 +53,8 @@ const Login = () => {
   const [canResend, setCanResend] = useState(false)
   const [isResending, setIsResending] = useState(false)
   const modalContext = useContext(ModalContext)
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
   let timeoutId: NodeJS.Timeout
 
   useEffect(() => {
@@ -57,32 +67,6 @@ const Login = () => {
         title={`Unable to sign in`}
         subtitleElement={
           <h4 className={styles.subtitleElement}>{errorString}</h4>
-        }
-        buttonText="Okay"
-        alternateImage={ErrorImage}
-        primary={true}
-        onConfirm={() => modalContext.close()}
-      />
-    )
-
-  const openSgidUnavailableModal = () =>
-    modalContext.setModalContent(
-      <ConfirmModal
-        title={`Singpass login is unavailable`}
-        subtitleElement={
-          <h4 className={styles.subtitleElement}>
-            From 5pm, 3 May onwards, Singpass login will no longer be available.{' '}
-            Please log in using email OTP instead. If you’re unable to access{' '}
-            your email, refer to this{' '}
-            <a
-              href="https://docs.developer.tech.gov.sg/docs/postman-sgdp-guide/login-on-the-go"
-              target="_blank"
-              rel="noreferrer"
-            >
-              guide
-            </a>{' '}
-            to learn how you can forward the email OTP to your phone number
-          </h4>
         }
         buttonText="Okay"
         alternateImage={ErrorImage}
@@ -123,6 +107,36 @@ const Login = () => {
     }
   }
 
+  // one.gov.sg redirects back here; the backend exchanges the code
+  async function loginOneGovSg(params: Record<string, string>) {
+    try {
+      await loginWithOneGovSg(params)
+      const user = await getUser()
+      if (!user?.email) {
+        throw new Error('Unable to confirm your sign-in. Please try again.')
+      }
+      setAuthenticated(true)
+      setAuthContextEmail(user.email)
+      setExperimentalData(
+        user.experimental_data as { [feature: string]: Record<string, string> }
+      )
+      setUserAnalytics(user)
+      navigate('/campaigns', { replace: true })
+    } catch (err) {
+      // Leave the callback route after a failed sign-in.
+      navigate('/login', { replace: true })
+      openErrorModal((err as Error).message)
+      sendException((err as Error).message)
+    }
+  }
+
+  useEffect(() => {
+    if (pathname === ONE_GOV_SG_CALLBACK_PATH) {
+      void loginOneGovSg(takeOneGovSgCallbackParams())
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   function resetButton() {
     setCanResend(false)
     setOtp('')
@@ -133,6 +147,10 @@ const Login = () => {
     setIsResending(true)
     await sendOtp()
     setIsResending(false)
+  }
+
+  if (pathname === ONE_GOV_SG_CALLBACK_PATH) {
+    return <i className="spinner bx bx-loader-alt bx-spin"></i>
   }
 
   return (
@@ -181,25 +199,14 @@ const Login = () => {
           loadingButtonLabel={<Trans>Verifying OTP...</Trans>}
         />
       )}
-      {!otpSent && (
+      {!otpSent && ONE_GOV_SG_ENABLED && (
         <React.Fragment>
           <h4 className={styles.text}>
             <Trans>or</Trans>
           </h4>
-          <PrimaryButton onClick={() => openSgidUnavailableModal()}>
-            Log in with Singpass
+          <PrimaryButton onClick={() => navigate(ONE_GOV_SG_START_PATH)}>
+            Log in with one.gov.sg
           </PrimaryButton>
-          <p>
-            Can my agency use this? Check{' '}
-            <a
-              style={{ textDecoration: 'underline' }}
-              href={''}
-              target="_blank"
-              rel="noreferrer"
-            >
-              here
-            </a>
-          </p>
         </React.Fragment>
       )}
     </div>

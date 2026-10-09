@@ -56,8 +56,14 @@ import { InitGovsgTransactionalMiddleware } from '@govsg/middlewares/govsg-trans
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
-  const authMiddleware = InitAuthMiddleware((app as any).authService)
-  const authenticationRoutes = InitAuthRoutes(authMiddleware)
+  const authMiddleware = InitAuthMiddleware(
+    (app as any).authService,
+    (app as any).oneGovSgService
+  )
+  const authenticationRoutes = InitAuthRoutes(
+    authMiddleware,
+    (app as any).redisService
+  )
   const settingsMiddleware = InitSettingsMiddleware(
     (app as any).credentialService
   )
