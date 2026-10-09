@@ -219,6 +219,8 @@ We use Github Actions to simplify our deployment process:
 
 When a pull request is merged to `staging`, it is deployed to staging automatically. To release to production, open a pull request from `staging` to `master`; it is deployed to production when merged.
 
+To deploy any other branch to staging, open the `Deploy staging` workflow under Actions, click `Run workflow` and pick the branch. That workflow only ever deploys to staging, and the production workflow has no manual trigger.
+
 ## Serverless
 
 We make use of AWS lambda to handle the callbacks from Twilio, as well as updating email delivery status.

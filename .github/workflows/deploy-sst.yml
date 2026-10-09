@@ -1,11 +1,11 @@
 name: Deploy SST functions
 on:
-  push:
-    branches:
-      - master
-      - staging
-
-concurrency: deploy-sst-functions-${{ github.ref }}
+  workflow_call:
+    inputs:
+      environment:
+        description: "staging or production"
+        required: true
+        type: string
 env:
   DIRECTORY: sst
 
@@ -40,4 +40,4 @@ jobs:
       - name: Install dependencies
         run: cd "$DIRECTORY" && npm ci
       - name: Deploy
-        run: cd "$DIRECTORY" && npx sst deploy --stage ${{ github.ref == 'refs/heads/master' && 'prod' || 'stg' }}
+        run: cd "$DIRECTORY" && npx sst deploy --stage ${{ inputs.environment == 'production' && 'prod' || 'stg' }}

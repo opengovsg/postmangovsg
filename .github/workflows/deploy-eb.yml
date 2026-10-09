@@ -1,6 +1,11 @@
 name: Deploy backend to AWS Elastic Beanstalk
 on:
   workflow_call:
+    inputs:
+      environment:
+        description: "staging or production"
+        required: true
+        type: string
     outputs:
       revert_command_backend:
         description: "Command to revert backend deployment"
@@ -13,20 +18,6 @@ env:
   DIRECTORY: backend
 
 jobs:
-  set_environment:
-    outputs:
-      current_env: ${{ steps.set-environment.outputs.current_env }}
-    runs-on: ubuntu-latest
-    steps:
-      - id: set-environment
-        run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
-            echo "current_env=production" >> $GITHUB_OUTPUT
-          else
-             echo "current_env=staging" >> $GITHUB_OUTPUT
-          fi
-
   lint-test:
     runs-on: ubuntu-latest
     services:
@@ -69,12 +60,12 @@ jobs:
           npm test
 
   build_application:
-    needs: [set_environment, lint-test]
+    needs: [lint-test]
     environment:
-      name: ${{ needs.set_environment.outputs.current_env }}
+      name: ${{ inputs.environment }}
     env:
       IMAGE_TAG: "github-actions-backend-${{ github.sha }}-${{ github.run_id }}-${{github.run_attempt}}"
-      BRANCH: ${{ needs.set_environment.outputs.current_env }}
+      BRANCH: ${{ inputs.environment }}
     runs-on: ubuntu-latest
     outputs:
       image_tag: ${{ steps.set-image-tag.outputs.image_tag }}
@@ -136,7 +127,8 @@ jobs:
         env:
           BUCKET_NAME: postmangovsg-elasticbeanstalk-appversion
           APP_NAME: postmangovsg
-          COMMIT_MESSAGE: ${{ github.event.head_commit.message }}
+          # this ensures that deploys via manual workflow triggers do not show an undefined commit message
+          COMMIT_MESSAGE: ${{ github.event_name == 'workflow_dispatch' && format('Manual deploy of {0} by {1}', github.ref_name, github.actor) || github.event.head_commit.message }}
         run: |
           cd backend
           TRUNCATED_DESC=$(echo "$COMMIT_MESSAGE" | head -n 1 | cut -b1-180)
@@ -150,9 +142,9 @@ jobs:
         run: echo "image_tag=$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   deploy_backend:
-    needs: [set_environment, build_application]
+    needs: [build_application]
     environment:
-      name: ${{ needs.set_environment.outputs.current_env }}
+      name: ${{ inputs.environment }}
     outputs:
       revert_cmd: ${{ steps.generate-revert-command.outputs.revert_cmd }}
     runs-on: ubuntu-latest
@@ -183,9 +175,9 @@ jobs:
           wait_for_environment_recovery: 480 # 8 minutes
 
   deploy_callback:
-    needs: [set_environment, build_application]
+    needs: [build_application]
     environment:
-      name: ${{ needs.set_environment.outputs.current_env }}
+      name: ${{ inputs.environment }}
     outputs:
       revert_cmd: ${{ steps.generate-revert-command.outputs.revert_cmd }}
     runs-on: ubuntu-latest
