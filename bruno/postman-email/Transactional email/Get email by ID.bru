@@ -1,0 +1,11 @@
+meta {
+  name: Get email by ID
+  type: http
+  seq: 4
+}
+
+get {
+  url: {{baseUrl}}/transactional/email/{{emailId}}
+  body: none
+  auth: inherit
+}

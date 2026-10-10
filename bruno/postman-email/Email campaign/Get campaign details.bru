@@ -1,0 +1,11 @@
+meta {
+  name: Get campaign details
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email
+  body: none
+  auth: inherit
+}

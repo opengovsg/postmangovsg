@@ -1,0 +1,11 @@
+meta {
+  name: Preview first message
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/preview
+  body: none
+  auth: inherit
+}

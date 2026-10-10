@@ -1,0 +1,21 @@
+meta {
+  name: Request OTP
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/otp
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{loginEmail}}"
+  }
+}
+
+docs {
+  Emails a one-time password to `loginEmail`. Set `loginEmail` in your environment or edit the body; don't commit it.
+}

@@ -1,0 +1,11 @@
+meta {
+  name: Get CSV upload status
+  type: http
+  seq: 5
+}
+
+get {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/upload/status
+  body: none
+  auth: inherit
+}

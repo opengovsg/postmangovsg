@@ -1,0 +1,21 @@
+meta {
+  name: Send campaign
+  type: http
+  seq: 9
+}
+
+post {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/send
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "rate": 10
+  }
+}
+
+docs {
+  `rate` is messages per second. Add `scheduledTiming` (ISO date) to schedule instead of sending now.
+}

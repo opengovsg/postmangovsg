@@ -1,0 +1,11 @@
+meta {
+  name: Export delivered recipients
+  type: http
+  seq: 13
+}
+
+get {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/export
+  body: none
+  auth: inherit
+}

@@ -1,0 +1,24 @@
+meta {
+  name: Save template
+  type: http
+  seq: 2
+}
+
+put {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/template
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "subject": "Hello {{name}}",
+    "body": "<p>Dear {{name}},</p>",
+    "reply_to": null,
+    "show_logo": true
+  }
+}
+
+docs {
+  `{{name}}` in the subject and body are Postman template keywords filled from the recipient CSV, not Bruno variables. `reply_to` is required but may be null. Optional `from` defaults to `info@mail.postman.gov.sg`; any other address needs its identity or domain set up in SES.
+}

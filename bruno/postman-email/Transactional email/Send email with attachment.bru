@@ -1,0 +1,23 @@
+meta {
+  name: Send email with attachment
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/transactional/email/send
+  body: multipartForm
+  auth: inherit
+}
+
+body:multipart-form {
+  recipient: recipient@example.com
+  subject: Test email with attachment
+  body: <p>See attached</p>
+  cc: ["cc@example.com"]
+  attachments: @file(fixtures/sample.txt)
+}
+
+docs {
+  Multipart form. `cc` and `bcc` must be stringified JSON arrays in form-data. Replace `fixtures/sample.txt` with your own file; add more `attachments` fields for more files.
+}

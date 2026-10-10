@@ -1,0 +1,15 @@
+meta {
+  name: Upload campaign embed
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/attachments
+  body: multipartForm
+  auth: none
+}
+
+body:multipart-form {
+  attachments: @file(fixtures/sample.txt)
+}

@@ -1,0 +1,22 @@
+meta {
+  name: Verify OTP and log in
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "email": "{{loginEmail}}",
+    "otp": "ABCD1234"
+  }
+}
+
+docs {
+  `otp` is the 8-character alphanumeric code from the OTP email. On success the backend sets a session cookie, which Bruno reuses for later requests.
+}
