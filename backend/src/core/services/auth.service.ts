@@ -234,9 +234,9 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
       body: `Your OTP is <b>${otp}</b>. It will expire in ${Math.floor(
         OTP_EXPIRY / 60
       )} minutes.
-    Please use this to login to your ${appName} account. <p>If your OTP does not work, please request for a new OTP.</p>
-    <p>This login attempt was made from the IP: ${ipAddress}. If you did not attempt to log in to ${appName}, you may choose to investigate this IP address further.</p>
-    <p>The ${appName} Support Team</p>`,
+    Please use this to login to your <a href="https://legacy.postman.gov.sg">legacy.postman.gov.sg</a> account. <p>If your OTP does not work, please request for a new OTP.</p>
+    <p>This login attempt was made from the IP: ${ipAddress}. If you did not attempt to log in to <a href="https://legacy.postman.gov.sg">legacy.postman.gov.sg</a>, you may choose to investigate this IP address further.</p>
+    <p>The <a href="https://legacy.postman.gov.sg">Postman Legacy</a> Support Team</p>`,
     })
   }
 
