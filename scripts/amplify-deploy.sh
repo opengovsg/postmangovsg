@@ -1,5 +1,5 @@
-echo "Deploy branch $2 at commit $3"
-JOB_ID=$(aws amplify start-job --app-id $1 --branch-name $2 --job-type RELEASE --commit-id $3 | jq -r '.jobSummary.jobId')
+echo "Deploy branch $2"
+JOB_ID=$(aws amplify start-job --app-id $1 --branch-name $2 --job-type RELEASE | jq -r '.jobSummary.jobId')
 echo "Release started"
 echo "Job ID is $JOB_ID"
 if [ -z "$JOB_ID" ]
