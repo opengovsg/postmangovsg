@@ -1,0 +1,17 @@
+meta {
+  name: Duplicate campaign
+  type: http
+  seq: 14
+}
+
+post {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/duplicate
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "name": "Copy of test campaign"
+  }
+}

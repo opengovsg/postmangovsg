@@ -1,0 +1,22 @@
+meta {
+  name: Complete protected upload
+  type: http
+  seq: 16
+}
+
+post {
+  url: {{baseUrl}}/campaign/{{campaignId}}/email/protect/upload/complete
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "filename": "recipients.csv",
+    "transaction_id": "<transaction_id from upload start>",
+    "part_count": 1,
+    "etags": [
+      "<ETag of part 1>"
+    ]
+  }
+}

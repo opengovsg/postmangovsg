@@ -1,0 +1,29 @@
+meta {
+  name: Send email
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/transactional/email/send
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "recipient": "recipient@example.com",
+    "subject": "Test email",
+    "body": "<p>Hello from Postman</p>",
+    "reply_to": "reply@example.com",
+    "classification": "FOR_INFO",
+    "tag": "test",
+    "cc": [],
+    "bcc": [],
+    "disable_tracking": false
+  }
+}
+
+docs {
+  Required: `recipient`, `subject`, `body`. Optional: `from` (defaults to `info@mail.postman.gov.sg`; any other address needs its identity or domain set up in SES), `reply_to`, `cc`, `bcc`, `tag` (max 255 chars), `classification` (`URGENT`, `FOR_ACTION`, `FOR_INFO`), `disable_tracking`.
+}

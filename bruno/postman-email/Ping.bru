@@ -1,0 +1,15 @@
+meta {
+  name: Ping
+  type: http
+  seq: 0
+}
+
+get {
+  url: {{baseUrl}}/ping
+  body: none
+  auth: none
+}
+
+docs {
+  Health check. Returns 200 when the backend can reach the database.
+}

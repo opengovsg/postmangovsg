@@ -1,0 +1,23 @@
+meta {
+  name: Create email campaign
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/campaigns
+  body: json
+  auth: inherit
+}
+
+body:json {
+  {
+    "type": "EMAIL",
+    "name": "Test campaign",
+    "protect": false
+  }
+}
+
+docs {
+  Copy the returned `id` into the `campaignId` environment variable.
+}

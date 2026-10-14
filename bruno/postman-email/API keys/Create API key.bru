@@ -1,0 +1,24 @@
+meta {
+  name: Create API key
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/api-key
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "label": "test-key",
+    "notification_contacts": [
+      "owner@example.com"
+    ]
+  }
+}
+
+docs {
+  The plaintext key is only returned once. Store it in the `apiKey` secret; never paste it into a `.bru` file.
+}

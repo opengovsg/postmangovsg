@@ -1,0 +1,21 @@
+meta {
+  name: List campaigns
+  type: http
+  seq: 1
+}
+
+get {
+  url: {{baseUrl}}/campaigns?limit=10&offset=0&type=EMAIL
+  body: none
+  auth: inherit
+}
+
+params:query {
+  limit: 10
+  offset: 0
+  type: EMAIL
+  ~status: Draft
+  ~name: test
+  ~sort_by: created_at
+  ~order_by: DESC
+}

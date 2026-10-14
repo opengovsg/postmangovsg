@@ -1,0 +1,11 @@
+meta {
+  name: Cancel scheduled campaign
+  type: http
+  seq: 5
+}
+
+post {
+  url: {{baseUrl}}/campaigns/{{campaignId}}/cancel
+  body: none
+  auth: inherit
+}
