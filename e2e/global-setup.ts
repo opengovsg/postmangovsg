@@ -12,7 +12,7 @@ async function exportOTPLoginState() {
   const page = await browser.newPage({
     baseURL: DASHBOARD_URL,
   });
-  page.goto('/login');
+  await page.goto('/login');
   await page.locator('input[type=email]').fill(MAILBOX);
   await page.locator('button[type=submit]').click();
 
