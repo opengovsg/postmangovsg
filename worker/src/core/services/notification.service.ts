@@ -52,9 +52,9 @@ const generateScheduledCampaignNotificationEmail = async (
   const templateBody =
     '<p>Greetings,</p>' +
     '<p>Your campaign <b>{{campaignName}}</b> has been sent!</p>' +
-    '<p>You may log in to Postman.gov.sg to view your campaign statistics and download your delivery report.</p>' +
+    '<p>You may log in to <a href="https://legacy.postman.gov.sg">legacy.postman.gov.sg</a> to view your campaign statistics and download your delivery report.</p>' +
     '<p>Thank you,</p>' +
-    '<p>Postman.gov.sg</p>'
+    '<p>The <a href="https://legacy.postman.gov.sg">Postman Legacy</a> Support Team</p>'
   const body = client.template(templateBody as string, params)
   return assembleNotificationMail(recipient, subject, body)
 }
@@ -74,7 +74,7 @@ const generateHaltedCampaignNotificationEmail = async (
     '<p>Your scheduled campaign <b>{{campaignTitle}}</b> was not sent because it was halted. This is likely due to the high number bounces caused by the invalid emails. </p>' +
     '<p>Please reply to this email so that we can resolve it for you</p>' +
     '<p>Thank you,</p>' +
-    '<p>Postman.gov.sg</p>'
+    '<p>The <a href="https://legacy.postman.gov.sg">Postman Legacy</a> Support Team</p>'
   const body = client.template(templateBody as string, params)
   return assembleNotificationMail(recipient, subject, body)
 }
