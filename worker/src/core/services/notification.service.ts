@@ -71,7 +71,7 @@ const generateHaltedCampaignNotificationEmail = async (
   const subject = 'Your scheduled campaign "' + campaignName + '" was not sent.'
   const templateBody =
     '<p>Greetings,</p>' +
-    '<p>Your scheduled campaign <b>{{campaignTitle}}</b> was not sent because it was halted. This is likely due to the high number bounces caused by the invalid emails. </p>' +
+    '<p>Your scheduled campaign <b>{{campaignName}}</b> was not sent because it was halted. This is likely due to the high number bounces caused by the invalid emails. </p>' +
     '<p>Please reply to this email so that we can resolve it for you</p>' +
     '<p>Thank you,</p>' +
     '<p>Postman.gov.sg</p>'
