@@ -1,5 +1,6 @@
 import { SSTConfig } from 'sst'
 
+import { LoggingStack } from './stacks/LoggingStack'
 import { MyStack } from './stacks/MyStack'
 
 export default {
@@ -19,5 +20,6 @@ export default {
       },
     })
     app.stack(MyStack)
+    if (app.stage === 'stg' || app.stage === 'prod') app.stack(LoggingStack)
   },
 } satisfies SSTConfig
