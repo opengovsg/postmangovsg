@@ -91,7 +91,7 @@ export function MyStack({ app, stack }: StackContext) {
   unsubDigestCron.bind(unsubDigestCronResources)
 }
 
-function getResourceIdentifiers(stage: string) {
+export function getResourceIdentifiers(stage: string) {
   return stage === 'prod'
     ? {
         vpcName: 'postmangovsg-prod-vpc',
