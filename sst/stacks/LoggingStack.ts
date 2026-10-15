@@ -1,6 +1,8 @@
-import { Duration } from 'aws-cdk-lib'
+import { ArnFormat, Duration } from 'aws-cdk-lib'
 import * as ec2 from 'aws-cdk-lib/aws-ec2'
 import * as iam from 'aws-cdk-lib/aws-iam'
+import * as logs from 'aws-cdk-lib/aws-logs'
+import * as route53resolver from 'aws-cdk-lib/aws-route53resolver'
 import * as s3 from 'aws-cdk-lib/aws-s3'
 import { StackContext } from 'sst/constructs'
 
@@ -52,6 +54,38 @@ export function LoggingStack({ app, stack }: StackContext) {
     destination: ec2.FlowLogDestination.toS3(bucket, FLOW_LOGS_PREFIX),
     trafficType: ec2.FlowLogTrafficType.ALL,
   })
+
+  if (app.stage === 'prod') {
+    // Route 53 Resolver adds the log group's write policy itself, provided
+    // the deploy role can call logs:PutResourcePolicy
+    const resolverLogs = new logs.LogGroup(stack, 'resolver-logs', {
+      logGroupName: `postmangovsg-${app.stage}/route53/resolver-logs`,
+      retention: logs.RetentionDays.ONE_MONTH,
+    })
+    // Resolver takes the bare log group ARN. logGroupArn ends in ":*".
+    const resolverLogsArn = stack.formatArn({
+      service: 'logs',
+      resource: 'log-group',
+      resourceName: resolverLogs.logGroupName,
+      arnFormat: ArnFormat.COLON_RESOURCE_NAME,
+    })
+    const queryLogConfig = new route53resolver.CfnResolverQueryLoggingConfig(
+      stack,
+      'resolver-query-logs',
+      {
+        name: `postmangovsg-${app.stage}-resolver-query-logs`,
+        destinationArn: resolverLogsArn,
+      },
+    )
+    new route53resolver.CfnResolverQueryLoggingConfigAssociation(
+      stack,
+      'resolver-query-logs-association',
+      {
+        resolverQueryLogConfigId: queryLogConfig.attrId,
+        resourceId: vpc.vpcId,
+      },
+    )
+  }
 
   stack.addOutputs({ SecurityLogsBucket: bucket.bucketName })
 }
