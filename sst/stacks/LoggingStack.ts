@@ -8,6 +8,7 @@ import { StackContext } from 'sst/constructs'
 
 import { getResourceIdentifiers } from './MyStack'
 
+const ALB_LOGS_PREFIX = 'AWSLogs'
 const FLOW_LOGS_PREFIX = 'vpc-flow-logs'
 
 export function LoggingStack({ app, stack }: StackContext) {
@@ -16,15 +17,32 @@ export function LoggingStack({ app, stack }: StackContext) {
 
   const bucket = new s3.Bucket(stack, 'security-logs', {
     bucketName: `postmangovsg-securitylogs-${app.stage}`,
+    // ALB access log delivery only supports SSE-S3, not KMS
     encryption: s3.BucketEncryption.S3_MANAGED,
     blockPublicAccess: s3.BlockPublicAccess.BLOCK_ALL,
     enforceSSL: true,
     // Retention follows the OGP cloud logging baselines in Notion
     lifecycleRules: [
+      { prefix: `${ALB_LOGS_PREFIX}/`, expiration: Duration.days(7) },
       { prefix: `${FLOW_LOGS_PREFIX}/`, expiration: Duration.days(30) },
     ],
   })
 
+  // The ALBs are created by Elastic Beanstalk, see
+  // backend/.ebextensions/01-elb-access-logs.config
+  bucket.addToResourcePolicy(
+    new iam.PolicyStatement({
+      principals: [
+        new iam.ServicePrincipal(
+          'logdelivery.elasticloadbalancing.amazonaws.com',
+        ),
+      ],
+      actions: ['s3:PutObject'],
+      resources: [
+        bucket.arnForObjects(`${ALB_LOGS_PREFIX}/${stack.account}/*`),
+      ],
+    }),
+  )
   bucket.addToResourcePolicy(
     new iam.PolicyStatement({
       principals: [new iam.ServicePrincipal('delivery.logs.amazonaws.com')],
