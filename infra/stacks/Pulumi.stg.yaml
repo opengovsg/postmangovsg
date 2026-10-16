@@ -1,0 +1,4 @@
+config:
+  aws:region: ap-southeast-1
+  postmangovsg-infra:accountId: '454894717801'
+  postmangovsg-infra:vpcId: vpc-006dc4e0a97146e40

@@ -1,0 +1,16 @@
+{
+  "name": "postmangovsg-infra",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Postman Email infrastructure. New resources only.",
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@pulumi/aws": "^7.51.0",
+    "@pulumi/pulumi": "^3.268.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.3.3"
+  }
+}

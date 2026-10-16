@@ -1,0 +1,8 @@
+name: postmangovsg-infra
+runtime:
+  name: nodejs
+  options:
+    typescript: true
+description: Postman Email infrastructure. New resources only, starting with security logging.
+main: src/index.ts
+stackConfigDir: stacks
