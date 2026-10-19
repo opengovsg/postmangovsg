@@ -172,8 +172,8 @@ const sendValidationMessage = async (
     subject: `Your From Address has been validated on ${appName}`,
     body: `<p>Congratulations, emails can be sent from this address: <b>${escapeHTML(
       fromAddress
-    )}</b> on ${appName}</p>
-    <p>The ${appName} Support Team</p>`,
+    )}</b> on <a href="https://legacy.postman.gov.sg">legacy.postman.gov.sg</a></p>
+    <p>The <a href="https://legacy.postman.gov.sg">Postman Legacy</a> Support Team</p>`,
   })
 }
 

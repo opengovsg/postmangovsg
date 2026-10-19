@@ -116,7 +116,7 @@ const createEmailBody = (campaigns: Array<CampaignUnsubscribeList>): string => {
     Please visit our <a href='${GUIDE_URL}' target=_blank>guide</a> if you have
     additional questions on the unsubscribe feature for the recipient.<br><br>
     Thank you,<br>
-    Postman.gov.sg
+    The <a href="https://legacy.postman.gov.sg">Postman Legacy</a> Support Team
   `
 
   return `${intro}${digest}${signOff}`
