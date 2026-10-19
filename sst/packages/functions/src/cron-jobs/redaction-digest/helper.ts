@@ -137,13 +137,13 @@ export const createEmailBody = (
     </p>
 
     <p>
-      Please log in to <a href="https://legacy.postman.gov.sg">postman.gov.sg</a> and navigate to your campaign
+      Please log in to <a href="https://legacy.postman.gov.sg">legacy.postman.gov.sg</a> and navigate to your campaign
       landing page to download your report if you wish to keep it for audit purpose.
     </p>
 
     <p>
       Thank you,<br>
-      <a href="https://legacy.postman.gov.sg">Postman.gov.sg</a> &bull; Open Government Products &bull; <a href="https://open.gov.sg">open.gov.sg</a>
+      The <a href="https://legacy.postman.gov.sg">Postman Legacy</a> Support Team &bull; Open Government Products &bull; <a href="https://open.gov.sg">open.gov.sg</a>
     </p>
   `
 
