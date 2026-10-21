@@ -1,4 +1,4 @@
-import { eq, sql } from 'drizzle-orm'
+import { and, eq, isNull, sql } from 'drizzle-orm'
 import { Config } from 'sst/node/config'
 
 import PostmanDbClient from '@/core/database/client'
@@ -55,7 +55,10 @@ async function sendApiKeyExpiryEmail() {
         .from(apiKeys)
         .innerJoin(users, eq(users.id, apiKeys.userId))
         .where(
-          sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${fourWeeks})`,
+          and(
+            isNull(apiKeys.deletedAt),
+            sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${fourWeeks})`,
+          ),
         ),
       await db
         .select({
@@ -68,7 +71,10 @@ async function sendApiKeyExpiryEmail() {
         .from(apiKeys)
         .innerJoin(users, eq(users.id, apiKeys.userId))
         .where(
-          sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${twoWeeks})`,
+          and(
+            isNull(apiKeys.deletedAt),
+            sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${twoWeeks})`,
+          ),
         ),
       await db
         .select({
@@ -81,7 +87,10 @@ async function sendApiKeyExpiryEmail() {
         .from(apiKeys)
         .innerJoin(users, eq(users.id, apiKeys.userId))
         .where(
-          sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${threeDays})`,
+          and(
+            isNull(apiKeys.deletedAt),
+            sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${threeDays})`,
+          ),
         ),
       await db
         .select({
@@ -93,7 +102,12 @@ async function sendApiKeyExpiryEmail() {
         })
         .from(apiKeys)
         .innerJoin(users, eq(users.id, apiKeys.userId))
-        .where(sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${oneDay})`),
+        .where(
+          and(
+            isNull(apiKeys.deletedAt),
+            sql`DATE_TRUNC('day', ${apiKeys.validUntil}) = DATE(${oneDay})`,
+          ),
+        ),
     ])
   const fourWeeksEmails = reminderEmailMapper(fourWeeksKeys, 'four weeks')
   const twoWeeksEmails = reminderEmailMapper(twoWeeksKeys, 'two weeks')
