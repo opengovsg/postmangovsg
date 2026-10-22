@@ -11,6 +11,7 @@ export default {
   },
   stacks(app) {
     app.setDefaultFunctionProps({
+      runtime: 'nodejs22.x',
       environment: {
         NODE_OPTIONS: '--enable-source-maps',
       },
