@@ -1,4 +1,4 @@
-FROM public.ecr.aws/docker/library/node:18-alpine as builder
+FROM public.ecr.aws/docker/library/node:22.23.4-alpine as builder
 WORKDIR /usr/home/postmangovsg
 
 COPY shared ../shared
@@ -13,7 +13,7 @@ COPY src ./src
 RUN npm run build
 RUN cd ../shared && npm run postbuild
 
-FROM public.ecr.aws/docker/library/node:18-alpine
+FROM public.ecr.aws/docker/library/node:22.23.4-alpine
 
 # required for node-gyp
 RUN apk update && apk upgrade && apk add --no-cache --virtual builds-deps build-base \
