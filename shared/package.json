@@ -46,7 +46,7 @@
     "@types/nodemailer": "6.4.0",
     "axios": "1.20.0",
     "cheerio": "1.0.0-rc.10",
-    "dd-trace": "5.131.1",
+    "dd-trace": "6.21.0",
     "libphonenumber-js": "1.10.6",
     "lodash": "4.17.21",
     "mustache": "4.2.0",
