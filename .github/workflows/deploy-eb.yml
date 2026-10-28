@@ -103,12 +103,15 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: true
 
       # Anonymous pulls of the node base image hit ECR Public's per-IP data limit on shared runners
       - name: Login to Amazon ECR Public
         uses: aws-actions/amazon-ecr-login@v1
         with:
           registry-type: public
+          mask-password: true
         env:
           AWS_REGION: us-east-1
 
