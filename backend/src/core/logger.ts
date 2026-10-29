@@ -17,7 +17,9 @@ const logger = winston.createLogger({
     winston.format.timestamp(),
     winston.format.errors({ stack: true }),
     winston.format.splat(),
-    winston.format.metadata(),
+    // datadog requires 'level', 'message', and 'dd' to be kept at the top-level of the log object
+    // in order for things like log explorer and traces to work
+    winston.format.metadata({ fillExcept: ['level', 'message', 'dd'] }),
     winston.format.json({
       space: config.get('env') === 'development' ? 2 : 0,
     })
