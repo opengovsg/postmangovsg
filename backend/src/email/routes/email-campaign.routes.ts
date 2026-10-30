@@ -88,7 +88,7 @@ export const InitEmailCampaignRoute = (
   // otherwise, the campaign will be sent immediately
   const sendCampaignValidator = {
     [Segments.BODY]: Joi.object({
-      scheduledTiming: Joi.date().iso(),
+      scheduledTiming: Joi.date(),
     }).unknown(true),
   }
 
