@@ -19,10 +19,10 @@ const SchedulingModal = ({
   const modalContext = useContext(ModalContext)
   const scheduledAt = campaign.scheduledAt
   const [scheduledDate, setScheduledDate] = useState<string>(
-    scheduledAt ? moment(scheduledAt).format('yyyy-M-DD') : ''
+    scheduledAt ? moment(scheduledAt).format('YYYY-MM-DD') : ''
   )
   const [scheduledTime, setScheduledTime] = useState<string>(
-    scheduledAt ? scheduledAt.toLocaleTimeString() : ''
+    scheduledAt ? moment(scheduledAt).format('HH:mm') : ''
   )
 
   const scheduledDatetime = useMemo(() => {
@@ -31,6 +31,12 @@ const SchedulingModal = ({
     }
     return moment()
   }, [scheduledDate, scheduledTime])
+
+  const isUnschedulable =
+    !scheduledDate ||
+    !scheduledTime ||
+    !scheduledDatetime.isValid() ||
+    scheduledDatetime.isBefore(moment())
 
   const scheduleTheSend = useCallback(async () => {
     // combine date and time
@@ -59,11 +65,7 @@ const SchedulingModal = ({
 
   async function handleScheduleCampaign(_: React.MouseEvent<HTMLDivElement>) {
     // form the payload from the date and time.
-    if (
-      !scheduledDate ||
-      !scheduledTime ||
-      scheduledDatetime.isBefore(moment())
-    ) {
+    if (isUnschedulable) {
       return
     }
     await scheduleTheSend()
@@ -94,7 +96,7 @@ const SchedulingModal = ({
             type={'date'}
             className={styles.dateInput}
             value={scheduledDate}
-            min={moment().format('yyyy-M-DD')}
+            min={moment().format('YYYY-MM-DD')}
             max={'2999-12-31'}
             onChange={handleDateChange}
             name={'Date'}
@@ -125,20 +127,11 @@ const SchedulingModal = ({
 
       <div className="separator"></div>
       <div className={styles.actionButton}>
-        <ActionButton
-          disabled={
-            !scheduledDate ||
-            !scheduledTime ||
-            scheduledDatetime.isBefore(moment())
-          }
-        >
+        <ActionButton disabled={isUnschedulable}>
           <div
             onClick={handleScheduleCampaign}
             className={cx({
-              [styles.disabledContent]:
-                !scheduledDate ||
-                !scheduledTime ||
-                scheduledDatetime.isBefore(moment()),
+              [styles.disabledContent]: isUnschedulable,
             })}
           >
             Schedule campaign
