@@ -27,14 +27,12 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
-    "baseUrl": "./src",
     "paths": {
-      "@core/*": ["core/*"],
-      "@sms/*": ["sms/*"],
-      "@email/*": ["email/*"],
-      "@telegram/*": ["telegram/*"],
-      "@shared/*": ["../../shared/src/*"]
+      "@core/*": ["./src/core/*"],
+      "@sms/*": ["./src/sms/*"],
+      "@email/*": ["./src/email/*"],
+      "@telegram/*": ["./src/telegram/*"],
+      "@shared/*": ["../shared/src/*"]
     },
     "esModuleInterop": true,
     "experimentalDecorators": true,
