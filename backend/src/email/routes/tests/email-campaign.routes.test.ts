@@ -425,3 +425,16 @@ describe('PUT /campaign/{campaignId}/email/template', () => {
     })
   })
 })
+
+describe('POST /campaign/{campaignId}/email/send', () => {
+  test('Null scheduledTiming is rejected instead of sending immediately', async () => {
+    const res = await request(app)
+      .post(`/campaign/${campaignId}/email/send`)
+      .send({ scheduledTiming: null })
+    expect(res.status).toBe(400)
+    expect(res.body).toEqual({
+      code: 'api_validation',
+      message: '"scheduledTiming" must be a valid date',
+    })
+  })
+})

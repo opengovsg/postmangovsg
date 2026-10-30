@@ -32,8 +32,6 @@ const SchedulingModal = ({
     return moment()
   }, [scheduledDate, scheduledTime])
 
-  // An invalid moment is neither before nor after now, and serialises to null,
-  // which the send endpoint treats as "send immediately".
   const isUnschedulable =
     !scheduledDate ||
     !scheduledTime ||

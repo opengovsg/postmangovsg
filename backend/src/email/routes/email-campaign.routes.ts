@@ -83,6 +83,15 @@ export const InitEmailCampaignRoute = (
     }),
   }
 
+  // JobMiddleware.sendCampaign treats a falsy scheduledTiming as "send now", so
+  // null or a malformed timing must be rejected here
+  // otherwise, the campaign will be sent immediately
+  const sendCampaignValidator = {
+    [Segments.BODY]: Joi.object({
+      scheduledTiming: Joi.date().iso(),
+    }).unknown(true),
+  }
+
   // Routes
 
   // Check if campaign belongs to user for this router
@@ -135,6 +144,7 @@ export const InitEmailCampaignRoute = (
 
   router.post(
     '/send',
+    celebrate(sendCampaignValidator),
     CampaignMiddleware.canEditCampaign,
     CampaignMiddleware.canSendCampaign,
     JobMiddleware.sendCampaign
