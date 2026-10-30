@@ -1,9 +1,7 @@
 import { useContext, useEffect, useState } from 'react'
-
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
-
 import { campaignFeedbackUrl, confirmSendCampaign } from '../util'
 
 import { ChannelType } from 'classes'
@@ -18,7 +16,6 @@ import {
 import SchedulingButton from 'components/dashboard/create/common/SchedulingButton'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
-
 import { getPreviewMessage } from 'services/email.service'
 
 const EmailSend = () => {

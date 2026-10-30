@@ -1,9 +1,7 @@
 import cx from 'classnames'
-
 import download from 'downloadjs'
 import moment from 'moment'
 import { useState, useEffect } from 'react'
-
 import type { MouseEvent as ReactMouseEvent } from 'react'
 
 import styles from './ExportRecipients.module.scss'

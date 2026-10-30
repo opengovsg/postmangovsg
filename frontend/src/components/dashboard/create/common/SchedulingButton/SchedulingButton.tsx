@@ -1,10 +1,8 @@
 import cx from 'classnames'
-
 import { MouseEvent as ReactMouseEvent, useContext } from 'react'
 
 import { Campaign } from 'classes'
 import { ActionButton } from 'components/common'
-
 import styles from 'components/common/export-recipients/ExportRecipients.module.scss'
 import SchedulingModal from 'components/dashboard/create/scheduling-modal'
 import { ModalContext } from 'contexts/modal.context'

@@ -1,5 +1,4 @@
 import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
-
 import {
   Dispatch,
   SetStateAction,
@@ -7,7 +6,6 @@ import {
   useState,
   useEffect,
 } from 'react'
-
 import { useParams } from 'react-router-dom'
 
 import { getLocalisedTemplateBody } from '../../../../utils/templateLocalisation'

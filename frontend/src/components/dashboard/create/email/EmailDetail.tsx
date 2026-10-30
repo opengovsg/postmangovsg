@@ -1,7 +1,6 @@
 import { useContext } from 'react'
 
 import { EmailCampaign } from 'classes'
-
 import { ChannelType, Status } from 'classes/Campaign'
 import {
   EmailPreviewBlock,
@@ -12,7 +11,6 @@ import CampaignScheduledInfo from 'components/common/CampaignScheduledInfo'
 import ScheduleDetails from 'components/common/schedule-details'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import { CampaignContext } from 'contexts/campaign.context'
-
 import { retryCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 

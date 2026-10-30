@@ -220,7 +220,7 @@ export function uploadCompleteOnChunk({
               // oxlint-disable-next-line typescript/ban-ts-comment
               // @ts-ignore
               passcode: message.params.passcode,
-            } as GovsgVerification)
+            }) as GovsgVerification
         ),
         { transaction }
       )

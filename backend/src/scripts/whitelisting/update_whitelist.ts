@@ -55,7 +55,7 @@ void (async function main() {
           ({
             userId: u.id,
             templateId: templateLabelToId.get(t),
-          } as unknown as GovsgTemplatesAccess)
+          }) as unknown as GovsgTemplatesAccess
       )
     ),
     {
@@ -72,7 +72,7 @@ void (async function main() {
           ({
             userId: u.id,
             templateId: templateLabelToId.get(t),
-          } as unknown as GovsgTemplatesAccess)
+          }) as unknown as GovsgTemplatesAccess
       )
     ),
     {
@@ -87,7 +87,7 @@ void (async function main() {
           ({
             userId: u.id,
             templateId: templateLabelToId.get(t),
-          } as unknown as GovsgTemplatesAccess)
+          }) as unknown as GovsgTemplatesAccess
       )
     ),
     {

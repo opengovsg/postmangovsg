@@ -9,7 +9,6 @@ import {
   useEffect,
   useState,
 } from 'react'
-
 import { useParams } from 'react-router-dom'
 
 import { getLocalisedTemplateBody } from '../../../../utils/templateLocalisation'
@@ -27,7 +26,6 @@ import {
 } from 'components/common'
 import { LanguageChipGroup } from 'components/common/ChipGroup/LanguageChipGroup'
 import { CampaignContext } from 'contexts/campaign.context'
-
 import { getAvailableTemplates, pickTemplate } from 'services/govsg.service'
 
 function GovsgPickTemplate({

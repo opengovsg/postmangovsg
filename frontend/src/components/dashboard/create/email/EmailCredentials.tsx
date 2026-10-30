@@ -1,5 +1,4 @@
 import { useContext, useState, Dispatch, SetStateAction } from 'react'
-
 import { useParams } from 'react-router-dom'
 
 import EmailValidationInput from './EmailValidationInput'
@@ -15,7 +14,6 @@ import {
   StepSection,
 } from 'components/common'
 import { CampaignContext } from 'contexts/campaign.context'
-
 import { sendPreviewMessage } from 'services/email.service'
 
 const EmailCredentials = ({

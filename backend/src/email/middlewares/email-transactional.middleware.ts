@@ -167,7 +167,7 @@ export const InitEmailTransactionalMiddleware = (
                 emailMessageTransactionalId: emailMessageTransactional.id,
                 email: c,
                 ccType: CcType.Cc,
-              } as EmailMessageTransactionalCc)
+              }) as EmailMessageTransactionalCc
           )
         : []
     )
@@ -180,7 +180,7 @@ export const InitEmailTransactionalMiddleware = (
                 emailMessageTransactionalId: emailMessageTransactional.id,
                 email: c,
                 ccType: CcType.Bcc,
-              } as EmailMessageTransactionalCc)
+              }) as EmailMessageTransactionalCc
           )
         : []
     )

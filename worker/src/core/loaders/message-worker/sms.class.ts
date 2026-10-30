@@ -129,9 +129,8 @@ class SMS {
   }
 
   async setSendingService(credentialName: string): Promise<void> {
-    const credentials = await CredentialService.getTwilioCredentials(
-      credentialName
-    )
+    const credentials =
+      await CredentialService.getTwilioCredentials(credentialName)
     this.smsClient = config.get('smsFallback.activate')
       ? new SnsSmsClient()
       : new TwilioClient(credentials)

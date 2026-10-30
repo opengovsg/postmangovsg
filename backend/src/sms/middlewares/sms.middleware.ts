@@ -156,9 +156,8 @@ export const InitSmsMiddleware = (
       : await getCredentialName(label, +userId)
 
     /* Get credential from the name */
-    res.locals.credentials = await credentialService.getTwilioCredentials(
-      credentialName
-    )
+    res.locals.credentials =
+      await credentialService.getTwilioCredentials(credentialName)
     res.locals.credentialName = credentialName
     return next()
   }
@@ -179,9 +178,8 @@ export const InitSmsMiddleware = (
       const credentialName = await getCredentialName(label, +userId)
 
       /* Get credential from the name */
-      res.locals.credentials = await credentialService.getTwilioCredentials(
-        credentialName
-      )
+      res.locals.credentials =
+        await credentialService.getTwilioCredentials(credentialName)
       res.locals.credentialName = credentialName
       return next()
     } catch (err) {
@@ -303,9 +301,8 @@ export const InitSmsMiddleware = (
     try {
       const { campaignId } = req.params
       const credentialName = getDemoCredentialName(DefaultCredentialName.SMS)
-      const credentials = await credentialService.getTwilioCredentials(
-        credentialName
-      )
+      const credentials =
+        await credentialService.getTwilioCredentials(credentialName)
       const result = await SmsService.getCampaignDetails(
         +campaignId,
         credentials

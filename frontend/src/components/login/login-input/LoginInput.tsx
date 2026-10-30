@@ -1,8 +1,6 @@
 import { Trans, t } from '@lingui/macro'
 import cx from 'classnames'
-
 import { noop } from 'lodash'
-
 import React, { useState, useContext, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -22,7 +20,6 @@ import {
   ONE_GOV_SG_START_PATH,
 } from 'config'
 import { AuthContext } from 'contexts/auth.context'
-
 import { ModalContext } from 'contexts/modal.context'
 import {
   getOtpWithEmail,
@@ -31,7 +28,6 @@ import {
   getUser,
   setUserAnalytics,
 } from 'services/auth.service'
-
 import {
   GA_USER_EVENTS,
   sendUserEvent,

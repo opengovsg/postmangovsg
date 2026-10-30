@@ -1,6 +1,5 @@
 import type { Dispatch, SetStateAction } from 'react'
 import { useCallback, useContext, useEffect, useState } from 'react'
-
 import { useParams } from 'react-router-dom'
 import { SegmentedMessage } from 'sms-segments-calculator'
 

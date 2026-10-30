@@ -1,13 +1,10 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
-
 import cx from 'classnames'
 import { AtomicBlockUtils } from 'draft-js'
 import { debounce } from 'lodash'
 import { useContext, useState, useMemo, useCallback } from 'react'
-
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
-
 import { OutboundLink } from 'react-ga'
 
 import { EditorContext } from '../RichTextEditor'

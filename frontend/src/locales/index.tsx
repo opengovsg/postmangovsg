@@ -1,6 +1,5 @@
 import { i18n } from '@lingui/core'
 import { en } from 'make-plural/plurals'
-
 /**
  * To create a new language or translation, for example, `en-custom`:
  * Add it to the `locales` array in `.linguirc` and run `npm run extract`

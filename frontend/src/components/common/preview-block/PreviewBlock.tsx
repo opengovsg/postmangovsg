@@ -1,6 +1,5 @@
 import cx from 'classnames'
 import escapeHTML from 'escape-html'
-
 import type { FunctionComponent } from 'react'
 
 import { RichTextEditor } from '..'

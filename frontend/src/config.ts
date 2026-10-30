@@ -1,7 +1,6 @@
 import { i18n } from '@lingui/core'
 import { t } from '@lingui/macro'
 import axios from 'axios'
-
 import type { InitializeOptions } from 'react-ga'
 
 import { sha256 } from './services/crypto.service'

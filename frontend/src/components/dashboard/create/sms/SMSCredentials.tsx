@@ -1,7 +1,5 @@
 import { i18n } from '@lingui/core'
-
 import cx from 'classnames'
-
 import { useState, useEffect, useContext } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { OutboundLink } from 'react-ga'
@@ -11,7 +9,6 @@ import styles from '../Create.module.scss'
 
 import SMSValidationInput from './SMSValidationInput'
 import TwilioCredentialsInput from './TwilioCredentialsInput'
-
 import type { TwilioCredentials } from './TwilioCredentialsInput'
 
 import type { SMSCampaign, SMSProgress } from 'classes'
@@ -54,9 +51,8 @@ const SMSCredentials = ({
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as TwilioCredentials | null)
   const [label, setLabel] = useState('')
-  const [showCredentialFields, setShowCredentialFields] = useState(
-    !hasCredential
-  )
+  const [showCredentialFields, setShowCredentialFields] =
+    useState(!hasCredential)
   const [isManual, setIsManual] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const { id: campaignId } = useParams<{ id: string }>()

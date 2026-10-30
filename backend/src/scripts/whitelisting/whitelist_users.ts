@@ -48,7 +48,7 @@ void (async function main() {
           designation: r[2],
           agency: r[3],
           templates: r[4] ? r[4].split(';') : [],
-        } as RawOfficerData)
+        }) as RawOfficerData
     )
   const rawUniqueDomains = Array.from(
     new Set(rawDataToInsert.map((r) => `@${r.email.split('@')[1]}`))
@@ -104,7 +104,7 @@ void (async function main() {
           ({
             email: r.email,
             emailDomain: `@${r.email.split('@')[1]}`,
-          } as User)
+          }) as User
       ),
     {
       ignoreDuplicates: true,
@@ -125,7 +125,7 @@ void (async function main() {
       ({
         ...r,
         id: allUsers.find((u) => u.email === r.email)?.id,
-      } as RawOfficerData)
+      }) as RawOfficerData
   )
   const inserted = await UserExperimental.bulkCreate(
     officersWithIds.map(
@@ -138,7 +138,7 @@ void (async function main() {
             agency: o.agency,
             officer_designation: o.designation,
           },
-        } as UserExperimental)
+        }) as UserExperimental
     ),
     {
       ignoreDuplicates: true,
@@ -164,7 +164,7 @@ void (async function main() {
           ({
             userId: u.id,
             templateId: templateLabelToId.get(t),
-          } as unknown as GovsgTemplatesAccess)
+          }) as unknown as GovsgTemplatesAccess
       )
     ),
     {
@@ -182,7 +182,7 @@ void (async function main() {
           ({
             userId: u.id,
             templateId: templateLabelToId.get(t),
-          } as unknown as GovsgTemplatesAccess)
+          }) as unknown as GovsgTemplatesAccess
       )
     ),
     {
@@ -200,7 +200,7 @@ void (async function main() {
           ({
             userId: u.id,
             templateId: templateLabelToId.get(t),
-          } as unknown as GovsgTemplatesAccess)
+          }) as unknown as GovsgTemplatesAccess
       )
     ),
     {
@@ -215,7 +215,7 @@ void (async function main() {
           ({
             userId: u.id,
             templateId: templateLabelToId.get(t),
-          } as unknown as GovsgTemplatesAccess)
+          }) as unknown as GovsgTemplatesAccess
       )
     ),
     {

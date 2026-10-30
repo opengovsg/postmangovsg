@@ -8,11 +8,9 @@ import {
   useState,
 } from 'react'
 import { OutboundLink } from 'react-ga'
-
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
-
 import { confirmSendCampaign } from '../util'
 
 import { ChannelType, GovsgProgress } from 'classes'
@@ -32,7 +30,6 @@ import {
 } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { LINKS } from 'config'
-
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 import {
@@ -81,9 +78,8 @@ const GovsgRecipients = ({
     let timeoutId: NodeJS.Timeout
     const pollStatus = async () => {
       try {
-        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
-          +campaignId
-        )
+        const { isCsvProcessing, preview, ...newCsvInfo } =
+          await getCsvStatus(+campaignId)
         // Prevent setting state if unmounted
         if (!isMounted.current) return
 

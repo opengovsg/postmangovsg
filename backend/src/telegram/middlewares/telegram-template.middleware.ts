@@ -95,9 +95,8 @@ const uploadCompleteHandler = async (
   try {
     const { s3Key } = UploadService.extractParamsFromJwt(transactionId)
 
-    const template = await TelegramTemplateService.getFilledTemplate(
-      +campaignId
-    )
+    const template =
+      await TelegramTemplateService.getFilledTemplate(+campaignId)
     if (template === null) {
       throw new Error(
         'Error: No message template found. Please create a message template before uploading a recipient file.'

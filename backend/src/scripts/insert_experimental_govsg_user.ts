@@ -37,7 +37,7 @@ void (async function main() {
           email: r[1].toLowerCase(),
           designation: r[2],
           agency: r[3],
-        } as RawOfficerData)
+        }) as RawOfficerData
     )
   const rawUniqueDomains = Array.from(
     new Set(rawDataToInsert.map((r) => `@${r.email.split('@')[1]}`))
@@ -77,7 +77,7 @@ void (async function main() {
           ({
             email: r.email,
             emailDomain: `@${r.email.split('@')[1]}`,
-          } as User)
+          }) as User
       )
   )
   console.log(SECTION_DIVIDER)
@@ -95,7 +95,7 @@ void (async function main() {
       ({
         ...r,
         id: allUsers.find((u) => u.email === r.email)?.id,
-      } as RawOfficerData)
+      }) as RawOfficerData
   )
   const inserted = await UserExperimental.bulkCreate(
     officersWithIds.map(
@@ -108,7 +108,7 @@ void (async function main() {
             agency: o.agency,
             officer_designation: o.designation,
           },
-        } as UserExperimental)
+        }) as UserExperimental
     )
   )
   console.log(SECTION_DIVIDER)
@@ -129,7 +129,7 @@ void (async function main() {
         ({
           userId: u.id,
           templateId: 1,
-        } as GovsgTemplatesAccess)
+        }) as GovsgTemplatesAccess
     )
   )
   console.log(SECTION_DIVIDER)

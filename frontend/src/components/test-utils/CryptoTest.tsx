@@ -2,7 +2,6 @@
 // instead of the node.js core module named buffer
 import { Buffer } from 'buffer/'
 import { useState } from 'react'
-
 import { uuid } from 'uuidv4'
 
 import styles from './CryptoTest.module.scss'

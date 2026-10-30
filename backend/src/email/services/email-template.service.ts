@@ -192,9 +192,8 @@ const storeTemplate = async ({
   if (fromAddress === defaultFromAddress) {
     expectedFromName = defaultFromName
   } else {
-    const customFromAddress = await CustomDomainService.getCustomFromAddress(
-      fromAddress
-    )
+    const customFromAddress =
+      await CustomDomainService.getCustomFromAddress(fromAddress)
     if (!customFromAddress) throw new Error('Invalid custom from address')
     const { fromName: customFromName } = parseFromAddress(customFromAddress)
     expectedFromName = customFromName
