@@ -1,0 +1,56 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  // Migrated from .prettierrc.js (prettier 2.6.2). printWidth and trailingComma
+  // pin prettier 2 defaults, which differ from oxfmt's (100 and "all").
+  "printWidth": 80,
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "sortPackageJson": false,
+  // Replaces eslint-plugin-import's import/order (default groups, alphabetize
+  // asc). The tsconfig.paths.json aliases resolved as "internal", which
+  // import/order placed in its trailing catch-all group; @shared/* resolved
+  // outside the package and was sorted as external, so it stays there.
+  "sortImports": {
+    "customGroups": [
+      {
+        "groupName": "path-aliases",
+        "elementNamePattern": [
+          "assets",
+          "assets/**",
+          "classes",
+          "classes/**",
+          "components",
+          "components/**",
+          "config",
+          "config/**",
+          "contexts",
+          "contexts/**",
+          "locales",
+          "locales/**",
+          "routes",
+          "routes/**",
+          "services",
+          "services/**",
+          "styles",
+          "styles/**",
+          "test-utils",
+          "test-utils/**"
+        ]
+      }
+    ],
+    "groups": [
+      "builtin",
+      "external",
+      "parent",
+      "sibling",
+      "index",
+      ["path-aliases", "internal", "unknown"]
+    ],
+    "ignoreCase": false,
+    "newlinesBetween": true
+  },
+  // Formerly .prettierignore, plus the files .eslintrc.js kept out of
+  // eslint-plugin-prettier's reach.
+  "ignorePatterns": ["/build", "config-overrides.js", "sentry.js"]
+}

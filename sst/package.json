@@ -15,15 +15,11 @@
   "devDependencies": {
     "@tsconfig/node16": "^16.1.0",
     "@types/lodash": "^4.14.195",
-    "@typescript-eslint/eslint-plugin": "^5.62.0",
     "aws-cdk-lib": "2.224.0",
     "constructs": "10.3.0",
-    "eslint": "^8.45.0",
-    "eslint-config-standard-with-typescript": "^36.0.1",
-    "eslint-plugin-import": "^2.27.5",
-    "eslint-plugin-n": "^15.7.0",
-    "eslint-plugin-promise": "^6.1.1",
     "lint-staged": "^13.2.3",
+    "oxfmt": "0.75.0",
+    "oxlint": "1.90.0",
     "sst": "2.49.8",
     "typescript": "^5.1.6"
   },
@@ -35,7 +31,10 @@
     "cronitor": "2.4.0"
   },
   "lint-staged": {
-    "*.{js,ts}": "eslint --cache --fix"
+    "*.{js,ts}": [
+      "oxlint --fix --no-error-on-unmatched-pattern",
+      "oxfmt --no-error-on-unmatched-pattern"
+    ]
   },
   "overrides": {
     "axios": "1.20.0"
