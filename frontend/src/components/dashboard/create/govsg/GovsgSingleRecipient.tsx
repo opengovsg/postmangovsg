@@ -96,7 +96,7 @@ const GovsgSingleRecipient = ({
 
   const onModalConfirm = async () => {
     if (!campaignId) return
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // oxlint-disable-next-line no-unused-vars
     const { passcode, ...dataWithoutPasscodePlaceholder } = data
     try {
       await sendSingleRecipientCampaign(

@@ -236,7 +236,7 @@ const Campaigns = () => {
       modeFilter,
       nameFilter
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [selectedPage])
 
   useEffect(() => {
@@ -306,7 +306,7 @@ const Campaigns = () => {
 
   const debouncedChangeHandler = useMemo(
     () => debounce(fetchCampaigns, 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
     []
   )
 
@@ -325,7 +325,7 @@ const Campaigns = () => {
     )
   }
 
-  /* eslint-disable react/display-name */
+  /* oxlint-disable react/display-name */
   const columns = [
     {
       name: 'Mode',
@@ -530,7 +530,7 @@ const Campaigns = () => {
     },
   ]
 
-  /* eslint-enable react/display-name */
+  /* oxlint-enable react/display-name */
 
   function renderRow(campaign: Campaign, key: number) {
     return (

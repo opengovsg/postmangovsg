@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/order
 import { useContext } from 'react'
 
 import { EmailCampaign } from 'classes'

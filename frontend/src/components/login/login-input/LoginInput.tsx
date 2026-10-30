@@ -134,7 +134,7 @@ const Login = () => {
     if (pathname === ONE_GOV_SG_CALLBACK_PATH) {
       void loginOneGovSg(takeOneGovSgCallbackParams())
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [])
 
   function resetButton() {

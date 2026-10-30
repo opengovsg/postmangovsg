@@ -21,6 +21,6 @@ export class Agency extends Model<Agency> {
     type: DataType.TEXT,
     allowNull: true,
   })
-  // eslint-disable-next-line @typescript-eslint/naming-convention
+  // oxlint-disable-next-line id-match
   logo_uri?: string
 }

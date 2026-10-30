@@ -62,14 +62,14 @@ export const listMessages = async (
   })
   const messages = rows.map((row) => {
     const {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // oxlint-disable-next-line no-unused-vars
       agency,
       recipient,
       officer_name,
       recipient_name,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // oxlint-disable-next-line no-unused-vars
       officer_designation,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      // oxlint-disable-next-line no-unused-vars
       passcode,
       ...remainingParams
     } = row.params as Record<string, string>

@@ -6,7 +6,7 @@ import { getUnsubscribeList, sendEmailAndUpdate } from './helper'
 
 export async function handler() {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    // oxlint-disable-next-line typescript/no-var-requires
     const cronitor = require('cronitor')(Config.CRONITOR_URL_SUFFIX) // common to all jobs on our shared Cronitor account
     const invokeFunction =
       process.env.IS_LOCAL === 'true'

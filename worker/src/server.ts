@@ -1,4 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+// oxlint-disable-next-line typescript/no-var-requires
 require('dotenv').config()
 require('module-alias/register')
 import config from '@core/config'

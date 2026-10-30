@@ -62,7 +62,7 @@ const getHydratedMessage = async (
 
   if (!template || !params) return
 
-  /* eslint-disable @typescript-eslint/no-non-null-assertion */
+  /* oxlint-disable typescript/no-non-null-assertion */
   const subject = EmailTemplateService.client.template(
     template?.subject as string,
     params
@@ -105,7 +105,7 @@ const getHydratedMessage = async (
     agencyLogoURI,
     showMasthead,
   }
-  /* eslint-enable @typescript-eslint/no-non-null-assertion */
+  /* oxlint-enable typescript/no-non-null-assertion */
 }
 
 /**
@@ -286,7 +286,7 @@ const uploadCompleteOnPreview = ({
   campaignId: number
 }): ((data: CSVParams[]) => Promise<void>) => {
   return async (data: CSVParams[]): Promise<void> => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // oxlint-disable-next-line typescript/no-non-null-assertion
     UploadService.checkTemplateKeysMatch(data, template.params!)
 
     EmailTemplateService.testHydration(

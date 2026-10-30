@@ -1,5 +1,5 @@
-/* eslint-disable no-console */
-// eslint-disable-next-line @typescript-eslint/no-var-requires
+/* oxlint-disable no-console */
+// oxlint-disable-next-line typescript/no-var-requires
 require('dotenv').config()
 require('module-alias/register')
 

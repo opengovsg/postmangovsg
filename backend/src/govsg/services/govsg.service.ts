@@ -112,7 +112,7 @@ export function uploadCompleteOnPreview({
     const paramsWithoutPasscode = template.params!.filter(
       (param) => param !== 'passcode'
     ) // TODO: Un-hardcode this
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // oxlint-disable-next-line typescript/no-non-null-assertion
     UploadService.checkTemplateKeysMatch(data, paramsWithoutPasscode)
 
     const testDataWithPasscodePlaceholder = {
@@ -217,7 +217,7 @@ export function uploadCompleteOnChunk({
           (message) =>
             ({
               govsgMessageId: message.id,
-              // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+              // oxlint-disable-next-line typescript/ban-ts-comment
               // @ts-ignore
               passcode: message.params.passcode,
             } as GovsgVerification)

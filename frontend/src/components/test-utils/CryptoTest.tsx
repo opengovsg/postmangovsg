@@ -53,7 +53,7 @@ const CryptoTest = () => {
           iterations
         )
         if (print) {
-          // eslint-disable-next-line no-console
+          // oxlint-disable-next-line no-console
           console.log(Buffer.from(key).toString('base64'))
         }
       }

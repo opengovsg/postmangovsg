@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/order
 import { useContext, useEffect } from 'react'
 
 import { ChannelType, Status } from 'classes/Campaign'

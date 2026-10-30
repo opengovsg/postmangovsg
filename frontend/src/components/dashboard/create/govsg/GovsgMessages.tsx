@@ -79,7 +79,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     setShouldHavePasscode(hasPasscode)
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // oxlint-disable-next-line react/exhaustive-deps
   const searchGovsgMessages = useCallback(
     debounce(async (search: string, selectedPage: number) => {
       await fetchGovsgMessages(search, selectedPage)
