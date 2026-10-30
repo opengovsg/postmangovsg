@@ -32,7 +32,6 @@
  */
 
 import { EditorState, ContentBlock, ContentState, Modifier } from 'draft-js'
-
 import { stateFromHTML } from 'draft-js-import-html'
 import { filterEditorState } from 'draftjs-filters'
 

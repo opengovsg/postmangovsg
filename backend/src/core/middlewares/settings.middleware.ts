@@ -166,9 +166,8 @@ export const InitSettingsMiddleware = (
           result = await credentialService.getSmsUserCredentialLabels(+userId)
           break
         case ChannelType.Telegram:
-          result = await credentialService.getTelegramUserCredentialLabels(
-            +userId
-          )
+          result =
+            await credentialService.getTelegramUserCredentialLabels(+userId)
           break
         default:
           throw new Error('Unsupported channel type')

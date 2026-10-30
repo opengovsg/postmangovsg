@@ -173,9 +173,8 @@ export const InitGovsgTransactionalMiddleware =
         language_code: languageCode,
       } = req.body
       try {
-        const govsgTransactional = await GovsgMessageTransactional.findByPk(
-          govsgTransactionalId
-        )
+        const govsgTransactional =
+          await GovsgMessageTransactional.findByPk(govsgTransactionalId)
         if (!govsgTransactional) {
           // practically this will never happen unless sendMessage is called before saveMessage
           throw new ApiNotFoundError(

@@ -1,5 +1,4 @@
 import { WhatsAppLanguages } from '@shared/clients/whatsapp-client.class/types'
-
 import {
   Dispatch,
   SetStateAction,
@@ -7,7 +6,6 @@ import {
   useState,
   useEffect,
 } from 'react'
-
 import { useParams } from 'react-router-dom'
 
 import { getLocalisedTemplateBody } from '../../../../utils/templateLocalisation'
@@ -96,7 +94,7 @@ const GovsgSingleRecipient = ({
 
   const onModalConfirm = async () => {
     if (!campaignId) return
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    // oxlint-disable-next-line no-unused-vars
     const { passcode, ...dataWithoutPasscodePlaceholder } = data
     try {
       await sendSingleRecipientCampaign(

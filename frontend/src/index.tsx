@@ -1,17 +1,13 @@
 // Import these before everything else
 import 'react-app-polyfill/stable'
 import 'locales'
-
 import { datadogRum } from '@datadog/browser-rum'
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import * as Sentry from '@sentry/browser'
-
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-
 // Locales
-
 // Contexts
 
 import App from './App'

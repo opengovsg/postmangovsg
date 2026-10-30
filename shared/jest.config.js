@@ -3,7 +3,7 @@ module.exports = {
   testMatch: ['**/tests/**/*.(spec|test).+(ts|tsx|js)'],
   testPathIgnorePatterns: ['<rootDir>/build/', '<rootDir>/node_modules/'],
   transform: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+    // oxlint-disable-next-line id-match
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   testEnvironment: 'node',

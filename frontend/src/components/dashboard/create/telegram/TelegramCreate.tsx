@@ -1,9 +1,7 @@
 import cx from 'classnames'
-
 import { useContext, useEffect, useState } from 'react'
 
 import { TELEGRAM_CREDENTIAL_BANNER_MESSAGE } from '../../../../constants'
-
 import styles from '../Create.module.scss'
 import BodyTemplate from '../common/BodyTemplate'
 

@@ -66,7 +66,7 @@ export class ThemeClient {
      * @see: https://stackoverflow.com/a/2857261
      */
     const themedBody = /<body.*?>([\s\S]*)<\/body>/.exec(themedHTMLEmail)?.[1]
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // oxlint-disable-next-line typescript/no-non-null-assertion
     return themedBody!
   }
 }

@@ -1,9 +1,7 @@
 import axios from 'axios'
-
 import cx from 'classnames'
 import { debounce } from 'lodash'
 import { useCallback, useContext, useEffect, useState } from 'react'
-
 import Moment from 'react-moment'
 
 import overrideStylesTextInput from '../../campaigns/OverrideTextInput.module.scss'
@@ -12,7 +10,6 @@ import overrideStylesTitleBar from '../../campaigns/OverrideTitleBar.module.scss
 import styles from './GovsgMessages.module.scss'
 
 import NoMatchDashboardImg from 'assets/img/no-match-dashboard.png'
-
 import { Campaign } from 'classes'
 import {
   ConfirmModal,
@@ -22,7 +19,6 @@ import {
 } from 'components/common'
 import { LoadingSpinner } from 'components/common/LoadingSpinner/LoadingSpinner'
 import { StatusIconText } from 'components/common/StatusIconText/StatusIconText'
-
 import { PasscodeBadge } from 'components/common/StyledText/PasscodeBadge'
 import { PrettyJson } from 'components/common/StyledText/PrettyJson'
 import { ResendButton } from 'components/common/action-button/ResendButton'
@@ -79,7 +75,7 @@ export const GovsgMessages = ({ campaignId }: GovsgMessagesProps) => {
     setShouldHavePasscode(hasPasscode)
   }
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // oxlint-disable-next-line react/exhaustive-deps
   const searchGovsgMessages = useCallback(
     debounce(async (search: string, selectedPage: number) => {
       await fetchGovsgMessages(search, selectedPage)

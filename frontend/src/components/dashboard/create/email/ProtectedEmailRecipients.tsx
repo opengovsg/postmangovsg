@@ -5,9 +5,7 @@ import {
   Dispatch,
   SetStateAction,
 } from 'react'
-
 import { useParams } from 'react-router-dom'
-
 import isEmail from 'validator/lib/isEmail'
 
 import styles from '../Create.module.scss'
@@ -29,7 +27,6 @@ import {
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
-
 import { sendTiming } from 'services/ga.service'
 import { protectAndUploadCsv } from 'services/protect-csv.service'
 import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'

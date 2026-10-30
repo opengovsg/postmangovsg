@@ -1,9 +1,6 @@
 import { i18n } from '@lingui/core'
-
 import { useContext } from 'react'
-
 import { OutboundLink } from 'react-ga'
-
 import ReactPlayer from 'react-player/lazy'
 
 import styles from './DemoVideoModal.module.scss'

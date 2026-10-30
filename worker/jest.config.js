@@ -7,7 +7,7 @@ module.exports = {
     '@shared/(.*)': '<rootDir>/../shared/src/$1',
   },
   transform: {
-    // eslint-disable-next-line @typescript-eslint/naming-convention
+    // oxlint-disable-next-line id-match
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   testEnvironment: 'node',

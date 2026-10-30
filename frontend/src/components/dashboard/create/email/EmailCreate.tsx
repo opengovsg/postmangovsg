@@ -1,5 +1,4 @@
 import cx from 'classnames'
-
 import { useState, useEffect, useContext } from 'react'
 
 import styles from '../Create.module.scss'

@@ -5,7 +5,6 @@ import type { ReactNode, Dispatch, SetStateAction } from 'react'
 import { useLocation } from 'react-router-dom'
 
 import { ChannelType } from 'classes'
-
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
 import { initializeGA, sendPageView } from 'services/ga.service'
 

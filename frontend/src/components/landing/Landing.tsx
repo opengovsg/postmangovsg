@@ -1,16 +1,12 @@
 import { i18n } from '@lingui/core'
-
 import cx from 'classnames'
-
 import Lottie from 'lottie-react'
 import { createRef, useContext, useEffect, useState } from 'react'
-
 import { OutboundLink } from 'react-ga'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 import styles from './Landing.module.scss'
 import Banner from './banner'
-
 import Navbar from './nav-bar'
 
 import companyLogo from 'assets/img/brand/company-logo.svg'
@@ -24,12 +20,9 @@ import onboardingImg from 'assets/img/landing/onboard.png'
 import whyUse1 from 'assets/img/why-use-1.png'
 import whyUse2 from 'assets/img/why-use-2.png'
 import whyUse3 from 'assets/img/why-use-3.png'
-
 import landingAnimation from 'assets/lottie/landing.json'
-
 import { InfoBanner, PrimaryButton } from 'components/common'
 import { LINKS } from 'config'
-
 import { AuthContext } from 'contexts/auth.context'
 import { getLandingStats } from 'services/stats.service'
 
