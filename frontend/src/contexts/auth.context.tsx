@@ -4,8 +4,6 @@ import { createContext, useState, useEffect } from 'react'
 import type { ReactNode, Dispatch, SetStateAction } from 'react'
 import { useLocation } from 'react-router-dom'
 
-import { ChannelType } from 'classes'
-
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
 import { initializeGA, sendPageView } from 'services/ga.service'
 
@@ -70,18 +68,16 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   useEffect(() => {
-    if (email) {
-      datadogRum.setUser({
-        email,
-      })
+    if (!isAuthenticated || !email) return
+    datadogRum.setUser({
+      email,
+    })
+    datadogRum.startSessionReplayRecording()
+    return () => {
+      datadogRum.stopSessionReplayRecording()
+      datadogRum.clearUser()
     }
-  }, [email])
-
-  useEffect(() => {
-    if (email && experimentalData && experimentalData[ChannelType.Govsg]) {
-      datadogRum.startSessionReplayRecording()
-    }
-  }, [email, experimentalData])
+  }, [isAuthenticated, email])
 
   return (
     <AuthContext.Provider
