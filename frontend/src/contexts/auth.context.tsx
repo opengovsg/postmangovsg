@@ -68,13 +68,16 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   }, [])
 
   useEffect(() => {
-    if (email) {
-      datadogRum.setUser({
-        email,
-      })
-      datadogRum.startSessionReplayRecording()
+    if (!isAuthenticated || !email) return
+    datadogRum.setUser({
+      email,
+    })
+    datadogRum.startSessionReplayRecording()
+    return () => {
+      datadogRum.stopSessionReplayRecording()
+      datadogRum.clearUser()
     }
-  }, [email])
+  }, [isAuthenticated, email])
 
   return (
     <AuthContext.Provider
