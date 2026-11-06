@@ -8,7 +8,7 @@ import tracer from 'dd-trace'
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
-import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
+import { requestLogFilter } from '@core/utils/request-log-filter'
 import {
   isOneGovSgCallbackPath,
   redactOneGovSgSentryEvent,
@@ -204,37 +204,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
       ignoreRoute: (req: Request) => isOneGovSgCallbackPath(req.path),
       requestWhitelist: ['method', 'url', 'body', 'headers'],
       responseWhitelist: ['statusCode'],
-      requestFilter: (req: Request, propName: string) => {
-        // If body is undefined or null, normalize to empty object for safe access
-        req.body = req.body || {}
-        if (propName === 'headers' && req.headers.authorization) {
-          // we do this instead of adding it to `headerBlacklist`
-          // so we can distinguish if an API call is made via API key
-          req.headers.authorization = '[REDACTED]'
-        }
-        if (propName === 'headers' && req.headers.cookie) {
-          // redact cookies from logs
-          // keep header to distinguish if API call is made via cookie
-          req.headers.cookie = '[REDACTED]'
-        }
-        if (propName === 'body' && req.body.attachments) {
-          const { attachments } = req.body
-          req.body.attachments = ensureAttachmentsFieldIsArray(attachments).map(
-            (attachment) => ({
-              // truncate attachment data so the whole file won't get logged and take
-              // up our disk space
-              ...attachment,
-              data: '[REDACTED]',
-            })
-          )
-        }
-        if (propName === 'body' && req.body.body) {
-          // An example of req.body.body is the email body of an email that a user wishes to send
-          // We should redact such content as it may contain sensitive information
-          req.body.body = '[REDACTED]'
-        }
-        return (req as any)[propName]
-      },
+      requestFilter: requestLogFilter,
       metaField: null, // flatten this log to root instead of nesting under `meta`
     })
   )
