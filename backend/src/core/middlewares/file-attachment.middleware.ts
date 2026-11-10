@@ -21,6 +21,23 @@ const TOTAL_ATTACHMENT_SIZE_LIMIT = config.get(
 
 const s3 = new S3({ ...configureEndpoint(config) })
 
+// The stored type is whatever the uploader's browser declared, so only types
+// that cannot carry markup or script are rendered inline. Anything else, such
+// as text/html or image/svg+xml, is downloaded so an uploaded page never runs
+// on our origin.
+const INLINE_CONTENT_TYPES = [
+  'application/pdf',
+  'audio/mpeg',
+  'image/bmp',
+  'image/gif',
+  'image/jpeg',
+  'image/png',
+  'image/tiff',
+  'image/webp',
+  'text/plain',
+  'video/mp4',
+]
+
 const getFileUploadHandler = (fileSize: number, fieldSize: number) =>
   fileUpload({
     limits: {
@@ -147,10 +164,19 @@ async function streamCampaignEmbed(
     Bucket: config.get('commonAttachments.bucketName'),
     Key: id,
   })
-  res.setHeader('Content-Type', attachment.metadata.type)
+  const isInline = INLINE_CONTENT_TYPES.includes(attachment.metadata.type)
+  res.setHeader(
+    'Content-Type',
+    isInline ? attachment.metadata.type : 'application/octet-stream'
+  )
+  // RFC 5987 encoding: a raw non-ASCII name makes setHeader throw
+  const fileName = encodeURIComponent(attachment.originalFileName).replace(
+    /['()*]/g,
+    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
+  )
   res.setHeader(
     'Content-Disposition',
-    `inline; filename=${attachment.originalFileName}`
+    `${isInline ? 'inline' : 'attachment'}; filename*=UTF-8''${fileName}`
   )
   ;(obj.Body as Readable).pipe(res)
   return res
