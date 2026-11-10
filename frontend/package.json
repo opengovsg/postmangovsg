@@ -132,5 +132,8 @@
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": "eslint --cache --fix",
     "*.{md,scss}": "prettier --write"
+  },
+  "overrides": {
+    "body-parser": "1.20.9"
   }
 }
