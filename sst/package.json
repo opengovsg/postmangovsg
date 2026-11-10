@@ -38,6 +38,7 @@
     "*.{js,ts}": "eslint --cache --fix"
   },
   "overrides": {
-    "axios": "1.20.0"
+    "axios": "1.20.0",
+    "body-parser": "1.20.9"
   }
 }
