@@ -11,9 +11,8 @@ describe('CORS', () => {
 
   beforeAll(async () => {
     process.env.FRONTEND_URL = ALLOWED_ORIGINS.join(',')
-    const { default: expressLoader } = await import(
-      '@core/loaders/express.loader'
-    )
+    const { default: expressLoader } =
+      await import('@core/loaders/express.loader')
     const {
       InitAuthService,
       InitOneGovSgService,
@@ -53,11 +52,11 @@ describe('CORS', () => {
     }
   )
 
-  test('refuses to boot when FRONTEND_URL is a pattern', () => {
-    jest.isolateModules(() => {
-      process.env.FRONTEND_URL =
-        '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/'
-      expect(() => require('@core/config')).toThrow('is not an origin')
-    })
+  test('refuses to boot when FRONTEND_URL is a pattern', async () => {
+    jest.resetModules()
+    process.env.FRONTEND_URL =
+      '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/'
+
+    await expect(import('@core/config')).rejects.toThrow('is not an origin')
   })
 })
