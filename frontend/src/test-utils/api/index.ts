@@ -4,7 +4,6 @@ import {
   XSS_SMS_OPTION,
   XSS_TELEGRAM_OPTION,
 } from '@shared/templating'
-
 import { difference, union } from 'lodash'
 import { rest } from 'msw'
 
@@ -18,7 +17,6 @@ import {
   TWILIO_CREDENTIAL,
   USER_EMAIL,
 } from './constants'
-
 import type {
   EmailTemplate,
   SMSTemplate,

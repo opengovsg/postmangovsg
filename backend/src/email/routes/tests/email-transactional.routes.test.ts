@@ -1448,8 +1448,8 @@ describe(`GET ${emailTransactionalRoute}`, () => {
         i % 3 === 0
           ? deliveredMessage
           : i % 3 === 1
-          ? sentMessage
-          : acceptedMessage
+            ? sentMessage
+            : acceptedMessage
       const message = await EmailMessageTransactional.create({
         ...messageParams,
         userId: user.id,

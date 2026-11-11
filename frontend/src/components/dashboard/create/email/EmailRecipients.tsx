@@ -1,5 +1,4 @@
 import { i18n } from '@lingui/core'
-
 import {
   Dispatch,
   SetStateAction,
@@ -7,9 +6,7 @@ import {
   useEffect,
   useState,
 } from 'react'
-
 import { OutboundLink } from 'react-ga'
-
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
@@ -83,9 +80,8 @@ const EmailRecipients = ({
           setCsvInfo({ csvFilename })
           return
         }
-        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
-          +campaignId
-        )
+        const { isCsvProcessing, preview, ...newCsvInfo } =
+          await getCsvStatus(+campaignId)
         // Prevent setting state if unmounted
         if (!isMounted.current) return
 

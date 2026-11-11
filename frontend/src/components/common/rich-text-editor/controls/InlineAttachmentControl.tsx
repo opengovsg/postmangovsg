@@ -1,8 +1,6 @@
 import { EditorState, Modifier, SelectionState } from 'draft-js'
 import { useContext, useState } from 'react'
-
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
-
 import Dropzone from 'react-dropzone'
 
 import { EditorContext } from '../RichTextEditor'

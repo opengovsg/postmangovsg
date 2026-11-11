@@ -21,7 +21,7 @@ const OneGovSgLogoutToast = () => {
     if (!show) return
     const id = setTimeout(dismiss, TOAST_DURATION_MS)
     return () => clearTimeout(id)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [show])
 
   if (!show) return null

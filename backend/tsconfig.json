@@ -21,7 +21,6 @@
     "sourceMap": true,
     "outDir": "./build",
     "rootDir": "./src",
-    "downlevelIteration": true,
     "strict": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
@@ -34,35 +33,33 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
-    "baseUrl": "./src",
     "paths": {
       "@core/*": [
-        "core/*"
+        "./src/core/*"
       ],
       "@sms/*": [
-        "sms/*"
+        "./src/sms/*"
       ],
       "@email/*": [
-        "email/*"
+        "./src/email/*"
       ],
       "@telegram/*": [
-        "telegram/*"
+        "./src/telegram/*"
       ],
       "@govsg/*": [
-        "govsg/*"
+        "./src/govsg/*"
       ],
       "@shared/*": [
-        "../../shared/src/*"
+        "../shared/src/*"
       ],
       "@test-utils/*": [
-        "test-utils/*"
+        "./src/test-utils/*"
       ],
       "@database/*": [
-        "database/*"
+        "./src/database/*"
       ],
       "@mocks/*": [
-        "__mocks__/*"
+        "./src/__mocks__/*"
       ],
     },
     "esModuleInterop": true,

@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  // Root formatting covers YAML and Markdown only (see package.json scripts).
+  // There was no root prettier config, so these pin prettier 2 defaults where
+  // oxfmt's differ.
+  "printWidth": 80,
+  "trailingComma": "es5",
+  "sortPackageJson": false,
+  // From the old .prettierignore. Its /backend, /frontend and /worker entries
+  // are gone: each has its own .oxfmtrc.jsonc, and oxfmt applies the nearest
+  // config's ignorePatterns, so ignoring them here would do nothing.
+  // /serverless and /modules no longer exist.
+  "ignorePatterns": ["amplify.yml"]
+}

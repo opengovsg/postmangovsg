@@ -130,7 +130,7 @@ const checkNewTemplateParams = async ({
 
     try {
       client.template(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         updatedTemplate.body!,
         firstRecord.params as { [key: string]: string }
       )

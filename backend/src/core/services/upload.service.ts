@@ -294,7 +294,7 @@ async function pgAdvisoryLockCampaign(
   id: number,
   transaction: Transaction
 ): Promise<boolean> {
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+  // oxlint-disable-next-line typescript/no-non-null-assertion
   const [[isProcessingByAnother]] = await Campaign.sequelize!.query(
     'SELECT pg_try_advisory_xact_lock(?)',
     {
@@ -337,7 +337,7 @@ const processUpload = <Template extends AllowedTemplateTypes>(
       // - download from s3
       const s3Client = new S3Client()
       await retry(async (bail) => {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         const transaction = await Campaign.sequelize!.transaction()
 
         // Our processing function somehow hog event loop resulting in the worker

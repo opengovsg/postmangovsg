@@ -1,0 +1,27 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  // Migrated from .prettierrc (prettier 3). printWidth pins prettier's
+  // default, which differs from oxfmt's (100).
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "semi": false,
+  "singleQuote": true,
+  "printWidth": 80,
+  "sortPackageJson": false,
+  // Replaces eslint-plugin-simple-import-sort's imports rule and its groups:
+  // side effects, packages, `@/` aliases, parent, then same-folder imports.
+  "sortImports": {
+    "groups": [
+      "side_effect",
+      ["builtin", "external"],
+      "internal",
+      "parent",
+      ["sibling", "index"],
+      "unknown"
+    ],
+    "internalPattern": ["@/"],
+    "newlinesBetween": true
+  },
+  // Files .eslintrc.cjs kept out of eslint-plugin-prettier's reach.
+  "ignorePatterns": ["build/", "graphql.ts"]
+}

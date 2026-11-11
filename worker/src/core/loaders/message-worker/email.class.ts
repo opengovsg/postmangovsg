@@ -133,12 +133,12 @@ class Email {
         throw new Error('Recipient is incorrectly formatted')
       }
 
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      // oxlint-disable-next-line typescript/no-non-null-assertion
       const hydratedSubject = templateClient.template(subject!, params)
       const hydratedBody = templateClient.template(body, params)
       if (!unsubLink) {
         unsubLink = this.generateUnsubLink(
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          // oxlint-disable-next-line typescript/no-non-null-assertion
           campaignId!,
           recipient
         ).toString()

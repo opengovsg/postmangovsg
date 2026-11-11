@@ -1,11 +1,7 @@
 import { i18n } from '@lingui/core'
-
 import cx from 'classnames'
-
 import { useState, useContext } from 'react'
-
 import { OutboundLink } from 'react-ga'
-
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 import styles from './NavBar.module.scss'
@@ -16,7 +12,6 @@ import CreateModal from 'components/dashboard/create/create-modal'
 import { LINKS } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
-
 import { logout } from 'services/auth.service'
 
 const NavBar = () => {

@@ -1,5 +1,4 @@
 import cx from 'classnames'
-
 import { OutboundLink } from 'react-ga'
 
 import styles from './AnnouncementModalOptions.module.scss'

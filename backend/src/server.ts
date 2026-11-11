@@ -11,7 +11,7 @@ const start = async (): Promise<void> => {
   try {
     await loaders({ app })
     const server = app.listen(port, () =>
-      // eslint-disable-next-line no-console
+      // oxlint-disable-next-line no-console
       console.log(`Listening on port ${port}!`)
     )
 

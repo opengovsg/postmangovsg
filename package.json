@@ -40,8 +40,8 @@
     "precommit:shared": "cd shared && npm run precommit",
     "precommit:root": "lint-staged && npm run detect-secrets:precommit && sh check-env-format.sh",
     "precommit:sst": "cd sst && npm run precommit",
-    "lint-no-fix": "prettier --check '**/*.{yml,md}'",
-    "lint": "prettier --write '**/*.{yml,yaml,md}' --loglevel warn",
+    "lint-no-fix": "oxfmt --check '**/*.{yml,md}'",
+    "lint": "oxfmt '**/*.{yml,yaml,md}'",
     "wait:backend": "wait-on http-get://localhost:4000",
     "detect-secrets:update": "detect-secrets scan --baseline .secrets.baseline",
     "detect-secrets:check": "git ls-files -z | xargs -0 detect-secrets-hook --baseline .secrets.baseline",
@@ -62,12 +62,12 @@
     "concurrently": "^7.2.1",
     "husky": "^8.0.1",
     "lint-staged": "^13.0.0",
-    "prettier": "^2.6.2",
+    "oxfmt": "0.75.0",
     "typescript": "^5.3.3",
     "wait-on": "^6.0.1"
   },
   "lint-staged": {
-    "*.{yml,yaml,md}": "prettier --write"
+    "*.{yml,yaml,md}": "oxfmt --no-error-on-unmatched-pattern"
   },
   "dependencies": {
     "@datadog/browser-rum": "^5.9.0"

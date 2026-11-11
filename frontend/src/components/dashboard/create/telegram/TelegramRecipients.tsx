@@ -1,11 +1,7 @@
 import { i18n } from '@lingui/core'
-
 import { useState, useEffect, useContext } from 'react'
-
 import type { Dispatch, SetStateAction } from 'react'
-
 import { OutboundLink } from 'react-ga'
-
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
@@ -28,14 +24,12 @@ import {
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
-
 import { sendTiming } from 'services/ga.service'
 import {
   uploadFileToS3,
   deleteCsvStatus,
   getCsvStatus,
 } from 'services/upload.service'
-
 import type { CsvStatusResponse } from 'services/upload.service'
 
 const TelegramRecipients = ({
@@ -75,9 +69,8 @@ const TelegramRecipients = ({
     let timeoutId: NodeJS.Timeout
     const pollStatus = async () => {
       try {
-        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
-          +campaignId
-        )
+        const { isCsvProcessing, preview, ...newCsvInfo } =
+          await getCsvStatus(+campaignId)
         // Prevent setting state if unmounted
         if (!isMounted.current) return
 

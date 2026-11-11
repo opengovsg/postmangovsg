@@ -1,5 +1,4 @@
 import cx from 'classnames'
-
 import type { FunctionComponent, ReactNode } from 'react'
 
 import styles from './BodyWrapper.module.scss'

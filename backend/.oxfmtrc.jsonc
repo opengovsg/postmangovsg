@@ -1,0 +1,12 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  // Migrated from .prettierrc.js (prettier 2.6.2). printWidth and trailingComma
+  // pin prettier 2 defaults, which differ from oxfmt's (100 and "all").
+  "printWidth": 80,
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "sortPackageJson": false,
+  // Files .eslintrc.js and .eslintignore kept out of eslint-plugin-prettier's reach.
+  "ignorePatterns": ["jest.config.js", "src/database/migrations/"]
+}

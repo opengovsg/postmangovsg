@@ -1,7 +1,5 @@
 import { i18n } from '@lingui/core'
-
 import cx from 'classnames'
-
 import { Dispatch, SetStateAction, useState } from 'react'
 import { OutboundLink } from 'react-ga'
 
