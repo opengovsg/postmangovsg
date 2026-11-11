@@ -122,5 +122,8 @@
       "oxfmt --no-error-on-unmatched-pattern"
     ],
     "*.{md,scss}": "oxfmt --no-error-on-unmatched-pattern"
+  },
+  "overrides": {
+    "body-parser": "1.20.9"
   }
 }
