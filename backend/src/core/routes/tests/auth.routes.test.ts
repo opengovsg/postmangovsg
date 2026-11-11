@@ -107,6 +107,37 @@ describe('POST /auth/login', () => {
       .send({ email, otp: 'ABCDEFGH' })
     expect(res.status).toBe(200)
   })
+
+  test('Login invalidates the session cookie sent with it', async () => {
+    const login = async (email: string, cookie?: string) => {
+      const otp = JSON.stringify({
+        retries: 1,
+        hash: await bcrypt.hash('ABCDEFGH', 10),
+        createdAt: 123,
+      })
+      await new Promise((resolve) =>
+        (app as any).redisService.otpClient.set(email, otp, resolve)
+      )
+      const res = await request(app)
+        .post('/auth/login')
+        .set(cookie ? { Cookie: cookie } : {})
+        .send({ email, otp: 'ABCDEFGH' })
+      expect(res.status).toBe(200)
+      return res.headers['set-cookie'][0].split(';')[0] as string
+    }
+    const attackerCookie = await login('attacker@agency.gov.sg')
+
+    const victimCookie = await login('victim@agency.gov.sg', attackerCookie)
+
+    const attackerRes = await request(app)
+      .get('/auth/userinfo')
+      .set('Cookie', attackerCookie)
+    expect(attackerRes.body).toEqual({})
+    const victimRes = await request(app)
+      .get('/auth/userinfo')
+      .set('Cookie', victimCookie)
+    expect(victimRes.body.email).toEqual('victim@agency.gov.sg')
+  })
 })
 
 describe('GET /auth/userinfo', () => {
