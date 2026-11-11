@@ -70,7 +70,6 @@ export interface CredentialService {
   ): Promise<ApiKey & { plainTextKey: string }>
 }
 
-// oxlint-disable-next-line typescript/explicit-function-return-type
 export const InitCredentialService = (redisService: RedisService) => {
   const secretsManager = new SecretsManager(configureEndpoint(config))
   const logger = loggerWithLabel(module)

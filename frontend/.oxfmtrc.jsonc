@@ -11,6 +11,8 @@
   // asc). The tsconfig.paths.json aliases resolved as "internal", which
   // import/order placed in its trailing catch-all group; @shared/* resolved
   // outside the package and was sorted as external, so it stays there.
+  // tsconfig.paths.json maps "*" to src/*, so every top-level src/ directory
+  // is importable bare: keep this list in step with src/.
   "sortImports": {
     "customGroups": [
       {
@@ -24,6 +26,7 @@
           "components/**",
           "config",
           "config/**",
+          "constants",
           "contexts",
           "contexts/**",
           "locales",
@@ -35,7 +38,13 @@
           "styles",
           "styles/**",
           "test-utils",
-          "test-utils/**"
+          "test-utils/**",
+          "tests",
+          "tests/**",
+          "types",
+          "types/**",
+          "utils",
+          "utils/**"
         ]
       }
     ],

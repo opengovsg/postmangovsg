@@ -27,7 +27,6 @@ export enum AuthType {
   ApiKey = 'API_KEY',
 }
 
-// oxlint-disable-next-line typescript/explicit-function-return-type
 export const InitAuthMiddleware = (
   authService: AuthService,
   oneGovSgService: OneGovSgService

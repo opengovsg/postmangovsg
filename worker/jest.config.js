@@ -7,7 +7,6 @@ module.exports = {
     '@shared/(.*)': '<rootDir>/../shared/src/$1',
   },
   transform: {
-    // oxlint-disable-next-line id-match
     '^.+\\.(ts|tsx)$': 'ts-jest',
   },
   testEnvironment: 'node',
