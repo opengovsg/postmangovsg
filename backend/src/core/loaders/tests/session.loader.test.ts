@@ -23,15 +23,17 @@ afterAll(async () => {
 test('Using a session does not extend its expiry', async () => {
   const sid = 'seeded-session-id'
   const key = `sess:${sid}`
-  const oneHour = 60 * 60
+  const maxAge = config.get('session.cookieSettings.maxAge')
+  // Seed below maxAge, so a slide back up to maxAge shows as a larger TTL
+  const seededTtl = Math.floor(maxAge / 1000 / 2)
   const sessionClient = (app as any).redisService.sessionClient
   await new Promise((resolve) =>
     sessionClient.set(
       key,
       JSON.stringify({
         cookie: {
-          expires: new Date(Date.now() + oneHour * 1000),
-          originalMaxAge: config.get('session.cookieSettings.maxAge'),
+          expires: new Date(Date.now() + seededTtl * 1000),
+          originalMaxAge: maxAge,
           path: '/',
         },
         user: { id: 1, email: 'user@agency.gov.sg' },
@@ -39,7 +41,7 @@ test('Using a session does not extend its expiry', async () => {
         rateLimit: DEFAULT_TX_EMAIL_RATE_LIMIT,
       }),
       'EX',
-      oneHour,
+      seededTtl,
       resolve
     )
   )
@@ -57,5 +59,5 @@ test('Using a session does not extend its expiry', async () => {
     sessionClient.ttl(key, (_err: Error, value: number) => resolve(value))
   )
   expect(ttl).toBeGreaterThan(0)
-  expect(ttl).toBeLessThanOrEqual(oneHour)
+  expect(ttl).toBeLessThanOrEqual(seededTtl)
 })
