@@ -28,6 +28,9 @@ const s3 = new S3({ ...configureEndpoint(config) })
 const INLINE_CONTENT_TYPES = [
   'application/pdf',
   'audio/mpeg',
+  'audio/ogg',
+  'audio/wav',
+  'image/avif',
   'image/bmp',
   'image/gif',
   'image/jpeg',
@@ -36,6 +39,8 @@ const INLINE_CONTENT_TYPES = [
   'image/webp',
   'text/plain',
   'video/mp4',
+  'video/quicktime',
+  'video/webm',
 ]
 
 const getFileUploadHandler = (fileSize: number, fieldSize: number) =>
