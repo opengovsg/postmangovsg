@@ -62,12 +62,12 @@ afterAll(async () => {
 })
 
 describe('On successful message send, status should update according to Twilio response', () => {
-  const validApiCall = {
-    body: 'Hello world',
-    recipient: '98765432',
-    label: 'twilio-callback-1',
-  }
   test('Should send a message successfully', async () => {
+    const validApiCall = {
+      body: 'Hello world',
+      recipient: '98765432',
+      label: `twilio-callback-${user.id}`,
+    }
     const mockSendMessageResolvedValue = 'message_id_callback'
     const mockSendMessage = jest
       .spyOn(SmsService, 'sendMessage')
@@ -97,7 +97,9 @@ describe('On successful message send, status should update according to Twilio r
     expect(getByIdRes.body.status).toBe(TransactionalSmsMessageStatus.Unsent)
     expect(getByIdRes.body.body).toEqual('Hello world')
     expect(getByIdRes.body.recipient).toEqual('98765432')
-    expect(getByIdRes.body.credentialsLabel).toEqual('twilio-callback-1')
+    expect(getByIdRes.body.credentialsLabel).toEqual(
+      `twilio-callback-${user.id}`
+    )
     expect(getByIdRes.body.accepted_at).not.toBeNull()
     expect(getByIdRes.body.sent_at).toBeNull()
     expect(getByIdRes.body.errored_at).toBeNull()
