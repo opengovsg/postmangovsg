@@ -1,5 +1,4 @@
 import cx from 'classnames'
-import { OutboundLink } from 'react-ga'
 
 import styles from './AnnouncementModalOptions.module.scss'
 
@@ -34,14 +33,14 @@ const AnnouncementModalOptions = ({
 
     if (secondaryButtonUrl) {
       secondaryLink = (
-        <OutboundLink
+        <a
           className={styles.option}
-          eventLabel={secondaryButtonUrl}
-          to={secondaryButtonUrl}
+          href={secondaryButtonUrl}
           target="_blank"
+          rel="noopener noreferrer"
         >
           {secondaryLink}
-        </OutboundLink>
+        </a>
       )
     }
   }
@@ -49,17 +48,17 @@ const AnnouncementModalOptions = ({
   return (
     <div className={styles.container}>
       {secondaryLink}
-      <OutboundLink
+      <a
         className={styles.option}
-        eventLabel={primaryButtonUrl}
-        to={primaryButtonUrl}
+        href={primaryButtonUrl}
         target="_blank"
+        rel="noopener noreferrer"
       >
         <PrimaryButton onClick={handleReadMoreClicked}>
           <span>{primaryButtonText}</span>
           <i className={cx('bx', styles.icon, 'bx-right-arrow-alt')}></i>
         </PrimaryButton>
-      </OutboundLink>{' '}
+      </a>{' '}
     </div>
   )
 }

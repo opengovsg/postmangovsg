@@ -1,7 +1,6 @@
 import { i18n } from '@lingui/core'
 import type { Dispatch, SetStateAction } from 'react'
 import { useContext, useEffect, useState } from 'react'
-import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
@@ -24,7 +23,6 @@ import {
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
-import { sendTiming } from 'services/ga.service'
 import type { CsvStatusResponse } from 'services/upload.service'
 import {
   deleteCsvStatus,
@@ -107,7 +105,6 @@ const SMSRecipients = ({
   async function uploadFile(files: FileList) {
     setIsUploading(true)
     setErrorMessage(null)
-    const uploadTimeStart = performance.now()
 
     try {
       // user did not select a file
@@ -116,9 +113,6 @@ const SMSRecipients = ({
       }
       clearCsvStatus()
       const tempCsvFilename = await uploadFileToS3(+campaignId, files[0])
-
-      const uploadTimeEnd = performance.now()
-      sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
 
       // Prevent setting state if unmounted
       if (!isMounted.current) {
@@ -160,14 +154,14 @@ const SMSRecipients = ({
             This is because some use cases intend to send multiple messages to
             the same recipient. If this is not intended, please remove the
             duplicates. Learn how{' '}
-            <OutboundLink
+            <a
               className={styles.warningHelpLink}
-              eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
-              to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              href={i18n._(LINKS.guideRemoveDuplicatesUrl)}
               target="_blank"
+              rel="noopener noreferrer"
             >
               from our guide
-            </OutboundLink>
+            </a>
             .
           </WarningBlock>
         )}

@@ -1,7 +1,7 @@
 import { useContext } from 'react'
 
 import { EmailCampaign } from 'classes'
-import { ChannelType, Status } from 'classes/Campaign'
+import { Status } from 'classes/Campaign'
 import {
   EmailPreviewBlock,
   ProgressDetails,
@@ -12,7 +12,6 @@ import ScheduleDetails from 'components/common/schedule-details'
 import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stats'
 import { CampaignContext } from 'contexts/campaign.context'
 import { retryCampaign } from 'services/campaign.service'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const EmailDetail = () => {
   const { campaign, updateCampaign } = useContext(CampaignContext)
@@ -23,7 +22,6 @@ const EmailDetail = () => {
 
   async function handleRetry() {
     try {
-      sendUserEvent(GA_USER_EVENTS.RETRY_RESUME_SENDING, ChannelType.Email)
       await retryCampaign(id)
       await refreshCampaignStats()
     } catch (err) {

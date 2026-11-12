@@ -1,7 +1,6 @@
 import { i18n } from '@lingui/core'
 import cx from 'classnames'
 import { Dispatch, SetStateAction, useState } from 'react'
-import { OutboundLink } from 'react-ga'
 
 import styles from './SendRate.module.scss'
 
@@ -29,14 +28,14 @@ const SendRate = ({
               <label htmlFor="customSendRate">
                 You can send messages at a rapid rate, as long as the requests
                 do not max out Twilio&apos;s REST API concurrency limit.&nbsp;
-                <OutboundLink
+                <a
                   className={styles.link}
-                  eventLabel={i18n._(LINKS.guidePowerUserUrl)}
-                  to={i18n._(LINKS.guidePowerUserUrl)}
+                  href={i18n._(LINKS.guidePowerUserUrl)}
                   target="_blank"
+                  rel="noopener noreferrer"
                 >
                   Learn more about send rate limits
-                </OutboundLink>
+                </a>
               </label>
             </p>
 

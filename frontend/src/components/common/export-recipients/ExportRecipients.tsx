@@ -10,7 +10,6 @@ import { ChannelType } from 'classes/Campaign'
 import { Status } from 'classes/Campaign'
 import { ActionButton } from 'components/common'
 import { exportCampaignStats } from 'services/campaign.service'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 export enum CampaignExportStatus {
   Unavailable = 'Unavailable',
@@ -141,13 +140,6 @@ const ExportRecipients = ({
       )
 
       setExportStatus(CampaignExportStatus.Ready)
-
-      const campaignAgeInDays = moment().diff(sentAt, 'days')
-      sendUserEvent(
-        GA_USER_EVENTS.DOWNLOAD_DELIVERY_REPORT,
-        campaignType,
-        campaignAgeInDays
-      )
     } catch (error) {
       console.error(error)
     } finally {

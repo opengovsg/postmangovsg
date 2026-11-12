@@ -50,7 +50,6 @@ const SMSSend = () => {
     void confirmSendCampaign({
       campaignId: +campaignId,
       sendRate: +sendRate,
-      channelType: ChannelType.SMS,
       updateCampaign,
     })
   }

@@ -13,7 +13,6 @@ import { Campaign, ChannelType, Status } from 'classes'
 import { ExportRecipients } from 'components/common'
 import DuplicateCampaignModal from 'components/dashboard/create/duplicate-campaign-modal'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const ActionsButton = ({
   campaign,
@@ -104,7 +103,6 @@ const ActionsButton = ({
         onClick={(event: ReactMouseEvent<HTMLButtonElement>) => {
           event.stopPropagation()
           if (isDuplicateDisabled) return
-          sendUserEvent(GA_USER_EVENTS.OPEN_DUPLICATE_MODAL, campaign.type)
           const modal = campaign.demoMessageLimit ? (
             <CreateDemoModal
               duplicateCampaign={{

@@ -1,5 +1,4 @@
 import { i18n } from '@lingui/core'
-import { OutboundLink } from 'react-ga'
 import { useNavigate } from 'react-router-dom'
 
 import styles from './NavBar.module.scss'
@@ -28,22 +27,22 @@ const NavBar = () => {
       </a>
       <div className={styles.navbarLinks}>
         <div className={styles.links}>
-          <OutboundLink
+          <a
             className={styles.link}
-            eventLabel={i18n._(LINKS.contributeUrl)}
-            to={i18n._(LINKS.contributeUrl)}
+            href={i18n._(LINKS.contributeUrl)}
             target="_blank"
+            rel="noopener noreferrer"
           >
             Contribute
-          </OutboundLink>
-          <OutboundLink
+          </a>
+          <a
             className={styles.link}
-            eventLabel={`Landing navbar / ${i18n._(LINKS.guideUrl)}`}
-            to={i18n._(LINKS.guideUrl)}
+            href={i18n._(LINKS.guideUrl)}
             target="_blank"
+            rel="noopener noreferrer"
           >
             Guide
-          </OutboundLink>
+          </a>
         </div>
         <PrimaryButton className={styles.signInButton} onClick={directToSignIn}>
           Sign in

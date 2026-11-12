@@ -1,7 +1,6 @@
 import { i18n } from '@lingui/core'
 import cx from 'classnames'
 import { useContext, useState } from 'react'
-import { OutboundLink } from 'react-ga'
 import { useNavigate } from 'react-router-dom'
 
 import styles from './CreateModal.module.scss'
@@ -92,14 +91,14 @@ const CreateModal = ({
               </label>
               {selectedChannel === ChannelType.Email && !protect && (
                 <p className={styles.infotext}>
-                  <OutboundLink
+                  <a
                     className={styles.link}
-                    eventLabel="https://go.gov.sg/postman-email"
-                    to="https://go.gov.sg/postman-email"
+                    href="https://go.gov.sg/postman-email"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Learn more
-                  </OutboundLink>
+                  </a>
                   &nbsp; about sending emails on Postman.
                 </p>
               )}
@@ -125,14 +124,14 @@ const CreateModal = ({
               {selectedChannel === ChannelType.Email && protect && (
                 <p className={styles.infotext}>
                   Send sensitive content using Postman. &nbsp;
-                  <OutboundLink
+                  <a
                     className={styles.link}
-                    eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
-                    to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    href={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Learn more.
-                  </OutboundLink>
+                  </a>
                 </p>
               )}
             </div>
@@ -151,14 +150,14 @@ const CreateModal = ({
               {selectedChannel === ChannelType.SMS && (
                 <p className={styles.infotext}>
                   Set up your Twilio credentials. &nbsp;
-                  <OutboundLink
+                  <a
                     className={styles.link}
-                    eventLabel={i18n._(LINKS.guideSmsUrl)}
-                    to={i18n._(LINKS.guideSmsUrl)}
+                    href={i18n._(LINKS.guideSmsUrl)}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Learn more.
-                  </OutboundLink>
+                  </a>
                 </p>
               )}
             </div>
@@ -178,14 +177,14 @@ const CreateModal = ({
               {selectedChannel === ChannelType.Telegram && (
                 <p className={styles.infotext}>
                   Set up your Telegram Bot. &nbsp;
-                  <OutboundLink
+                  <a
                     className={styles.link}
-                    eventLabel="https://go.gov.sg/postman-telegram"
-                    to="https://go.gov.sg/postman-telegram"
+                    href="https://go.gov.sg/postman-telegram"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Learn more.
-                  </OutboundLink>
+                  </a>
                 </p>
               )}
             </div>

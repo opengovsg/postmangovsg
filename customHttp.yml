@@ -23,14 +23,13 @@ customHeaders:
           https://s3.ap-southeast-1.amazonaws.com/file-staging.postman.gov.sg/
           https://s3.ap-southeast-1.amazonaws.com/file-production.postman.gov.sg/
           https://o399364.ingest.sentry.io/
-          https://www.google-analytics.com
           https://*.browser-intake-datadoghq.com;
           style-src 'self' https://*.postman.gov.sg https://fonts.googleapis.com 'unsafe-inline';
           font-src 'self' https://*.postman.gov.sg https://fonts.gstatic.com;
           default-src 'self' https://*.postman.gov.sg;
           object-src 'none';
-          script-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://ssl.google-analytics.com;
-          img-src 'self' https://*.postman.gov.sg https://www.google-analytics.com https://file.go.gov.sg https://file.for.sg https://file.for.edu.sg;
+          script-src 'self';
+          img-src 'self' https://*.postman.gov.sg https://file.go.gov.sg https://file.for.sg https://file.for.edu.sg;
           media-src 'self' https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/;
           child-src 'self' https://s3-ap-southeast-1.amazonaws.com/public.postman.gov.sg/;
           frame-src 'self' https://form.gov.sg/;

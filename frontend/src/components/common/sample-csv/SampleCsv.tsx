@@ -5,7 +5,6 @@ import TextButton from '../text-button'
 
 import styles from './SampleCsv.module.scss'
 
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 import {
   PROTECTED_CSV_HEADERS,
   extractParams,
@@ -58,8 +57,6 @@ const SampleCsv = ({
       const content = [`${headers.join(',')}`, `${body.join(',')}`].join('\r\n')
 
       download(content, 'postman_sample.csv', 'text/csv')
-
-      sendUserEvent(GA_USER_EVENTS.DOWNLOAD_SAMPLE_FILE)
     } catch (e) {
       setErrorMsg ? setErrorMsg((e as Error).message) : console.error(e)
     }

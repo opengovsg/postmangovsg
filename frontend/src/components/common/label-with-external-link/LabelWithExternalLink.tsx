@@ -1,5 +1,3 @@
-import { OutboundLink } from 'react-ga'
-
 import styles from './LabelWithExternalLink.module.scss'
 
 const LabelWithExternalLink = ({
@@ -15,14 +13,14 @@ const LabelWithExternalLink = ({
     <div className={styles.label}>
       <label htmlFor={htmlFor}>{label}</label>
       {link && (
-        <OutboundLink
+        <a
           className={styles.link}
-          eventLabel={link}
-          to={link}
+          href={link}
           target="_blank"
+          rel="noopener noreferrer"
         >
           <i className="bx bx-link-external" />
-        </OutboundLink>
+        </a>
       )}
     </div>
   )

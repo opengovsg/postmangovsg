@@ -1,7 +1,6 @@
 import { i18n } from '@lingui/core'
 import cx from 'classnames'
 import { useState, useContext } from 'react'
-import { OutboundLink } from 'react-ga'
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 
 import styles from './NavBar.module.scss'
@@ -71,14 +70,14 @@ const NavBar = () => {
         >
           Create
         </TextButton>
-        <OutboundLink
+        <a
           className={styles.link}
-          eventLabel={`Dashboard navbar / ${i18n._(LINKS.guideUrl)}`}
-          to={i18n._(LINKS.guideUrl)}
+          href={i18n._(LINKS.guideUrl)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           Guide
-        </OutboundLink>
+        </a>
         <NavLink
           className={({ isActive }) =>
             cx(styles.link, isActive ? styles.active : '')
@@ -87,22 +86,22 @@ const NavBar = () => {
         >
           Settings
         </NavLink>
-        <OutboundLink
+        <a
           className={styles.link}
-          eventLabel={i18n._(LINKS.featureRequestUrl)}
-          to={i18n._(LINKS.featureRequestUrl)}
+          href={i18n._(LINKS.featureRequestUrl)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           Feature Request
-        </OutboundLink>
-        <OutboundLink
+        </a>
+        <a
           className={styles.link}
-          eventLabel={i18n._(LINKS.contactUsUrl)}
-          to={i18n._(LINKS.contactUsUrl)}
+          href={i18n._(LINKS.contactUsUrl)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           Contact Us
-        </OutboundLink>
+        </a>
 
         <div className={styles.separator}></div>
 
