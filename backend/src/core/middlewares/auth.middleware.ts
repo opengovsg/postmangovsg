@@ -3,7 +3,6 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import {
   AuthService,
-  experimentService,
   OneGovSgCallbackError,
   OneGovSgIdentity,
   OneGovSgService,
@@ -116,10 +115,7 @@ export const InitAuthMiddleware = (
     res: Response
   ): Promise<Response | void> => {
     if (req?.session?.user?.id) {
-      const [user, experimentalData] = await Promise.all([
-        authService.findUser(req?.session?.user?.id),
-        experimentService.getUserExperimentalData(req?.session?.user?.id),
-      ])
+      const user = await authService.findUser(req?.session?.user?.id)
       logger.info({
         message: 'Existing user session found',
         action: 'getUser',
@@ -127,7 +123,6 @@ export const InitAuthMiddleware = (
       return res.json({
         email: user?.email,
         id: user?.id,
-        experimental_data: experimentalData,
       })
     }
     logger.info({

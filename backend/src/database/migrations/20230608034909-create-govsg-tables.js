@@ -1,6 +1,17 @@
 'use strict'
 
-const { GovsgMessageStatus } = require('@core/constants')
+// Inlined: the GovsgMessageStatus enum was removed from @core/constants along
+// with the GovSG channel, but this migration still runs on fresh databases.
+const GovsgMessageStatus = {
+  Unsent: 'UNSENT',
+  Accepted: 'ACCEPTED',
+  Sent: 'SENT',
+  Delivered: 'DELIVERED',
+  Read: 'READ',
+  Error: 'ERROR',
+  InvalidRecipient: 'INVALID_RECIPIENT',
+  Deleted: 'DELETED',
+}
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {

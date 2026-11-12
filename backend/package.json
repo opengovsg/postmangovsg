@@ -82,7 +82,6 @@
     "yamljs": "0.3.0"
   },
   "devDependencies": {
-    "@json2csv/plainjs": "^7.0.1",
     "@types/async-retry": "1.4.4",
     "@types/bcrypt": "3.0.0",
     "@types/bluebird": "3.5.30",
@@ -113,7 +112,6 @@
     "@types/validator": "12.0.1",
     "@types/yamljs": "0.2.31",
     "copyfiles": "2.2.0",
-    "csvtojson": "2.0.10",
     "express-async-errors": "3.1.1",
     "jest": "^27.5.1",
     "lint-staged": "10.2.6",
@@ -134,7 +132,6 @@
     "@email": "build/email",
     "@telegram": "build/telegram",
     "@database": "build/database",
-    "@govsg": "build/govsg",
     "@shared": "../shared/build/"
   },
   "repository": {

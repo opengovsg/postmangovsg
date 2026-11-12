@@ -9,7 +9,6 @@ import styles from './CreateModal.module.scss'
 import { Campaign, ChannelType } from 'classes/Campaign'
 import { ErrorBlock, PrimaryButton, TextInput } from 'components/common'
 import { LINKS } from 'config'
-import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
 import { createCampaign } from 'services/campaign.service'
 
@@ -26,8 +25,6 @@ const CreateModal = ({
   const [selectedChannel, setSelectedChannel] = useState(channelType)
   const [selectedName, setSelectedName] = useState(name)
   const [protect, setProtected] = useState(false)
-  const { experimentalData } = useContext(AuthContext)
-  const canAccessGovsg = !!experimentalData[ChannelType.Govsg]
 
   async function handleCreateCampaign() {
     try {
@@ -189,26 +186,6 @@ const CreateModal = ({
                 </p>
               )}
             </div>
-            {canAccessGovsg && (
-              <div className={styles.channelContainer}>
-                <input
-                  type="radio"
-                  aria-label={ChannelType.Govsg}
-                  id={ChannelType.Govsg}
-                  value={ChannelType.Govsg}
-                  checked={selectedChannel === ChannelType.Govsg}
-                  onChange={() => setSelectedChannel(ChannelType.Govsg)}
-                />
-                <label htmlFor={ChannelType.Govsg} className={styles.subtext}>
-                  Gov.sg WhatsApp
-                </label>
-                {selectedChannel === ChannelType.Govsg && (
-                  <p className={styles.infotext}>
-                    Send WhatsApp messages from a verified Gov.sg account
-                  </p>
-                )}
-              </div>
-            )}
           </div>
         </div>
 
