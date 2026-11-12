@@ -1,7 +1,6 @@
 'use strict'
 
-// Inlined: the GovsgMessageStatus enum was removed from @core/constants along
-// with the GovSG channel, but this migration still runs on fresh databases.
+// Inlined so migrations run without building and configuring the app
 const GovsgMessageStatus = {
   Unsent: 'UNSENT',
   Accepted: 'ACCEPTED',
