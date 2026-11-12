@@ -198,7 +198,8 @@ convict.addFormats({
     },
   },
   'origin-list': {
-    // convict requires validate, but config.validate() is never called
+    // coerce has already rejected anything that is not an origin, so this
+    // only catches an empty list
     validate: (val: any): void => {
       if (!Array.isArray(val) || val.length === 0) {
         throw new Error('must be a non-empty list of origins')
@@ -875,8 +876,8 @@ switch (config.get('env')) {
         'https://legacy-staging.postman.gov.sg',
         'https://tesseract.postman.gov.sg',
       ],
-      protectedUrl: 'https://staging.postman.gov.sg/p',
-      unsubscribeUrl: 'https://staging.postman.gov.sg/unsubscribe',
+      protectedUrl: 'https://legacy-staging.postman.gov.sg/p',
+      unsubscribeUrl: 'https://legacy-staging.postman.gov.sg/unsubscribe',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-staging',
