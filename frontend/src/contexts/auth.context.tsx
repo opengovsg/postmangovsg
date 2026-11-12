@@ -2,10 +2,8 @@ import { datadogRum } from '@datadog/browser-rum'
 import axios from 'axios'
 import { createContext, useState, useEffect } from 'react'
 import type { ReactNode, Dispatch, SetStateAction } from 'react'
-import { useLocation } from 'react-router-dom'
 
 import { getUser, logout, setUserAnalytics } from 'services/auth.service'
-import { initializeGA, sendPageView } from 'services/ga.service'
 
 interface ContextProps {
   isAuthenticated: boolean
@@ -28,13 +26,6 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
     [key: string]: Record<string, string>
   }>({})
 
-  const location = useLocation()
-
-  useEffect(() => {
-    // ensure that GA is loaded before sending event
-    isLoaded && sendPageView(location.pathname)
-  }, [location, isLoaded])
-
   useEffect(() => {
     async function initialChecks() {
       try {
@@ -43,7 +34,6 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         setEmail(user?.email || '')
         setExperimentalData(user?.experimental_data || {})
 
-        initializeGA()
         setUserAnalytics(user)
       } catch (err) {
         // is unauthorized

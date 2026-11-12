@@ -7,15 +7,13 @@ import {
   useEffect,
   useState,
 } from 'react'
-import { OutboundLink } from 'react-ga'
-
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
 
 import { confirmSendCampaign } from '../util'
 
-import { ChannelType, GovsgProgress } from 'classes'
+import { GovsgProgress } from 'classes'
 import {
   ButtonGroup,
   ConfirmModal,
@@ -149,7 +147,6 @@ const GovsgRecipients = ({
     if (!campaignId) return
     void confirmSendCampaign({
       campaignId: +campaignId,
-      channelType: ChannelType.Govsg,
       sendRate: 0,
       updateCampaign,
     })
@@ -187,14 +184,14 @@ const GovsgRecipients = ({
             This is because some use cases intend to send multiple messages to
             the same recipient. If this is not intended, please remove the
             duplicates. Learn how{' '}
-            <OutboundLink
+            <a
               className={styles.warningHelpLink}
-              eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
-              to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              href={i18n._(LINKS.guideRemoveDuplicatesUrl)}
               target="_blank"
+              rel="noopener noreferrer"
             >
               from our guide
-            </OutboundLink>
+            </a>
             .
           </WarningBlock>
         )}

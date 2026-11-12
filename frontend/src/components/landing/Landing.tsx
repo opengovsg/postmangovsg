@@ -5,7 +5,6 @@ import cx from 'classnames'
 import Lottie from 'lottie-react'
 import { createRef, useContext, useEffect, useState } from 'react'
 
-import { OutboundLink } from 'react-ga'
 import { Navigate, useNavigate } from 'react-router-dom'
 
 import styles from './Landing.module.scss'
@@ -142,14 +141,14 @@ const Landing = () => {
               >
                 Sign in
               </PrimaryButton>
-              <OutboundLink
+              <a
                 className={styles.contactUs}
-                eventLabel={i18n._(LINKS.contactUsUrl)}
-                to={i18n._(LINKS.contactUsUrl)}
+                href={i18n._(LINKS.contactUsUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Need help?<span>Talk to us</span>
-              </OutboundLink>
+              </a>
             </div>
           </div>
           <div className={styles.landingAnimation}>
@@ -190,13 +189,13 @@ const Landing = () => {
               Go digital and send personalized emails. No more letterheads and
               stamps. Use our password-protected feature to send sensitive
               information like a payslip or personal PIN to your recipients.{' '}
-              <OutboundLink
-                eventLabel="https://go.gov.sg/postman-email"
-                to="https://go.gov.sg/postman-email"
+              <a
+                href="https://go.gov.sg/postman-email"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Read more
-              </OutboundLink>
+              </a>
             </p>
 
             <h4>SMS</h4>
@@ -204,13 +203,13 @@ const Landing = () => {
               Move away from calling. Send transactional SMS easily through our
               Twilio integration. Remind citizens to come for their
               appointments. The possibilities are endless.{' '}
-              <OutboundLink
-                eventLabel="https://go.gov.sg/postman-sms"
-                to="https://go.gov.sg/postman-sms"
+              <a
+                href="https://go.gov.sg/postman-sms"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Read more
-              </OutboundLink>
+              </a>
             </p>
 
             <h4>Telegram</h4>
@@ -220,13 +219,13 @@ const Landing = () => {
               broadcasting feature. You can easily send private messages to your
               agency employees for a fitness event or engage citizens for a
               donation drive.{' '}
-              <OutboundLink
-                eventLabel="https://go.gov.sg/postman-telegram"
-                to="https://go.gov.sg/postman-telegram"
+              <a
+                href="https://go.gov.sg/postman-telegram"
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Read more
-              </OutboundLink>
+              </a>
             </p>
           </div>
         </div>
@@ -293,13 +292,13 @@ const Landing = () => {
               >
                 <span>Get started</span>
               </PrimaryButton>
-              <OutboundLink
-                eventLabel={i18n._(LINKS.contactUsUrl)}
-                to={i18n._(LINKS.contactUsUrl)}
+              <a
+                href={i18n._(LINKS.contactUsUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Contact us
-              </OutboundLink>
+              </a>
             </div>
           </div>
           <div className={styles.imageContainer}>
@@ -322,20 +321,20 @@ const Landing = () => {
                   Reach out to citizens in minutes
                 </span>
               </div>
-              <OutboundLink
-                eventLabel={i18n._(LINKS.guideUrl)}
-                to={i18n._(LINKS.guideUrl)}
+              <a
+                href={i18n._(LINKS.guideUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Guide
-              </OutboundLink>
-              <OutboundLink
-                eventLabel={i18n._(LINKS.contributeUrl)}
-                to={i18n._(LINKS.contributeUrl)}
+              </a>
+              <a
+                href={i18n._(LINKS.contributeUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Contribute
-              </OutboundLink>
+              </a>
             </div>
 
             <div className={styles.builtBy}>
@@ -346,28 +345,28 @@ const Landing = () => {
           <div className={styles.lineBreak} />
           <div className={styles.footer}>
             <div className={styles.links}>
-              <OutboundLink
+              <a
                 className={styles.navLink}
-                eventLabel={i18n._(LINKS.privacyUrl)}
-                to={i18n._(LINKS.privacyUrl)}
+                href={i18n._(LINKS.privacyUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Privacy
-              </OutboundLink>
-              <OutboundLink
-                eventLabel={i18n._(LINKS.tncUrl)}
-                to={i18n._(LINKS.tncUrl)}
+              </a>
+              <a
+                href={i18n._(LINKS.tncUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Terms of Use
-              </OutboundLink>
-              <OutboundLink
-                eventLabel={i18n._(LINKS.reportBugUrl)}
-                to={i18n._(LINKS.reportBugUrl)}
+              </a>
+              <a
+                href={i18n._(LINKS.reportBugUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Report Vulnerability
-              </OutboundLink>
+              </a>
             </div>
             <span>
               &copy; {new Date().getFullYear()} Open Government Products

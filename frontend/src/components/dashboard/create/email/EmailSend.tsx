@@ -6,7 +6,6 @@ import styles from '../Create.module.scss'
 
 import { campaignFeedbackUrl, confirmSendCampaign } from '../util'
 
-import { ChannelType } from 'classes'
 import {
   ButtonGroup,
   ConfirmModal,
@@ -59,7 +58,6 @@ const EmailSend = () => {
     void confirmSendCampaign({
       campaignId: +campaignId,
       sendRate: 0,
-      channelType: ChannelType.Email,
       updateCampaign,
     })
   }

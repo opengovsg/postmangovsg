@@ -2,8 +2,6 @@ import { i18n } from '@lingui/core'
 
 import { useContext, useEffect, useState } from 'react'
 
-import { OutboundLink } from 'react-ga'
-
 import styles from './CompletedDemoModal.module.scss'
 
 import CongratsImage from 'assets/img/demo/congrats.png'
@@ -101,15 +99,15 @@ const CompletedDemoModal = ({
           Watch tutorial
         </PrimaryButton>
 
-        <OutboundLink
-          eventLabel={i18n._(LINKS.contactUsUrl)}
-          to={i18n._(LINKS.contactUsUrl)}
+        <a
+          href={i18n._(LINKS.contactUsUrl)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           <PrimaryButton className={styles.outlineBtn}>
             I need help
           </PrimaryButton>
-        </OutboundLink>
+        </a>
       </div>
     </div>
   )

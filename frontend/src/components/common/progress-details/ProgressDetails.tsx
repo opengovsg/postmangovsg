@@ -3,7 +3,6 @@ import { i18n } from '@lingui/core'
 import cx from 'classnames'
 
 import { useContext } from 'react'
-import { OutboundLink } from 'react-ga'
 import Moment from 'react-moment'
 
 import styles from './ProgressDetails.module.scss'
@@ -51,13 +50,13 @@ const ProgressDetails = ({
       return (
         <span>
           Too many of your emails bounced.{' '}
-          <OutboundLink
-            eventLabel={i18n._(LINKS.contactUsUrl)}
-            to={i18n._(LINKS.contactUsUrl)}
+          <a
+            href={i18n._(LINKS.contactUsUrl)}
             target="_blank"
+            rel="noopener noreferrer"
           >
             Contact us
-          </OutboundLink>{' '}
+          </a>{' '}
           for details.
         </span>
       )

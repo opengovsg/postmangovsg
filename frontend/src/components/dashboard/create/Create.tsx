@@ -27,8 +27,6 @@ import { GovsgDetailContextProvider } from 'contexts/govsg-detail.context'
 
 import { getCampaignDetails } from 'services/campaign.service'
 
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
-
 const Create = () => {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
@@ -61,7 +59,6 @@ const Create = () => {
 
   async function handleFinishLater() {
     if (campaign.status === Status.Draft) {
-      sendUserEvent(GA_USER_EVENTS.FINISH_CAMPAIGN_LATER, campaign.type)
       if (finishLaterContent) return finishLaterContextHandler()
     }
     navigate('/campaigns')

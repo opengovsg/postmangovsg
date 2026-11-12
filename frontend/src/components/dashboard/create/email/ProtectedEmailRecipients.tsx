@@ -30,7 +30,6 @@ import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
 
-import { sendTiming } from 'services/ga.service'
 import { protectAndUploadCsv } from 'services/protect-csv.service'
 import { ProtectedCsvInfo, validateCsv } from 'services/validate-csv.service'
 
@@ -120,19 +119,12 @@ const ProtectedEmailRecipients = ({
       throw new Error('No csv selected')
     }
     try {
-      const uploadTimeStart = performance.now()
       await protectAndUploadCsv({
         campaignId: +campaignId,
         file: selectedFile,
         template,
         removeEmptyLines,
       })
-      const uploadTimeEnd = performance.now()
-      sendTiming(
-        'Contacts file',
-        'protected upload',
-        uploadTimeEnd - uploadTimeStart
-      )
       setPhase(ProtectPhase.PROCESSING)
     } catch (err) {
       setErrorMessage((err as Error).message)

@@ -4,8 +4,6 @@ import cx from 'classnames'
 
 import { useContext, useState } from 'react'
 
-import { OutboundLink } from 'react-ga'
-
 import { useNavigate } from 'react-router-dom'
 
 import styles from './DuplicateCampaignModal.module.scss'
@@ -17,7 +15,6 @@ import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
 
 import { duplicateCampaign } from 'services/campaign.service'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
   const { close } = useContext(ModalContext)
@@ -36,7 +33,6 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
         name: selectedName,
         campaignId: campaign.id,
       })
-      sendUserEvent(GA_USER_EVENTS.COMPLETE_DUPLICATE, campaign.type)
       // close modal and go to create view
       close()
       navigate(`/campaigns/${duplicate.id}`)
@@ -93,14 +89,14 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
               </label>
               {campaign.type === ChannelType.Email && !campaign.protect && (
                 <p className={styles.infotext}>
-                  <OutboundLink
+                  <a
                     className={styles.link}
-                    eventLabel="https://go.gov.sg/postman-email"
-                    to="https://go.gov.sg/postman-email"
+                    href="https://go.gov.sg/postman-email"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Learn more
-                  </OutboundLink>
+                  </a>
                   &nbsp; about sending emails on Postman.
                 </p>
               )}
@@ -125,14 +121,14 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
               {campaign.type === ChannelType.Email && campaign.protect && (
                 <p className={styles.infotext}>
                   Send sensitive content using Postman. &nbsp;
-                  <OutboundLink
+                  <a
                     className={styles.link}
-                    eventLabel={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
-                    to={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
+                    href={i18n._(LINKS.guideEmailPasswordProtectedUrl)}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Learn more.
-                  </OutboundLink>
+                  </a>
                 </p>
               )}
             </div>
@@ -151,14 +147,14 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
               {campaign.type === ChannelType.SMS && (
                 <p className={styles.infotext}>
                   Set up your Twilio credentials. &nbsp;
-                  <OutboundLink
+                  <a
                     className={styles.link}
-                    eventLabel={i18n._(LINKS.guideSmsUrl)}
-                    to={i18n._(LINKS.guideSmsUrl)}
+                    href={i18n._(LINKS.guideSmsUrl)}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Learn more.
-                  </OutboundLink>
+                  </a>
                 </p>
               )}
             </div>
@@ -177,14 +173,14 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
               {campaign.type === ChannelType.Telegram && (
                 <p className={styles.infotext}>
                   Set up your Telegram Bot. &nbsp;
-                  <OutboundLink
+                  <a
                     className={styles.link}
-                    eventLabel="https://go.gov.sg/postman-telegram"
-                    to="https://go.gov.sg/postman-telegram"
+                    href="https://go.gov.sg/postman-telegram"
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Learn more.
-                  </OutboundLink>
+                  </a>
                 </p>
               )}
             </div>

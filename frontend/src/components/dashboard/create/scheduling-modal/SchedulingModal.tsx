@@ -43,7 +43,6 @@ const SchedulingModal = ({
     await confirmSendCampaign({
       campaignId: +campaign.id,
       sendRate: 0,
-      channelType: campaign.type,
       updateCampaign,
       scheduledTiming: scheduledDatetime.toDate(),
     })
@@ -55,13 +54,7 @@ const SchedulingModal = ({
         window.location.reload()
       })
     return
-  }, [
-    scheduledDatetime,
-    campaign.id,
-    campaign.type,
-    updateCampaign,
-    modalContext,
-  ])
+  }, [scheduledDatetime, campaign.id, updateCampaign, modalContext])
 
   async function handleScheduleCampaign(_: React.MouseEvent<HTMLDivElement>) {
     // form the payload from the date and time.

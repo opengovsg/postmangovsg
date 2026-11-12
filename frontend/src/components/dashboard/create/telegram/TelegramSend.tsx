@@ -53,7 +53,6 @@ const TelegramSend = () => {
     void confirmSendCampaign({
       campaignId: +campaignId,
       sendRate: +sendRate,
-      channelType: ChannelType.Telegram,
       updateCampaign,
     })
   }

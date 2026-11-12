@@ -4,8 +4,6 @@ import cx from 'classnames'
 
 import { useEffect, useState, useContext } from 'react'
 
-import { OutboundLink } from 'react-ga'
-
 import styles from './AddCredentialModal.module.scss'
 
 import ChooseChannelsImage from 'assets/img/choose-channels.svg'
@@ -279,13 +277,13 @@ const AddCredentialModal = ({
           <>
             Before you validate the credentials, the phone number you are
             testing with must be already subscribed to the bot.&nbsp;
-            <OutboundLink
-              eventLabel={i18n._(LINKS.guideTelegramUrl)}
-              to={i18n._(LINKS.guideTelegramUrl)}
+            <a
+              href={i18n._(LINKS.guideTelegramUrl)}
               target="_blank"
+              rel="noopener noreferrer"
             >
               Learn more
-            </OutboundLink>
+            </a>
           </>
         )
         validateInput = <TelegramValidationInput onClick={validateCredential} />

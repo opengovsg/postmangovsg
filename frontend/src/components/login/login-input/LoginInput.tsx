@@ -32,12 +32,6 @@ import {
   setUserAnalytics,
 } from 'services/auth.service'
 
-import {
-  GA_USER_EVENTS,
-  sendUserEvent,
-  sendException,
-} from 'services/ga.service'
-
 const RESEND_WAIT_TIME = 30000
 
 const Login = () => {
@@ -87,7 +81,6 @@ const Login = () => {
     } catch (err) {
       setCanResend(true)
       openErrorModal((err as Error).message)
-      sendException((err as Error).message)
     }
   }
 
@@ -103,7 +96,6 @@ const Login = () => {
       setUserAnalytics(user)
     } catch (err) {
       openErrorModal((err as Error).message)
-      sendException((err as Error).message)
     }
   }
 
@@ -126,7 +118,6 @@ const Login = () => {
       // Leave the callback route after a failed sign-in.
       navigate('/login', { replace: true })
       openErrorModal((err as Error).message)
-      sendException((err as Error).message)
     }
   }
 
@@ -143,7 +134,6 @@ const Login = () => {
   }
 
   async function resend() {
-    sendUserEvent(GA_USER_EVENTS.RESEND_OTP)
     setIsResending(true)
     await sendOtp()
     setIsResending(false)

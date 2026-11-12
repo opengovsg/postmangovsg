@@ -4,8 +4,6 @@ import { useState, useEffect, useContext } from 'react'
 
 import type { Dispatch, SetStateAction } from 'react'
 
-import { OutboundLink } from 'react-ga'
-
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
@@ -29,7 +27,6 @@ import useIsMounted from 'components/custom-hooks/use-is-mounted'
 import { LINKS } from 'config'
 import { CampaignContext } from 'contexts/campaign.context'
 
-import { sendTiming } from 'services/ga.service'
 import {
   uploadFileToS3,
   deleteCsvStatus,
@@ -109,7 +106,6 @@ const TelegramRecipients = ({
   async function uploadFile(files: FileList) {
     setIsUploading(true)
     setErrorMessage(null)
-    const uploadTimeStart = performance.now()
 
     try {
       // user did not select a file
@@ -118,9 +114,6 @@ const TelegramRecipients = ({
       }
       clearCsvStatus()
       const tempCsvFilename = await uploadFileToS3(+campaignId, files[0])
-
-      const uploadTimeEnd = performance.now()
-      sendTiming('Contacts file', 'upload', uploadTimeEnd - uploadTimeStart)
 
       // Prevent setting state if unmounted
       if (!isMounted.current) return
@@ -163,14 +156,14 @@ const TelegramRecipients = ({
             This is because some use cases intend to send multiple messages to
             the same recipient. If this is not intended, please remove the
             duplicates. Learn how{' '}
-            <OutboundLink
+            <a
               className={styles.warningHelpLink}
-              eventLabel={i18n._(LINKS.guideRemoveDuplicatesUrl)}
-              to={i18n._(LINKS.guideRemoveDuplicatesUrl)}
+              href={i18n._(LINKS.guideRemoveDuplicatesUrl)}
               target="_blank"
+              rel="noopener noreferrer"
             >
               from our guide
-            </OutboundLink>
+            </a>
             .
           </WarningBlock>
         )}

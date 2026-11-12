@@ -8,8 +8,6 @@ import { useContext, useState, useMemo, useCallback } from 'react'
 
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
-import { OutboundLink } from 'react-ga'
-
 import { EditorContext } from '../RichTextEditor'
 import styles from '../RichTextEditor.module.scss'
 import { isImgSrcValid, isExternalImage } from '../utils/image'
@@ -181,14 +179,14 @@ const ImageForm = ({
       )}
 
       <div className={styles.submit}>
-        <OutboundLink
+        <a
           className={styles.guideLink}
-          eventLabel={i18n._(LINKS.guideEmailImageUrl)}
-          to={i18n._(LINKS.guideEmailImageUrl)}
+          href={i18n._(LINKS.guideEmailImageUrl)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           View guide <i className="bx bx-link-external"></i>
-        </OutboundLink>
+        </a>
         <button
           type="submit"
           disabled={

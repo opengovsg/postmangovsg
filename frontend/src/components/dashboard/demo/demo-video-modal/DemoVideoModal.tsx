@@ -2,8 +2,6 @@ import { i18n } from '@lingui/core'
 
 import { useContext } from 'react'
 
-import { OutboundLink } from 'react-ga'
-
 import ReactPlayer from 'react-player/lazy'
 
 import styles from './DemoVideoModal.module.scss'
@@ -40,13 +38,13 @@ const DemoVideoModal = ({
       ></ReactPlayer>
       <div className={styles.helpText}>
         Need more help?{' '}
-        <OutboundLink
-          eventLabel={i18n._(LINKS.guideDemoUrl)}
-          to={i18n._(LINKS.guideDemoUrl)}
+        <a
+          href={i18n._(LINKS.guideDemoUrl)}
           target="_blank"
+          rel="noopener noreferrer"
         >
           Read the walkthrough tutorial
-        </OutboundLink>
+        </a>
         .
       </div>
       <div className={styles.options}>
