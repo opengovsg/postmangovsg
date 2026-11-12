@@ -27,7 +27,15 @@ const sessionLoader = ({ app }: { app: express.Application }): void => {
     }),
   }
   app.set('trust proxy', 1) // For HTTPS cookies (our TLS terminates at load balancer, not ec2)
-  app.use(session(sessionOptions))
+  const sessionMiddleware = session(sessionOptions)
+  // Skip sessions for API key requests. Otherwise the session would store the key's user
+  // and return a cookie that passes Cookie auth on console-only routes (/settings, /api-key),
+  // and that cookie keeps working after the key is revoked.
+  app.use((req, res, next) =>
+    req.get('authorization')?.startsWith('Bearer ')
+      ? next()
+      : sessionMiddleware(req, res, next)
+  )
 }
 
 export default sessionLoader

@@ -1,6 +1,8 @@
 import request from 'supertest'
 import { Sequelize } from 'sequelize-typescript'
 import bcrypt from 'bcrypt'
+import { createHmac } from 'crypto'
+import config from '@core/config'
 import initialiseServer from '@test-utils/server'
 import sequelizeLoader from '@test-utils/sequelize-loader'
 import { MailService } from '@core/services'
@@ -157,8 +159,56 @@ describe('GET /auth/userinfo', () => {
 })
 
 describe('GET /auth/logout', () => {
+  test('Returns 200 when an API key header skipped the session', async () => {
+    const res = await request(app)
+      .get('/auth/logout')
+      .set('Authorization', 'Bearer name_v1_key')
+    expect(res.status).toBe(200)
+    expect(res.body).toEqual({ oneGovSg: false })
+  })
+
   test('Successfully logged out', async () => {
     const res = await request(appWithUserSession).get('/auth/logout')
     expect(res.status).toBe(200)
   })
+})
+
+describe('Cookie authentication', () => {
+  // Seeds a session in the store the way express-session saves one, and returns its cookie
+  const seedSession = async (data: Record<string, unknown>) => {
+    const sid = 'seeded-session-id'
+    const expires = new Date(Date.now() + 60 * 60 * 1000)
+    await new Promise((resolve) =>
+      (app as any).redisService.sessionClient.set(
+        `sess:${sid}`,
+        JSON.stringify({ cookie: { expires, path: '/' }, ...data }),
+        resolve
+      )
+    )
+    // express-session signs the session ID with an unpadded base64 HMAC-SHA256
+    const signature = createHmac('sha256', config.get('session.secret'))
+      .update(sid)
+      .digest('base64')
+      .replace(/=+$/, '')
+    const signed = encodeURIComponent(`s:${sid}.${signature}`)
+    return `${config.get('session.cookieName')}=${signed}`
+  }
+
+  test.each([
+    { apiKey: undefined, status: 200 },
+    { apiKey: true, status: 401 },
+  ])(
+    'Session with apiKey $apiKey gets $status on a Cookie-only route',
+    async ({ apiKey, status }) => {
+      await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
+      const cookie = await seedSession({
+        user: { id: 1, email: 'user@agency.gov.sg' },
+        apiKey,
+      })
+
+      const res = await request(app).get('/api-key').set('Cookie', cookie)
+
+      expect(res.status).toBe(status)
+    }
+  )
 })

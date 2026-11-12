@@ -257,13 +257,13 @@ export const InitV1Route = (app: Application): Router => {
 
   router.use(
     '/transactional/sms',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    authMiddleware.getAuthMiddleware([AuthType.ApiKey]),
     smsTransactionalRoutes
   )
 
   router.use(
     '/transactional/email',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    authMiddleware.getAuthMiddleware([AuthType.ApiKey]),
     emailTransactionalRoutes
   )
 

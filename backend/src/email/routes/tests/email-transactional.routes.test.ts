@@ -34,6 +34,7 @@ let apiKey: string
 let mockSendEmail: jest.SpyInstance
 
 const app = initialiseServer(false)
+const appWithUserSession = initialiseServer(true)
 const userEmail = 'user@agency.gov.sg'
 
 beforeEach(async () => {
@@ -66,6 +67,7 @@ afterAll(async () => {
     (app as any).redisService.rateLimitClient.flushdb(resolve)
   )
   await (app as any).cleanup()
+  await (appWithUserSession as any).cleanup()
 })
 
 const emailTransactionalRoute = '/transactional/email'
@@ -105,6 +107,17 @@ describe(`${emailTransactionalRoute}/send`, () => {
       .send({})
 
     expect(res.status).toBe(401)
+  })
+
+  test('Should reject a console login session', async () => {
+    // Stops a real send if the route accepts the session again
+    jest.spyOn(EmailService, 'sendEmail').mockResolvedValue(true)
+    const res = await request(appWithUserSession)
+      .post(endpoint)
+      .send(validApiCall)
+
+    expect(res.status).toBe(401)
+    expect(await EmailMessageTransactional.count()).toBe(0)
   })
 
   test('Should throw an error if API key is valid but payload is not', async () => {
@@ -1168,6 +1181,14 @@ describe(`GET ${emailTransactionalRoute}`, () => {
     expect(res.status).toBe(200)
     expect(res.body.has_more).toBe(false)
     expect(res.body.data).toEqual([])
+  })
+
+  test('Should not return a session cookie', async () => {
+    const res = await request(app)
+      .get(endpoint)
+      .set('Authorization', `Bearer ${apiKey}`)
+    expect(res.status).toBe(200)
+    expect(res.headers['set-cookie']).toBeUndefined()
   })
 
   test('Should return 200 with descending array of messages when messages are found', async () => {

@@ -80,6 +80,11 @@ router.put(
   CampaignMiddleware.updateCampaign
 )
 
-router.post('/:campaignId/cancel', JobMiddleware.cancelScheduledCampaign)
+router.post(
+  '/:campaignId/cancel',
+  celebrate(deleteCampaignValidator),
+  CampaignMiddleware.isCampaignOwnedByUser,
+  JobMiddleware.cancelScheduledCampaign
+)
 
 export default router
