@@ -1,5 +1,4 @@
 import { i18n } from '@lingui/core'
-
 import { useNavigate } from 'react-router-dom'
 
 import styles from './NavBar.module.scss'

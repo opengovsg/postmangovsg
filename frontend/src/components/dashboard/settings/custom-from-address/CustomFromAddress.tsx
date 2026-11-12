@@ -1,11 +1,9 @@
 import { i18n } from '@lingui/core'
 import { Trans } from '@lingui/macro'
 import cx from 'classnames'
-
 import { useContext } from 'react'
 
 import UpdateCustomFromAddressModal from '../update-custom-from-address-modal'
-
 import VerifyCustomFromAddressModal from '../verify-custom-from-address-modal'
 
 import styles from './CustomFromAddress.module.scss'

@@ -6,7 +6,6 @@ import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
 import { ChannelType } from 'classes'
-
 import { PrimaryButton, ErrorBlock } from 'components/common'
 import EmailValidationInput from 'components/dashboard/create/email/EmailValidationInput'
 import SMSValidationInput from 'components/dashboard/create/sms/SMSValidationInput'

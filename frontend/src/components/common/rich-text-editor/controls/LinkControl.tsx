@@ -1,5 +1,4 @@
 import { useState } from 'react'
-
 import type { FormEvent, MouseEvent as ReactMouseEvent } from 'react'
 
 import styles from '../RichTextEditor.module.scss'

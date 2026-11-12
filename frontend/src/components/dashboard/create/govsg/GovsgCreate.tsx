@@ -4,9 +4,7 @@ import styles from '../Create.module.scss'
 
 import GovsgDetail from './GovsgDetail'
 import GovsgPickTemplate from './GovsgPickTemplate'
-
 import GovsgRecipients from './GovsgRecipients'
-
 import GovsgSingleRecipient from './GovsgSingleRecipient'
 
 import { GovsgCampaign, GovsgProgress, Status } from 'classes'

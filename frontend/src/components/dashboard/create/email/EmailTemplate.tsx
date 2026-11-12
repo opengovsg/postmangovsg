@@ -9,7 +9,6 @@ import {
   Dispatch,
   SetStateAction,
 } from 'react'
-
 import { useParams } from 'react-router-dom'
 
 import styles from './EmailTemplate.module.scss'
@@ -28,13 +27,11 @@ import {
   ToggleSwitch,
   Checkbox,
 } from 'components/common'
-
 import SaveDraftModal from 'components/dashboard/create/save-draft-modal'
 import { LINKS } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
-
 import { updateCampaign as apiUpdateCampaign } from 'services/campaign.service'
 import { saveTemplate } from 'services/email.service'
 import { getCustomFromAddresses } from 'services/settings.service'

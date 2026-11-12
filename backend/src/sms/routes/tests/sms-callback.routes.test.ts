@@ -27,6 +27,8 @@ let credential: Credential
 const app = initialiseServer(false)
 
 beforeEach(async () => {
+  // the label below hard-codes user id 1, and earlier suites leave the users sequence higher
+  await User.truncate({ cascade: true, restartIdentity: true })
   user = await User.create({
     email: 'sms_callback@agency.gov.sg',
   } as User)

@@ -139,9 +139,8 @@ export const InitTelegramMiddleware = (
       : await getCredentialName(label, +userId)
 
     try {
-      const telegramBotToken = await credentialService.getTelegramCredential(
-        credentialName
-      )
+      const telegramBotToken =
+        await credentialService.getTelegramCredential(credentialName)
       res.locals.credentials = { telegramBotToken }
       res.locals.credentialName = botId(telegramBotToken)
       return next()
@@ -181,9 +180,8 @@ export const InitTelegramMiddleware = (
       throw new ApiNotFoundError('No credentials found for this campaign.')
     }
 
-    const telegramBotToken = await credentialService.getTelegramCredential(
-      credName
-    )
+    const telegramBotToken =
+      await credentialService.getTelegramCredential(credName)
 
     res.locals.credentials = { telegramBotToken }
     res.locals.credentialName = botId(telegramBotToken)

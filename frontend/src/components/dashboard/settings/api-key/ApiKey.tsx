@@ -1,18 +1,14 @@
 import cx from 'classnames'
-
 import moment from 'moment'
 import { useState, useContext, useEffect } from 'react'
-
 import type { FunctionComponent } from 'react'
 
 import styles from './ApiKey.module.scss'
-
 import { CopyModal } from './CopyModal'
 import { CreateUpdateModal } from './CreateUpdateModal'
 
 import { ConfirmModal, PrimaryButton } from 'components/common'
 import { ModalContext } from 'contexts/modal.context'
-
 import {
   ApiKey as ApiKeyType,
   deleteApiKey,

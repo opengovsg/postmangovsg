@@ -1,8 +1,6 @@
 import { i18n } from '@lingui/core'
 import cx from 'classnames'
-
 import { useContext, useState } from 'react'
-
 import { useNavigate } from 'react-router-dom'
 
 import styles from './CreateModal.module.scss'
@@ -12,7 +10,6 @@ import { ErrorBlock, PrimaryButton, TextInput } from 'components/common'
 import { LINKS } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
-
 import { createCampaign } from 'services/campaign.service'
 
 const CreateModal = ({

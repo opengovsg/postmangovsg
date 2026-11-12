@@ -1,7 +1,5 @@
 import cx from 'classnames'
-
 import { useState, MutableRefObject } from 'react'
-
 import type {
   InputHTMLAttributes,
   ReactNode,
@@ -14,8 +12,10 @@ import defaultStyles from './TextInputWithButton.module.scss'
 import { PrimaryButton, TextInput } from 'components/common'
 import useIsMounted from 'components/custom-hooks/use-is-mounted'
 
-interface TextInputWithButtonProps
-  extends Omit<InputHTMLAttributes<HTMLInputElement>, 'onChange'> {
+interface TextInputWithButtonProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  'onChange'
+> {
   onChange: (value: string) => void
   onClick: () => void | Promise<void>
   buttonDisabled?: boolean

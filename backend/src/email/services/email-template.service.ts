@@ -143,7 +143,7 @@ const checkNewTemplateParams = async ({
 
     try {
       client.template(
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        // oxlint-disable-next-line typescript/no-non-null-assertion
         updatedTemplate.body!,
         firstRecord.params as { [key: string]: string }
       )
@@ -192,9 +192,8 @@ const storeTemplate = async ({
   if (fromAddress === defaultFromAddress) {
     expectedFromName = defaultFromName
   } else {
-    const customFromAddress = await CustomDomainService.getCustomFromAddress(
-      fromAddress
-    )
+    const customFromAddress =
+      await CustomDomainService.getCustomFromAddress(fromAddress)
     if (!customFromAddress) throw new Error('Invalid custom from address')
     const { fromName: customFromName } = parseFromAddress(customFromAddress)
     expectedFromName = customFromName

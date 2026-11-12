@@ -1,5 +1,4 @@
 import userEvent from '@testing-library/user-event'
-
 import { Route, Routes } from 'react-router-dom'
 
 import SMSCredentials from '../SMSCredentials'
