@@ -88,6 +88,10 @@ export const InitAuthMiddleware = (
     try {
       if (req.session) {
         const user = await authService.findOrCreateUser(email)
+        // A new session ID on login, so a cookie planted before login cannot be reused
+        await new Promise<void>((resolve, reject) =>
+          req.session?.regenerate((err) => (err ? reject(err) : resolve()))
+        )
         req.session.user = {
           id: user.id,
           createdAt: user.createdAt,
