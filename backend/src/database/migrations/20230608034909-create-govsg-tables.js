@@ -1,6 +1,16 @@
 'use strict'
 
-const { GovsgMessageStatus } = require('@core/constants')
+// Inlined so migrations run without building and configuring the app
+const GovsgMessageStatus = {
+  Unsent: 'UNSENT',
+  Accepted: 'ACCEPTED',
+  Sent: 'SENT',
+  Delivered: 'DELIVERED',
+  Read: 'READ',
+  Error: 'ERROR',
+  InvalidRecipient: 'INVALID_RECIPIENT',
+  Deleted: 'DELETED',
+}
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {

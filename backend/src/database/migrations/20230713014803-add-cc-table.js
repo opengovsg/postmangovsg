@@ -1,6 +1,10 @@
 'use strict'
 
-const { CcType } = require('@email/models')
+// Inlined so migrations run without building and configuring the app
+const CcType = {
+  Cc: 'CC',
+  Bcc: 'BCC',
+}
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {

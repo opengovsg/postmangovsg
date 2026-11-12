@@ -1,6 +1,13 @@
 'use strict';
 
-const {TransactionalSmsMessageStatus} = require('@sms/models');
+// Inlined so migrations run without building and configuring the app
+const TransactionalSmsMessageStatus = {
+  Unsent: 'UNSENT',
+  Accepted: 'ACCEPTED',
+  Sent: 'SENT',
+  Delivered: 'DELIVERED',
+  Error: 'ERROR',
+};
 module.exports = {
     up: async (queryInterface, Sequelize) => {
         await queryInterface.addColumn('sms_messages_transactional', 'status', {

@@ -1,6 +1,15 @@
 'use strict'
 
-const { TransactionalEmailMessageStatus } = require('@email/models')
+// Inlined so migrations run without building and configuring the app
+const TransactionalEmailMessageStatus = {
+  Unsent: 'UNSENT',
+  Accepted: 'ACCEPTED',
+  Sent: 'SENT',
+  Bounced: 'BOUNCED',
+  Delivered: 'DELIVERED',
+  Opened: 'OPENED',
+  Complaint: 'COMPLAINT',
+}
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {

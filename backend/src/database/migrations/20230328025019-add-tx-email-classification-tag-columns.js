@@ -1,6 +1,11 @@
 'use strict';
 
-const { TransactionalEmailClassification } = require('@email/models')
+// Inlined so migrations run without building and configuring the app
+const TransactionalEmailClassification = {
+  Urgent: 'URGENT',
+  ForAction: 'FOR_ACTION',
+  ForInfo: 'FOR_INFO',
+}
 
 module.exports = {
   up: async (queryInterface, Sequelize) => {
