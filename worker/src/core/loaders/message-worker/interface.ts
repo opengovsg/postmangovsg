@@ -19,7 +19,6 @@ export interface Message {
   whatsappTemplateLabel?: string
   apiClient?: WhatsAppApiClient
   language?: WhatsAppLanguages
-  userUniqueLink?: string
   unsubLink?: string // custom unsubscribe link
 }
 
