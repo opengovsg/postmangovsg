@@ -123,6 +123,9 @@ export const InitAuthMiddleware = (
       return res.json({
         email: user?.email,
         id: user?.id,
+        // Frontend bundles from before GovSG's removal read this on login and
+        // crash without it. Remove one release after the frontend redeploys.
+        experimental_data: {},
       })
     }
     logger.info({
