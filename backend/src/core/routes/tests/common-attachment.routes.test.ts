@@ -48,6 +48,18 @@ describe('GET /attachments/{attachmentId}/{fileName}', () => {
       "inline; filename*=UTF-8''photo.png",
     ],
     [
+      'memo.m4a',
+      'audio/x-m4a',
+      'audio/x-m4a',
+      "inline; filename*=UTF-8''memo.m4a",
+    ],
+    [
+      'page.xml',
+      'image/x+xml',
+      'application/octet-stream',
+      "attachment; filename*=UTF-8''page.xml",
+    ],
+    [
       'page.html',
       'text/html',
       'application/octet-stream',

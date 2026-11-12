@@ -21,27 +21,12 @@ const TOTAL_ATTACHMENT_SIZE_LIMIT = config.get(
 
 const s3 = new S3({ ...configureEndpoint(config) })
 
-// The stored type is whatever the uploader's browser declared, so only types
-// that cannot carry markup or script are rendered inline. Anything else, such
-// as text/html or image/svg+xml, is downloaded so an uploaded page never runs
-// on our origin.
-const INLINE_CONTENT_TYPES = [
-  'application/pdf',
-  'audio/mpeg',
-  'audio/ogg',
-  'audio/wav',
-  'image/avif',
-  'image/bmp',
-  'image/gif',
-  'image/jpeg',
-  'image/png',
-  'image/tiff',
-  'image/webp',
-  'text/plain',
-  'video/mp4',
-  'video/quicktime',
-  'video/webm',
-]
+// The stored type is whatever the uploader's browser declared, so only media,
+// PDF and plain text are rendered inline. A subtype containing `+`, such as
+// image/svg+xml, can be an XML document that runs script, so it never matches.
+// Anything else is downloaded so an uploaded page never runs on our origin.
+const INLINE_CONTENT_TYPE =
+  /^((image|audio|video)\/[a-z0-9.-]+|application\/pdf|text\/plain)$/
 
 const getFileUploadHandler = (fileSize: number, fieldSize: number) =>
   fileUpload({
@@ -169,7 +154,7 @@ async function streamCampaignEmbed(
     Bucket: config.get('commonAttachments.bucketName'),
     Key: id,
   })
-  const isInline = INLINE_CONTENT_TYPES.includes(attachment.metadata.type)
+  const isInline = INLINE_CONTENT_TYPE.test(attachment.metadata.type)
   res.setHeader(
     'Content-Type',
     isInline ? attachment.metadata.type : 'application/octet-stream'
