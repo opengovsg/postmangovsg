@@ -145,7 +145,11 @@ jobs:
           SECRET_ARN: ${{ vars.SECRET_ARN }}
           FILE: task-definition-sending.json
         run: |
-          : "${SECRET_ARN:?Set the SECRET_ARN environment variable to the ARN of the secret SECRET_ID names}"
+          if ! jq -e 'any(.containerDefinitions[]; any(.environment[]?; .name == "DD_API_KEY"))' "$FILE" > /dev/null; then
+            echo "DD_API_KEY is not set as a plaintext environment variable; nothing to change"
+            exit 0
+          fi
+          : "${SECRET_ARN:?A plaintext DD_API_KEY is present. Set the SECRET_ARN environment variable to the ARN of the secret SECRET_ID names}"
           jq --arg arn "$SECRET_ARN:DD_API_KEY::" '
             .containerDefinitions |= map(
               if ((.environment // []) | any(.name == "DD_API_KEY")) or ((.secrets // []) | any(.name == "DD_API_KEY"))
@@ -203,7 +207,11 @@ jobs:
           SECRET_ARN: ${{ vars.SECRET_ARN }}
           FILE: task-definition-logging.json
         run: |
-          : "${SECRET_ARN:?Set the SECRET_ARN environment variable to the ARN of the secret SECRET_ID names}"
+          if ! jq -e 'any(.containerDefinitions[]; any(.environment[]?; .name == "DD_API_KEY"))' "$FILE" > /dev/null; then
+            echo "DD_API_KEY is not set as a plaintext environment variable; nothing to change"
+            exit 0
+          fi
+          : "${SECRET_ARN:?A plaintext DD_API_KEY is present. Set the SECRET_ARN environment variable to the ARN of the secret SECRET_ID names}"
           jq --arg arn "$SECRET_ARN:DD_API_KEY::" '
             .containerDefinitions |= map(
               if ((.environment // []) | any(.name == "DD_API_KEY")) or ((.secrets // []) | any(.name == "DD_API_KEY"))
