@@ -21,19 +21,6 @@ import {
 } from '@core/errors/rest-api.errors'
 
 const logger = loggerWithLabel(module)
-const FRONTEND_URL = config.get('frontendUrl')
-
-/**
- * Returns a regex or a string used by cors to determine if requests comes from allowed origin
- * @param v
- */
-const origin = (v: string): string | RegExp => {
-  if (v.startsWith('/') && v.endsWith('/')) {
-    // Remove the leading and trailing slash
-    return new RegExp(v.substring(1, v.length - 1))
-  }
-  return v
-}
 
 const sentrySessionMiddleware = (
   req: Request,
@@ -181,7 +168,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
   // }
   app.use(
     cors({
-      origin: origin(FRONTEND_URL),
+      origin: config.get('frontendUrl'),
       credentials: true, // required for setting cookie
     })
   )

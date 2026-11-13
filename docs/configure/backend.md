@@ -54,7 +54,7 @@ Sensitive configuration has to be set with environment variables.
 | `APP_ENV`                      | Set to `production` or `staging` for deployment                                                                                                                                  |
 | `APP_NAME`                     | Name of the app                                                                                                                                                                  |
 | `DOMAIN_WHITELIST`             | Semi-colon separated list of domains that can sign in to the app. Example: `.gov.sg;@xyz.abc.sg` will allow any emails ending in `@<agency>.gov.sg` and `@xyz.abc.sg` to sign in |
-| `FRONTEND_URL`                 | CORS: accept requests from this origin. Can be a string, or regex                                                                                                                |
+| `FRONTEND_URL`                 | CORS: comma-separated exact origins allowed to make credentialed requests. Example: `https://legacy.postman.gov.sg`                                                              |
 | `MAX_RATE_PER_JOB`             | Number of messages that one worker can send at a time                                                                                                                            |
 | `CSV_PROCESSING_TIMEOUT_IN_MS` | Maximum permissible time for csv processing before it is marked as timed out (defaults to 10 mins)                                                                               |
 
