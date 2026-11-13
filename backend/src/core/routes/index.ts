@@ -147,6 +147,10 @@ export const InitV1Route = (app: Application): Router => {
       })
       return res.sendStatus(404)
     }
+    // GOVSG campaigns remain in the table with no route to serve them
+    if (!Object.values(ChannelType).includes(campaign.type)) {
+      return res.sendStatus(404)
+    }
 
     const redirectTo = `${campaignUrl}/${campaign?.type.toLowerCase()}${resource}`
     return res.redirect(307, redirectTo)

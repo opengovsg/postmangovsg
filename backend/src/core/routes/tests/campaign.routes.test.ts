@@ -524,3 +524,23 @@ describe('POST /campaigns/:campaignId/cancel', () => {
     expect(res.status).toBe(400)
   })
 })
+
+describe('GET /campaign/:campaignId', () => {
+  test('A campaign of a removed channel returns 404 instead of redirecting', async () => {
+    // Production keeps GOVSG in the enum; sync() builds it from ChannelType
+    await sequelize.query(
+      `ALTER TYPE "enum_campaigns_type" ADD VALUE IF NOT EXISTS 'GOVSG'`
+    )
+    const campaign = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: 'GOVSG' as ChannelType,
+      valid: false,
+      protect: false,
+    } as Campaign)
+
+    const res = await request(app).get(`/campaign/${campaign.id}`)
+
+    expect(res.status).toBe(404)
+  })
+})
