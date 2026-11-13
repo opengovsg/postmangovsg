@@ -138,6 +138,21 @@ async function storeCampaignEmbed(
   })
 }
 
+// busboy decodes a multipart filename as latin1, so a UTF-8 name such as
+// 通知.txt is stored as é€šçŸ¥.txt. Recover the UTF-8 name when the stored
+// bytes are valid UTF-8, and keep the name as stored otherwise.
+// https://github.com/mscdex/busboy#exports
+function decodeUploadedFileName(name: string): string {
+  if (/[\u0100-\uffff]/.test(name)) return name
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(
+      Buffer.from(name, 'latin1')
+    )
+  } catch {
+    return name
+  }
+}
+
 async function streamCampaignEmbed(
   req: Request,
   res: Response
@@ -160,10 +175,9 @@ async function streamCampaignEmbed(
     isInline ? attachment.metadata.type : 'application/octet-stream'
   )
   // RFC 5987 encoding: a raw non-ASCII name makes setHeader throw
-  const fileName = encodeURIComponent(attachment.originalFileName).replace(
-    /['()*]/g,
-    (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`
-  )
+  const fileName = encodeURIComponent(
+    decodeUploadedFileName(attachment.originalFileName)
+  ).replace(/['()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`)
   res.setHeader(
     'Content-Disposition',
     `${isInline ? 'inline' : 'attachment'}; filename*=UTF-8''${fileName}`
