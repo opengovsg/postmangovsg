@@ -140,17 +140,24 @@ jobs:
           CMD="aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK_DEFINITION:$(jq .revision $OUT)"
           echo "revert_cmd=$CMD" >> $GITHUB_OUTPUT
 
-      - name: (Sending) Read the Datadog API key from Secrets Manager
+      - name: (Sending) Keep the Datadog API key out of the task definition
         env:
-          SECRET_ARN: ${{ vars.SECRET_ARN }}
+          SECRET_ID: ${{ vars.SECRET_ID }}
           FILE: task-definition-sending.json
         run: |
-          : "${SECRET_ARN:?Set the SECRET_ARN environment variable to the ARN of the secret SECRET_ID names}"
-          jq --arg arn "$SECRET_ARN:DD_API_KEY::" '
+          : "${SECRET_ID:?SECRET_ID is not set}"
+          jq --arg handle "ENC[$SECRET_ID;DD_API_KEY]" --arg backend '{"aws_session":{"aws_region":"ap-southeast-1"}}' '
+            def setenv($name; $value):
+              .environment |= ((. // []) | if any(.name == $name)
+                then map(if .name == $name then .value = $value else . end)
+                else . + [{name: $name, value: $value}] end);
             .containerDefinitions |= map(
-              if ((.environment // []) | any(.name == "DD_API_KEY")) or ((.secrets // []) | any(.name == "DD_API_KEY"))
-              then .environment = ((.environment // []) | map(select(.name != "DD_API_KEY")))
-                | .secrets = (((.secrets // []) | map(select(.name != "DD_API_KEY"))) + [{name: "DD_API_KEY", valueFrom: $arn}])
+              if .name == "dd-agent" then
+                setenv("DD_API_KEY"; $handle)
+                | setenv("DD_SECRET_BACKEND_TYPE"; "aws.secrets")
+                | setenv("DD_SECRET_BACKEND_CONFIG"; $backend)
+              elif ((.environment // []) | any(.name == "DD_API_KEY")) then
+                .environment |= map(select(.name != "DD_API_KEY"))
               else . end)
           ' "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
 
@@ -198,17 +205,24 @@ jobs:
           CMD="aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK_DEFINITION:$(jq .revision $OUT)"
           echo "revert_cmd=$CMD" >> $GITHUB_OUTPUT
 
-      - name: (Logging) Read the Datadog API key from Secrets Manager
+      - name: (Logging) Keep the Datadog API key out of the task definition
         env:
-          SECRET_ARN: ${{ vars.SECRET_ARN }}
+          SECRET_ID: ${{ vars.SECRET_ID }}
           FILE: task-definition-logging.json
         run: |
-          : "${SECRET_ARN:?Set the SECRET_ARN environment variable to the ARN of the secret SECRET_ID names}"
-          jq --arg arn "$SECRET_ARN:DD_API_KEY::" '
+          : "${SECRET_ID:?SECRET_ID is not set}"
+          jq --arg handle "ENC[$SECRET_ID;DD_API_KEY]" --arg backend '{"aws_session":{"aws_region":"ap-southeast-1"}}' '
+            def setenv($name; $value):
+              .environment |= ((. // []) | if any(.name == $name)
+                then map(if .name == $name then .value = $value else . end)
+                else . + [{name: $name, value: $value}] end);
             .containerDefinitions |= map(
-              if ((.environment // []) | any(.name == "DD_API_KEY")) or ((.secrets // []) | any(.name == "DD_API_KEY"))
-              then .environment = ((.environment // []) | map(select(.name != "DD_API_KEY")))
-                | .secrets = (((.secrets // []) | map(select(.name != "DD_API_KEY"))) + [{name: "DD_API_KEY", valueFrom: $arn}])
+              if .name == "dd-agent" then
+                setenv("DD_API_KEY"; $handle)
+                | setenv("DD_SECRET_BACKEND_TYPE"; "aws.secrets")
+                | setenv("DD_SECRET_BACKEND_CONFIG"; $backend)
+              elif ((.environment // []) | any(.name == "DD_API_KEY")) then
+                .environment |= map(select(.name != "DD_API_KEY"))
               else . end)
           ' "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
 
