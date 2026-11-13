@@ -138,11 +138,6 @@ export enum TransactionalSmsSortField {
   Updated = 'updated_at',
 }
 
-export enum TransactionalGovsgSortField {
-  Created = 'created_at',
-  Updated = 'updated_at',
-}
-
 export interface TimestampFilter {
   createdAt: ComparisonOperator<Date>
 }

@@ -50,9 +50,7 @@ import {
   govsgCallbackRoutes,
   govsgCampaignRoutes,
   govsgTemplateRoutes,
-  InitGovsgMessageTransactionalRoute,
 } from '@govsg/routes'
-import { InitGovsgTransactionalMiddleware } from '@govsg/middlewares/govsg-transactional.middleware'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -108,10 +106,6 @@ export const InitV1Route = (app: Application): Router => {
   )
   const apiKeyMiddleware = InitApiKeyMiddleware((app as any).credentialService)
   const apiKeyRoutes = InitApiKeyRoute(apiKeyMiddleware)
-  const govsgTransactionalMiddleware = InitGovsgTransactionalMiddleware()
-  const govsgTransactionalRoutes = InitGovsgMessageTransactionalRoute(
-    govsgTransactionalMiddleware
-  )
 
   const CHANNEL_ROUTES = Object.values(ChannelType).map(
     (route) => `/${route.toLowerCase()}`
@@ -265,12 +259,6 @@ export const InitV1Route = (app: Application): Router => {
     '/transactional/email',
     authMiddleware.getAuthMiddleware([AuthType.ApiKey]),
     emailTransactionalRoutes
-  )
-
-  router.use(
-    '/transactional/govsg',
-    authMiddleware.getAuthMiddleware([AuthType.ApiKey]),
-    govsgTransactionalRoutes
   )
 
   router.use('/callback/email', emailCallbackRoutes)
