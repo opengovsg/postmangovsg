@@ -46,9 +46,6 @@
       "@telegram/*": [
         "./src/telegram/*"
       ],
-      "@govsg/*": [
-        "./src/govsg/*"
-      ],
       "@shared/*": [
         "../shared/src/*"
       ],

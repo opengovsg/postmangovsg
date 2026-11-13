@@ -11,8 +11,6 @@ import { SmsTemplate } from '@sms/models'
 import { TelegramTemplate } from '@telegram/models'
 
 import trace from 'dd-trace'
-import { GovsgTemplateService } from '@govsg/services'
-import { GovsgTemplate } from '@govsg/models/govsg-template'
 
 const logger = loggerWithLabel(module)
 enum QueueEvent {
@@ -65,10 +63,6 @@ const initUploadQueue = async (): Promise<void> => {
           case ChannelType.Telegram:
             return TelegramTemplateService.processUpload(
               data as UploadData<TelegramTemplate>
-            )
-          case ChannelType.Govsg:
-            return GovsgTemplateService.processUpload(
-              data as UploadData<GovsgTemplate>
             )
         }
       }

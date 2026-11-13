@@ -94,9 +94,6 @@ const Campaigns = () => {
   )
   const [nameFilter, setNameFilter] = useState(searchInit)
 
-  const { experimentalData } = useContext(AuthContext)
-  const canAccessGovsg = !!experimentalData[ChannelType.Govsg]
-
   function getNameFromEmail(email: string): string {
     const parts = email.split('@')
     const [nameParts] = parts
@@ -340,12 +337,7 @@ const Campaigns = () => {
         <th className={width} key={key}>
           <DropdownFilter
             onSelect={handleModeFilter}
-            options={[
-              filterInit,
-              ...Object.values(ChannelType).filter(
-                (v) => v !== ChannelType.Govsg || canAccessGovsg
-              ),
-            ].map((opt) => ({
+            options={[filterInit, ...Object.values(ChannelType)].map((opt) => ({
               label: displayChannelType(opt),
               value: opt,
             }))}

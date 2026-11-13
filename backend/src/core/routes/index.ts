@@ -4,7 +4,6 @@ import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import {
   AuthType,
-  ExperimentMiddleware,
   InitAuthMiddleware,
   InitSettingsMiddleware,
 } from '@core/middlewares'
@@ -46,11 +45,6 @@ import { InitTelegramMiddleware } from '@telegram/middlewares'
 import { InitApiKeyRoute } from '@core/routes/api-key.routes'
 import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 import { InitCommonAttachmentRoute } from './common-attachment.routes'
-import {
-  govsgCallbackRoutes,
-  govsgCampaignRoutes,
-  govsgTemplateRoutes,
-} from '@govsg/routes'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -153,6 +147,10 @@ export const InitV1Route = (app: Application): Router => {
       })
       return res.sendStatus(404)
     }
+    // GOVSG campaigns remain in the table with no route to serve them
+    if (!Object.values(ChannelType).includes(campaign.type)) {
+      return res.sendStatus(404)
+    }
 
     const redirectTo = `${campaignUrl}/${campaign?.type.toLowerCase()}${resource}`
     return res.redirect(307, redirectTo)
@@ -208,19 +206,6 @@ export const InitV1Route = (app: Application): Router => {
     telegramCampaignRoutes
   )
   router.use(
-    '/govsg/templates',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
-    ExperimentMiddleware.experimentalUserOnly(ChannelType.Govsg),
-    govsgTemplateRoutes
-  )
-  router.use(
-    '/campaign/:campaignId/govsg',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
-    ExperimentMiddleware.experimentalUserOnly(ChannelType.Govsg),
-    celebrate(campaignIdValidator),
-    govsgCampaignRoutes
-  )
-  router.use(
     '/campaign/:campaignId',
     authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     celebrate(campaignIdValidator),
@@ -266,8 +251,6 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/callback/sms', smsCallbackRoutes)
 
   router.use('/callback/telegram', telegramCallbackRoutes)
-
-  router.use('/callback/govsg', govsgCallbackRoutes)
 
   router.use(
     '/api-key',

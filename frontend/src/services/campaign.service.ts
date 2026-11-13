@@ -7,8 +7,6 @@ import {
   ChannelType,
   EmailCampaign,
   EmailCampaignRecipient,
-  GovsgCampaign,
-  GovsgCampaignRecipient,
   Ordering,
   SMSCampaign,
   SMSCampaignRecipient,
@@ -117,7 +115,7 @@ export async function getCampaignStats(
 
 export async function getCampaignDetails(
   campaignId: number
-): Promise<EmailCampaign | SMSCampaign | TelegramCampaign | GovsgCampaign> {
+): Promise<EmailCampaign | SMSCampaign | TelegramCampaign> {
   return axios.get(`/campaign/${campaignId}`).then((response) => {
     const campaign = response.data
     const { sentAt, visibleAt } = getJobTimestamps(campaign.job_queue)
@@ -134,8 +132,6 @@ export async function getCampaignDetails(
         return new EmailCampaign(details)
       case ChannelType.Telegram:
         return new TelegramCampaign(details)
-      case ChannelType.Govsg:
-        return new GovsgCampaign(details)
       default:
         throw new Error('Invalid channel type')
     }
@@ -209,8 +205,6 @@ export async function exportCampaignStats(
           return new SMSCampaignRecipient(record)
         case ChannelType.Telegram:
           return new TelegramCampaignRecipient(record)
-        case ChannelType.Govsg:
-          return new GovsgCampaignRecipient(record)
         default:
           throw new Error('Invalid channel type')
       }

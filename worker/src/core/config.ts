@@ -52,7 +52,6 @@ export interface ConfigSchema {
       acquire: number
     }
     useIam: boolean
-    flamingoUri: string
   }
   mailOptions: {
     host: string
@@ -75,20 +74,6 @@ export interface ConfigSchema {
   smsFallback: { activate: boolean; senderId: string }
   emailFallback: { activate: boolean }
   showMastheadDomain: string
-  whatsapp: {
-    namespace: string
-    adminCredentialsOne: string
-    adminCredentialsTwo: string
-    onPremClientOneUrl: string
-    onPremClientTwoUrl: string
-    proxyToken: string
-    proxyUrl: string
-    authTokenOne: string
-    authTokenOneExpiry: string
-    authTokenTwo: string
-    authTokenTwoExpiry: string
-  }
-  sgcCampaignAlertChannelWebhookUrl: string
 }
 
 const config: Config<ConfigSchema> = convict({
@@ -177,12 +162,6 @@ const config: Config<ConfigSchema> = convict({
       doc: 'Whether to use IAM for authentication to database',
       default: false,
       env: 'DB_USE_IAM',
-    },
-    flamingoUri: {
-      doc: 'URI to the flamingo database',
-      default: '',
-      format: 'required-string',
-      env: 'FLAMINGO_DB_URI',
     },
   },
   mailOptions: {
@@ -326,73 +305,6 @@ const config: Config<ConfigSchema> = convict({
     doc: 'Show masthead within email template if logged-in user has email ending with this domain',
     default: '.gov.sg',
     env: 'SHOW_MASTHEAD_DOMAIN',
-  },
-  whatsapp: {
-    adminCredentialsOne: {
-      doc: 'Admin credentials for retrieving WhatsApp tokens for client 1',
-      env: 'WA_ADMIN_CREDS_1',
-      format: 'required-string',
-      default: '',
-    },
-    adminCredentialsTwo: {
-      doc: 'Admin credentials for retrieving WhatsApp tokens for client 2',
-      env: 'WA_ADMIN_CREDS_2',
-      format: 'required-string',
-      default: '',
-    },
-    namespace: {
-      doc: 'WhatsApp Account Namespace',
-      env: 'WHATSAPP_NAMESPACE',
-      format: 'required-string',
-      default: '',
-    },
-    onPremClientOneUrl: {
-      doc: 'Load balancer URL for WhatsApp On Prem Client 1',
-      env: 'WHATSAPP_LB_URL_1',
-      format: 'required-string',
-      default: '',
-    },
-    onPremClientTwoUrl: {
-      doc: 'Load balancer URL for WhatsApp On Prem Client 2',
-      env: 'WHATSAPP_LB_URL_2',
-      format: 'required-string',
-      default: '',
-    },
-    proxyToken: {
-      doc: 'Proxy token for accessing WhatsApp On Prem Client via proxy',
-      env: 'WHATSAPP_PROXY_TOKEN',
-      default: '',
-    },
-    proxyUrl: {
-      doc: 'Proxy URL for accessing WhatsApp On Prem Client via proxy',
-      env: 'WHATSAPP_PROXY_URL',
-      default: '',
-    },
-    authTokenOne: {
-      doc: 'WhatsApp Auth Token for client 1, for local dev only',
-      env: 'WA_AUTH_TOKEN_1',
-      default: '',
-    },
-    authTokenOneExpiry: {
-      doc: 'WhatsApp Auth Token expiry for client 1, for local dev only',
-      env: 'WA_AUTH_TOKEN_1_EXPIRY',
-      default: '',
-    },
-    authTokenTwo: {
-      doc: 'WhatsApp Auth Token for client 2, for local dev only',
-      env: 'WA_AUTH_TOKEN_2',
-      default: '',
-    },
-    authTokenTwoExpiry: {
-      doc: 'WhatsApp Auth Token expiry for client 2, for local dev only',
-      env: 'WA_AUTH_TOKEN_2_EXPIRY',
-      default: '',
-    },
-  },
-  sgcCampaignAlertChannelWebhookUrl: {
-    doc: 'Slack webhook URL to post Gov.sg campaign alerts',
-    env: 'SGC_CAMPAIGN_ALERT_WEBHOOK',
-    default: '',
   },
 })
 
