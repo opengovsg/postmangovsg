@@ -140,6 +140,20 @@ jobs:
           CMD="aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK_DEFINITION:$(jq .revision $OUT)"
           echo "revert_cmd=$CMD" >> $GITHUB_OUTPUT
 
+      - name: (Sending) Read the Datadog API key from Secrets Manager
+        env:
+          SECRET_ARN: ${{ vars.SECRET_ARN }}
+          FILE: task-definition-sending.json
+        run: |
+          : "${SECRET_ARN:?Set the SECRET_ARN environment variable to the ARN of the secret SECRET_ID names}"
+          jq --arg arn "$SECRET_ARN:DD_API_KEY::" '
+            .containerDefinitions |= map(
+              if ((.environment // []) | any(.name == "DD_API_KEY")) or ((.secrets // []) | any(.name == "DD_API_KEY"))
+              then .environment = ((.environment // []) | map(select(.name != "DD_API_KEY")))
+                | .secrets = (((.secrets // []) | map(select(.name != "DD_API_KEY"))) + [{name: "DD_API_KEY", valueFrom: $arn}])
+              else . end)
+          ' "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
+
       - name: (Sending) Fill in the new image ID in the Amazon ECS task definition
         id: task-def-sending
         uses: aws-actions/amazon-ecs-render-task-definition@v1
@@ -183,6 +197,20 @@ jobs:
           echo "task-definition=$OUT" >> $GITHUB_OUTPUT
           CMD="aws ecs update-service --cluster $CLUSTER --service $SERVICE --task-definition $TASK_DEFINITION:$(jq .revision $OUT)"
           echo "revert_cmd=$CMD" >> $GITHUB_OUTPUT
+
+      - name: (Logging) Read the Datadog API key from Secrets Manager
+        env:
+          SECRET_ARN: ${{ vars.SECRET_ARN }}
+          FILE: task-definition-logging.json
+        run: |
+          : "${SECRET_ARN:?Set the SECRET_ARN environment variable to the ARN of the secret SECRET_ID names}"
+          jq --arg arn "$SECRET_ARN:DD_API_KEY::" '
+            .containerDefinitions |= map(
+              if ((.environment // []) | any(.name == "DD_API_KEY")) or ((.secrets // []) | any(.name == "DD_API_KEY"))
+              then .environment = ((.environment // []) | map(select(.name != "DD_API_KEY")))
+                | .secrets = (((.secrets // []) | map(select(.name != "DD_API_KEY"))) + [{name: "DD_API_KEY", valueFrom: $arn}])
+              else . end)
+          ' "$FILE" > "$FILE.tmp" && mv "$FILE.tmp" "$FILE"
 
       - name: (Logging) Fill in the new image ID in the Amazon ECS task definition
         id: task-def-logging
