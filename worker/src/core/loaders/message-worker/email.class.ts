@@ -125,7 +125,6 @@ class Email {
     agencyName,
     agencyLogoURI,
     showMasthead,
-    userUniqueLink,
     unsubLink,
   }: Message): Promise<void> {
     try {
@@ -149,7 +148,6 @@ class Email {
         agencyName,
         agencyLogoURI,
         showMasthead,
-        userUniqueLink,
       })
 
       await this.mailService.sendMail({
