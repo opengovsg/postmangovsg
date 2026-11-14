@@ -236,6 +236,25 @@ describe('template', () => {
         const output = "test alert('xss!') hello"
         expect(client.template(body, params)).toEqual(output)
       })
+      test('email template should allow content-id image sources', () => {
+        const body = '<img src="cid:0">'
+        expect(client.template(body, {})).toEqual(body)
+      })
+      test.each([
+        [
+          `<img src='cid:"><img/src/onerror=alert()>'>`,
+          '<img src="cid:&quot;&gt;&lt;img/src/onerror=alert()&gt;">',
+        ],
+        [
+          `<img src='cid:x"><iframe srcdoc="<script></script>"></iframe>'>`,
+          '<img src="cid:x&quot;&gt;&lt;iframe srcdoc=&quot;&lt;script&gt;&lt;/script&gt;&quot;&gt;&lt;/iframe&gt;">',
+        ],
+      ])(
+        'email template should escape markup inside a content-id image source: %s',
+        (body, output) => {
+          expect(client.template(body, {})).toEqual(output)
+        }
+      )
     })
     describe('sms', () => {
       const client: TemplateClient = new TemplateClient({
@@ -279,6 +298,12 @@ describe('template', () => {
       test('inline mention links should be supported', () => {
         const body = '<a href="tg://user?id=837238105">me</a>'
         expect(client.template(body, {})).toEqual(body)
+      })
+      test('inline mention links should have markup escaped', () => {
+        const body = `<a href='tg://"><img src=x onerror=alert()>'>me</a>`
+        const output =
+          '<a href="tg://&quot;&gt;&lt;img src=x onerror=alert()&gt;">me</a>'
+        expect(client.template(body, {})).toEqual(output)
       })
       test('line breaks should be preserved', () => {
         const body = 'hello\nhello'
