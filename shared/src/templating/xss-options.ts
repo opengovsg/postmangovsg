@@ -2,6 +2,7 @@ import {
   IFilterXSSOptions,
   ICSSFilter,
   cssFilter,
+  escapeAttrValue,
   safeAttrValue,
   getDefaultCSSWhiteList,
 } from 'xss'
@@ -88,9 +89,9 @@ export const XSS_EMAIL_OPTION = {
     if (tag === 'img' && name === 'src' && value.match(KEYWORD_REGEX)) {
       return value
     }
-    // Do not sanitize keyword if eg: <img src="cid:attachment">, to support content-id images
+    // Allow content-id images, eg: <img src="cid:attachment">. Escape the value, since it skips the default filter
     if (tag === 'img' && name === 'src' && isCid(value)) {
-      return value
+      return escapeAttrValue(value)
     }
     // The default safeAttrValue does guard against some edge cases
     // https://github.com/leizongmin/js-xss/blob/446f5daa3b65e9e8f0e9c71276cf61dad73d1ec3/dist/xss.js
@@ -132,11 +133,11 @@ export const XSS_TELEGRAM_OPTION = {
     cssFilter: ICSSFilter
   ): string => {
     // Handle Telegram mention as xss-js does not recognize it as a valid url.
-    if (
-      tag === 'a' &&
-      name === 'href' &&
-      (value.startsWith('tg://') || value.match(KEYWORD_REGEX))
-    ) {
+    // Escape it, since it skips the default filter.
+    if (tag === 'a' && name === 'href' && value.startsWith('tg://')) {
+      return escapeAttrValue(value)
+    }
+    if (tag === 'a' && name === 'href' && value.match(KEYWORD_REGEX)) {
       return value
     }
     return safeAttrValue(tag, name, value, cssFilter)
