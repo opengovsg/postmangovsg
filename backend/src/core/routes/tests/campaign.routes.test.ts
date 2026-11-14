@@ -526,6 +526,33 @@ describe('POST /campaigns/:campaignId/cancel', () => {
 })
 
 describe('GET /campaign/:campaignId', () => {
+  const createEmailCampaign = (userId: number) =>
+    Campaign.create({
+      name: 'campaign-1',
+      userId,
+      type: ChannelType.Email,
+      valid: false,
+      protect: false,
+    } as Campaign)
+
+  test("A campaign the caller owns redirects to its channel's route", async () => {
+    const campaign = await createEmailCampaign(1)
+
+    const res = await request(app).get(`/campaign/${campaign.id}/details`)
+
+    expect(res.status).toBe(307)
+    expect(res.headers.location).toBe(`/campaign/${campaign.id}/email/details`)
+  })
+
+  test("Another user's campaign returns 404 without revealing its channel", async () => {
+    const campaign = await createEmailCampaign(2)
+
+    const res = await request(app).get(`/campaign/${campaign.id}/details`)
+
+    expect(res.status).toBe(404)
+    expect(res.headers.location).toBeUndefined()
+  })
+
   test('A campaign of a removed channel returns 404 instead of redirecting', async () => {
     // Production keeps GOVSG in the enum; sync() builds it from ChannelType
     await sequelize.query(
