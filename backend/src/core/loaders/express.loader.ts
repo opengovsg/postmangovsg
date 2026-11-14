@@ -125,6 +125,66 @@ Sentry.init({
   beforeSend: redactOneGovSgSentryEvent,
 })
 
+const TELEGRAM_CALLBACK_PATH = /^\/v1\/callback\/telegram\//i
+
+// Request body fields kept out of the request log: message content and credentials
+const REDACTED_BODY_FIELDS = [
+  'body',
+  'otp',
+  'password_hash',
+  'twilio_api_secret',
+  'telegram_bot_token',
+]
+
+export const requestLoggerMiddleware = expressWinston.logger({
+  msg: `Incoming HTTP Request {{req.method}} {{req.url}}`,
+  winstonInstance: logger,
+  ignoredRoutes: ['/'],
+  // The one.gov.sg callback carries a single-use code and state in its body, and the
+  // Telegram webhook URL ends in the bot token. Ignore the whole request, including
+  // req.url and the log message.
+  ignoreRoute: (req: Request) =>
+    isOneGovSgCallbackPath(req.path) || TELEGRAM_CALLBACK_PATH.test(req.path),
+  requestWhitelist: ['method', 'url', 'body', 'headers'],
+  responseWhitelist: ['statusCode'],
+  requestFilter: (req: Request, propName: string) => {
+    // If body is undefined or null, normalize to empty object for safe access
+    req.body = req.body || {}
+    if (propName === 'headers' && req.headers.authorization) {
+      // we do this instead of adding it to `headerBlacklist`
+      // so we can distinguish if an API call is made via API key
+      req.headers.authorization = '[REDACTED]'
+    }
+    if (propName === 'headers' && req.headers.cookie) {
+      // redact cookies from logs
+      // keep header to distinguish if API call is made via cookie
+      req.headers.cookie = '[REDACTED]'
+    }
+    if (propName === 'body' && req.body.attachments) {
+      const { attachments } = req.body
+      req.body.attachments = ensureAttachmentsFieldIsArray(attachments).map(
+        (attachment) => ({
+          // truncate attachment data so the whole file won't get logged and take
+          // up our disk space
+          ...attachment,
+          data: '[REDACTED]',
+        })
+      )
+    }
+    if (propName === 'body') {
+      // Redacted in place: express-winston reads req.body again for the logged body, and
+      // this runs when the response ends, after the handlers have read the values
+      for (const field of REDACTED_BODY_FIELDS) {
+        if (req.body[field]) {
+          req.body[field] = '[REDACTED]'
+        }
+      }
+    }
+    return (req as any)[propName]
+  },
+  metaField: null, // flatten this log to root instead of nesting under `meta`
+})
+
 /**
  * SNS defaults the content-type header to 'content-type': 'text/plain; charset=UTF-8',
  * even though it is sending a json document, causing bodyParser to not work
@@ -194,50 +254,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     next()
   })
 
-  app.use(
-    expressWinston.logger({
-      msg: `Incoming HTTP Request {{req.method}} {{req.url}}`,
-      winstonInstance: logger,
-      ignoredRoutes: ['/'],
-      // The callback carries a single-use code and state in its body. Ignore
-      // the whole request, including any query string in req.url or the log message.
-      ignoreRoute: (req: Request) => isOneGovSgCallbackPath(req.path),
-      requestWhitelist: ['method', 'url', 'body', 'headers'],
-      responseWhitelist: ['statusCode'],
-      requestFilter: (req: Request, propName: string) => {
-        // If body is undefined or null, normalize to empty object for safe access
-        req.body = req.body || {}
-        if (propName === 'headers' && req.headers.authorization) {
-          // we do this instead of adding it to `headerBlacklist`
-          // so we can distinguish if an API call is made via API key
-          req.headers.authorization = '[REDACTED]'
-        }
-        if (propName === 'headers' && req.headers.cookie) {
-          // redact cookies from logs
-          // keep header to distinguish if API call is made via cookie
-          req.headers.cookie = '[REDACTED]'
-        }
-        if (propName === 'body' && req.body.attachments) {
-          const { attachments } = req.body
-          req.body.attachments = ensureAttachmentsFieldIsArray(attachments).map(
-            (attachment) => ({
-              // truncate attachment data so the whole file won't get logged and take
-              // up our disk space
-              ...attachment,
-              data: '[REDACTED]',
-            })
-          )
-        }
-        if (propName === 'body' && req.body.body) {
-          // An example of req.body.body is the email body of an email that a user wishes to send
-          // We should redact such content as it may contain sensitive information
-          req.body.body = '[REDACTED]'
-        }
-        return (req as any)[propName]
-      },
-      metaField: null, // flatten this log to root instead of nesting under `meta`
-    })
-  )
+  app.use(requestLoggerMiddleware)
 
   app.use(
     helmet({
