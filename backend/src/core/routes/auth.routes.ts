@@ -1,11 +1,19 @@
-import { Router } from 'express'
+import { Request, Router } from 'express'
 import expressRateLimit from 'express-rate-limit'
 import RedisStore from 'rate-limit-redis'
 import { celebrate, Joi, Segments } from 'celebrate'
 import config from '@core/config'
 import { AuthMiddleware } from '@core/middlewares'
 import { RedisService } from '@core/services'
+import { ApiRateLimitError } from '@core/errors/rest-api.errors'
+import { loggerWithLabel } from '@core/logger'
 import { getRequestIp } from '@core/utils/request'
+
+// Per client IP, with headroom for officers who share a government network's egress IP
+const OTP_LOGIN_WINDOW_SECONDS = 60
+const OTP_LOGIN_MAX_PER_WINDOW = 10
+
+const logger = loggerWithLabel(module)
 
 export const InitAuthRoutes = (
   authMiddleware: AuthMiddleware,
@@ -106,7 +114,31 @@ export const InitAuthRoutes = (
    *        "500":
    *           description: Internal Server Error
    */
-  router.post('/login', celebrate(verifyOtpValidator), authMiddleware.verifyOtp)
+  router.post(
+    '/login',
+    expressRateLimit({
+      store: new RedisStore({
+        prefix: 'otpLogin:',
+        client: redisService.rateLimitClient,
+        expiry: OTP_LOGIN_WINDOW_SECONDS,
+      }),
+      windowMs: OTP_LOGIN_WINDOW_SECONDS * 1000,
+      max: OTP_LOGIN_MAX_PER_WINDOW,
+      keyGenerator: getRequestIp,
+      handler: (req: Request) => {
+        logger.warn({
+          message: 'Rate limited OTP login',
+          ip: getRequestIp(req),
+          action: 'otpLoginRateLimit',
+        })
+        throw new ApiRateLimitError(
+          'Too many requests. Please try again later.'
+        )
+      },
+    }),
+    celebrate(verifyOtpValidator),
+    authMiddleware.verifyOtp
+  )
 
   /**
    * paths:
