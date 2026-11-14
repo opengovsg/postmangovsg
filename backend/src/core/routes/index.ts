@@ -135,11 +135,11 @@ export const InitV1Route = (app: Application): Router => {
     const { campaignId } = req.params
 
     const campaign = await Campaign.findOne({
-      where: { id: +campaignId },
+      where: { id: +campaignId, userId: req.session?.user?.id },
       attributes: ['type'],
     })
     if (!campaign) {
-      // This campaign doesn't exist
+      // This campaign doesn't exist or belongs to another user
       logger.error({
         message: 'Campaign does not exist',
         campaignId,
