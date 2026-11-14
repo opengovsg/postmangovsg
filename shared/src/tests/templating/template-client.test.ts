@@ -255,6 +255,30 @@ describe('template', () => {
           expect(client.template(body, {})).toEqual(output)
         }
       )
+      test('email template should escape the GTA-130-018 proof of concept', () => {
+        const body = `<img src='cid://aa\\"a><iframe srcdoc="<script src=&quot;https://api.postman.gov.sg/x.js&quot;></script>"></iframe>'>`
+        const output =
+          '<img src="cid://aa\\&quot;a&gt;&lt;iframe srcdoc=&quot;&lt;script src=&quot;https://api.postman.gov.sg/x.js&quot;&gt;&lt;/script&gt;&quot;&gt;&lt;/iframe&gt;">'
+        expect(client.template(body, {})).toEqual(output)
+      })
+      test('email template should escape markup in a content-id image source from params', () => {
+        const body = `<img src='{{src}}'>`
+        const params = { src: 'cid:"><img/src/onerror=alert()>' }
+        const output =
+          '<img src="cid:&quot;&gt;&lt;img/src/onerror=alert()&gt;">'
+        expect(client.template(body, params)).toEqual(output)
+      })
+      test('email template with allowed image sources should escape markup inside a content-id image source', () => {
+        // The protected message page and CSV preview sanitize with this config
+        const clientWithImageSources = new TemplateClient({
+          allowedImageSources: ['file.go.gov.sg'],
+          xssOptions: XSS_EMAIL_OPTION,
+        })
+        const body = `<img src='cid:"><img/src/onerror=alert()>'>`
+        const output =
+          '<img src="cid:&quot;&gt;&lt;img/src/onerror=alert()&gt;">'
+        expect(clientWithImageSources.template(body, {})).toEqual(output)
+      })
     })
     describe('sms', () => {
       const client: TemplateClient = new TemplateClient({
@@ -304,6 +328,13 @@ describe('template', () => {
         const output =
           '<a href="tg://&quot;&gt;&lt;img src=x onerror=alert()&gt;">me</a>'
         expect(client.template(body, {})).toEqual(output)
+      })
+      test('inline mention links from params should have markup escaped', () => {
+        const body = `<a href='{{mention}}'>me</a>`
+        const params = { mention: 'tg://"><img src=x onerror=alert()>' }
+        const output =
+          '<a href="tg://&quot;&gt;&lt;img src=x onerror=alert()&gt;">me</a>'
+        expect(client.template(body, params)).toEqual(output)
       })
       test('line breaks should be preserved', () => {
         const body = 'hello\nhello'
