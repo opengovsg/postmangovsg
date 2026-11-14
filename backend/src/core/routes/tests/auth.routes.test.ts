@@ -16,6 +16,12 @@ beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
 })
 
+beforeEach(async () => {
+  await new Promise((resolve) =>
+    (app as any).redisService.rateLimitClient.flushdb(resolve)
+  )
+})
+
 afterEach(async () => {
   await User.destroy({ where: {} })
 })
@@ -139,6 +145,36 @@ describe('POST /auth/login', () => {
       .get('/auth/userinfo')
       .set('Cookie', victimCookie)
     expect(victimRes.body.email).toEqual('victim@agency.gov.sg')
+  })
+})
+
+describe('POST /auth/login rate limit', () => {
+  const attemptLogin = (ip: string) =>
+    request(app)
+      .post('/auth/login')
+      .set('cf-connecting-ip', ip)
+      .send({ email: 'user@agency.gov.sg', otp: '00000000' })
+
+  test('The 11th attempt within a minute from one IP returns 429', async () => {
+    for (let i = 0; i < 10; i++) {
+      expect((await attemptLogin('203.0.113.1')).status).toBe(401)
+    }
+
+    const res = await attemptLogin('203.0.113.1')
+
+    expect(res.status).toBe(429)
+    expect(res.body).toEqual({
+      code: 'rate_limit',
+      message: 'Too many requests. Please try again later.',
+    })
+  })
+
+  test('A rate-limited IP does not limit another IP', async () => {
+    for (let i = 0; i < 11; i++) {
+      await attemptLogin('203.0.113.1')
+    }
+
+    expect((await attemptLogin('203.0.113.2')).status).toBe(401)
   })
 })
 
