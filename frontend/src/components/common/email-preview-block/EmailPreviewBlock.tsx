@@ -21,23 +21,33 @@ const preprocessImages = async (html: string): Promise<string> => {
   const parsed = parser.parseFromString(html, 'text/html')
   const images = parsed.body.querySelectorAll('img')
 
+  // Built with DOM APIs, not innerHTML: the parser above has decoded src, so it may now
+  // contain markup the sanitizer let through only because it was entity-escaped.
   const createPlaceholder = (src: string, width: number, message: string) => {
     const placeholder = document.createElement('div')
     placeholder.className = styles.imagePlaceholder
     placeholder.style.width = `${width}%`
-    placeholder.innerHTML = `
-      <p>
-        <i class="bx bx-image"></i>
-        <i class="bx bx-x"></i>
-      </p>
-      <p>${message}</p>
-      <p>
-        <a href="${src}" target="_blank" rel="noopener noreferrer">
-          ${src.substring(0, 64) + (src.length > 64 ? '...' : '')}
-        </a>
-      </p>
-    `
 
+    const imageIcon = document.createElement('i')
+    imageIcon.className = 'bx bx-image'
+    const crossIcon = document.createElement('i')
+    crossIcon.className = 'bx bx-x'
+    const icons = document.createElement('p')
+    // The space keeps the cross icon where the stylesheet's negative margin expects it
+    icons.append(imageIcon, ' ', crossIcon)
+
+    const messageParagraph = document.createElement('p')
+    messageParagraph.textContent = message
+
+    const link = document.createElement('a')
+    link.href = src
+    link.target = '_blank'
+    link.rel = 'noopener noreferrer'
+    link.textContent = src.substring(0, 64) + (src.length > 64 ? '...' : '')
+    const linkParagraph = document.createElement('p')
+    linkParagraph.appendChild(link)
+
+    placeholder.append(icons, messageParagraph, linkParagraph)
     return placeholder
   }
 
