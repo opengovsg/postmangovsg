@@ -17,8 +17,8 @@ jobs:
     steps:
       - id: set-environment
         run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+          echo "Running on branch $GITHUB_REF"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
             echo "current_env=production" >> $GITHUB_OUTPUT
           else
             echo "current_env=staging" >> $GITHUB_OUTPUT
