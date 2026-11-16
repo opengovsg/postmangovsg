@@ -4,6 +4,9 @@ import './setup'
 import 'source-map-support/register'
 import express from 'express'
 import { loaders } from '@core/loaders'
+import { loggerWithLabel } from '@core/logger'
+
+const logger = loggerWithLabel(module)
 const port = Number(process.env.PORT) || 4000
 const app: express.Application = express()
 
@@ -23,5 +26,15 @@ const start = async (): Promise<void> => {
     console.error(err)
   }
 }
+
+// Log and keep serving, as the process did while Sentry's handler was registered.
+// Without a listener, Node exits on an unhandled rejection.
+process.on('unhandledRejection', (reason) => {
+  logger.error({
+    message: 'Unhandled promise rejection',
+    error: reason,
+    action: 'unhandledRejection',
+  })
+})
 
 void start()
