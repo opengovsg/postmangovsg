@@ -9,9 +9,10 @@ import { ApiRateLimitError } from '@core/errors/rest-api.errors'
 import { loggerWithLabel } from '@core/logger'
 import { getRequestIp } from '@core/utils/request'
 
-// Per client IP, with headroom for officers who share a government network's egress IP
-const OTP_LOGIN_WINDOW_SECONDS = 60
-const OTP_LOGIN_MAX_PER_WINDOW = 10
+// OTP verification attempts per client IP, with headroom for officers who share a
+// government network's egress IP
+const VERIFY_OTP_WINDOW_SECONDS = 60
+const VERIFY_OTP_MAX_PER_WINDOW = 10
 
 const logger = loggerWithLabel(module)
 
@@ -45,6 +46,25 @@ export const InitAuthRoutes = (
         .required(),
     }),
   }
+
+  const verifyOtpRateLimit = expressRateLimit({
+    store: new RedisStore({
+      prefix: 'verifyOtp:',
+      client: redisService.rateLimitClient,
+      expiry: VERIFY_OTP_WINDOW_SECONDS,
+    }),
+    windowMs: VERIFY_OTP_WINDOW_SECONDS * 1000,
+    max: VERIFY_OTP_MAX_PER_WINDOW,
+    keyGenerator: getRequestIp,
+    handler: (req: Request) => {
+      logger.warn({
+        message: 'Rate limited OTP verification',
+        ip: getRequestIp(req),
+        action: 'verifyOtpRateLimit',
+      })
+      throw new ApiRateLimitError('Too many requests. Please try again later.')
+    },
+  })
 
   // actual routes here
 
@@ -116,26 +136,7 @@ export const InitAuthRoutes = (
    */
   router.post(
     '/login',
-    expressRateLimit({
-      store: new RedisStore({
-        prefix: 'otpLogin:',
-        client: redisService.rateLimitClient,
-        expiry: OTP_LOGIN_WINDOW_SECONDS,
-      }),
-      windowMs: OTP_LOGIN_WINDOW_SECONDS * 1000,
-      max: OTP_LOGIN_MAX_PER_WINDOW,
-      keyGenerator: getRequestIp,
-      handler: (req: Request) => {
-        logger.warn({
-          message: 'Rate limited OTP login',
-          ip: getRequestIp(req),
-          action: 'otpLoginRateLimit',
-        })
-        throw new ApiRateLimitError(
-          'Too many requests. Please try again later.'
-        )
-      },
-    }),
+    verifyOtpRateLimit,
     celebrate(verifyOtpValidator),
     authMiddleware.verifyOtp
   )
