@@ -2,17 +2,13 @@ import cors from 'cors'
 import { isCelebrate } from 'celebrate'
 import express, { Request, Response, NextFunction } from 'express'
 import expressWinston from 'express-winston'
-import * as Sentry from '@sentry/node'
 import tracer from 'dd-trace'
 
 import config from '@core/config'
 import { InitV1Route } from '@core/routes'
 import { loggerWithLabel } from '@core/logger'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
-import {
-  isOneGovSgCallbackPath,
-  redactOneGovSgSentryEvent,
-} from '@core/utils/one-gov-sg-logging'
+import { isOneGovSgCallbackPath } from '@core/utils/one-gov-sg-logging'
 import helmet from 'helmet'
 import {
   ApiMalformError,
@@ -33,20 +29,6 @@ const origin = (v: string): string | RegExp => {
     return new RegExp(v.substring(1, v.length - 1))
   }
   return v
-}
-
-const sentrySessionMiddleware = (
-  req: Request,
-  _res: Response,
-  next: NextFunction
-): void => {
-  if (req.session?.user) {
-    Sentry.setUser({ id: req.session?.user?.id })
-  }
-  if (req.session?.apiKey) {
-    Sentry.setTag('usesApiKey', 'true')
-  }
-  next()
 }
 
 interface ErrorWithType extends Error {
@@ -118,12 +100,6 @@ export function restApiErrorMiddleware(
   }
   next()
 }
-
-Sentry.init({
-  dsn: config.get('sentryDsn'),
-  environment: config.get('env'),
-  beforeSend: redactOneGovSgSentryEvent,
-})
 
 const TELEGRAM_CALLBACK_PATH = /^\/v1\/callback\/telegram\//i
 
@@ -204,8 +180,6 @@ const overrideContentTypeHeaderMiddleware = (
 }
 
 const expressApp = ({ app }: { app: express.Application }): void => {
-  app.use(Sentry.Handlers.requestHandler())
-
   app.use(overrideContentTypeHeaderMiddleware)
 
   // We need to parse the body as text specifically for SendGrid callbacks.
@@ -267,14 +241,10 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     return res.sendStatus(200)
   })
 
-  app.use(sentrySessionMiddleware)
-
   app.use('/v1', InitV1Route(app))
   app.use(celebrateErrorMiddleware)
   app.use(bodyParserErrorMiddleware)
   app.use(restApiErrorMiddleware)
-
-  app.use(Sentry.Handlers.errorHandler())
 
   app.use(
     (
