@@ -15,8 +15,6 @@ import { Message } from './interface'
 import { NotificationService } from '@core/services/notification.service'
 import { TemplateClient, XSS_EMAIL_OPTION } from '@shared/templating'
 import MailClient, { MailToSend } from '@shared/clients/mail-client.class'
-import Govsg from './govsg.class'
-import axios from 'axios'
 
 require('module-alias/register') // to resolve aliased paths like @core, @sms, @email
 
@@ -24,20 +22,18 @@ const logger = loggerWithLabel(module)
 const client = new TemplateClient({ xssOptions: XSS_EMAIL_OPTION })
 
 let postmanConnection: Sequelize,
-  flamingoConnection: Sequelize,
   workerId: string,
   currentCampaignType: string,
   email: Email,
   sms: SMS,
-  telegram: Telegram,
-  govsg: Govsg
+  telegram: Telegram
 let shouldRun = false
 
 /**
  *  Different channel types operate on their own channel type tables.
  *  Helper method to decide which queries to use, depending on channel type
  */
-const service = (): Email | SMS | Telegram | Govsg => {
+const service = (): Email | SMS | Telegram => {
   switch (currentCampaignType) {
     case 'EMAIL':
       return email
@@ -45,8 +41,6 @@ const service = (): Email | SMS | Telegram | Govsg => {
       return sms
     case 'TELEGRAM':
       return telegram
-    case 'GOVSG':
-      return govsg
     default:
       throw new Error(`${currentCampaignType} not supported`)
   }
@@ -167,88 +161,22 @@ const finalize = tracer.wrap(
         })
       })
 
-    const logGovsgJob = postmanConnection
-      .query('SELECT log_next_job_govsg();')
-      .then(([result]) => get(result, '[0].log_next_job_govsg', ''))
-      .then(async (campaignId: number) => {
-        const rawMessages = await postmanConnection.query(
-          "SELECT * FROM govsg_messages WHERE status = 'ERROR' AND campaign_id = :campaignId",
-          { type: QueryTypes.SELECT, replacements: { campaignId } }
-        )
-        if (!rawMessages) {
-          return campaignId
-        }
-
-        const messagesWithErr = rawMessages as Array<{
-          id: number
-          error_code: string
-          error_description: string
-        }>
-        if (
-          messagesWithErr.length === 0 ||
-          !config.get('sgcCampaignAlertChannelWebhookUrl')
-        ) {
-          return campaignId
-        }
-        let text = `*****NEW ALERT******\n*Campaign ${campaignId} has some errors*\n=====\n| Message ID | Error Code | Error Description |\n=====\n`
-        messagesWithErr.forEach((m) => {
-          text += `| ${m.id} | ${m.error_code} | ${m.error_description} |\n`
-        })
-        text += '***********'
-        await axios
-          .post(config.get('sgcCampaignAlertChannelWebhookUrl'), {
-            text: text,
+    return Promise.all([logEmailJob, logSmsJob, logTelegramJob]).then(
+      (campaignIds) => {
+        campaignIds.filter(Boolean).forEach((campaignId) => {
+          logger.info({
+            message: 'Logging finalized',
+            workerId,
+            campaignId,
+            action: 'finalize',
           })
-          .catch((e) => {
-            logger.error({
-              message: 'Failed to report errors to #sgc-campaign-alerts',
-              error: e,
-              action: 'finalize',
-            })
-          })
-
-        return campaignId
-      })
-      .catch((err) => {
-        logger.error({
-          message: 'Log govsg job',
-          error: err,
-          action: 'finalize',
+          // for each campaign id, send email confirmation
+          void sendFinalizedNotification(campaignId)
         })
-      })
-
-    return Promise.all([
-      logEmailJob,
-      logSmsJob,
-      logTelegramJob,
-      logGovsgJob,
-    ]).then((campaignIds) => {
-      campaignIds.filter(Boolean).forEach((campaignId) => {
-        logger.info({
-          message: 'Logging finalized',
-          workerId,
-          campaignId,
-          action: 'finalize',
-        })
-        // for each campaign id, send email confirmation
-        void sendFinalizedNotification(campaignId)
-      })
-    })
+      }
+    )
   }
 )
-
-const createFlamingoConnection = (): Sequelize => {
-  return new Sequelize(config.get('database.flamingoUri'), {
-    dialect: 'postgres',
-    logging: false,
-    dialectOptions: {
-      ssl: {
-        rejectUnauthorized: false,
-      },
-    },
-    pool: config.get('database.poolOptions'),
-  })
-}
 
 const createPostmanConnection = (): Sequelize => {
   const dialectOptions =
@@ -449,11 +377,9 @@ const start = async (index: string, isLogger = false): Promise<any> => {
   await ECSUtil.load()
   workerId = ECSUtil.getWorkerId(index)
   postmanConnection = createPostmanConnection()
-  flamingoConnection = createFlamingoConnection()
   email = new Email(workerId, postmanConnection)
   sms = new SMS(workerId, postmanConnection)
   telegram = new Telegram(workerId, postmanConnection)
-  govsg = new Govsg(workerId, postmanConnection, flamingoConnection)
 
   try {
     shouldRun = true
@@ -480,14 +406,6 @@ const start = async (index: string, isLogger = false): Promise<any> => {
         workerId,
       })
       await postmanConnection.close()
-    }
-    if (flamingoConnection) {
-      logger.info({
-        message: 'Closing flamingo database connection',
-        action: 'start',
-        workerId,
-      })
-      await flamingoConnection.close()
     }
   }
 }

@@ -1,7 +1,0 @@
-export * from './campaign-govsg-template'
-export * from './govsg-op'
-export * from './govsg-message'
-export * from './govsg-message-transactional'
-export * from './govsg-template'
-export * from './govsg-template-access'
-export * from './govsg-verification'

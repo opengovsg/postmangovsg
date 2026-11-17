@@ -8,7 +8,6 @@ import styles from './DuplicateCampaignModal.module.scss'
 import { Campaign, ChannelType } from 'classes/Campaign'
 import { ErrorBlock, PrimaryButton, TextInput } from 'components/common'
 import { LINKS } from 'config'
-import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
 import { duplicateCampaign } from 'services/campaign.service'
 
@@ -20,8 +19,6 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
     // Only prepend 'Copy of' if the campaign name doesn't already have one
     (campaign.name.startsWith('Copy of') ? '' : 'Copy of ') + campaign.name
   )
-  const { experimentalData } = useContext(AuthContext)
-  const canAccessGovsg = !!experimentalData[ChannelType.Govsg]
 
   async function handleDuplicateCampaign() {
     try {
@@ -180,26 +177,6 @@ const DuplicateCampaignModal = ({ campaign }: { campaign: Campaign }) => {
                 </p>
               )}
             </div>
-            {canAccessGovsg && (
-              <div className={styles.channelContainer}>
-                <input
-                  type="radio"
-                  aria-label={ChannelType.Govsg}
-                  id={ChannelType.Govsg}
-                  value={ChannelType.Govsg}
-                  checked={campaign.type === ChannelType.Govsg}
-                  disabled
-                />
-                <label htmlFor={ChannelType.Govsg} className={styles.subtext}>
-                  Gov.sg WhatsApp
-                </label>
-                {campaign.type === ChannelType.Govsg && (
-                  <p className={styles.infotext}>
-                    Send WhatsApp messages from a verified Gov.sg account
-                  </p>
-                )}
-              </div>
-            )}
           </div>
         </div>
 

@@ -31,4 +31,4 @@ Nothing else sends email. The CSV upload requests only store the recipient list.
 | `GET /auth/one-gov-sg/login`, `POST /auth/one-gov-sg/callback` | one.gov.sg login is a browser redirect to the identity provider with server-side state and PKCE. Use `Auth/Request OTP` instead. |
 | `POST /protect/:id`                                            | Needs a password hash for a protected message.                                                                                   |
 | CSV upload to S3                                               | `Start CSV upload` returns a presigned S3 URL. The `PUT` of the file to that URL happens outside the Postman API.                |
-| SMS, Telegram and GovSG routes                                 | Out of scope for this collection.                                                                                                |
+| SMS and Telegram routes                                        | Out of scope for this collection.                                                                                                |

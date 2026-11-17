@@ -30,7 +30,6 @@ test('exchanges captured params and replaces the callback history entry', async 
   ;(getUser as jest.Mock).mockResolvedValue({
     email: 'officer@agency.gov.sg',
     id: 1,
-    experimental_data: {},
   })
 
   render(
@@ -41,8 +40,6 @@ test('exchanges captured params and replaces the callback history entry', async 
           setAuthenticated: jest.fn(),
           email: '',
           setEmail: jest.fn(),
-          experimentalData: {},
-          setExperimentalData: jest.fn(),
         }}
       >
         <MemoryRouter initialEntries={['/prior', callbackUrl]} initialIndex={1}>

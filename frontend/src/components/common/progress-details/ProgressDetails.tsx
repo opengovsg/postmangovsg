@@ -33,7 +33,6 @@ const ProgressDetails = ({
     unsent,
     sent,
     invalid,
-    delivered,
     updatedAt,
     halted,
     unsubscribed,
@@ -189,18 +188,6 @@ const ProgressDetails = ({
             <td className={'md'}>Sent to recipient</td>
             <td className={'sm'}>{sent}</td>
           </tr>
-          {type === ChannelType.Govsg && (
-            <tr>
-              <td className={cx(styles.status, 'md')}>
-                <i
-                  className={cx(styles.icon, styles.grey, 'bx bx-check-double')}
-                ></i>
-                Delivered
-              </td>
-              <td className={'md'}>Delivered to recipient</td>
-              <td className={'sm'}>{delivered}</td>
-            </tr>
-          )}
           <tr>
             <td className={cx(styles.status, 'md')}>
               <i

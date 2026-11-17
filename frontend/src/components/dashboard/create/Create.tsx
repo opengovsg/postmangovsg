@@ -4,19 +4,15 @@ import { useNavigate, useParams } from 'react-router-dom'
 
 import styles from './Create.module.scss'
 import EmailCreate from './email/EmailCreate'
-import CreateGovsg from './govsg/GovsgCreate'
 import SMSCreate from './sms/SMSCreate'
 import TelegramCreate from './telegram/TelegramCreate'
 
 import { ChannelType, Status } from 'classes'
 import { TitleBar, PrimaryButton } from 'components/common'
-import { CampaignHeaderTabs } from 'components/common/CampaignHeaderTabs/CampaignHeaderTabs'
-import { TitleBarWithTabs } from 'components/common/title-bar/TitleBarWithTabs'
 import DemoInfoBanner from 'components/dashboard/demo/demo-info-banner/DemoInfoBanner'
 import Error from 'components/error'
 import { CampaignContext } from 'contexts/campaign.context'
 import { FinishLaterModalContext } from 'contexts/finish-later.modal.context'
-import { GovsgDetailContextProvider } from 'contexts/govsg-detail.context'
 import { getCampaignDetails } from 'services/campaign.service'
 
 const Create = () => {
@@ -56,31 +52,15 @@ const Create = () => {
     navigate('/campaigns')
   }
 
-  const renderTitleBar = () => {
-    if (
-      campaign.type === ChannelType.Govsg &&
-      campaign.status !== Status.Draft
-    ) {
-      return (
-        <TitleBarWithTabs title={campaign.name}>
-          <CampaignHeaderTabs />
-          <PrimaryButton onClick={handleFinishLater}>
-            Back to campaigns
-          </PrimaryButton>
-        </TitleBarWithTabs>
-      )
-    } else {
-      return (
-        <TitleBar title={campaign.name}>
-          <PrimaryButton onClick={handleFinishLater}>
-            {campaign.status === Status.Draft
-              ? 'Finish this later'
-              : 'Back to campaigns'}
-          </PrimaryButton>
-        </TitleBar>
-      )
-    }
-  }
+  const renderTitleBar = () => (
+    <TitleBar title={campaign.name}>
+      <PrimaryButton onClick={handleFinishLater}>
+        {campaign.status === Status.Draft
+          ? 'Finish this later'
+          : 'Back to campaigns'}
+      </PrimaryButton>
+    </TitleBar>
+  )
 
   function renderCreateChannel() {
     switch (campaign.type) {
@@ -90,8 +70,6 @@ const Create = () => {
         return <EmailCreate />
       case ChannelType.Telegram:
         return <TelegramCreate />
-      case ChannelType.Govsg:
-        return <CreateGovsg />
       default:
         return <p>Invalid Channel Type</p>
     }
@@ -101,22 +79,18 @@ const Create = () => {
     return <Error />
   }
 
-  return (
-    <GovsgDetailContextProvider>
-      {campaign ? (
-        <>
-          {renderTitleBar()}
-          {!!campaign.demoMessageLimit && <DemoInfoBanner></DemoInfoBanner>}
-          {isLoading ? (
-            <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
-          ) : (
-            renderCreateChannel()
-          )}
-        </>
+  return campaign ? (
+    <>
+      {renderTitleBar()}
+      {!!campaign.demoMessageLimit && <DemoInfoBanner></DemoInfoBanner>}
+      {isLoading ? (
+        <i className={cx(styles.spinner, 'bx bx-loader-alt bx-spin')}></i>
       ) : (
-        <p>loading..</p>
+        renderCreateChannel()
       )}
-    </GovsgDetailContextProvider>
+    </>
+  ) : (
+    <p>loading..</p>
   )
 }
 

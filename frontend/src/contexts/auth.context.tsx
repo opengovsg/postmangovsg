@@ -10,10 +10,6 @@ interface ContextProps {
   setAuthenticated: Dispatch<SetStateAction<boolean>>
   email: string
   setEmail: Dispatch<SetStateAction<string>>
-  experimentalData: { [key: string]: Record<string, string> }
-  setExperimentalData: Dispatch<
-    SetStateAction<{ [key: string]: Record<string, string> }>
-  >
 }
 
 export const AuthContext = createContext({} as ContextProps)
@@ -22,9 +18,6 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setAuthenticated] = useState(false)
   const [isLoaded, setLoaded] = useState(false)
   const [email, setEmail] = useState('')
-  const [experimentalData, setExperimentalData] = useState<{
-    [key: string]: Record<string, string>
-  }>({})
 
   useEffect(() => {
     async function initialChecks() {
@@ -32,7 +25,6 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         const user = await getUser()
         setAuthenticated(!!user?.email)
         setEmail(user?.email || '')
-        setExperimentalData(user?.experimental_data || {})
 
         setUserAnalytics(user)
       } catch (err) {
@@ -76,8 +68,6 @@ const AuthContextProvider = ({ children }: { children: ReactNode }) => {
         setAuthenticated,
         email,
         setEmail,
-        experimentalData,
-        setExperimentalData,
       }}
     >
       {isLoaded && children}
