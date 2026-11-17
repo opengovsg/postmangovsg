@@ -40,6 +40,4 @@ jobs:
       - name: Install dependencies
         run: cd "$DIRECTORY" && npm ci
       - name: Deploy
-        env:
-          DEPLOY_STAGE: ${{ github.ref == 'refs/heads/master' && 'prod' || 'stg' }}
-        run: cd "$DIRECTORY" && npx sst deploy --stage "$DEPLOY_STAGE"
+        run: cd "$DIRECTORY" && npx sst deploy --stage ${{ github.ref == 'refs/heads/master' && 'prod' || 'stg' }}
