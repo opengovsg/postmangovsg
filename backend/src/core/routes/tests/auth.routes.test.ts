@@ -110,6 +110,25 @@ describe('POST /auth/login', () => {
     expect(res.status).toBe(200)
   })
 
+  test('Valid otp sent as an HTML form body is rejected without a session', async () => {
+    const email = 'user@agency.gov.sg'
+    const otp = JSON.stringify({
+      retries: 1,
+      hash: await bcrypt.hash('ABCDEFGH', 10),
+      createdAt: 123,
+    })
+    await new Promise((resolve) =>
+      (app as any).redisService.otpClient.set(email, otp, resolve)
+    )
+
+    const res = await request(app)
+      .post('/auth/login')
+      .type('form')
+      .send({ email, otp: 'ABCDEFGH' })
+    expect(res.status).toBe(415)
+    expect(res.headers['set-cookie']).toBeUndefined()
+  })
+
   test('Login invalidates the session cookie sent with it', async () => {
     const login = async (email: string, cookie?: string) => {
       const otp = JSON.stringify({

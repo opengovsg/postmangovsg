@@ -1,4 +1,4 @@
-import { Router } from 'express'
+import { NextFunction, Request, Response, Router } from 'express'
 import expressRateLimit from 'express-rate-limit'
 import RedisStore from 'rate-limit-redis'
 import { celebrate, Joi, Segments } from 'celebrate'
@@ -36,6 +36,21 @@ export const InitAuthRoutes = (
         .pattern(/^[A-Z0-9]+$/, { name: 'alphanumeric' })
         .required(),
     }),
+  }
+
+  // Cross-site HTML forms cannot send application/json, and cross-site scripts that do must pass
+  // the CORS preflight, so this stops another site logging a browser into an account it controls
+  const requireJsonBody = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): Response | void => {
+    if (!req.is('application/json')) {
+      return res
+        .status(415)
+        .json({ message: 'Content-Type must be application/json' })
+    }
+    return next()
   }
 
   // actual routes here
@@ -103,10 +118,17 @@ export const InitAuthRoutes = (
    *            application/json:
    *              schema:
    *                type: object
+   *        "415":
+   *           description: Request body is not application/json
    *        "500":
    *           description: Internal Server Error
    */
-  router.post('/login', celebrate(verifyOtpValidator), authMiddleware.verifyOtp)
+  router.post(
+    '/login',
+    requireJsonBody,
+    celebrate(verifyOtpValidator),
+    authMiddleware.verifyOtp
+  )
 
   /**
    * paths:
