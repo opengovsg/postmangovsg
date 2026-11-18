@@ -1,7 +1,6 @@
 import { i18n } from '@lingui/core'
 import cx from 'classnames'
 import { createRef, useEffect, useContext } from 'react'
-import { OutboundLink } from 'react-ga'
 import { Navigate, useLocation } from 'react-router-dom'
 
 import styles from './LoginTemplate.module.scss'
@@ -93,22 +92,22 @@ const LoginTemplate: React.FC<LoginTemplateProps> = ({
               alt="company logo"
             ></img>
             <div className={styles.linkBar}>
-              <OutboundLink
+              <a
                 className={styles.navLink}
-                eventLabel={i18n._(LINKS.guideUrl)}
-                to={i18n._(LINKS.guideUrl)}
+                href={i18n._(LINKS.guideUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Guide
-              </OutboundLink>
-              <OutboundLink
+              </a>
+              <a
                 className={styles.navLink}
-                eventLabel={i18n._(LINKS.contactUsUrl)}
-                to={i18n._(LINKS.contactUsUrl)}
+                href={i18n._(LINKS.contactUsUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 Contact Us
-              </OutboundLink>
+              </a>
             </div>
           </div>
         </div>

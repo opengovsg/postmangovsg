@@ -2,7 +2,6 @@ import { i18n } from '@lingui/core'
 import { Trans } from '@lingui/macro'
 import cx from 'classnames'
 import { useContext } from 'react'
-import { OutboundLink } from 'react-ga'
 
 import UpdateCustomFromAddressModal from '../update-custom-from-address-modal'
 import VerifyCustomFromAddressModal from '../verify-custom-from-address-modal'
@@ -13,7 +12,6 @@ import { StepHeader } from 'components/common'
 import { LINKS } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const CustomFromAddress = ({
   customFromAddresses,
@@ -27,7 +25,6 @@ const CustomFromAddress = ({
   const title = 'From Address'
 
   async function onVerifyFromAddressClicked(label: string) {
-    sendUserEvent(GA_USER_EVENTS.ADD_FROM_ADDRESS)
     modalContext.setModalContent(
       <VerifyCustomFromAddressModal
         label={label}
@@ -37,7 +34,6 @@ const CustomFromAddress = ({
   }
 
   async function onUpdateDisplayNameClicked(label: string) {
-    sendUserEvent(GA_USER_EVENTS.UPDATE_FROM_ADDRESS)
     modalContext.setModalContent(
       <UpdateCustomFromAddressModal
         label={label}
@@ -123,15 +119,15 @@ const CustomFromAddress = ({
         </StepHeader>
 
         <div className={styles.actionButtons}>
-          <OutboundLink
-            eventLabel={i18n._(LINKS.customFromAddressRequestUrl)}
-            to={i18n._(LINKS.customFromAddressRequestUrl)}
+          <a
+            href={i18n._(LINKS.customFromAddressRequestUrl)}
             target="_blank"
+            rel="noopener noreferrer"
           >
             <button className={styles.request}>
               Fill in request form <i className="bx bx-right-arrow-alt"></i>
             </button>
-          </OutboundLink>
+          </a>
           <button
             className={styles.status}
             onClick={() => onVerifyFromAddressClicked(email)}
