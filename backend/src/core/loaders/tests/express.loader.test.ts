@@ -3,7 +3,10 @@ import request from 'supertest'
 import winston from 'winston'
 import { Writable } from 'stream'
 import { addTransport } from '@core/logger'
-import { requestLoggerMiddleware } from '@core/loaders/express.loader'
+import {
+  requestDomainMiddleware,
+  requestLoggerMiddleware,
+} from '@core/loaders/express.loader'
 
 const logLines: any[] = []
 addTransport(
@@ -59,5 +62,29 @@ describe('requestLoggerMiddleware', () => {
 
     expect(res.status).toBe(200)
     expect(logLines).toEqual([])
+  })
+})
+
+describe('requestDomainMiddleware', () => {
+  test('returns 500 when a request throws from a callback', async () => {
+    const domainApp = express()
+    domainApp.use(requestDomainMiddleware)
+    domainApp.get('/throws', () => {
+      setImmediate(() => {
+        throw new Error('thrown outside a promise')
+      })
+    })
+    domainApp.use(
+      (
+        _err: Error,
+        _req: express.Request,
+        res: express.Response,
+        _next: express.NextFunction
+      ) => res.sendStatus(500)
+    )
+
+    const res = await request(domainApp).get('/throws').timeout(2000)
+
+    expect(res.status).toBe(500)
   })
 })

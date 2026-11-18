@@ -1,4 +1,5 @@
 import cors from 'cors'
+import domain from 'domain'
 import { isCelebrate } from 'celebrate'
 import express, { Request, Response, NextFunction } from 'express'
 import expressWinston from 'express-winston'
@@ -161,6 +162,20 @@ export const requestLoggerMiddleware = expressWinston.logger({
   metaField: null, // flatten this log to root instead of nesting under `meta`
 })
 
+// Runs each request in a domain so an error thrown from a callback, timer or emitter
+// reaches the error handlers as a 500 instead of exiting the process
+export const requestDomainMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const requestDomain = domain.create()
+  requestDomain.add(req)
+  requestDomain.add(res)
+  requestDomain.on('error', next)
+  requestDomain.run(next)
+}
+
 /**
  * SNS defaults the content-type header to 'content-type': 'text/plain; charset=UTF-8',
  * even though it is sending a json document, causing bodyParser to not work
@@ -180,6 +195,8 @@ const overrideContentTypeHeaderMiddleware = (
 }
 
 const expressApp = ({ app }: { app: express.Application }): void => {
+  app.use(requestDomainMiddleware)
+
   app.use(overrideContentTypeHeaderMiddleware)
 
   // We need to parse the body as text specifically for SendGrid callbacks.
