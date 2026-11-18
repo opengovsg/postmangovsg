@@ -36,6 +36,13 @@ const securityHeadersLoader = ({ app }: { app: express.Application }): void => {
 
   app.use(helmet.referrerPolicy({ policy: 'same-origin' }))
 
+  // helmet 3 predates these headers
+  app.use((_req, res, next) => {
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin')
+    res.setHeader('Cross-Origin-Resource-Policy', 'same-site')
+    next()
+  })
+
   app.use(
     helmet.featurePolicy({
       features: {
