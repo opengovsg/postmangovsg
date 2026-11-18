@@ -41,7 +41,7 @@ jobs:
     needs:
       - slack-prepare
     steps:
-      - uses: slackapi/slack-github-action@v1.23.0
+      - uses: slackapi/slack-github-action@007b2c3c751a190b6f0f040e47ed024deaa72844 # v1.23.0
         id: slack
         with:
           channel-id: ${{ env.SLACK_CHANNEL_ID }}
@@ -135,7 +135,7 @@ jobs:
     name: Send Slack message about successful build
     runs-on: ubuntu-latest
     steps:
-      - uses: slackapi/slack-github-action@v1.23.0
+      - uses: slackapi/slack-github-action@007b2c3c751a190b6f0f040e47ed024deaa72844 # v1.23.0
         with:
           channel-id: ${{ env.SLACK_CHANNEL_ID }}
           update-ts: ${{ needs.slack-started.outputs.message_id }}
@@ -188,7 +188,7 @@ jobs:
     name: Send Slack message about failed build and tag engineers if it's prod
     runs-on: ubuntu-latest
     steps:
-      - uses: slackapi/slack-github-action@v1.23.0
+      - uses: slackapi/slack-github-action@007b2c3c751a190b6f0f040e47ed024deaa72844 # v1.23.0
         env:
           SLACK_BOT_TOKEN: ${{ secrets.SLACK_BOT_TOKEN }}
           DEPLOY_ENV: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
