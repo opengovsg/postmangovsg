@@ -169,6 +169,37 @@ describe('POST /auth/login rate limit', () => {
     })
   })
 
+  test('Successful logins do not count toward the limit', async () => {
+    const email = 'user@agency.gov.sg'
+    const hash = await bcrypt.hash('ABCDEFGH', 10)
+    for (let i = 0; i < 11; i++) {
+      await new Promise((resolve) =>
+        (app as any).redisService.otpClient.set(
+          email,
+          JSON.stringify({ retries: 1, hash, createdAt: 123 }),
+          resolve
+        )
+      )
+      const res = await request(app)
+        .post('/auth/login')
+        .set('cf-connecting-ip', '203.0.113.1')
+        .send({ email, otp: 'ABCDEFGH' })
+      expect(res.status).toBe(200)
+    }
+  })
+
+  test('Login still works while the rate-limit Redis is unreachable', async () => {
+    const client = (app as any).redisService.rateLimitClient
+    client.connected = false
+    client.ready = false
+    try {
+      expect((await attemptLogin('203.0.113.1')).status).toBe(401)
+    } finally {
+      client.connected = true
+      client.ready = true
+    }
+  })
+
   test('A rate-limited IP does not limit another IP', async () => {
     for (let i = 0; i < 11; i++) {
       await attemptLogin('203.0.113.1')

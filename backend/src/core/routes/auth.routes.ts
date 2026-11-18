@@ -9,8 +9,7 @@ import { ApiRateLimitError } from '@core/errors/rest-api.errors'
 import { loggerWithLabel } from '@core/logger'
 import { getRequestIp } from '@core/utils/request'
 
-// OTP verification attempts per client IP, with headroom for officers who share a
-// government network's egress IP
+// Failed OTP verification attempts per client IP
 const VERIFY_OTP_WINDOW_SECONDS = 60
 const VERIFY_OTP_MAX_PER_WINDOW = 10
 
@@ -52,9 +51,13 @@ export const InitAuthRoutes = (
       prefix: 'verifyOtp:',
       client: redisService.rateLimitClient,
       expiry: VERIFY_OTP_WINDOW_SECONDS,
-    }),
+      // Fail open: a rate-limit Redis outage must not block login. The option is in
+      // rate-limit-redis 2.1.0 but missing from its 1.7 typings.
+      passIfNotConnected: true,
+    } as RedisStore.Options),
     windowMs: VERIFY_OTP_WINDOW_SECONDS * 1000,
     max: VERIFY_OTP_MAX_PER_WINDOW,
+    skipSuccessfulRequests: true,
     keyGenerator: getRequestIp,
     handler: (req: Request) => {
       logger.warn({
