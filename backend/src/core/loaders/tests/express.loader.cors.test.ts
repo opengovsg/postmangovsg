@@ -8,9 +8,8 @@ describe('CORS', () => {
 
   beforeAll(async () => {
     process.env.FRONTEND_URL = ALLOWED_ORIGIN
-    const { default: expressLoader } = await import(
-      '@core/loaders/express.loader'
-    )
+    const { default: expressLoader } =
+      await import('@core/loaders/express.loader')
     const {
       InitAuthService,
       InitOneGovSgService,
