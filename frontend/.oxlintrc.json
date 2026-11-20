@@ -29,7 +29,6 @@
     "**/node_modules",
     "**/jest.config.js",
     "**/config-overrides.js",
-    "**/sentry.js",
     // Lingui output. The eslint patterns (locales/...) were relative to the
     // config file and matched nothing; these point at the real directory.
     "src/locales/_build/",

@@ -4,7 +4,6 @@ import 'locales'
 import { datadogRum } from '@datadog/browser-rum'
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
-import * as Sentry from '@sentry/browser'
 import { createRoot } from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 // Locales
@@ -13,20 +12,10 @@ import { BrowserRouter } from 'react-router-dom'
 import App from './App'
 
 import { captureOneGovSgCallback } from 'components/login/one-gov-sg-callback'
-import {
-  SENTRY_DSN,
-  SENTRY_RELEASE,
-  APP_ENV,
-  ONE_GOV_SG_CALLBACK_PATH,
-} from 'config'
+import { APP_ENV, ONE_GOV_SG_CALLBACK_PATH } from 'config'
 import AuthContextProvider from 'contexts/auth.context'
 
 captureOneGovSgCallback()
-Sentry.init({
-  dsn: SENTRY_DSN,
-  release: SENTRY_RELEASE,
-  environment: APP_ENV,
-})
 
 if (APP_ENV === 'production' || APP_ENV === 'staging') {
   datadogRum.init({

@@ -61,5 +61,5 @@
   },
   // Formerly .prettierignore, plus the files .eslintrc.js kept out of
   // eslint-plugin-prettier's reach.
-  "ignorePatterns": ["/build", "config-overrides.js", "sentry.js"]
+  "ignorePatterns": ["/build", "config-overrides.js"]
 }
