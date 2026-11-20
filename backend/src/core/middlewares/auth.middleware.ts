@@ -3,13 +3,11 @@ import config from '@core/config'
 import { loggerWithLabel } from '@core/logger'
 import {
   AuthService,
-  experimentService,
   OneGovSgCallbackError,
   OneGovSgIdentity,
   OneGovSgService,
 } from '@core/services'
 import { getRequestIp } from '@core/utils/request'
-import { DEFAULT_TX_EMAIL_RATE_LIMIT } from '@core/models'
 import { ApiAuthenticationError } from '@core/errors/rest-api.errors'
 
 export interface AuthMiddleware {
@@ -27,7 +25,6 @@ export enum AuthType {
   ApiKey = 'API_KEY',
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const InitAuthMiddleware = (
   authService: AuthService,
   oneGovSgService: OneGovSgService
@@ -89,6 +86,10 @@ export const InitAuthMiddleware = (
     try {
       if (req.session) {
         const user = await authService.findOrCreateUser(email)
+        // A new session ID on login, so a cookie planted before login cannot be reused
+        await new Promise<void>((resolve, reject) =>
+          req.session?.regenerate((err) => (err ? reject(err) : resolve()))
+        )
         req.session.user = {
           id: user.id,
           createdAt: user.createdAt,
@@ -114,10 +115,7 @@ export const InitAuthMiddleware = (
     res: Response
   ): Promise<Response | void> => {
     if (req?.session?.user?.id) {
-      const [user, experimentalData] = await Promise.all([
-        authService.findUser(req?.session?.user?.id),
-        experimentService.getUserExperimentalData(req?.session?.user?.id),
-      ])
+      const user = await authService.findUser(req?.session?.user?.id)
       logger.info({
         message: 'Existing user session found',
         action: 'getUser',
@@ -125,7 +123,9 @@ export const InitAuthMiddleware = (
       return res.json({
         email: user?.email,
         id: user?.id,
-        experimental_data: experimentalData,
+        // Frontend bundles from before GovSG's removal read this on login and
+        // crash without it. Remove one release after the frontend redeploys.
+        experimental_data: {},
       })
     }
     logger.info({
@@ -148,23 +148,20 @@ export const InitAuthMiddleware = (
         action: 'authenticators[AuthType.Cookie]',
         user: req.session?.user,
       })
-      if (req.session) {
-        // default user to 10 requests per second if they're using cookie
-        req.session.rateLimit = DEFAULT_TX_EMAIL_RATE_LIMIT
-      }
       return true
     },
     [AuthType.ApiKey]: async (req: Request) => {
       const user = await authService.getUserForApiKey(req)
-      if (user === null || !req.session) {
+      if (user === null) {
         return false
       }
-      // Ideally, we store the user id in res.locals for api key, because theoretically, no session was created.
-      // Practically, we have to check multiple places for the user id when we want to retrieve the id
-      // To avoid these checks, we assign the user id to the session property instead so that downstream middlewares can use it
-      req.session.user = user
-      req.session.apiKey = true
-      req.session.rateLimit = user.rateLimit
+      // Downstream middlewares read the user from req.session. The session middleware skips
+      // API key requests, so this request-scoped object is never saved or sent as a cookie.
+      req.session = {
+        user,
+        apiKey: true,
+        rateLimit: user.rateLimit,
+      } as unknown as Request['session']
       logger.info({
         message: 'User authenticated by API key',
         action: 'authenticators[AuthType.ApiKey]',
@@ -212,10 +209,15 @@ export const InitAuthMiddleware = (
     res: Response,
     next: NextFunction
   ): Promise<Response | void> => {
+    // API key requests have no session to destroy
+    if (!req.session) {
+      return res.status(200).json({ oneGovSg: false })
+    }
+    const session = req.session
     // Read before destroy so the frontend can tell the user they're still signed in to one.gov.sg
-    const oneGovSg = !!req.session?.oneGovSgSid
+    const oneGovSg = !!session.oneGovSgSid
     return new Promise<Response | void>((resolve, reject) => {
-      req.session?.destroy((err) => {
+      session.destroy((err) => {
         res.cookie(config.get('session.cookieName'), '', {
           expires: new Date(),
         }) // Makes cookie expire immediately

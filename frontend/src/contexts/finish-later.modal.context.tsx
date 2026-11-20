@@ -1,5 +1,4 @@
 import { createContext, useState, useContext } from 'react'
-
 import type { ReactNode, Dispatch, SetStateAction } from 'react'
 
 import { ModalContext } from 'contexts/modal.context'

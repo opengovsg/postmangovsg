@@ -5,7 +5,7 @@ import {
   FileAttachmentMiddleware,
 } from '@core/middlewares'
 import { Joi, Segments, celebrate } from 'celebrate'
-import { Router } from 'express'
+import { NextFunction, Request, Response, Router } from 'express'
 
 export const InitCommonAttachmentRoute = (
   authMiddleware: AuthMiddleware
@@ -37,6 +37,12 @@ export const InitCommonAttachmentRoute = (
 
   router.get(
     '/:attachmentId/:fileName',
+    // Attachments are public, so any site may embed one, such as a webmail
+    // client showing an image
+    (_req: Request, res: Response, next: NextFunction) => {
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin')
+      next()
+    },
     celebrate({
       [Segments.PARAMS]: Joi.object({
         attachmentId: Joi.string().guid({ version: 'uuidv4' }).required(),

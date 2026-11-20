@@ -125,6 +125,23 @@ Sentry.init({
   beforeSend: redactOneGovSgSentryEvent,
 })
 
+const TELEGRAM_CALLBACK_PATH = /^\/v1\/callback\/telegram\//i
+
+export const requestLoggerMiddleware = expressWinston.logger({
+  msg: `Incoming HTTP Request {{req.method}} {{req.url}}`,
+  winstonInstance: logger,
+  ignoredRoutes: ['/'],
+  // The one.gov.sg callback carries a single-use code and state in its body, and the
+  // Telegram webhook URL ends in the bot token. Ignore the whole request, including
+  // req.url and the log message.
+  ignoreRoute: (req: Request) =>
+    isOneGovSgCallbackPath(req.path) || TELEGRAM_CALLBACK_PATH.test(req.path),
+  requestWhitelist: ['method', 'url', 'body', 'headers'],
+  responseWhitelist: ['statusCode'],
+  requestFilter: requestLogFilter,
+  metaField: null, // flatten this log to root instead of nesting under `meta`
+})
+
 /**
  * SNS defaults the content-type header to 'content-type': 'text/plain; charset=UTF-8',
  * even though it is sending a json document, causing bodyParser to not work
@@ -194,20 +211,7 @@ const expressApp = ({ app }: { app: express.Application }): void => {
     next()
   })
 
-  app.use(
-    expressWinston.logger({
-      msg: `Incoming HTTP Request {{req.method}} {{req.url}}`,
-      winstonInstance: logger,
-      ignoredRoutes: ['/'],
-      // The callback carries a single-use code and state in its body. Ignore
-      // the whole request, including any query string in req.url or the log message.
-      ignoreRoute: (req: Request) => isOneGovSgCallbackPath(req.path),
-      requestWhitelist: ['method', 'url', 'body', 'headers'],
-      responseWhitelist: ['statusCode'],
-      requestFilter: requestLogFilter,
-      metaField: null, // flatten this log to root instead of nesting under `meta`
-    })
-  )
+  app.use(requestLoggerMiddleware)
 
   app.use(
     helmet({

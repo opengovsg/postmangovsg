@@ -1,9 +1,6 @@
 import { i18n } from '@lingui/core'
-
 import cx from 'classnames'
-
 import { useEffect, useState, useContext } from 'react'
-
 import { OutboundLink } from 'react-ga'
 
 import styles from './AddCredentialModal.module.scss'
@@ -13,7 +10,6 @@ import ConfirmImage from 'assets/img/confirm-modal.svg'
 import FailureImage from 'assets/img/failure.png'
 import SuccessImage from 'assets/img/success.png'
 import { ChannelType, channelIcons } from 'classes'
-
 import {
   PrimaryButton,
   TextButton,
@@ -27,7 +23,6 @@ import TelegramCredentialsInput from 'components/dashboard/create/telegram/Teleg
 import TelegramValidationInput from 'components/dashboard/create/telegram/TelegramValidationInput'
 import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
-
 import {
   getStoredCredentials as getSmsStoredCredentials,
   storeCredentials as storeSmsCredentials,

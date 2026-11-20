@@ -167,7 +167,7 @@ export const InitEmailTransactionalMiddleware = (
                 emailMessageTransactionalId: emailMessageTransactional.id,
                 email: c,
                 ccType: CcType.Cc,
-              } as EmailMessageTransactionalCc)
+              }) as EmailMessageTransactionalCc
           )
         : []
     )
@@ -180,7 +180,7 @@ export const InitEmailTransactionalMiddleware = (
                 emailMessageTransactionalId: emailMessageTransactional.id,
                 email: c,
                 ccType: CcType.Bcc,
-              } as EmailMessageTransactionalCc)
+              }) as EmailMessageTransactionalCc
           )
         : []
     )
@@ -238,7 +238,7 @@ export const InitEmailTransactionalMiddleware = (
       const isMainRecipientBlacklisted =
         blacklistedRecipients.includes(recipient)
       if (isMainRecipientBlacklisted) {
-        void EmailMessageTransactional.update(
+        await EmailMessageTransactional.update(
           {
             errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
           },
@@ -248,7 +248,7 @@ export const InitEmailTransactionalMiddleware = (
         )
         throw new InvalidRecipientError('Recipient email is blacklisted')
       }
-      void EmailMessageTransactionalCc.update(
+      await EmailMessageTransactionalCc.update(
         {
           errorCode: BLACKLISTED_RECIPIENT_ERROR_CODE,
         },

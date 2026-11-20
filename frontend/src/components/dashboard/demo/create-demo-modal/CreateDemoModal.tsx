@@ -1,7 +1,5 @@
 import cx from 'classnames'
-
 import { useContext, useEffect, useState } from 'react'
-
 import { useNavigate } from 'react-router-dom'
 
 import styles from './CreateDemoModal.module.scss'
@@ -16,7 +14,6 @@ import {
 } from 'components/common'
 import DemoVideoModal from 'components/dashboard/demo/demo-video-modal'
 import { ModalContext } from 'contexts/modal.context'
-
 import { createCampaign } from 'services/campaign.service'
 
 const CreateDemoModal = ({

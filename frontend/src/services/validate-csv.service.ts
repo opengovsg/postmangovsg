@@ -1,5 +1,4 @@
 import { i18n } from '@lingui/core'
-
 import {
   TemplateClient,
   TemplateError,

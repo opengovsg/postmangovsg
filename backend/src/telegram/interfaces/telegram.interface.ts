@@ -14,8 +14,7 @@ export interface StoreTemplateOutput {
   valid?: boolean
 }
 
-export interface TelegramDuplicateCampaignDetails
-  extends DuplicateCampaignDetails {
+export interface TelegramDuplicateCampaignDetails extends DuplicateCampaignDetails {
   telegram_templates: {
     body: string
   }

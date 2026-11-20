@@ -61,9 +61,7 @@ export const InitEmailTemplateMiddleware = (
           body,
           replyTo:
             replyTo ||
-            (
-              await authService.findUser(req.session?.user?.id)
-            )?.email,
+            (await authService.findUser(req.session?.user?.id))?.email,
           from,
           showLogo,
         })

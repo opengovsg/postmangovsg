@@ -70,7 +70,6 @@ export interface CredentialService {
   ): Promise<ApiKey & { plainTextKey: string }>
 }
 
-// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const InitCredentialService = (redisService: RedisService) => {
   const secretsManager = new SecretsManager(configureEndpoint(config))
   const logger = loggerWithLabel(module)

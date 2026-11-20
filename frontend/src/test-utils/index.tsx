@@ -1,7 +1,6 @@
 import { i18n } from '@lingui/core'
 import { I18nProvider } from '@lingui/react'
 import { render as _render, RenderOptions } from '@testing-library/react'
-
 import { rest } from 'msw'
 import { setupServer } from 'msw/node'
 import type { ReactElement } from 'react'

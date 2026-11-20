@@ -1,6 +1,5 @@
 import cx from 'classnames'
 import { useState } from 'react'
-
 import type { MouseEvent as ReactMouseEvent } from 'react'
 
 import styles from './ActionButton.module.scss'

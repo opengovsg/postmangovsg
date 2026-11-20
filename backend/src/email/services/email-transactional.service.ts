@@ -65,7 +65,7 @@ async function sendMessage({
   // this only triggers if the subject or body is empty after sanitization
   // highly unlikely in practice
   if (!sanitizedSubject || !sanitizedBody) {
-    void EmailMessageTransactional.update(
+    await EmailMessageTransactional.update(
       {
         errorCode: EMPTY_MESSAGE_ERROR_CODE,
       },

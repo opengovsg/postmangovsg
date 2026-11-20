@@ -1,5 +1,4 @@
 import cx from 'classnames'
-
 import type { ButtonHTMLAttributes } from 'react'
 
 import defaultStyles from './TextButton.module.scss'

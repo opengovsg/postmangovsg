@@ -1,6 +1,5 @@
 import cx from 'classnames'
 import { useState } from 'react'
-
 import { useParams } from 'react-router-dom'
 
 import styles from './Protected.module.scss'
@@ -10,7 +9,6 @@ import appLogo from 'assets/img/brand/app-logo.svg'
 import landingHero from 'assets/img/landing/landing-hero.png'
 import { TextInputWithButton, ProtectedPreview } from 'components/common'
 import Banner from 'components/landing/banner'
-
 import { fetchMessage } from 'services/decrypt-mail.service'
 
 interface CSSStylesWithZoom extends CSSStyleDeclaration {

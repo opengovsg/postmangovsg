@@ -1,7 +1,5 @@
 import cx from 'classnames'
-
 import { useState, useMemo } from 'react'
-
 import type {
   ButtonHTMLAttributes,
   ReactElement,

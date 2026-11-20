@@ -5,7 +5,7 @@ export const parseFromAddress = (
   email: string
 ): { fromName: string | null; fromAddress: string } => {
   // Regex from https://github.com/validatorjs/validator.js/blob/685c3d2edef67d68c27193d28db84d08c0f4534a/src/lib/isEmail.js#L18
-  // eslint-disable-next-line no-control-regex
+  // oxlint-disable-next-line no-control-regex
   const address = email.match(/^([^\x00-\x1F\x7F-\x9F\cX]+)<(.+)>$/i) // Matches display name if it exists
   if (address !== null) {
     const [, fromName, fromAddress] = address

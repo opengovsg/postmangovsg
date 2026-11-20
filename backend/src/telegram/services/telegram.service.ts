@@ -52,12 +52,12 @@ const getHydratedMessage = async (
   const params = await getParams(campaignId)
   if (params === null || template === null) return null
 
-  /* eslint-disable @typescript-eslint/no-non-null-assertion */
+  /* oxlint-disable typescript/no-non-null-assertion */
   const body = TelegramTemplateService.client.template(
     template?.body as string,
     params
   )
-  /* eslint-enable @typescript-eslint/no-non-null-assertion */
+  /* oxlint-enable typescript/no-non-null-assertion */
   return { body }
 }
 
@@ -218,7 +218,7 @@ const uploadCompleteOnPreview = ({
   campaignId: number
 }): ((data: CSVParams[]) => Promise<void>) => {
   return async (data: CSVParams[]): Promise<void> => {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    // oxlint-disable-next-line typescript/no-non-null-assertion
     UploadService.checkTemplateKeysMatch(data, template.params!)
 
     TelegramTemplateService.testHydration(

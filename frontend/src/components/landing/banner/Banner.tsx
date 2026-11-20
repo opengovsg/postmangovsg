@@ -1,5 +1,4 @@
 import cx from 'classnames'
-
 import { RefObject, useState } from 'react'
 
 import styles from './Banner.module.scss'

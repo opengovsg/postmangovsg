@@ -1,6 +1,15 @@
 import { Request } from 'express'
 import { ensureAttachmentsFieldIsArray } from '@core/utils/attachment'
 
+// Request body fields kept out of the request log: message content and credentials
+const REDACTED_BODY_FIELDS = [
+  'body',
+  'otp',
+  'password_hash',
+  'twilio_api_secret',
+  'telegram_bot_token',
+]
+
 /**
  * requestFilter for express-winston's request logger.
  *
@@ -35,10 +44,14 @@ export const requestLogFilter = (req: Request, propName: string): any => {
       })
     )
   }
-  if (propName === 'body' && req.body?.body) {
-    // An example of req.body.body is the email body of an email that a user wishes to send
-    // We should redact such content as it may contain sensitive information
-    req.body.body = '[REDACTED]'
+  if (propName === 'body' && req.body) {
+    // Redacted in place: express-winston reads req.body again for the logged body, and
+    // this runs when the response ends, after the handlers have read the values
+    for (const field of REDACTED_BODY_FIELDS) {
+      if (req.body[field]) {
+        req.body[field] = '[REDACTED]'
+      }
+    }
   }
   return (req as any)[propName]
 }

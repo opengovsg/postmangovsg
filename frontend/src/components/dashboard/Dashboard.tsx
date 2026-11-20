@@ -2,9 +2,7 @@ import { createRef, useEffect } from 'react'
 import { Route, Routes } from 'react-router-dom'
 
 import Campaigns from './campaigns'
-
 import Create from './create'
-
 import Settings from './settings'
 
 import { InfoBanner, NavBar } from 'components/common'

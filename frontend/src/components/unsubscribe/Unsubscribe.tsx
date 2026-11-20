@@ -1,9 +1,7 @@
 import querystring from 'querystring'
 
 import { Trans } from '@lingui/macro'
-
 import { useState } from 'react'
-
 import { useParams, useLocation } from 'react-router-dom'
 
 import styles from './Unsubscribe.module.scss'
@@ -18,7 +16,6 @@ import {
   TextInput,
 } from 'components/common'
 import Banner from 'components/landing/banner'
-
 import {
   subscribeAgain,
   unsubscribeRequest,

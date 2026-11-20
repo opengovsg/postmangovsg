@@ -21,6 +21,13 @@ const TOTAL_ATTACHMENT_SIZE_LIMIT = config.get(
 
 const s3 = new S3({ ...configureEndpoint(config) })
 
+// The stored type is whatever the uploader's browser declared, so only media,
+// PDF and plain text are rendered inline. A subtype containing `+`, such as
+// image/svg+xml, can be an XML document that runs script, so it never matches.
+// Anything else is downloaded so an uploaded page never runs on our origin.
+const INLINE_CONTENT_TYPE =
+  /^((image|audio|video)\/[a-z0-9.-]+|application\/pdf|text\/plain)$/
+
 const getFileUploadHandler = (fileSize: number, fieldSize: number) =>
   fileUpload({
     limits: {
@@ -131,6 +138,21 @@ async function storeCampaignEmbed(
   })
 }
 
+// busboy decodes a multipart filename as latin1, so a UTF-8 name such as
+// 通知.txt is stored as é€šçŸ¥.txt. Recover the UTF-8 name when the stored
+// bytes are valid UTF-8, and keep the name as stored otherwise.
+// https://github.com/mscdex/busboy#exports
+function decodeUploadedFileName(name: string): string {
+  if (/[\u0100-\uffff]/.test(name)) return name
+  try {
+    return new TextDecoder('utf-8', { fatal: true }).decode(
+      Buffer.from(name, 'latin1')
+    )
+  } catch {
+    return name
+  }
+}
+
 async function streamCampaignEmbed(
   req: Request,
   res: Response
@@ -147,10 +169,18 @@ async function streamCampaignEmbed(
     Bucket: config.get('commonAttachments.bucketName'),
     Key: id,
   })
-  res.setHeader('Content-Type', attachment.metadata.type)
+  const isInline = INLINE_CONTENT_TYPE.test(attachment.metadata.type)
+  res.setHeader(
+    'Content-Type',
+    isInline ? attachment.metadata.type : 'application/octet-stream'
+  )
+  // RFC 5987 encoding: a raw non-ASCII name makes setHeader throw
+  const fileName = encodeURIComponent(
+    decodeUploadedFileName(attachment.originalFileName)
+  ).replace(/['()*]/g, (c) => `%${c.charCodeAt(0).toString(16).toUpperCase()}`)
   res.setHeader(
     'Content-Disposition',
-    `inline; filename=${attachment.originalFileName}`
+    `${isInline ? 'inline' : 'attachment'}; filename*=UTF-8''${fileName}`
   )
   ;(obj.Body as Readable).pipe(res)
   return res

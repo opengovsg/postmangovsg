@@ -13,11 +13,10 @@ import {
   CampaignStats,
   CampaignStatsCount,
 } from '@core/interfaces'
-import { GovsgMessageStatus, JobStatus, MessageStatus } from '@core/constants'
+import { JobStatus, MessageStatus } from '@core/constants'
 import { Writable } from 'stream'
 import { waitForMs } from '@shared/utils/wait-for-ms'
 import { EmailMessage } from '@email/models'
-import { GovsgOp } from '@govsg/models/govsg-op'
 
 /**
  * Helper method to get precomputed number of errored , sent, and unsent from statistic table.
@@ -54,9 +53,8 @@ const getStatsFromArchive = async (
  * @param campaignId
  */
 const getNumRecipients = async (campaignId: number): Promise<number> => {
-  const { error, unsent, sent, invalid, delivered } = await getStatsFromArchive(
-    campaignId
-  )
+  const { error, unsent, sent, invalid, delivered } =
+    await getStatsFromArchive(campaignId)
   return error + unsent + sent + invalid + (delivered ?? 0)
 }
 
@@ -94,71 +92,6 @@ const getStatsFromTable = async (
   campaignId: number,
   model: any
 ): Promise<CampaignStatsCount> => {
-  if (model === GovsgOp) {
-    const [data] = await model.findAll({
-      raw: true,
-      where: { campaignId },
-      attributes: [
-        [fn('sum', cast({ status: GovsgMessageStatus.Error }, 'int')), 'error'],
-        [
-          fn(
-            'sum',
-            cast(
-              {
-                [Op.or]: [
-                  { status: GovsgMessageStatus.Sent },
-                  { status: GovsgMessageStatus.Accepted },
-                ],
-              },
-              'int'
-            )
-          ),
-          'sent',
-        ],
-        [
-          fn('sum', cast({ status: GovsgMessageStatus.Unsent }, 'int')),
-          'unsent',
-        ],
-        [
-          fn(
-            'sum',
-            cast({ status: GovsgMessageStatus.InvalidRecipient }, 'int')
-          ),
-          'invalid',
-        ],
-        [
-          fn('sum', cast({ status: GovsgMessageStatus.Delivered }, 'int')),
-          'delivered',
-        ],
-        [
-          fn(
-            'sum',
-            cast(
-              {
-                [Op.or]: [
-                  { status: GovsgMessageStatus.Read },
-                  { status: GovsgMessageStatus.Deleted },
-                ],
-              },
-              'int'
-            )
-          ),
-          'read',
-        ],
-      ],
-    })
-
-    return {
-      error: +data.error,
-      sent: +data.sent,
-      unsent: +data.unsent,
-      invalid: +data.invalid,
-      read: +data.read,
-      delivered: +data.delivered,
-      updated_at: new Date(),
-    }
-  }
-
   // Retrieve stats from ops table
   const [data] = await model.findAll({
     raw: true,

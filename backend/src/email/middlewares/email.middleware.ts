@@ -239,7 +239,7 @@ export const InitEmailMiddleware = (
       })
       // db update is only required for transactional email
       if (req.body.emailMessageTransactionalId) {
-        void EmailMessageTransactional.update(
+        await EmailMessageTransactional.update(
           {
             errorCode: `Error 400: ${INVALID_FROM_ADDRESS_ERROR_MESSAGE}`,
           },
@@ -285,7 +285,7 @@ export const InitEmailMiddleware = (
         action: 'existsFromAddress',
       })
       if (req.body.emailMessageTransactionalId) {
-        void EmailMessageTransactional.update(
+        await EmailMessageTransactional.update(
           {
             errorCode: `Error 400: ${UNVERIFIED_FROM_ADDRESS_ERROR_MESSAGE}`,
           },

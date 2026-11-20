@@ -1,7 +1,5 @@
 import cx from 'classnames'
-
 import { capitalize, debounce } from 'lodash'
-
 import {
   MouseEvent as ReactMouseEvent,
   useCallback,
@@ -11,9 +9,7 @@ import {
   useRef,
   useState,
 } from 'react'
-
 import Moment from 'react-moment'
-
 import { Link, useNavigate } from 'react-router-dom'
 
 import styles from './Campaigns.module.scss'
@@ -21,11 +17,8 @@ import overrideStylesTextButton from './OverrideTextButton.module.scss'
 import overrideStylesTextInput from './OverrideTextInput.module.scss'
 import overrideStylesTextInputWithButton from './OverrideTextInputWithButton.module.scss'
 import overrideStylesTitleBar from './OverrideTitleBar.module.scss'
-
 import ActionsButton from './actions-button'
-
 import AnnouncementModal from './announcement-modal'
-
 import DropdownFilter from './dropdown-filter'
 
 import EmptyDashboardImg from 'assets/img/empty-dashboard.png'
@@ -53,13 +46,11 @@ import DemoBar from 'components/dashboard/demo/demo-bar/DemoBar'
 import { ANNOUNCEMENT, getAnnouncementVersion } from 'config'
 import { AuthContext } from 'contexts/auth.context'
 import { ModalContext } from 'contexts/modal.context'
-
 import {
   deleteCampaignById,
   getCampaigns,
   updateCampaign,
 } from 'services/campaign.service'
-
 import { getUserSettings } from 'services/settings.service'
 
 const ITEMS_PER_PAGE = 10
@@ -102,9 +93,6 @@ const Campaigns = () => {
     filterInit
   )
   const [nameFilter, setNameFilter] = useState(searchInit)
-
-  const { experimentalData } = useContext(AuthContext)
-  const canAccessGovsg = !!experimentalData[ChannelType.Govsg]
 
   function getNameFromEmail(email: string): string {
     const parts = email.split('@')
@@ -236,7 +224,7 @@ const Campaigns = () => {
       modeFilter,
       nameFilter
     )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [selectedPage])
 
   useEffect(() => {
@@ -306,7 +294,7 @@ const Campaigns = () => {
 
   const debouncedChangeHandler = useMemo(
     () => debounce(fetchCampaigns, 300),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
     []
   )
 
@@ -325,7 +313,7 @@ const Campaigns = () => {
     )
   }
 
-  /* eslint-disable react/display-name */
+  /* oxlint-disable react/display-name */
   const columns = [
     {
       name: 'Mode',
@@ -349,12 +337,7 @@ const Campaigns = () => {
         <th className={width} key={key}>
           <DropdownFilter
             onSelect={handleModeFilter}
-            options={[
-              filterInit,
-              ...Object.values(ChannelType).filter(
-                (v) => v !== ChannelType.Govsg || canAccessGovsg
-              ),
-            ].map((opt) => ({
+            options={[filterInit, ...Object.values(ChannelType)].map((opt) => ({
               label: displayChannelType(opt),
               value: opt,
             }))}
@@ -530,7 +513,7 @@ const Campaigns = () => {
     },
   ]
 
-  /* eslint-enable react/display-name */
+  /* oxlint-enable react/display-name */
 
   function renderRow(campaign: Campaign, key: number) {
     return (

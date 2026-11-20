@@ -1,5 +1,4 @@
 import { i18n } from '@lingui/core'
-
 import { useEffect, useState } from 'react'
 
 import { TextInput, LabelWithExternalLink } from 'components/common'

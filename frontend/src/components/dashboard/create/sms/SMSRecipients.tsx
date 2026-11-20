@@ -1,10 +1,7 @@
 import { i18n } from '@lingui/core'
-
 import type { Dispatch, SetStateAction } from 'react'
 import { useContext, useEffect, useState } from 'react'
-
 import { OutboundLink } from 'react-ga'
-
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
@@ -72,9 +69,8 @@ const SMSRecipients = ({
     let timeoutId: NodeJS.Timeout
     const pollStatus = async () => {
       try {
-        const { isCsvProcessing, preview, ...newCsvInfo } = await getCsvStatus(
-          +campaignId
-        )
+        const { isCsvProcessing, preview, ...newCsvInfo } =
+          await getCsvStatus(+campaignId)
         // Prevent setting state if unmounted
         if (!isMounted.current) return
 
