@@ -299,8 +299,8 @@ const config: Config<ConfigSchema> = convict({
     sensitive: true,
   },
   frontendUrl: {
-    doc: 'CORS: accept requests from this origin. Can be a string, or regex',
-    default: '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/',
+    doc: 'CORS: the one exact origin allowed to make credentialed requests',
+    default: 'https://legacy.postman.gov.sg',
     env: 'FRONTEND_URL',
   },
   protectedUrl: {
@@ -747,8 +747,9 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 switch (config.get('env')) {
   case 'staging':
     config.load({
-      protectedUrl: 'https://staging.postman.gov.sg/p',
-      unsubscribeUrl: 'https://staging.postman.gov.sg/unsubscribe',
+      frontendUrl: 'https://legacy-staging.postman.gov.sg',
+      protectedUrl: 'https://legacy-staging.postman.gov.sg/p',
+      unsubscribeUrl: 'https://legacy-staging.postman.gov.sg/unsubscribe',
       aws: {
         uploadBucket: 'postmangovsg-dev-upload',
         logGroupName: 'postmangovsg-beanstalk-staging',
