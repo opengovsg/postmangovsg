@@ -196,7 +196,9 @@ export const InitAuthService = (redisService: RedisService): AuthService => {
    * @param req
    */
   const checkCookie = (req: Request): boolean => {
-    return req.session?.user?.id !== undefined
+    // API key requests no longer create sessions, but ones they created before this check
+    // stay in the store until they expire
+    return req.session?.user?.id !== undefined && !req.session.apiKey
   }
 
   /**

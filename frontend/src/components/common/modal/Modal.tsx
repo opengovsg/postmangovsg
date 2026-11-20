@@ -1,5 +1,4 @@
 import cx from 'classnames'
-
 import type { ReactNode } from 'react'
 
 import styles from './Modal.module.scss'

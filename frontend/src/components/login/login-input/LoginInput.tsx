@@ -1,8 +1,6 @@
 import { Trans, t } from '@lingui/macro'
 import cx from 'classnames'
-
 import { noop } from 'lodash'
-
 import React, { useState, useContext, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 
@@ -22,7 +20,6 @@ import {
   ONE_GOV_SG_START_PATH,
 } from 'config'
 import { AuthContext } from 'contexts/auth.context'
-
 import { ModalContext } from 'contexts/modal.context'
 import {
   getOtpWithEmail,
@@ -31,7 +28,6 @@ import {
   getUser,
   setUserAnalytics,
 } from 'services/auth.service'
-
 import {
   GA_USER_EVENTS,
   sendUserEvent,
@@ -41,11 +37,8 @@ import {
 const RESEND_WAIT_TIME = 30000
 
 const Login = () => {
-  const {
-    setAuthenticated,
-    setEmail: setAuthContextEmail,
-    setExperimentalData,
-  } = useContext(AuthContext)
+  const { setAuthenticated, setEmail: setAuthContextEmail } =
+    useContext(AuthContext)
 
   const [otpSent, setOtpSent] = useState(false)
   const [email, setEmail] = useState('')
@@ -97,9 +90,6 @@ const Login = () => {
       setAuthenticated(true)
       setAuthContextEmail(email)
       const user = await getUser()
-      setExperimentalData(
-        user?.experimental_data as { [feature: string]: Record<string, string> }
-      )
       setUserAnalytics(user)
     } catch (err) {
       openErrorModal((err as Error).message)
@@ -117,9 +107,6 @@ const Login = () => {
       }
       setAuthenticated(true)
       setAuthContextEmail(user.email)
-      setExperimentalData(
-        user.experimental_data as { [feature: string]: Record<string, string> }
-      )
       setUserAnalytics(user)
       navigate('/campaigns', { replace: true })
     } catch (err) {
@@ -134,7 +121,7 @@ const Login = () => {
     if (pathname === ONE_GOV_SG_CALLBACK_PATH) {
       void loginOneGovSg(takeOneGovSgCallbackParams())
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [])
 
   function resetButton() {

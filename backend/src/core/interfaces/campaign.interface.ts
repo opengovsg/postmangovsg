@@ -1,8 +1,3 @@
-import {
-  GovsgTemplateLanguageMetadata,
-  GovsgTemplateParamMetadata,
-} from '@govsg/models'
-
 export interface CampaignS3ObjectInterface {
   key?: string
   bucket?: string
@@ -40,14 +35,6 @@ export interface CampaignDetails {
   }
   sms_templates?: {
     body: string
-  }
-  govsg_templates?: {
-    id: number
-    body: string
-    params: Array<string> | null
-    for_single_recipient: boolean
-    param_metadata: Record<string, GovsgTemplateParamMetadata>
-    languages: GovsgTemplateLanguageMetadata[]
   }
   job_queue?: {
     status: string

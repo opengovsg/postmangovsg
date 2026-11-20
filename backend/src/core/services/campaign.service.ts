@@ -247,13 +247,25 @@ const listCampaigns = ({
 
   const order: Order = ((sortBy, orderBy) => {
     orderBy = orderBy || Ordering.DESC // default to descending
-    if (!sortBy) return [[CampaignSortField.Created, orderBy]]
+    // Campaigns created in the same millisecond tie on created_at, and Postgres
+    // returns ties in any order, so break ties on id to keep pages stable
+    if (!sortBy)
+      return [
+        [CampaignSortField.Created, orderBy],
+        ['id', orderBy],
+      ]
     switch (sortBy) {
       case CampaignSortField.Sent: {
-        return [[literal('"job_queue.sent_at"'), orderBy]]
+        return [
+          [literal('"job_queue.sent_at"'), orderBy],
+          ['id', orderBy],
+        ]
       }
       case CampaignSortField.Created: {
-        return [[CampaignSortField.Created, orderBy]]
+        return [
+          [CampaignSortField.Created, orderBy],
+          ['id', orderBy],
+        ]
       }
     }
   })(sortBy, orderBy)

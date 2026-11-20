@@ -1,11 +1,8 @@
 import { i18n } from '@lingui/core'
-
 import { useContext, useState, useEffect } from 'react'
 
 import styles from './AnnouncementModal.module.scss'
-
 import GraphicAnnouncementModal from './GraphicAnnouncementModal'
-
 import VideoAnnouncementModal from './VideoAnnouncementModal'
 
 import { ErrorBlock } from 'components/common'

@@ -1,9 +1,7 @@
 import axios, { AxiosError } from 'axios'
-
 // require buffer with trailing slash to ensure use of the npm module named buffer
 // instead of the node.js core module named buffer
 import { Buffer } from 'buffer/'
-
 import Papa from 'papaparse'
 import SparkMD5 from 'spark-md5'
 

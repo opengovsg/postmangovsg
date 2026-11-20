@@ -145,7 +145,7 @@ export const ImageBlock = ({
     // with new readOnly value somehow.
     const newState = EditorState.moveSelectionToEnd(editorState)
     setEditorState(newState)
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // oxlint-disable-next-line react/exhaustive-deps
   }, [showPopover, setEditorReadonlyMode])
 
   function hidePopover() {

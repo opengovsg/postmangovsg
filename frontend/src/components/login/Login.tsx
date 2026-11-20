@@ -1,5 +1,4 @@
 import LoginTemplate from './LoginTemplate'
-
 import LoginInput from './login-input'
 
 import ModalContextProvider from 'contexts/modal.context'

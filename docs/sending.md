@@ -45,14 +45,15 @@ A user creates a campaign, and associates it with a credential. When 'Send Campa
 ## States of a job
 
 There are six states that a job can be in.
-|Status|Description|
-|--|--|
-|READY| Initial state |
-|ENQUEUED| Chosen by sender worker. Messages are enqueued in ops table|
-|SENDING| Sender worker is picking off messages to send|
-|SENT| Sender worker has finished picking off all the messages for that campaign to send.|Subject to other conditions, logger worker will try to finalize this job|
-|STOPPED|User stopped the job. Logger worker will try to finalize this job|
-|LOGGED|Logger worker has finished copying these messages from ops back to ground truth|
+
+| Status   | Description                                                                        |
+| -------- | ---------------------------------------------------------------------------------- |
+| READY    | Initial state                                                                      |
+| ENQUEUED | Chosen by sender worker. Messages are enqueued in ops table                        |
+| SENDING  | Sender worker is picking off messages to send                                      |
+| SENT     | Sender worker has finished picking off all the messages for that campaign to send. | Subject to other conditions, logger worker will try to finalize this job |
+| STOPPED  | User stopped the job. Logger worker will try to finalize this job                  |
+| LOGGED   | Logger worker has finished copying these messages from ops back to ground truth    |
 
 ## Sender worker
 

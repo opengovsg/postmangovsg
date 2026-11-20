@@ -1,11 +1,9 @@
 import cx from 'classnames'
-
 import { ReactNode, useContext, useState } from 'react'
 
 import styles from './ConfirmModal.module.scss'
 
 import ConfirmImage from 'assets/img/confirm-modal.svg'
-
 import { PrimaryButton, TextButton, ErrorBlock } from 'components/common'
 import FeedbackModal from 'components/common/feedback-modal'
 import { AuthContext } from 'contexts/auth.context'
@@ -93,8 +91,8 @@ const ConfirmModal = ({
               primary
                 ? styles.blueButton
                 : destructive
-                ? styles.redButton
-                : styles.greenButton
+                  ? styles.redButton
+                  : styles.greenButton
             }
             onClick={onConfirmedClicked}
           >

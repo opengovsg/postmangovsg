@@ -1,7 +1,5 @@
 import { i18n } from '@lingui/core'
-
 import cx from 'classnames'
-
 import { useState, useEffect, useContext } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
 import { OutboundLink } from 'react-ga'
@@ -54,9 +52,8 @@ const TelegramCredentials = ({
   const [selectedCredential, setSelectedCredential] = useState('')
   const [creds, setCreds] = useState(null as any)
   const [label, setLabel] = useState('')
-  const [showCredentialFields, setShowCredentialFields] = useState(
-    !hasCredential
-  )
+  const [showCredentialFields, setShowCredentialFields] =
+    useState(!hasCredential)
   const [isManual, setIsManual] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [sendSuccess, setSendSuccess] = useState(false)

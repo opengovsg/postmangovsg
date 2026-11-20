@@ -18,8 +18,7 @@ export interface StoreTemplateOutput {
   valid?: boolean
 }
 
-export interface EmailDuplicateCampaignDetails
-  extends DuplicateCampaignDetails {
+export interface EmailDuplicateCampaignDetails extends DuplicateCampaignDetails {
   email_templates: {
     body: string
     subject: string

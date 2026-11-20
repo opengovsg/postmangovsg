@@ -10,11 +10,9 @@ import {
 import styles from './ActionsButton.module.scss'
 
 import { Campaign, ChannelType, Status } from 'classes'
-
 import { ExportRecipients } from 'components/common'
 import DuplicateCampaignModal from 'components/dashboard/create/duplicate-campaign-modal'
 import CreateDemoModal from 'components/dashboard/demo/create-demo-modal'
-
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const ActionsButton = ({

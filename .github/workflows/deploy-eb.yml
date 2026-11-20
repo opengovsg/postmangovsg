@@ -49,8 +49,8 @@ jobs:
           - "6379:6379"
         options: --entrypoint redis-server
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version-file: .nvmrc
       - name: Lint lock file
@@ -79,22 +79,21 @@ jobs:
     outputs:
       image_tag: ${{ steps.set-image-tag.outputs.image_tag }}
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@a37ce9120846195fa4ece8f58b268e6043cb2f26 # v3.7.0
+      - uses: actions/setup-node@3235b876344d2a9aa001b8d1453c930bba69e610 # v3.9.1
         with:
           node-version-file: .nvmrc
       - name: Before deploy
         env:
           SECRET_ID: ${{ vars.SECRET_ID }}
-          DD_API_KEY: ${{ secrets.DD_API_KEY }}
         run: |
           cd $DIRECTORY
           cp -R ../shared ./
           sed -i -e "s#@SECRET_ID#$SECRET_ID#g" docker-entrypoint.sh
-          sed -i -e "s#@DD_API_KEY#$DD_API_KEY#g" .ebextensions/99datadog.config
+          sed -i -e "s#@SECRET_ID#$SECRET_ID#g" .ebextensions/99datadog.config
 
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@5fd3084fc36e372ff1fff382a39b10d03659f355 # v2.2.0
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -102,13 +101,13 @@ jobs:
 
       - name: Login to Amazon ECR
         id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@5a88a04c91d5c6f97aae0d9be790e64d9b1d47b7 # v1.7.1
         with:
           mask-password: true
 
       # Anonymous pulls of the node base image hit ECR Public's per-IP data limit on shared runners
       - name: Login to Amazon ECR Public
-        uses: aws-actions/amazon-ecr-login@v1
+        uses: aws-actions/amazon-ecr-login@5a88a04c91d5c6f97aae0d9be790e64d9b1d47b7 # v1.7.1
         with:
           registry-type: public
           mask-password: true
@@ -116,10 +115,10 @@ jobs:
           AWS_REGION: us-east-1
 
       - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v2
+        uses: docker/setup-buildx-action@885d1462b80bc1c1c7f0b00334ad271f09369c55 # v2.10.0
 
       - name: Build and push
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@0a97817b6ade9f46837855d676c4cca3a2471fc9 # v4.2.1
         with:
           context: ${{ env.DIRECTORY }}
           push: true
@@ -169,7 +168,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@5fd3084fc36e372ff1fff382a39b10d03659f355 # v2.2.0
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -183,7 +182,7 @@ jobs:
           CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
           echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
       - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@18e5b85bd914cabf00fccabe72f60b8757dcd3cb
+        uses: einaregilsson/beanstalk-deploy@18e5b85bd914cabf00fccabe72f60b8757dcd3cb # v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -202,7 +201,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
+        uses: aws-actions/configure-aws-credentials@5fd3084fc36e372ff1fff382a39b10d03659f355 # v2.2.0
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
@@ -216,7 +215,7 @@ jobs:
           CURRENT_VERSION_LABEL=$(aws elasticbeanstalk describe-environments --application-name $APP_NAME --environment-names $EB_ENV_NAME --max-items 1 | jq .Environments[0].VersionLabel)
           echo "revert_cmd=aws elasticbeanstalk update-environment --application-name $APP_NAME --environment-name $EB_ENV_NAME --version-label $CURRENT_VERSION_LABEL" >> $GITHUB_OUTPUT
       - name: Deploy to EB
-        uses: einaregilsson/beanstalk-deploy@18e5b85bd914cabf00fccabe72f60b8757dcd3cb
+        uses: einaregilsson/beanstalk-deploy@18e5b85bd914cabf00fccabe72f60b8757dcd3cb # v21
         with:
           aws_access_key: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws_secret_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}

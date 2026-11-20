@@ -1,4 +1,5 @@
 import cx from 'classnames'
+import escapeHTML from 'escape-html'
 import { useState, useEffect } from 'react'
 import type { FC } from 'react'
 
@@ -25,6 +26,7 @@ const preprocessImages = async (html: string): Promise<string> => {
     const placeholder = document.createElement('div')
     placeholder.className = styles.imagePlaceholder
     placeholder.style.width = `${width}%`
+    // src was decoded by the parser above, so escape it before it goes back into HTML
     placeholder.innerHTML = `
       <p>
         <i class="bx bx-image"></i>
@@ -32,8 +34,8 @@ const preprocessImages = async (html: string): Promise<string> => {
       </p>
       <p>${message}</p>
       <p>
-        <a href="${src}" target="_blank" rel="noopener noreferrer">
-          ${src.substring(0, 64) + (src.length > 64 ? '...' : '')}
+        <a href="${escapeHTML(src)}" target="_blank" rel="noopener noreferrer">
+          ${escapeHTML(src.substring(0, 64) + (src.length > 64 ? '...' : ''))}
         </a>
       </p>
     `

@@ -1,6 +1,5 @@
 import { parseFromAddress, formatFromAddress } from '@shared/utils/from-address'
 import { useState, useContext, useEffect } from 'react'
-
 import isEmail from 'validator/lib/isEmail'
 
 import styles from './UpdateCustomFromAddressModal.module.scss'

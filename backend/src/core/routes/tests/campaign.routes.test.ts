@@ -18,6 +18,7 @@ let sequelize: Sequelize
 beforeAll(async () => {
   sequelize = await sequelizeLoader(process.env.JEST_WORKER_ID || '1')
   await User.create({ id: 1, email: 'user@agency.gov.sg' } as User)
+  await User.create({ id: 2, email: 'other@agency.gov.sg' } as User)
 })
 
 afterEach(async () => {
@@ -481,6 +482,92 @@ describe('DELETE /campaigns/:campaignId', () => {
   })
   test('Returns 404 if the campaign ID doesnt exist', async () => {
     const res = await request(app).delete('/campaigns/696969')
+    expect(res.status).toBe(404)
+  })
+})
+
+describe('POST /campaigns/:campaignId/cancel', () => {
+  test.each([
+    { owner: 'the user', userId: 1, status: 200, jobsLeft: 0 },
+    { owner: 'another user', userId: 2, status: 403, jobsLeft: 1 },
+  ])(
+    'Cancelling a campaign owned by $owner returns $status and leaves $jobsLeft jobs',
+    async ({ userId, status, jobsLeft }) => {
+      const campaign = await Campaign.create({
+        name: 'campaign-1',
+        userId,
+        type: ChannelType.Email,
+        valid: false,
+        protect: false,
+      } as Campaign)
+      await JobQueue.create({
+        campaignId: campaign.id,
+        status: JobStatus.Ready,
+      } as JobQueue)
+
+      const res = await request(app).post(`/campaigns/${campaign.id}/cancel`)
+
+      expect(res.status).toBe(status)
+      expect(await JobQueue.count({ where: { campaignId: campaign.id } })).toBe(
+        jobsLeft
+      )
+    }
+  )
+
+  test('Cancelling a missing campaign returns 404', async () => {
+    const res = await request(app).post('/campaigns/999999/cancel')
+    expect(res.status).toBe(404)
+  })
+
+  test('Cancelling with a non-numeric campaign ID returns 400', async () => {
+    const res = await request(app).post('/campaigns/abc/cancel')
+    expect(res.status).toBe(400)
+  })
+})
+
+describe('GET /campaign/:campaignId', () => {
+  const createEmailCampaign = (userId: number) =>
+    Campaign.create({
+      name: 'campaign-1',
+      userId,
+      type: ChannelType.Email,
+      valid: false,
+      protect: false,
+    } as Campaign)
+
+  test("A campaign the caller owns redirects to its channel's route", async () => {
+    const campaign = await createEmailCampaign(1)
+
+    const res = await request(app).get(`/campaign/${campaign.id}/details`)
+
+    expect(res.status).toBe(307)
+    expect(res.headers.location).toBe(`/campaign/${campaign.id}/email/details`)
+  })
+
+  test("Another user's campaign returns 404 without revealing its channel", async () => {
+    const campaign = await createEmailCampaign(2)
+
+    const res = await request(app).get(`/campaign/${campaign.id}/details`)
+
+    expect(res.status).toBe(404)
+    expect(res.headers.location).toBeUndefined()
+  })
+
+  test('A campaign of a removed channel returns 404 instead of redirecting', async () => {
+    // Production keeps GOVSG in the enum; sync() builds it from ChannelType
+    await sequelize.query(
+      `ALTER TYPE "enum_campaigns_type" ADD VALUE IF NOT EXISTS 'GOVSG'`
+    )
+    const campaign = await Campaign.create({
+      name: 'campaign-1',
+      userId: 1,
+      type: 'GOVSG' as ChannelType,
+      valid: false,
+      protect: false,
+    } as Campaign)
+
+    const res = await request(app).get(`/campaign/${campaign.id}`)
+
     expect(res.status).toBe(404)
   })
 })

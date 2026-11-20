@@ -1,5 +1,4 @@
 import cx from 'classnames'
-
 import { NavLink, useNavigate } from 'react-router-dom'
 
 import styles from './SideNav.module.scss'

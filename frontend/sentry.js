@@ -1,4 +1,4 @@
-/* eslint-disable */
+/* oxlint-disable */
 const SentryClient = require('@sentry/cli')
 
 async function createReleaseAndUpload() {

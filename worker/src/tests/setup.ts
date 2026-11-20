@@ -1,7 +1,7 @@
 import { config } from 'dotenv'
 // manually import config here
 config()
-/* eslint-disable no-console */
+/* oxlint-disable no-console */
 global.console = {
   ...global.console,
   log: jest.fn(), // console.log are ignored in tests

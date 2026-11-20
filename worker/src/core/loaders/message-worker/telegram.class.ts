@@ -23,9 +23,8 @@ class Telegram {
    * Fetches bot token and instantiates a Telegram client.
    */
   async setSendingService(credentialName: string): Promise<void> {
-    const botToken = await CredentialService.getTelegramCredentials(
-      credentialName
-    )
+    const botToken =
+      await CredentialService.getTelegramCredentials(credentialName)
     this.telegramClient = new TelegramClient(botToken)
   }
 

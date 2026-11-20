@@ -163,24 +163,6 @@ interface ConfigSchema {
     maxFileSize: number
     bucketName: string
   }
-  whatsapp: {
-    namespace: string
-    adminCredentialsOne: string
-    adminCredentialsTwo: string
-    onPremClientOneUrl: string
-    onPremClientTwoUrl: string
-    proxyToken: string
-    proxyUrl: string
-    authTokenOne: string
-    authTokenOneExpiry: string
-    authTokenTwo: string
-    authTokenTwoExpiry: string
-    callbackVerifyToken: string
-    precallTemplateLabel: string
-  }
-  flamingo: {
-    dbUri: string
-  }
 }
 
 convict.addFormats({
@@ -753,87 +735,6 @@ const config: Config<ConfigSchema> = convict({
       doc: 'S3 bucket to store common attachments',
       default: 'development.common-attachments',
       env: 'COMMON_ATTACHMENT_BUCKET_NAME',
-    },
-  },
-  whatsapp: {
-    adminCredentialsOne: {
-      doc: 'Admin credentials for retrieving WhatsApp tokens for client 1',
-      env: 'WA_ADMIN_CREDS_1',
-      format: 'required-string',
-      default: '',
-    },
-    adminCredentialsTwo: {
-      doc: 'Admin credentials for retrieving WhatsApp tokens for client 2',
-      env: 'WA_ADMIN_CREDS_2',
-      format: 'required-string',
-      default: '',
-    },
-    namespace: {
-      doc: 'WhatsApp Account Namespace',
-      env: 'WHATSAPP_NAMESPACE',
-      format: 'required-string',
-      default: '',
-    },
-    onPremClientOneUrl: {
-      doc: 'Load balancer URL for WhatsApp On Prem Client 1',
-      env: 'WHATSAPP_LB_URL_1',
-      format: 'required-string',
-      default: '',
-    },
-    onPremClientTwoUrl: {
-      doc: 'Load balancer URL for WhatsApp On Prem Client 2',
-      env: 'WHATSAPP_LB_URL_2',
-      format: 'required-string',
-      default: '',
-    },
-    authTokenOne: {
-      doc: 'WhatsApp Auth Token for client 1, for local dev only',
-      env: 'WA_AUTH_TOKEN_1',
-      default: '',
-    },
-    authTokenOneExpiry: {
-      doc: 'WhatsApp Auth Token expiry for client 1, for local dev only',
-      env: 'WA_AUTH_TOKEN_1_EXPIRY',
-      default: '',
-    },
-    authTokenTwo: {
-      doc: 'WhatsApp Auth Token for client 2, for local dev only',
-      env: 'WA_AUTH_TOKEN_2',
-      default: '',
-    },
-    authTokenTwoExpiry: {
-      doc: 'WhatsApp Auth Token expiry for client 2, for local dev only',
-      env: 'WA_AUTH_TOKEN_2_EXPIRY',
-      default: '',
-    },
-    proxyToken: {
-      doc: 'Proxy token for accessing WhatsApp On Prem Client via proxy',
-      env: 'WHATSAPP_PROXY_TOKEN',
-      default: '',
-    },
-    proxyUrl: {
-      doc: 'Proxy URL for accessing WhatsApp On Prem Client via proxy',
-      env: 'WHATSAPP_PROXY_URL',
-      default: '',
-    },
-    callbackVerifyToken: {
-      doc: 'Callback verify token for WhatsApp On Prem Client',
-      env: 'WHATSAPP_CALLBACK_VERIFY_TOKEN',
-      default: '',
-    },
-    precallTemplateLabel: {
-      doc: 'WhatsApp template name for pre-call notification',
-      env: 'WA_PRECALL_TEMPLATE_LABEL',
-      format: 'required-string',
-      default: '',
-    },
-  },
-  flamingo: {
-    dbUri: {
-      doc: 'URI to the flamingo database',
-      default: '',
-      format: 'required-string',
-      env: 'FLAMINGO_DB_URI',
     },
   },
 })

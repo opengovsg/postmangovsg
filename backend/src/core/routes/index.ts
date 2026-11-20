@@ -4,7 +4,6 @@ import { ChannelType } from '@core/constants'
 import { Campaign } from '@core/models'
 import {
   AuthType,
-  ExperimentMiddleware,
   InitAuthMiddleware,
   InitSettingsMiddleware,
 } from '@core/middlewares'
@@ -46,13 +45,6 @@ import { InitTelegramMiddleware } from '@telegram/middlewares'
 import { InitApiKeyRoute } from '@core/routes/api-key.routes'
 import { InitApiKeyMiddleware } from '@core/middlewares/api-key.middleware'
 import { InitCommonAttachmentRoute } from './common-attachment.routes'
-import {
-  govsgCallbackRoutes,
-  govsgCampaignRoutes,
-  govsgTemplateRoutes,
-  InitGovsgMessageTransactionalRoute,
-} from '@govsg/routes'
-import { InitGovsgTransactionalMiddleware } from '@govsg/middlewares/govsg-transactional.middleware'
 
 export const InitV1Route = (app: Application): Router => {
   const logger = loggerWithLabel(module)
@@ -108,10 +100,6 @@ export const InitV1Route = (app: Application): Router => {
   )
   const apiKeyMiddleware = InitApiKeyMiddleware((app as any).credentialService)
   const apiKeyRoutes = InitApiKeyRoute(apiKeyMiddleware)
-  const govsgTransactionalMiddleware = InitGovsgTransactionalMiddleware()
-  const govsgTransactionalRoutes = InitGovsgMessageTransactionalRoute(
-    govsgTransactionalMiddleware
-  )
 
   const CHANNEL_ROUTES = Object.values(ChannelType).map(
     (route) => `/${route.toLowerCase()}`
@@ -147,16 +135,20 @@ export const InitV1Route = (app: Application): Router => {
     const { campaignId } = req.params
 
     const campaign = await Campaign.findOne({
-      where: { id: +campaignId },
+      where: { id: +campaignId, userId: req.session?.user?.id },
       attributes: ['type'],
     })
     if (!campaign) {
-      // This campaign doesn't exist
+      // This campaign doesn't exist or belongs to another user
       logger.error({
         message: 'Campaign does not exist',
         campaignId,
         action: 'redirectToChannelRoute',
       })
+      return res.sendStatus(404)
+    }
+    // GOVSG campaigns remain in the table with no route to serve them
+    if (!Object.values(ChannelType).includes(campaign.type)) {
       return res.sendStatus(404)
     }
 
@@ -214,19 +206,6 @@ export const InitV1Route = (app: Application): Router => {
     telegramCampaignRoutes
   )
   router.use(
-    '/govsg/templates',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
-    ExperimentMiddleware.experimentalUserOnly(ChannelType.Govsg),
-    govsgTemplateRoutes
-  )
-  router.use(
-    '/campaign/:campaignId/govsg',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie]),
-    ExperimentMiddleware.experimentalUserOnly(ChannelType.Govsg),
-    celebrate(campaignIdValidator),
-    govsgCampaignRoutes
-  )
-  router.use(
     '/campaign/:campaignId',
     authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
     celebrate(campaignIdValidator),
@@ -257,20 +236,14 @@ export const InitV1Route = (app: Application): Router => {
 
   router.use(
     '/transactional/sms',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
+    authMiddleware.getAuthMiddleware([AuthType.ApiKey]),
     smsTransactionalRoutes
   )
 
   router.use(
     '/transactional/email',
-    authMiddleware.getAuthMiddleware([AuthType.Cookie, AuthType.ApiKey]),
-    emailTransactionalRoutes
-  )
-
-  router.use(
-    '/transactional/govsg',
     authMiddleware.getAuthMiddleware([AuthType.ApiKey]),
-    govsgTransactionalRoutes
+    emailTransactionalRoutes
   )
 
   router.use('/callback/email', emailCallbackRoutes)
@@ -278,8 +251,6 @@ export const InitV1Route = (app: Application): Router => {
   router.use('/callback/sms', smsCallbackRoutes)
 
   router.use('/callback/telegram', telegramCallbackRoutes)
-
-  router.use('/callback/govsg', govsgCallbackRoutes)
 
   router.use(
     '/api-key',

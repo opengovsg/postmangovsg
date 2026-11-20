@@ -1,8 +1,6 @@
 import { t } from '@lingui/macro'
-
 import { fireEvent, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-
 import { Route, Routes } from 'react-router-dom'
 
 import EmailTemplate from '../EmailTemplate'

@@ -1,4 +1,3 @@
-// eslint-disable-next-line import/order
 import { useContext, useEffect } from 'react'
 
 import { ChannelType, Status } from 'classes/Campaign'
@@ -9,7 +8,6 @@ import usePollCampaignStats from 'components/custom-hooks/use-poll-campaign-stat
 import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
-
 import { retryCampaign } from 'services/campaign.service'
 import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 

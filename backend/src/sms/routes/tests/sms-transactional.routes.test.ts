@@ -26,6 +26,7 @@ let apiKey: string
 let credential: Credential
 
 const app = initialiseServer(false)
+const appWithUserSession = initialiseServer(true)
 
 beforeEach(async () => {
   user = await User.create({
@@ -62,6 +63,7 @@ afterEach(async () => {
 afterAll(async () => {
   await sequelize.close()
   await (app as any).cleanup()
+  await (appWithUserSession as any).cleanup()
 })
 
 describe('POST /transactional/sms/send', () => {
@@ -87,6 +89,15 @@ describe('POST /transactional/sms/send', () => {
       .send({})
 
     expect(res.status).toBe(400)
+  })
+
+  test('Should reject a console login session', async () => {
+    const res = await request(appWithUserSession)
+      .post('/transactional/sms/send')
+      .send(validApiCall)
+
+    expect(res.status).toBe(401)
+    expect(await SmsMessageTransactional.count()).toBe(0)
   })
 
   test('Should send a message successfully', async () => {

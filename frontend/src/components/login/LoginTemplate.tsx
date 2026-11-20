@@ -1,10 +1,7 @@
 import { i18n } from '@lingui/core'
-
 import cx from 'classnames'
 import { createRef, useEffect, useContext } from 'react'
-
 import { OutboundLink } from 'react-ga'
-
 import { Navigate, useLocation } from 'react-router-dom'
 
 import styles from './LoginTemplate.module.scss'

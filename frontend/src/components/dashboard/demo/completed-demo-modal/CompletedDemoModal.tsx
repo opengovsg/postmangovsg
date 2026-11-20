@@ -1,7 +1,5 @@
 import { i18n } from '@lingui/core'
-
 import { useContext, useEffect, useState } from 'react'
-
 import { OutboundLink } from 'react-ga'
 
 import styles from './CompletedDemoModal.module.scss'
@@ -13,7 +11,6 @@ import { PrimaryButton } from 'components/common'
 import DemoVideoModal from 'components/dashboard/demo/demo-video-modal'
 import { LINKS } from 'config'
 import { ModalContext } from 'contexts/modal.context'
-
 import { getUserSettings } from 'services/settings.service'
 
 const CompletedDemoModal = ({
