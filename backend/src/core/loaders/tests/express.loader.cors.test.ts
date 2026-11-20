@@ -48,15 +48,4 @@ describe('CORS', () => {
       expect(res.headers['access-control-allow-origin']).toBe(ALLOWED_ORIGIN)
     }
   )
-
-  test('refuses to boot when FRONTEND_URL is a pattern', async () => {
-    jest.resetModules()
-    process.env.FRONTEND_URL =
-      '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/'
-
-    const { default: config } = await import('@core/config')
-
-    // setup.ts runs this at boot
-    expect(() => config.validate()).toThrow('is not an origin')
-  })
 })

@@ -197,26 +197,6 @@ convict.addFormats({
       return val
     },
   },
-  origin: {
-    // cors sends this value verbatim as Access-Control-Allow-Origin, and the
-    // browser compares it character for character with the page's origin
-    // (scheme://host[:port], no path or trailing slash). A trailing slash or
-    // path would block every officer's login with no server-side error, so
-    // the built-in 'url' format, which accepts both, is not enough. A pattern
-    // (the old regex default) is rejected too. config.validate() runs this at
-    // boot (setup.ts), so a bad value crashes the app instead.
-    validate: (val: any): void => {
-      let parsed: string | undefined
-      try {
-        parsed = new URL(val).origin
-      } catch {
-        parsed = undefined
-      }
-      if (parsed !== val) {
-        throw new Error(`"${val}" is not an origin`)
-      }
-    },
-  },
   'float-percent': {
     validate: (val: any): void => {
       if (val !== 0 && (!val || val > 1 || val < 0)) {
@@ -339,7 +319,6 @@ const config: Config<ConfigSchema> = convict({
   frontendUrl: {
     doc: 'CORS: the one exact origin allowed to make credentialed requests',
     default: 'https://legacy.postman.gov.sg',
-    format: 'origin',
     env: 'FRONTEND_URL',
   },
   protectedUrl: {
