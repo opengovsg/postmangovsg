@@ -1,16 +1,13 @@
 import request from 'supertest'
 import express from 'express'
 
-const ALLOWED_ORIGINS = [
-  'https://legacy.postman.gov.sg',
-  'https://legacy-staging.postman.gov.sg',
-]
+const ALLOWED_ORIGIN = 'https://legacy.postman.gov.sg'
 
 describe('CORS', () => {
   let app: express.Application
 
   beforeAll(async () => {
-    process.env.FRONTEND_URL = ALLOWED_ORIGINS.join(',')
+    process.env.FRONTEND_URL = ALLOWED_ORIGIN
     const { default: expressLoader } = await import(
       '@core/loaders/express.loader'
     )
@@ -34,22 +31,21 @@ describe('CORS', () => {
     await (app as any).redisService.shutdown()
   })
 
-  test.each(ALLOWED_ORIGINS)(
-    'allows credentialed requests from %s',
-    async (origin) => {
-      const res = await request(app).get('/').set('Origin', origin)
+  test('allows credentialed requests from the configured origin', async () => {
+    const res = await request(app).get('/').set('Origin', ALLOWED_ORIGIN)
 
-      expect(res.headers['access-control-allow-origin']).toBe(origin)
-      expect(res.headers['access-control-allow-credentials']).toBe('true')
-    }
-  )
+    expect(res.headers['access-control-allow-origin']).toBe(ALLOWED_ORIGIN)
+    expect(res.headers['access-control-allow-credentials']).toBe('true')
+  })
 
+  // A string origin is sent as-is, never reflected, so the browser rejects
+  // the response for any other origin
   test.each(['https://xss.postman.gov.sg', 'https://postman.gov.sg'])(
-    'sends no Access-Control-Allow-Origin to %s',
+    'does not reflect %s in Access-Control-Allow-Origin',
     async (origin) => {
       const res = await request(app).get('/').set('Origin', origin)
 
-      expect(res.headers['access-control-allow-origin']).toBeUndefined()
+      expect(res.headers['access-control-allow-origin']).toBe(ALLOWED_ORIGIN)
     }
   )
 
@@ -58,6 +54,9 @@ describe('CORS', () => {
     process.env.FRONTEND_URL =
       '/^https:\\/\\/([A-z0-9-]+\\.)?(postman\\.gov\\.sg)$/'
 
-    await expect(import('@core/config')).rejects.toThrow('is not an origin')
+    const { default: config } = await import('@core/config')
+
+    // setup.ts runs this at boot
+    expect(() => config.validate()).toThrow('is not an origin')
   })
 })

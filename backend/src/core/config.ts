@@ -48,7 +48,7 @@ interface ConfigSchema {
     useIam: boolean
   }
   jwtSecret: string
-  frontendUrl: string[]
+  frontendUrl: string
   protectedUrl: string
   unsubscribeUrl: string
   session: {
@@ -197,30 +197,20 @@ convict.addFormats({
       return val
     },
   },
-  'origin-list': {
-    // coerce has already rejected anything that is not an origin, so this
-    // only catches an empty list
+  origin: {
+    // One exact origin: a pattern would let every host it matches make
+    // credentialed requests. Throwing here crashes boot on a stale value.
     validate: (val: any): void => {
-      if (!Array.isArray(val) || val.length === 0) {
-        throw new Error('must be a non-empty list of origins')
+      let parsed: string | undefined
+      try {
+        parsed = new URL(val).origin
+      } catch {
+        parsed = undefined
+      }
+      if (parsed !== val) {
+        throw new Error(`"${val}" is not an origin`)
       }
     },
-    // Exact origins only: a pattern would let every host it matches make
-    // credentialed requests. Throwing here crashes boot on a stale value.
-    coerce: (val: string): string[] =>
-      val.split(',').map((v) => {
-        const origin = v.trim()
-        let parsed: string | undefined
-        try {
-          parsed = new URL(origin).origin
-        } catch {
-          parsed = undefined
-        }
-        if (parsed !== origin) {
-          throw new Error(`FRONTEND_URL entry "${origin}" is not an origin`)
-        }
-        return origin
-      }),
   },
   'float-percent': {
     validate: (val: any): void => {
@@ -342,9 +332,9 @@ const config: Config<ConfigSchema> = convict({
     sensitive: true,
   },
   frontendUrl: {
-    doc: 'CORS: comma-separated exact origins allowed to make credentialed requests',
-    default: ['https://legacy.postman.gov.sg'],
-    format: 'origin-list',
+    doc: 'CORS: the one exact origin allowed to make credentialed requests',
+    default: 'https://legacy.postman.gov.sg',
+    format: 'origin',
     env: 'FRONTEND_URL',
   },
   protectedUrl: {
@@ -872,7 +862,7 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 switch (config.get('env')) {
   case 'staging':
     config.load({
-      frontendUrl: ['https://legacy-staging.postman.gov.sg'],
+      frontendUrl: 'https://legacy-staging.postman.gov.sg',
       protectedUrl: 'https://legacy-staging.postman.gov.sg/p',
       unsubscribeUrl: 'https://legacy-staging.postman.gov.sg/unsubscribe',
       aws: {
@@ -893,7 +883,7 @@ switch (config.get('env')) {
     break
   case 'development':
     config.load({
-      frontendUrl: ['http://localhost:3000'],
+      frontendUrl: 'http://localhost:3000',
       protectedUrl: 'http://localhost:3000/p',
       unsubscribeUrl: 'http://localhost:3000/unsubscribe',
       aws: {
