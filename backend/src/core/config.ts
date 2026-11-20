@@ -198,8 +198,13 @@ convict.addFormats({
     },
   },
   origin: {
-    // One exact origin: a pattern would let every host it matches make
-    // credentialed requests. Throwing here crashes boot on a stale value.
+    // cors sends this value verbatim as Access-Control-Allow-Origin, and the
+    // browser compares it character for character with the page's origin
+    // (scheme://host[:port], no path or trailing slash). A trailing slash or
+    // path would block every officer's login with no server-side error, so
+    // the built-in 'url' format, which accepts both, is not enough. A pattern
+    // (the old regex default) is rejected too. config.validate() runs this at
+    // boot (setup.ts), so a bad value crashes the app instead.
     validate: (val: any): void => {
       let parsed: string | undefined
       try {
