@@ -3,7 +3,7 @@ import express from 'express'
 
 const ALLOWED_ORIGINS = [
   'https://legacy.postman.gov.sg',
-  'https://tesseract.postman.gov.sg',
+  'https://legacy-staging.postman.gov.sg',
 ]
 
 describe('CORS', () => {
@@ -11,8 +11,9 @@ describe('CORS', () => {
 
   beforeAll(async () => {
     process.env.FRONTEND_URL = ALLOWED_ORIGINS.join(',')
-    const { default: expressLoader } =
-      await import('@core/loaders/express.loader')
+    const { default: expressLoader } = await import(
+      '@core/loaders/express.loader'
+    )
     const {
       InitAuthService,
       InitOneGovSgService,

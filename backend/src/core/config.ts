@@ -872,10 +872,7 @@ config.set('mailFrom', config.get('mailFrom') || defaultMailFrom)
 switch (config.get('env')) {
   case 'staging':
     config.load({
-      frontendUrl: [
-        'https://legacy-staging.postman.gov.sg',
-        'https://tesseract.postman.gov.sg',
-      ],
+      frontendUrl: ['https://legacy-staging.postman.gov.sg'],
       protectedUrl: 'https://legacy-staging.postman.gov.sg/p',
       unsubscribeUrl: 'https://legacy-staging.postman.gov.sg/unsubscribe',
       aws: {
