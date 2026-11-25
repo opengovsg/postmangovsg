@@ -23,8 +23,8 @@ jobs:
       - name: Extract branch name
         shell: bash
         run: |
-          echo "Running on branch ${{ github.ref }}"
-          if [ "${{ github.ref }}" = "refs/heads/master" ]; then
+          echo "Running on branch $GITHUB_REF"
+          if [ "$GITHUB_REF" = "refs/heads/master" ]; then
             echo "branch=master" >> $GITHUB_OUTPUT
           else
             echo "branch=staging" >> $GITHUB_OUTPUT
