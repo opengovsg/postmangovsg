@@ -1,11 +1,19 @@
-import { Router } from 'express'
+import { Request, Router } from 'express'
 import expressRateLimit from 'express-rate-limit'
 import RedisStore from 'rate-limit-redis'
 import { celebrate, Joi, Segments } from 'celebrate'
 import config from '@core/config'
 import { AuthMiddleware } from '@core/middlewares'
 import { RedisService } from '@core/services'
+import { ApiRateLimitError } from '@core/errors/rest-api.errors'
+import { loggerWithLabel } from '@core/logger'
 import { getRequestIp } from '@core/utils/request'
+
+// Failed OTP verification attempts per client IP
+const VERIFY_OTP_WINDOW_SECONDS = 60
+const VERIFY_OTP_MAX_PER_WINDOW = 10
+
+const logger = loggerWithLabel(module)
 
 export const InitAuthRoutes = (
   authMiddleware: AuthMiddleware,
@@ -37,6 +45,29 @@ export const InitAuthRoutes = (
         .required(),
     }),
   }
+
+  const verifyOtpRateLimit = expressRateLimit({
+    store: new RedisStore({
+      prefix: 'verifyOtp:',
+      client: redisService.rateLimitClient,
+      expiry: VERIFY_OTP_WINDOW_SECONDS,
+      // Fail open: a rate-limit Redis outage must not block login. The option is in
+      // rate-limit-redis 2.1.0 but missing from its 1.7 typings.
+      passIfNotConnected: true,
+    } as RedisStore.Options),
+    windowMs: VERIFY_OTP_WINDOW_SECONDS * 1000,
+    max: VERIFY_OTP_MAX_PER_WINDOW,
+    skipSuccessfulRequests: true,
+    keyGenerator: getRequestIp,
+    handler: (req: Request) => {
+      logger.warn({
+        message: 'Rate limited OTP verification',
+        ip: getRequestIp(req),
+        action: 'verifyOtpRateLimit',
+      })
+      throw new ApiRateLimitError('Too many requests. Please try again later.')
+    },
+  })
 
   // actual routes here
 
@@ -106,7 +137,12 @@ export const InitAuthRoutes = (
    *        "500":
    *           description: Internal Server Error
    */
-  router.post('/login', celebrate(verifyOtpValidator), authMiddleware.verifyOtp)
+  router.post(
+    '/login',
+    verifyOtpRateLimit,
+    celebrate(verifyOtpValidator),
+    authMiddleware.verifyOtp
+  )
 
   /**
    * paths:
