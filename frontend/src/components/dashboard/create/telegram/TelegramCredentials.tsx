@@ -2,7 +2,6 @@ import { i18n } from '@lingui/core'
 import cx from 'classnames'
 import { useState, useEffect, useContext } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
@@ -176,13 +175,13 @@ const TelegramCredentials = ({
                   Please provide your Telegram bot token for validation. If you
                   are unsure about how to retrieve your bot token, please follow
                   the instructions provided&nbsp;
-                  <OutboundLink
-                    eventLabel={i18n._(LINKS.guideTelegramUrl)}
-                    to={i18n._(LINKS.guideTelegramUrl)}
+                  <a
+                    href={i18n._(LINKS.guideTelegramUrl)}
                     target="_blank"
+                    rel="noopener noreferrer"
                   >
                     here.
-                  </OutboundLink>
+                  </a>
                 </p>
               </StepHeader>
 
@@ -255,27 +254,27 @@ const TelegramCredentials = ({
                     In demo mode, you can use Postman&apos;s default Telegram
                     bot to try sending Telegram messages. In a normal campaign,
                     you’d have to set up your own Telegram bot.{' '}
-                    <OutboundLink
+                    <a
                       className={styles.inputLabelHelpLink}
-                      eventLabel={i18n._(LINKS.guideTelegramUrl)}
-                      to={i18n._(LINKS.guideTelegramUrl)}
+                      href={i18n._(LINKS.guideTelegramUrl)}
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       Learn more
-                    </OutboundLink>
+                    </a>
                   </p>
                   <p>
                     Make sure that you and your recipients are{' '}
                     <b>
                       subscribed to{' '}
-                      <OutboundLink
+                      <a
                         className={styles.inputLabelHelpLink}
-                        eventLabel={i18n._(LINKS.demoTelegramBotUrl)}
-                        to={i18n._(LINKS.demoTelegramBotUrl)}
+                        href={i18n._(LINKS.demoTelegramBotUrl)}
                         target="_blank"
+                        rel="noopener noreferrer"
                       >
                         @postmangovsgbot
-                      </OutboundLink>
+                      </a>
                     </b>{' '}
                     before proceeding. Unsubscribed recipients will not receive
                     your message.

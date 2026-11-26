@@ -2,7 +2,6 @@ import cx from 'classnames'
 import moment from 'moment'
 import { useState, useContext, useEffect } from 'react'
 import type { FunctionComponent } from 'react'
-import { OutboundLink } from 'react-ga'
 
 import styles from './ApiKey.module.scss'
 import { CopyModal } from './CopyModal'
@@ -106,13 +105,13 @@ const ApiKey: FunctionComponent = () => {
       <p className={styles.helpText}>
         You can create an API key to access our programmatic email and
         programmatic SMS APIs. For more information, go to our{' '}
-        <OutboundLink
-          eventLabel="https://go.gov.sg/postman-api"
-          to="https://go.gov.sg/postman-api"
+        <a
+          href="https://go.gov.sg/postman-api"
           target="_blank"
+          rel="noopener noreferrer"
         >
           API Guide
-        </OutboundLink>
+        </a>
         .
       </p>
       {apiKeys.length > 0 && (

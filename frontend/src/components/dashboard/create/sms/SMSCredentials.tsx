@@ -2,7 +2,6 @@ import { i18n } from '@lingui/core'
 import cx from 'classnames'
 import { useState, useEffect, useContext } from 'react'
 import type { Dispatch, SetStateAction } from 'react'
-import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 
 import styles from '../Create.module.scss'
@@ -178,14 +177,14 @@ const SMSCredentials = ({
                     try sending SMS messages for free. In a normal campaign,
                     you’d have to add your own credentials by setting up your
                     own Twilio account.{' '}
-                    <OutboundLink
+                    <a
                       className={styles.inputLabelHelpLink}
-                      eventLabel={i18n._(LINKS.guideSmsUrl)}
-                      to={i18n._(LINKS.guideSmsUrl)}
+                      href={i18n._(LINKS.guideSmsUrl)}
                       target="_blank"
+                      rel="noopener noreferrer"
                     >
                       Learn more
-                    </OutboundLink>
+                    </a>
                   </span>
                 </InfoBlock>
               )}

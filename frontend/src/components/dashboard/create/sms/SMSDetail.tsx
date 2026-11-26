@@ -9,7 +9,6 @@ import CompletedDemoModal from 'components/dashboard/demo/completed-demo-modal'
 import { CampaignContext } from 'contexts/campaign.context'
 import { ModalContext } from 'contexts/modal.context'
 import { retryCampaign } from 'services/campaign.service'
-import { GA_USER_EVENTS, sendUserEvent } from 'services/ga.service'
 
 const SMSDetail = () => {
   const { setModalContent } = useContext(ModalContext) // Destructured to avoid the addition of modalContext to useEffect's dependencies
@@ -20,7 +19,6 @@ const SMSDetail = () => {
 
   async function handleRetry() {
     try {
-      sendUserEvent(GA_USER_EVENTS.RETRY_RESUME_SENDING, ChannelType.SMS)
       await retryCampaign(id)
       await refreshCampaignStats()
     } catch (err) {

@@ -9,7 +9,6 @@ import {
   Dispatch,
   SetStateAction,
 } from 'react'
-import { OutboundLink } from 'react-ga'
 import { useParams } from 'react-router-dom'
 
 import styles from './EmailTemplate.module.scss'
@@ -326,14 +325,14 @@ const EmailTemplate = ({
             <InfoBlock className={styles.uploadLogoInfoBlock}>
               Your agency’s logo has not been uploaded. To upload a logo, please
               fill up this{' '}
-              <OutboundLink
+              <a
                 className={styles.uploadLogoLink}
-                eventLabel={i18n._(LINKS.uploadLogoUrl)}
-                to={i18n._(LINKS.uploadLogoUrl)}
+                href={i18n._(LINKS.uploadLogoUrl)}
                 target="_blank"
+                rel="noopener noreferrer"
               >
                 form
-              </OutboundLink>
+              </a>
               .
             </InfoBlock>
           )}
