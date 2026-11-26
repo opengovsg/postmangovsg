@@ -31,8 +31,6 @@ if (process.env.NODE_ENV === 'test') {
     'REACT_APP_TITLE',
     'REACT_APP_DESCRIPTION',
     'REACT_APP_BACKEND_URL',
-    'REACT_APP_SENTRY_DSN',
-    'REACT_APP_SENTRY_RELEASE',
   ].reduce(function (acc: string[], name: string) {
     if (process.env[name] === undefined) acc.push(name)
     return acc
@@ -90,8 +88,6 @@ export const ALLOWED_IMAGE_SOURCES = t`allowedImageSources`
 
 export const GA_INITIALIZE_OPTIONS = gaInitializeOptions
 export const GA_TRACKING_ID = gaTrackingId
-export const SENTRY_DSN = process.env.REACT_APP_SENTRY_DSN as string
-export const SENTRY_RELEASE = process.env.REACT_APP_SENTRY_RELEASE as string
 export const APP_ENV =
   (process.env.REACT_APP_ENVIRONMENT as string) || 'development'
 export const INFO_BANNER = process.env.REACT_APP_INFO_BANNER as string

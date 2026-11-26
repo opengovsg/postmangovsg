@@ -107,7 +107,6 @@ interface ConfigSchema {
     version: string
   }
   domains: string
-  sentryDsn: string
   unsubscribeHmac: {
     version: string
     v1: {
@@ -544,11 +543,6 @@ const config: Config<ConfigSchema> = convict({
     doc: 'Semi-colon separated list of domains that can sign in to the app.',
     default: '.gov.sg',
     env: 'DOMAIN_WHITELIST',
-  },
-  sentryDsn: {
-    doc: 'Sentry DSN for backend',
-    default: '',
-    env: 'SENTRY_DSN',
   },
   unsubscribeHmac: {
     version: {

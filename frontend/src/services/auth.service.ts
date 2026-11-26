@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/browser'
 import axios from 'axios'
 
 import { setGAUserId } from './ga.service'
@@ -57,13 +56,6 @@ async function logout(): Promise<boolean> {
 function setUserAnalytics(user?: { email: string; id: number } | null) {
   // set user id to track logged in user
   setGAUserId(user?.id || null)
-
-  Sentry.configureScope((scope) => {
-    const scopeUser = user?.email
-      ? { email: user?.email, id: `${user?.id}` }
-      : null
-    scope.setUser(scopeUser)
-  })
 }
 
 function errorHandler(e: unknown, customHandlers: any = {}) {
