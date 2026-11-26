@@ -26,9 +26,10 @@ const isAuthenticated = (
 
   const credentials = Buffer.from(secret, 'base64').toString('utf8')
   const [username, password] = credentials.split(':')
+  const plainTextPassword = username + messageId + campaignId
   return compareSha256Hash(
     config.get('smsCallback.callbackSecret'),
-    username + messageId + campaignId,
+    plainTextPassword,
     password
   )
 }
