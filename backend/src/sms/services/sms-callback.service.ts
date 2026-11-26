@@ -1,6 +1,5 @@
 import { Request } from 'express'
 import { Op } from 'sequelize'
-import bcrypt from 'bcrypt'
 import config from '@core/config'
 import {
   SmsMessage,
@@ -28,29 +27,11 @@ const isAuthenticated = (
   const credentials = Buffer.from(secret, 'base64').toString('utf8')
   const [username, password] = credentials.split(':')
   const plainTextPassword = username + messageId + campaignId
-  let isAuthenticated = compareSha256Hash(
+  return compareSha256Hash(
     config.get('smsCallback.callbackSecret'),
     plainTextPassword,
     password
   )
-  // if not passed with the new hash, retry with the old way
-  // TODO: remove this after all campaigns sent with the old way have completed
-  if (!isAuthenticated) {
-    logger.info({
-      message: 'Incorrect sms callback hash',
-      hash: password,
-      messageId,
-      campaignId,
-      username,
-    })
-    const bcryptPlainTextPassword =
-      username +
-      messageId +
-      campaignId +
-      config.get('smsCallback.callbackSecret')
-    isAuthenticated = bcrypt.compareSync(bcryptPlainTextPassword, password)
-  }
-  return isAuthenticated
 }
 
 const isAuthenticatedTransactional = (authHeader?: string): boolean => {
